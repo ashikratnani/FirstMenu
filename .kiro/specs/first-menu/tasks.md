@@ -21,10 +21,10 @@ Deadline: Friday, December 4, 2026, 2:00 PM PT. Target submission: Thursday, Dec
   - [ ] 1.4 After the CI workflow has run once on `main`, ask the maintainer to turn on branch protection for `main` requiring the CI check to pass. (This replaces the earlier save hook: Kiro Web doesn't run hooks, so CI on every PR is where the safety tests run.)
     - _Requirements: 2.6, 4.9, 15.2_
 
-- [ ] 2. Domain types and age
-  - [ ] 2.1 Write `domain/types.ts` with the data models from the design.
+- [x] 2. Domain types and age
+  - [x] 2.1 Write `domain/types.ts` with the data models from the design.
     - _Requirements: 2.2, 2.3, 8.1, 12.6_
-  - [ ] 2.2 Implement `ageInMonths`, `stageFor` and `defaultSlots` in `domain/age.ts`, with tests for month boundaries, end-of-month birthdays and leap years.
+  - [x] 2.2 Implement `ageInMonths`, `stageFor` and `defaultSlots` in `domain/age.ts`, with tests for month boundaries, end-of-month birthdays and leap years.
     - _Requirements: 1.2, 1.3, 8.2_
 
 - [ ] 3. Safety screen
