@@ -30,7 +30,7 @@ Deadline: Friday, December 4, 2026, 2:00 PM PT. Target submission: Thursday, Dec
 - [ ] 3. Safety screen
   - [ ] 3.1 Implement `safety/normalize.ts` (normalize, tokenize, plural-aware phrase matching) with unit tests.
     - _Requirements: 4.1, 4.2_
-  - [ ] 3.2 Write `safety/rules.ts` with the block, reminder and allergen rules and the sources table from the design. Confirm the sources marked "confirm source" (unpasteurized products, egg and meat cooking, 3-day new-food spacing) and record the URLs. Add `RULESET_VERSION`.
+  - [ ] 3.2 Write `safety/rules.ts` with the block, reminder and allergen rules and the sources table from the design. Find sources for the rules marked "confirm source" (unpasteurized products, egg and meat cooking, 3-day new-food spacing) and record the URLs. Any still missing stay active and are tracked in a GitHub issue until task 17.0. Add `RULESET_VERSION`.
     - _Requirements: 4.3, 4.4, 4.5, 4.6, 4.7, 6.4, 7.8_
   - [ ] 3.3 Implement `screenIngredient` and `screenRecipe` in `safety/screen.ts`, including age limits, exceptions and reminder de-duplication.
     - _Requirements: 4.1 – 4.5, 4.8, 5.3, 5.5, 6.3_
@@ -38,12 +38,12 @@ Deadline: Friday, December 4, 2026, 2:00 PM PT. Target submission: Thursday, Dec
     - _Requirements: 4.1 – 4.7_
 
 - [ ] 4. Built-in recipes
-  - [ ] 4.1 Write at least 24 recipes in `data/recipes.ts`: at least 10 per stage, all four meal types, at least half freezer-friendly, all nine allergen groups covered. Set fridge and freezer times from food-safety guidance and note the source in a comment.
-    - _Requirements: 2.1, 2.2, 2.3, 2.5_
-  - [ ] 4.2 Add recipe invariant tests: counts per stage, allergen coverage, no block findings at the youngest age of each tagged stage, valid categories.
-    - _Requirements: 2.1, 2.5, 2.6_
-  - [ ] 4.3 **Checkpoint:** you and your wife review the recipe list and texture notes. Kiro applies the changes.
-    - _Requirements: 2.2_
+  - [ ] 4.1 Search for published baby recipes and add at least 24 to `data/recipes.ts`, following "Built-in recipe sourcing" in the design: at least 10 per stage, all four meal types, all nine allergen groups. Copy ingredients and quantities, rewrite steps in our own words, record the source and any adaptations, skip recipes that would need other changes. If the published recipes can't meet the counts or allergen coverage, stop and report the gap before using tier 3 sources.
+    - _Requirements: 2.1, 2.2, 2.3, 2.5, 2.7, 2.8, 2.9, 2.10_
+  - [ ] 4.2 Add recipe invariant tests: counts per stage, allergen coverage, no block findings at the youngest age of each tagged stage, valid categories, source fields present, storage times sourced.
+    - _Requirements: 2.1, 2.5, 2.6, 2.7, 2.10_
+  - [ ] 4.3 **Checkpoint:** you and your wife review the chosen recipes, their sources and adaptations, and the stage tags. Kiro applies the changes.
+    - _Requirements: 2.2, 2.9_
 
 - [ ] 5. State and storage
   - [ ] 5.1 Implement `domain/storage.ts`: schema version, `migrate`, zod validation, corrupt-data backup, debounced save, storage-unavailable detection. Add tests.
@@ -72,15 +72,15 @@ Deadline: Friday, December 4, 2026, 2:00 PM PT. Target submission: Thursday, Dec
 - [ ] 9. Recipe library and recipe page
   - [ ] 9.1 Build the library with stage and meal-type filters, ghost cards, door badges and pumpkin badges.
     - _Requirements: 2.4, 5.1, 5.3, 7.3, 9.1_
-  - [ ] 9.2 Build the recipe page with ingredients, prep reminders, steps, storage, block reasons and the disclaimer.
-    - _Requirements: 5.3, 6.1, 6.2, 13.1_
+  - [ ] 9.2 Build the recipe page with ingredients, prep reminders, steps, storage, block reasons, the source link and adaptations, and the disclaimer. Add recipe sources to the Sources page.
+    - _Requirements: 2.7, 2.9, 5.3, 6.1, 6.2, 13.1_
   - [ ] 9.3 Build the custom recipe editor: all fields, a "counts as" food per ingredient, screening on save with findings shown, and delete with emptied-slot notice.
     - _Requirements: 3.1 – 3.5, 4.9, 5.6_
 
-- [ ] 10. Week plan (haunted house)
+- [ ] 10. Week plan
   - [ ] 10.1 Implement `domain/plan.ts`: default start date, new week (keep or empty), new-food spacing warnings. Add tests.
     - _Requirements: 7.8, 8.1, 8.5_
-  - [ ] 10.2 Build the week view and slot picker: slot toggles, eligible recipes first, ghosts disabled with reasons, door markers, ghosted-slot replacement prompt, spacing warning.
+  - [ ] 10.2 Build the week view (a plain, bright grid of day cards) and slot picker: slot toggles, eligible recipes first, ghosts disabled with reasons, door markers, ghosted-slot replacement prompt, spacing warning.
     - _Requirements: 5.2, 5.4, 7.8, 8.2 – 8.4_
   - [ ] 10.3 Component tests: a ghosted recipe can't be added; a reaction ghosts planned slots.
     - _Requirements: 5.2, 5.4, 7.6_
@@ -108,7 +108,7 @@ Deadline: Friday, December 4, 2026, 2:00 PM PT. Target submission: Thursday, Dec
     - _Requirements: 6.1, 11.7_
 
 - [ ] 15. Theme art
-  - [ ] 15.1 Draw the SVG set: friendly ghost, mystery door, friendly monsters (one per allergen group plus a generic one), pumpkin badge, lantern, haunted house with 7 windows. Add door-opening and ghost-float animations that turn off under reduced motion.
+  - [ ] 15.1 Draw the SVG set: friendly ghost, mystery door, friendly monsters (one per allergen group plus a generic one), pumpkin badge, lantern. Light, welcoming palette; no haunted house or night scenes. Add door-opening and ghost-float animations that turn off under reduced motion.
     - _Requirements: 14.1, 14.2, 14.3, 14.5_
 
 - [ ] 16. Accessibility and device pass
@@ -116,11 +116,13 @@ Deadline: Friday, December 4, 2026, 2:00 PM PT. Target submission: Thursday, Dec
     - _Requirements: 14.3, 14.4, 14.6, 15.3_
 
 - [ ] 17. Deploy and verify
+  - [ ] 17.0 Release gate: confirm every rule cites a published source with a URL, and switch on the required-source test. If any source is still missing, raise it with you before submission.
+    - _Requirements: 4.7_
   - [ ] 17.1 Merge to `main` and confirm the app loads at `https://ashikratnani.github.io/FirstMenu/`. Plan a week end to end on a phone and open a share link on a second device.
     - _Requirements: 15.1, 15.2_
 
 - [ ] 18. Hackathon deliverables
-  - [ ] 18.1 Update `README.md`: what the app does, app URL, screenshots, disclaimer, sources, license.
+  - [ ] 18.1 Update `README.md`: what the app does, app URL, screenshots, disclaimer, safety and recipe sources, license.
     - _Requirements: 13.1, 15.4_
   - [ ] 18.2 Write `docs/kiro-usage.md`: how the spec drove the build, the steering files, the safety-test hook, and examples of Kiro-generated code and tests.
     - _Requirements: 15.4_

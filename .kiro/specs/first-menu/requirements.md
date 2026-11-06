@@ -11,7 +11,7 @@ Project constraints:
 - Stack: React + TypeScript + Vite, static hosting on GitHub Pages.
 - Repository: public, MIT license, `ashikratnani/FirstMenu`.
 - Hackathon deadline: Friday, December 4, 2026, 2:00 PM PT. Deliverables: a working app URL, a public YouTube demo video under 3 minutes, and a short write-up of how Kiro was used.
-- Theme: cute-spooky (friendly ghosts, pumpkins, a haunted house). Nothing scary.
+- Theme: welcoming, with a light cute-spooky touch (friendly ghosts, pumpkins, mystery doors, friendly monsters). Nothing scary, and no haunted house.
 
 ## Glossary
 
@@ -54,12 +54,16 @@ Project constraints:
 
 #### Acceptance Criteria
 
-1. THE app SHALL ship at least 24 built-in recipes, with at least 10 tagged for each stage.
+1. THE app SHALL ship at least 24 built-in recipes taken from published recipes, with at least 10 tagged for each stage.
 2. EACH recipe SHALL have a title, one or more stages, one or more meal types, an ingredient list (name, optional quantity and unit, grocery category), steps, a texture note, and the number of servings it makes.
 3. EACH recipe MAY have storage info: days it keeps in the fridge, months it keeps in the freezer, and a make-ahead note.
 4. THE library SHALL show recipes for the child's stage by default and SHALL offer a filter to show all stages and to filter by meal type.
 5. THE built-in library SHALL include, across all recipes, at least one recipe containing each of the nine allergen groups.
 6. EVERY built-in recipe SHALL pass the safety screen with no block findings at the youngest age of each stage it is tagged with (6 months for `6–8 months`, 9 months for `9–12 months`).
+7. EACH built-in recipe SHALL come from a published recipe and SHALL record the source title, publisher, URL and retrieval date. The recipe page and the Sources page SHALL show the source with a link.
+8. A built-in recipe SHALL use the source's ingredients and quantities, and SHALL give the steps in the app's own words instead of copying the source text.
+9. A built-in recipe MAY differ from its source only by choosing one of the options the source offers, or by leaving out an ingredient the safety screen blocks. THE recipe page SHALL list each difference, for example "Adapted: water instead of apple juice". A recipe that would need any other change SHALL NOT be included.
+10. Storage times for a built-in recipe SHALL come from the source recipe or from a cited food-safety source.
 
 ### Requirement 3: Custom recipes
 
@@ -211,7 +215,7 @@ Project constraints:
 
 #### Acceptance Criteria
 
-1. THE visual theme SHALL use cute-spooky elements only (friendly ghosts, pumpkins, doors, friendly monsters, a haunted house) and SHALL NOT use frightening imagery, gore or jump scares.
+1. THE visual theme SHALL feel welcoming and SHALL use only friendly cute-spooky elements (friendly ghosts, pumpkins, mystery doors, friendly monsters). It SHALL NOT use haunted houses, night scenes, frightening imagery, gore or jump scares.
 2. EACH theme element SHALL map to a feature as listed in the design.
 3. EVERY state shown by a theme element (ghosted, mystery door, friendly monster, freezer-friendly) SHALL also be shown in text that screen readers announce.
 4. THE app SHALL meet WCAG 2.1 AA color contrast and SHALL be fully usable with a keyboard.

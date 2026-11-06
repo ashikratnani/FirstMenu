@@ -68,7 +68,7 @@ src/
     AppProvider.tsx   context, reducer, persistence effect
     selectors.ts      memoized derived data
   ui/
-    pages/            Home (haunted house), Recipes, RecipeDetail, RecipeEditor,
+    pages/            Home (week grid), Recipes, RecipeDetail, RecipeEditor,
                       Foods, Prep, Grocery, Share, SharedView, Print, Settings,
                       Onboarding, Sources
     components/       GhostCard, MysteryDoor, FriendlyMonster, PumpkinBadge,
@@ -94,7 +94,8 @@ interface Ingredient {
 
 interface Recipe {
   id: string;              // 'b-...' for built-in, uuid for custom
-  source: 'builtin' | 'custom';
+  origin: 'builtin' | 'custom';
+  source?: RecipeSource;   // required for built-in recipes
   title: string;
   stages: StageId[];
   mealTypes: MealType[];
@@ -104,6 +105,15 @@ interface Recipe {
   servings: number;        // servings one batch makes
   storage?: { fridgeDays?: number; freezerMonths?: number };
   makeAheadNote?: string;
+}
+
+interface RecipeSource {
+  title: string;           // the recipe's title at the source
+  publisher: string;       // e.g. "Minnesota Department of Health, WIC Program"
+  url: string;
+  retrieved: string;       // YYYY-MM-DD
+  adaptations: string[];   // e.g. ["Water instead of apple juice"]; empty if unchanged
+  storageSource?: string;  // URL for fridge/freezer times if not from the recipe itself
 }
 
 interface ChildProfile { name?: string; birthDate: string /* YYYY-MM-DD */ }
@@ -139,7 +149,7 @@ interface AppState {
 
 - `ageInMonths(birthDate, onDate)`: whole calendar months between the dates. A baby born 2026-01-15 is 9 months old on 2026-10-15 and 8 months old on 2026-10-14.
 - `stageFor(months)`: `< 9 → '6-8'`, otherwise `'9-12'` (Requirement 1.3).
-- `defaultSlots(stage)`: `6-8 → [breakfast, dinner]`, `9-12 → [breakfast, lunch, dinner, snack]`. These are starting defaults only; the user can change them (Requirement 8.2). **Open question for review: are these the defaults you want?**
+- `defaultSlots(stage)`: `6-8 → [breakfast, dinner]`, `9-12 → [breakfast, lunch, dinner, snack]`. These are starting defaults only; the user can change them (Requirement 8.2). Confirmed in review.
 
 The age used everywhere is `ageInMonths(child.birthDate, plan.startDate)` (Requirement 1.2). A share link carries this number directly.
 
@@ -281,6 +291,40 @@ Matching is whole-word, so a name the list doesn't contain (for example a fish s
 | HHS-CFOC | [Caring for Our Children 4.5.0.10: Foods that are choking hazards](https://childcareta.acf.hhs.gov/cfoc/basic/chapter/4/4.5.0.10) |
 | CDC-food-safety | To be confirmed in task 3.2 |
 
+### Built-in recipe sourcing (`data/recipes.ts`)
+
+Built-in recipes come from published recipes (Requirement 2.7 – 2.10). Kiro does not invent recipes.
+
+**Where to look, in order of preference**
+
+1. U.S. government and public health nutrition programs: USDA Food and Nutrition Service and state WIC programs.
+2. Children's hospitals and pediatric health systems.
+3. Other published recipe sites, only when tiers 1 and 2 don't cover a stage, meal type or allergen group.
+
+Candidate sources found during spec review:
+
+| Source | What it has |
+| --- | --- |
+| [Minnesota WIC: Homemade baby food recipes](https://www.health.state.mn.us/people/wic/recipes/babyfood.html) | Carrots and apples, sweet potato chicken, mix-and-match meal, plus storage times for homemade baby food |
+| [Minnesota WIC: Infant food recipes](https://www.health.mn.gov/people/wic/recipes/infantfoods.html) | Cereal pancakes, apple rice pudding, meat balls, spinach-apple and sweet potato puffs |
+| [Utah WIC: Homemade baby foods (PDF)](https://wic.stage.utah.gov/wp-content/uploads/Homemade-Baby-Foods-1.pdf) | To review in task 4.1 |
+| [California WIC: Baby food for me (PDF)](https://docs.wic.ca.gov/Content/Documents/NutritionHealth/Infants/BabyFoodforMe.pdf) | To review in task 4.1 |
+| [USDA FNS: Feeding Infants, Chapter 7: Buying and preparing baby foods (PDF)](https://www.fna.usda.gov/sites/default/files/resource-files/FI_Ch7a_PrepareFoods.pdf) | Preparation guidance, to review in task 4.1 |
+
+**How a source recipe becomes a built-in recipe**
+
+1. Copy the title, ingredients and quantities.
+2. Write the steps in our own words, keeping the method, times and temperatures. Don't copy the source's sentences.
+3. Run the safety screen at 6 and 9 months.
+   - If an ingredient is blocked and the source offers a safe option, use that option and record it. Minnesota's cereal pancakes say "water or apple juice", so the built-in uses water, with the adaptation "Water instead of apple juice". Its apple rice pudding says "vanilla (or plain) yogurt", so it uses plain yogurt.
+   - If a blocked ingredient can be left out without changing the dish (salt, sugar, honey), leave it out and record it.
+   - Otherwise, skip the recipe.
+4. Tag stages from the source's age guidance and texture. If the source gives no age, tag by texture: smooth purees `6-8`, mashed and finger foods `9-12`, and record that in a code comment.
+5. Storage times: use the source's own times if it gives them. Otherwise use the Minnesota WIC homemade baby food guidance (fridge no more than 2 days, meat, egg, fish and chicken within 1 day, freezer up to 1 month) and set `storageSource` to that page.
+6. Record `publisher`, `url` and `retrieved` date.
+
+If published recipes can't cover the 24-recipe count, 10 per stage, or all nine allergen groups (shellfish, sesame and tree nuts are the likely gaps), task 4.1 stops and reports the gap to you before using tier 3 sources.
+
 ### Foods and first tastes (`foods.ts`)
 
 - `foodKeyFor(ingredient)`: if any allergen rule fires, the key is `allergen:<group>` (an ingredient can map to more than one group: "egg noodles" maps to egg and wheat). Otherwise use `ingredient.food` if set; otherwise derive it from the name by normalizing, dropping descriptor words (fresh, frozen, ripe, cooked, raw, chopped, diced, mashed, pureed, grated, ground, organic, plain, whole, unsalted, low sodium, canned, small, medium, large, baby) and quantities.
@@ -310,7 +354,7 @@ For each recipe in non-ghosted slots:
    - Else: cook fresh. Group uses greedily: start a cook session on the first remaining use day, cover every use within `fridgeDays` of it (or only that day if `fridgeDays` is unset), repeat.
 4. `batches` = sum over cook sessions of `ceil(servingsInSession / recipe.servings)`.
 
-Output: a list of cook sessions by date (`{ date, recipeId, batches, store: 'fridge' | 'freezer' | 'serve' }`) plus thaw reminders. Built-in storage values are authored per recipe and checked against food-safety guidance in task 4.1.
+Output: a list of cook sessions by date (`{ date, recipeId, batches, store: 'fridge' | 'freezer' | 'serve' }`) plus thaw reminders. Built-in storage values come from the source recipe or a cited food-safety source (see Built-in recipe sourcing).
 
 ### Grocery list (`grocery.ts`)
 
@@ -363,12 +407,11 @@ A route with print CSS: no illustrations or color fills, ghost/door/monster stat
 | Mystery door | Untried food | "New food: egg" |
 | Friendly monster (door opens) | Food marked tried with no reaction | "Tried on Nov 12" |
 | Pumpkin badge | Freezer-friendly recipe | "Freezes for 3 months" |
-| Haunted house with 7 windows | Week plan home screen, one window per day | Day names and meals listed as text |
 | Lantern | Prep reminder | "Prep: quarter lengthwise" |
 
-Ghost, door, monster and pumpkin are the parts you specified. The haunted house home screen and lantern reminders are my proposals; **please confirm or replace them.**
+The week plan home screen is a plain, bright grid of day cards with no themed scene. The theme lives in the badges and cards above.
 
-Visual rules: soft purples, oranges and creams; rounded shapes; ghosts smile; no skulls, blood, sharp teeth or jump scares (Requirement 14.1). Animations (door opening, ghost floating) are CSS only and disabled under `prefers-reduced-motion: reduce` (Requirement 14.5). All illustrations are inline SVG with `aria-hidden="true"`; the state is carried by visible text and the accessible name (Requirement 14.3).
+Visual rules: light backgrounds in creams, soft oranges and lavender; rounded shapes; ghosts and monsters smile. No haunted houses, night scenes, skulls, blood, sharp teeth or jump scares (Requirement 14.1). Animations (door opening, ghost floating) are CSS only and disabled under `prefers-reduced-motion: reduce` (Requirement 14.5). All illustrations are inline SVG with `aria-hidden="true"`; the state is carried by visible text and the accessible name (Requirement 14.3).
 
 ## Error Handling
 
@@ -388,8 +431,9 @@ The safety screen is the part where a bug can hurt someone, so it gets the most 
 - **Unit (Vitest), domain modules:**
   - `normalize`: tokenizing, singularizing, phrase matching.
   - `screen`: every case in the matching table above, plus each rule firing on at least one term and respecting its age limit at `limit - 1` and `limit` months.
-  - Built-in recipe checks (Requirements 2.1, 2.5, 2.6): count per stage, all nine allergen groups covered, no block findings at the youngest age of each tagged stage, every recipe has a valid category for each ingredient.
+  - Built-in recipe checks (Requirements 2.1, 2.5 – 2.7, 2.10): count per stage, all nine allergen groups covered, no block findings at the youngest age of each tagged stage, valid category for each ingredient, every recipe has a source with publisher, URL and retrieval date, and storage times have a source.
   - Rules: every rule has at least one source and every source id exists.
+  - Release gate: a test that fails when any rule cites a source without a URL. It is skipped during development and switched on in task 17.1, so the app can't be submitted while a rule still lacks a published source.
   - `age`: month boundaries, leap years, end-of-month birthdays.
   - `prep`: fridge, freezer and cook-fresh schedules, batch rounding.
   - `grocery`: merging, separate units, "as needed", check reconciliation.
@@ -399,9 +443,9 @@ The safety screen is the part where a bug can hurt someone, so it gets the most 
 - **Accessibility:** `vitest-axe` on main pages, plus a manual keyboard and VoiceOver pass on iOS Safari.
 - **CI:** lint, test and build on every pull request.
 
-## Open questions for review
+## Decisions from review (November 6, 2026)
 
-1. Default meal slots per stage (see Age above).
-2. Haunted house home screen and lantern reminders (see Theme mapping).
-3. Rules marked "confirm source" stay in the list until confirmed. If you'd prefer to drop any instead, say which.
-4. The built-in recipes will be written by Kiro from general baby-feeding practice. You and your wife should review them before the demo (task 4.3).
+1. Default meal slots per stage are confirmed as written in Age.
+2. No haunted house. The home screen is a plain week grid and the app should feel welcoming.
+3. Rules marked "confirm source" stay active, and each must have a published source before submission (release gate in Testing Strategy).
+4. Built-in recipes come from published recipes found online, not written by Kiro (see Built-in recipe sourcing).
