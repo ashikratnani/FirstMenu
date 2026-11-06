@@ -1,0 +1,63 @@
+---
+inclusion: always
+---
+
+# Tech conventions
+
+Stack and conventions follow `.kiro/specs/first-menu/design.md`. This file is
+the short version; the design doc is the source of truth.
+
+## Stack
+
+- React 18 + TypeScript, built with Vite. Strict TypeScript everywhere.
+- Static hosting on GitHub Pages at `https://ashikratnani.github.io/FirstMenu/`.
+- `HashRouter` for routing. GitHub Pages has no server-side rewrites, so hash
+  routes always load `index.html`.
+- Vite `base` is `'/FirstMenu/'`. Do not change it; the deployed URL depends on
+  it.
+- State: a single React context with `useReducer`. No external state library.
+- Validation: `zod` for all untrusted input (imported files, share links).
+- Share links: `lz-string` (`compressToEncodedURIComponent`), data in the URL
+  fragment.
+- Styling: plain CSS with custom properties, CSS modules per component. No CSS
+  framework, no CSS-in-JS runtime.
+- Tests: Vitest + React Testing Library (jsdom).
+
+## Architecture rules
+
+- The domain is pure TypeScript with no React dependency: `domain/age.ts`,
+  `domain/safety/*`, `domain/foods.ts`, `domain/plan.ts`, `domain/prep.ts`,
+  `domain/grocery.ts`, `domain/share.ts`, `domain/storage.ts`. Keeping it pure
+  lets the safety screen be tested exhaustively without rendering.
+- Derived data (screen results, foods, prep list, grocery list) is never stored.
+  Compute it from state with memoized selectors.
+- The UI (`ui/pages`, `ui/components`) is a thin React layer over the domain.
+
+## Source layout
+
+```
+src/
+  domain/   types.ts, age.ts, safety/{normalize,rules,screen}.ts,
+            foods.ts, plan.ts, prep.ts, grocery.ts, share.ts, storage.ts
+  data/     recipes.ts (built-in recipes)
+  state/    AppProvider.tsx, selectors.ts
+  ui/       pages/, components/, assets/ (inline SVG), theme.css
+```
+
+## Hard rules
+
+- No analytics, ads, third-party trackers, web fonts, or any files loaded from
+  third-party hosts (Req 12.2, 12.3). The only network requests the app makes
+  are for its own files.
+- All illustrations are inline SVG with `aria-hidden="true"`; state is carried
+  by visible text and the accessible name.
+- Animations are CSS-only and disabled under `prefers-reduced-motion: reduce`.
+- Meet WCAG 2.1 AA color contrast; the app must be fully keyboard-usable and
+  work on screens 360 px wide and up.
+
+## Workflow
+
+- One branch and one PR per top-level task in `tasks.md`. See
+  `.kiro/steering/workflow.md`.
+- `npm run lint`, `npm test` and `npm run build` must all pass before a PR is
+  marked ready. CI runs the same on every pull request.

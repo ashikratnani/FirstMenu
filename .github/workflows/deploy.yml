@@ -1,0 +1,61 @@
+name: Deploy to GitHub Pages
+
+# Build and deploy the static site on every push to main (Req 15.1, 15.2).
+#
+# IMPORTANT (maintainer action): GitHub Pages must be enabled for this to work.
+# Settings -> Pages -> Source: "GitHub Actions". Until the maintainer turns it
+# on, the deploy job fails with HTTP 403 when creating the Pages deployment.
+# That failure is expected and does NOT block any other task; CI (ci.yml) still
+# gates pull requests. The site goes live at
+# https://ashikratnani.github.io/FirstMenu/ once Pages is enabled.
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+# Permissions required by actions/deploy-pages (OIDC id-token + pages write).
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow one concurrent deployment; let an in-progress run finish.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
