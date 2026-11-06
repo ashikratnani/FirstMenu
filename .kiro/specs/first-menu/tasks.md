@@ -14,12 +14,12 @@ Deadline: Friday, December 4, 2026, 2:00 PM PT. Target submission: Thursday, Dec
 - [ ] 1. Set up the project
   - [ ] 1.1 Scaffold React + TypeScript + Vite in the repo root with `base: '/FirstMenu/'`, `HashRouter`, ESLint, Vitest and React Testing Library. Add `zod`, `lz-string`, `react-router-dom`. No analytics, fonts or other files loaded from third-party hosts.
     - _Requirements: 12.2, 12.3, 15.1_
-  - [ ] 1.2 Add `.github/workflows/ci.yml` (lint, test, build on pull requests) and `.github/workflows/deploy.yml` (build and deploy to GitHub Pages on push to `main`). Turn on Pages with source "GitHub Actions" in repo settings (owner action if the token can't).
+  - [ ] 1.2 Add `.github/workflows/ci.yml` (lint, test, build on pull requests) and `.github/workflows/deploy.yml` (build and deploy to GitHub Pages on push to `main`). Pages must be turned on by the maintainer (Settings → Pages → Source: "GitHub Actions"); Kiro's token gets HTTP 403. If it isn't on yet, the deploy job will fail until it is, which doesn't block other tasks.
     - _Requirements: 15.2_
   - [ ] 1.3 Add `.kiro/steering/` files: product summary, tech conventions, and a safety-rules steering file stating that every rule needs a source and a test case, and that rules match ingredient names only.
     - _Requirements: 4.6, 4.7, 15.4_
-  - [ ] 1.4 Add a Kiro hook that runs the safety-screen tests when `src/domain/safety/**` or `src/data/recipes.ts` is saved.
-    - _Requirements: 2.6, 4.9_
+  - [ ] 1.4 After the CI workflow has run once on `main`, ask the maintainer to turn on branch protection for `main` requiring the CI check to pass. (This replaces the earlier save hook: Kiro Web doesn't run hooks, so CI on every PR is where the safety tests run.)
+    - _Requirements: 2.6, 4.9, 15.2_
 
 - [ ] 2. Domain types and age
   - [ ] 2.1 Write `domain/types.ts` with the data models from the design.
@@ -42,7 +42,7 @@ Deadline: Friday, December 4, 2026, 2:00 PM PT. Target submission: Thursday, Dec
     - _Requirements: 2.1, 2.2, 2.3, 2.5, 2.7, 2.8, 2.9, 2.10_
   - [ ] 4.2 Add recipe invariant tests: counts per stage, allergen coverage, no block findings at the youngest age of each tagged stage, valid categories, source fields present, storage times sourced.
     - _Requirements: 2.1, 2.5, 2.6, 2.7, 2.10_
-  - [ ] 4.3 **Checkpoint:** you and your wife review the chosen recipes, their sources and adaptations, and the stage tags. Kiro applies the changes.
+  - [ ] 4.3 Open a `Recipe review` issue listing every built-in recipe with its source link, stage tags and adaptations, for the maintainer and his wife to review. This doesn't block later tasks. Apply their feedback in a follow-up PR when it arrives, and tick this task then.
     - _Requirements: 2.2, 2.9_
 
 - [ ] 5. State and storage
@@ -124,7 +124,7 @@ Deadline: Friday, December 4, 2026, 2:00 PM PT. Target submission: Thursday, Dec
 - [ ] 18. Hackathon deliverables
   - [ ] 18.1 Update `README.md`: what the app does, app URL, screenshots, disclaimer, safety and recipe sources, license.
     - _Requirements: 13.1, 15.4_
-  - [ ] 18.2 Write `docs/kiro-usage.md`: how the spec drove the build, the steering files, the safety-test hook, and examples of Kiro-generated code and tests.
+  - [ ] 18.2 Write `docs/kiro-usage.md`: how the spec drove the build, the steering files, the `pr-reviewer` agent and its review loop (with links to example review comments), and examples of Kiro-generated code and tests.
     - _Requirements: 15.4_
   - [ ] 18.3 Draft a demo script under 3 minutes (setup, ghosted honey, grapes reminder, first-taste door opening, plan, prep and grocery list, share link). You record it and upload it publicly to YouTube.
   - [ ] 18.4 Submit by Thursday, December 3: app URL, YouTube link, repo link, write-up.
