@@ -5,11 +5,15 @@ name: CI
 on:
   pull_request:
   push:
-    branches-ignore:
+    branches:
       - main
 
+# CI only needs to read the repository contents to lint, test and build.
+permissions:
+  contents: read
+
 jobs:
-  build:
+  ci:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

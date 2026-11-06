@@ -5,7 +5,7 @@ export default function Home() {
   return (
     <main>
       <h1>FirstMenu</h1>
-      <p>Plan a week of safe baby meals.</p>
+      <p>Plan a week of baby meals.</p>
       <p>
         <small>
           FirstMenu is not medical advice. Check with your pediatrician.

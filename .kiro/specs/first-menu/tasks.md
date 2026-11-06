@@ -11,14 +11,14 @@ Deadline: Friday, December 4, 2026, 2:00 PM PT. Target submission: Thursday, Dec
 
 ## Tasks
 
-- [x] 1. Set up the project
+- [ ] 1. Set up the project
   - [x] 1.1 Scaffold React + TypeScript + Vite in the repo root with `base: '/FirstMenu/'`, `HashRouter`, ESLint, Vitest and React Testing Library. Add `zod`, `lz-string`, `react-router-dom`. No analytics, fonts or other files loaded from third-party hosts.
     - _Requirements: 12.2, 12.3, 15.1_
   - [x] 1.2 Add `.github/workflows/ci.yml` (lint, test, build on pull requests) and `.github/workflows/deploy.yml` (build and deploy to GitHub Pages on push to `main`). Pages must be turned on by the maintainer (Settings → Pages → Source: "GitHub Actions"); Kiro's token gets HTTP 403. If it isn't on yet, the deploy job will fail until it is, which doesn't block other tasks.
     - _Requirements: 15.2_
   - [x] 1.3 Add `.kiro/steering/` files: product summary, tech conventions, and a safety-rules steering file stating that every rule needs a source and a test case, and that rules match ingredient names only.
     - _Requirements: 4.6, 4.7, 15.4_
-  - [x] 1.4 After the CI workflow has run once on `main`, ask the maintainer to turn on branch protection for `main` requiring the CI check to pass. (This replaces the earlier save hook: Kiro Web doesn't run hooks, so CI on every PR is where the safety tests run.)
+  - [ ] 1.4 After the CI workflow has run once on `main`, ask the maintainer to turn on branch protection for `main` requiring the CI check to pass. (This replaces the earlier save hook: Kiro Web doesn't run hooks, so CI on every PR is where the safety tests run.)
     - _Requirements: 2.6, 4.9, 15.2_
 
 - [ ] 2. Domain types and age
