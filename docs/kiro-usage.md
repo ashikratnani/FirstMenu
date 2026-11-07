@@ -32,7 +32,7 @@ Kiro worked through `tasks.md` top to bottom, one top-level task at a time, and 
 | 16 | Accessibility pass (`ui/a11y.test.tsx`) | [#30](https://github.com/ashikratnani/FirstMenu/pull/30) |
 | 17.0 | Release gate: required-source test switched on | [#31](https://github.com/ashikratnani/FirstMenu/pull/31) |
 
-A few small follow-up fixes rode in on their own `fix/` PRs, for example the wheat-term fix in [#22](https://github.com/ashikratnani/FirstMenu/pull/22) and the notice-wording fix in [#16](https://github.com/ashikratnani/FirstMenu/issues/16).
+A few small follow-up fixes rode in on their own `fix/` PRs, for example the wheat-term fix in [#22](https://github.com/ashikratnani/FirstMenu/pull/22) and the notice-wording fix in [#18](https://github.com/ashikratnani/FirstMenu/pull/18) (which finalised the approved under-6 / 12-plus notice wording decided in issue [#16](https://github.com/ashikratnani/FirstMenu/issues/16)).
 
 ## The steering files
 
@@ -52,20 +52,25 @@ Kiro never merged its own work. For each top-level task it opened one PR and the
 - **`NEEDS_CHANGES`**: Kiro fixes every listed problem on the same branch, pushes, and invokes `pr-reviewer` again. After two rounds without a pass, it stops and asks the maintainer instead of trying a third time.
 - **`NEEDS_MAINTAINER`**: Kiro stops work on that PR and escalates to the maintainer via a `Decision needed:` issue.
 
-Examples of the loop on real merged PRs:
+Examples of real `pr-reviewer` verdict comments on this repo:
 
-- Safety screen: [PR #5](https://github.com/ashikratnani/FirstMenu/pull/5)
-- State and storage: [PR #11](https://github.com/ashikratnani/FirstMenu/pull/11)
-- App shell and Sources page: [PR #13](https://github.com/ashikratnani/FirstMenu/pull/13)
-- Recipe library and editor: [PR #19](https://github.com/ashikratnani/FirstMenu/pull/19)
-- Grocery list: [PR #25](https://github.com/ashikratnani/FirstMenu/pull/25)
-- Share link: [PR #27](https://github.com/ashikratnani/FirstMenu/pull/27)
+`PASS` verdicts (the reviewer merged the PR):
+
+- Safety screen, Task 3: [`VERDICT: PASS` on PR #5](https://github.com/ashikratnani/FirstMenu/pull/5#issuecomment-6700190741)
+- State and storage, Task 5: [`VERDICT: PASS` on PR #11](https://github.com/ashikratnani/FirstMenu/pull/11#issuecomment-6703835545)
+- Release gate, Task 17.0: [`VERDICT: PASS` on PR #31](https://github.com/ashikratnani/FirstMenu/pull/31#issuecomment-6714550516)
+
+`NEEDS_MAINTAINER` verdicts (the reviewer stopped and escalated a decision to the maintainer):
+
+- Built-in recipe sourcing, Task 4: [`VERDICT: NEEDS_MAINTAINER` on PR #8](https://github.com/ashikratnani/FirstMenu/pull/8#issuecomment-6701550622) → issue [#7](https://github.com/ashikratnani/FirstMenu/issues/7)
+- Wheat term vs. spaghetti squash: [`VERDICT: NEEDS_MAINTAINER` on PR #22](https://github.com/ashikratnani/FirstMenu/pull/22#issuecomment-6712450282) → issue [#23](https://github.com/ashikratnani/FirstMenu/issues/23)
+- Grocery line key, Task 12: [`VERDICT: NEEDS_MAINTAINER` on PR #25](https://github.com/ashikratnani/FirstMenu/pull/25#issuecomment-6713038278) → issue [#26](https://github.com/ashikratnani/FirstMenu/issues/26)
 
 Decisions the reviewer or the autonomy rules escalated as `NEEDS_MAINTAINER` were tracked as GitHub issues and resolved by the maintainer before work continued, for example:
 
 - **Built-in recipe sourcing** ([#7](https://github.com/ashikratnani/FirstMenu/issues/7)): only two Minnesota WIC pages were reachable, so the maintainer chose "Option 4": ship a reduced first batch of 10 recipes (covering dairy, egg and wheat) and defer the full Requirement 2 counts and allergen coverage.
-- **Grocery line key** ([#26](https://github.com/ashikratnani/FirstMenu/issues/26)): how to merge grocery lines by food and unit.
-- **Spaghetti squash** ([#23](https://github.com/ashikratnani/FirstMenu/issues/23)): a recipe-ingredient naming question.
+- **Grocery line key** ([#26](https://github.com/ashikratnani/FirstMenu/issues/26)): whether grocery lines should be keyed by the ingredient's derived food name or by its allergen group. The maintainer chose the derived food name, so different foods such as yogurt and cheese do not merge into a single "dairy" line and a multi-allergen ingredient is not double-counted. The fix shipped in [#25](https://github.com/ashikratnani/FirstMenu/pull/25).
+- **Spaghetti squash** ([#23](https://github.com/ashikratnani/FirstMenu/issues/23)): a safety-rule false positive. The wheat allergen term "spaghetti" (added to cover the macaroni/wheat gap) also matched "spaghetti squash", a wheat-free vegetable. The maintainer chose Option B: drop "spaghetti" and keep "macaroni" and "penne". The fix shipped in [#22](https://github.com/ashikratnani/FirstMenu/pull/22).
 
 Other maintainer decisions recorded as issues include servings estimation ([#9](https://github.com/ashikratnani/FirstMenu/issues/9)) and the under-6 / 12-plus notice wording ([#16](https://github.com/ashikratnani/FirstMenu/issues/16)).
 

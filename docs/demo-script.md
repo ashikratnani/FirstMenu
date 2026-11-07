@@ -26,25 +26,30 @@ onboarding shows.
 - Check off a couple of already-tried foods.
 
 > "Setup takes a few seconds: a birth date, an optional name, and the foods
-> you've already tried. From the age, FirstMenu knows the stage and which foods
-> are safe yet."
+> you've already tried. From the age, FirstMenu picks the stage and runs every
+> recipe through the safety screen, which checks ingredient names against a
+> fixed list. It can miss foods that aren't on that list, so it's a helper, not
+> a guarantee of safety."
 
 **[0:45 – 1:05] A ghosted honey recipe**
 
-- Open the recipe library and show a recipe that contains honey appearing as a
-  greyed-out *ghost* that can't be planned, with the reason visible.
+- Open the custom recipe editor (/recipes/new) and quickly add a recipe whose
+  ingredients include honey, then save and open it in the library. It appears as
+  a greyed-out *ghost* that can't be planned, with the reason visible.
 
-> "Here's the safety screen. A recipe with honey shows up as a ghost. It can't
-> be planned, and it tells you why: honey can cause infant botulism under one
-> year. Every rule like this cites a published source you can read on the
-> Sources page."
+> "Let me add a custom recipe with honey in it. Watch what happens: the safety
+> screen turns it into a ghost. It can't be planned, and it tells you why: honey
+> can cause infant botulism, even baked into food. Every rule like this cites a
+> published source you can read on the Sources page."
 
 **[1:05 – 1:25] The grapes reminder**
 
-- Open a recipe that uses grapes and show the prep reminder.
+- Back in the custom recipe editor, add another recipe that uses grapes, save it,
+  and open it to show the prep reminder on the recipe.
 
-> "Some foods are fine but need prep. Grapes carry a reminder to quarter them
-> lengthwise before serving, right on the recipe, so nothing gets missed."
+> "Some foods are fine but need prep. Add a recipe with grapes and it carries a
+> reminder to quarter them lengthwise before serving, right on the recipe, so
+> nothing gets missed."
 
 **[1:25 – 1:45] A first-taste door opening**
 
@@ -80,8 +85,9 @@ onboarding shows.
   device) to show the read-only view.
 
 > "And you can share the week as a read-only link. The plan is packed into the
-> link itself, with no name or birth date, so whoever's cooking can follow along
-> or print it out. That's FirstMenu."
+> link itself, with no name or birth date, so whoever's cooking can follow along.
+> If you want it on paper, there's a dedicated print page in the app. That's
+> FirstMenu."
 
 ---
 
