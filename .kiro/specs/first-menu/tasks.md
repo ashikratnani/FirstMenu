@@ -107,8 +107,8 @@ Deadline: Friday, December 4, 2026, 2:00 PM PT. Target submission: Thursday, Dec
   - [x] 14.1 Build the print route and print CSS: week grid, prep list, grocery list, reminders, text-only states.
     - _Requirements: 6.1, 11.7_
 
-- [ ] 15. Theme art
-  - [ ] 15.1 Draw the SVG set: friendly ghost, mystery door, friendly monsters (one per allergen group plus a generic one), pumpkin badge, lantern. Light, welcoming palette; no haunted house or night scenes. Add door-opening and ghost-float animations that turn off under reduced motion.
+- [x] 15. Theme art
+  - [x] 15.1 Draw the SVG set: friendly ghost, mystery door, friendly monsters (one per allergen group plus a generic one), pumpkin badge, lantern. Light, welcoming palette; no haunted house or night scenes. Add door-opening and ghost-float animations that turn off under reduced motion.
     - _Requirements: 14.1, 14.2, 14.3, 14.5_
 
 - [ ] 16. Accessibility and device pass

@@ -22,6 +22,34 @@
   background: var(--color-surface);
 }
 
+/*
+ * Ghost-float (Task 15, Req 14.5): a gentle CSS-only vertical bob on the ghost
+ * card's decorative art. The theme.css global reduced-motion block already
+ * neutralizes animation-duration, and the explicit guard below sets
+ * `animation: none` so no motion runs when the user requests reduced motion.
+ */
+.ghost :global(.foodArt) {
+  animation: ghost-float 3.2s ease-in-out infinite;
+  transform-origin: center;
+  will-change: transform;
+}
+
+@keyframes ghost-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ghost :global(.foodArt) {
+    animation: none;
+  }
+}
+
 .head {
   display: flex;
   align-items: center;
