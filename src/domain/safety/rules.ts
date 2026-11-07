@@ -356,7 +356,7 @@ const ALLERGEN_SPECS: AllergenSpec[] = [
   { group: 'soy', terms: ['soy', 'soya', 'tofu', 'edamame', 'tempeh', 'miso'] },
   {
     group: 'wheat',
-    terms: ['wheat', 'flour', 'bread', 'pasta', 'couscous', 'semolina', 'noodle', 'breadcrumb', 'cracker', 'macaroni', 'spaghetti', 'penne'],
+    terms: ['wheat', 'flour', 'bread', 'pasta', 'couscous', 'semolina', 'noodle', 'breadcrumb', 'cracker', 'macaroni', 'penne'],
     except: ['almond', 'oat', 'rice', 'coconut', 'chickpea', 'corn', 'buckwheat'],
   },
   {

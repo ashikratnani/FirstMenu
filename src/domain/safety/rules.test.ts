@@ -13,7 +13,7 @@ import { tokenize } from './normalize';
 const STRICT_AGE = 0;
 
 describe('rules metadata', () => {
-  it('exports a numeric RULESET_VERSION bumped to 2 (wheat terms macaroni/spaghetti/penne added)', () => {
+  it('exports a numeric RULESET_VERSION bumped to 2 (wheat terms macaroni/penne added)', () => {
     expect(RULESET_VERSION).toBe(2);
   });
 
