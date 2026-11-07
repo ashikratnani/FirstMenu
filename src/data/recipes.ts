@@ -229,9 +229,11 @@ export const BUILTIN_RECIPES: Recipe[] = [
   },
   {
     // Mix & Match Meal -> "Beef, squash, and macaroni" combination. Note: the
-    // token "macaroni" is not in the wheat allergen rule's terms, so the screen
-    // fires no wheat allergen here; wheat coverage for this batch comes from the
-    // flour and baby cereal in b-cereal-pancakes. No block at the tagged ages.
+    // token "macaroni" is in the wheat allergen rule's terms (added in
+    // RULESET_VERSION 2), so "cooked macaroni" surfaces a wheat allergen door
+    // here. Allergen rules never block, so there is still no block at the tagged
+    // ages; wheat coverage for the batch also comes from the flour and baby
+    // cereal in b-cereal-pancakes.
     // YIELD_OZ = beef 1 cup (8) + macaroni 1/2 cup (4) + squash 3/4 cup (6) +
     // liquid 3/4 cup (6) = 24 -> estimateServings(24) = 12.
     id: 'b-beef-squash-macaroni',

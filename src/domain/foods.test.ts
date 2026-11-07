@@ -340,9 +340,12 @@ describe('built-in recipes derive clean food keys (Item 3)', () => {
       'pea',
       'rice',
       'broccoli',
-      'macaroni',
-      'squash',
+      // "cooked macaroni" now derives allergen:wheat (RULESET_VERSION 2 added
+      // "macaroni" to the wheat allergen rule), taking the slot where the plain
+      // "macaroni" key used to sit; the flour-derived allergen:wheat later in
+      // the batch now dedups into this same key.
       'allergen:wheat',
+      'squash',
       'oat',
       'banana',
       'allergen:dairy',

@@ -39,6 +39,17 @@ describe('screenIngredient - matching table (must fire / must not fire)', () => 
     ['hot dogs', ['sausages'], []],
     ['egg noodles', ['allergen-egg', 'allergen-wheat'], []],
     ['rice noodles', [], ['allergen-wheat']],
+    // Wheat terms added in RULESET_VERSION 2 (maintainer-approved macaroni gap fix):
+    // macaroni and penne now surface the wheat allergen door. "spaghetti" was
+    // dropped (issue #23, Option B) because it matched "spaghetti squash", a
+    // common wheat-free baby vegetable; see the guard test below.
+    ['cooked macaroni', ['allergen-wheat'], []],
+    ['macaroni cheese', ['allergen-wheat', 'allergen-dairy'], []],
+    ['penne', ['allergen-wheat'], []],
+    // Guard against reintroducing the "spaghetti" false positive: spaghetti
+    // squash is a vegetable, not wheat, so it must NOT fire the wheat door.
+    ['spaghetti squash', [], ['allergen-wheat']],
+    ['roasted spaghetti squash', [], ['allergen-wheat']],
   ];
 
   for (const [name, mustFire, mustNotFire] of table) {
