@@ -107,8 +107,8 @@ export default function Share() {
         </h2>
         <p className={styles.privacyNote}>
           The link does not include your child&rsquo;s name or birth date. It
-          carries only the age in months, the plan, the recipes it uses and
-          which foods have been tried.
+          carries only the age in months, the plan, the recipes it uses, which
+          foods have been tried and which ones caused a reaction.
         </p>
       </section>
     </>

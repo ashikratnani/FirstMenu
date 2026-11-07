@@ -161,4 +161,75 @@ describe('SharedView (read-only shared link)', () => {
     // The ghost reason text names honey as not-yet.
     expect(screen.getAllByText(/not yet: honey/i).length).toBeGreaterThan(0);
   });
+
+  it('ghosts a recipe whose food had a recorded reaction (safety consistency)', () => {
+    // The payload carries foods with status 'reaction'. The custom recipe
+    // "Sweet Pea Mash" uses peas (derived food key 'pea'); recording a reaction
+    // on 'pea' must ghost the recipe in the shared week grid + recipe list the
+    // same way the owner's views do, consistent with prep/grocery excluding it.
+    const days: AppState['plan']['days'] = Array.from({ length: 7 }, () => ({}));
+    days[2] = { dinner: 'custom-sweet-pea-mash' };
+    const state = sampleState({
+      foods: { pea: { status: 'reaction', date: '2026-01-10' } },
+      plan: {
+        startDate: '2026-01-15',
+        prepDate: '2026-01-14',
+        activeSlots: ['dinner'],
+        days,
+      },
+    });
+
+    const { encoded } = encodeSharePayload(state);
+    renderShared(encoded);
+
+    // The reaction reason (matching ghostReason) appears on the ghosted recipe.
+    expect(
+      screen.getAllByText(/not yet: pea\. reaction recorded\./i).length,
+    ).toBeGreaterThan(0);
+
+    // And the recipe is excluded from the shared prep + grocery (ghosted), so
+    // its "Keep in the fridge"/grocery peas line never renders. The only peas
+    // reference is the ghost reason, not a grocery amount line.
+    expect(screen.queryByText('Nothing to buy.')).toBeInTheDocument();
+  });
+
+  it('shows per-recipe prep reminders from the current safety screen (Req 11.4)', () => {
+    // A recipe with grapes fires the grapes reminder under 48 months: "Quarter
+    // lengthwise before serving." It must show on the recipe card in the shared
+    // view, matching the owner's recipe page and the shared grocery list.
+    const grapeRecipe: Recipe = {
+      id: 'custom-grape-yogurt',
+      origin: 'custom',
+      title: 'Grape Yogurt',
+      stages: ['9-12'],
+      mealTypes: ['snack'],
+      ingredients: [
+        { name: 'grape', quantity: 5, unit: 'piece', category: 'produce' },
+        { name: 'plain yogurt', quantity: 0.5, unit: 'cup', category: 'dairy-eggs' },
+      ],
+      steps: ['Quarter the grapes.', 'Stir into the yogurt.'],
+      texture: 'soft',
+      servings: 1,
+    };
+    const days: AppState['plan']['days'] = Array.from({ length: 7 }, () => ({}));
+    days[0] = { snack: 'custom-grape-yogurt' };
+    const state = sampleState({
+      customRecipes: [grapeRecipe],
+      plan: {
+        startDate: '2026-01-15',
+        prepDate: '2026-01-14',
+        activeSlots: ['snack'],
+        days,
+      },
+    });
+
+    const { encoded } = encodeSharePayload(state);
+    renderShared(encoded);
+
+    // The reminder appears at least once (the recipe card; the grocery list may
+    // repeat it). The point is it is now on the recipe card too.
+    expect(
+      screen.getAllByText('Quarter lengthwise before serving.').length,
+    ).toBeGreaterThan(0);
+  });
 });

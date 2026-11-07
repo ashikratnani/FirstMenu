@@ -22,14 +22,14 @@
 import { useParams } from 'react-router-dom';
 import { decodeShareData, type SharePayload } from '../../domain/share';
 import type { AppState, MealType, Recipe } from '../../domain/types';
-import { screenRecipe, type Finding } from '../../domain/safety/screen';
+import { screenRecipe } from '../../domain/safety/screen';
 import { computePrepList, type CookSession } from '../../domain/prep';
 import {
   computeGroceryList,
   type GroceryLine,
 } from '../../domain/grocery';
 import type { GroceryCategory } from '../../domain/types';
-import { MEAL_TYPES, mealTypeLabel } from './recipeView';
+import { MEAL_TYPES, mealTypeLabel, recipeView, ghostReason } from './recipeView';
 import { dayDateLabel, dayDateYmd } from './weekView';
 import Disclaimer from '../components/Disclaimer';
 import styles from './SharedView.module.css';
@@ -54,13 +54,22 @@ function syntheticState(payload: SharePayload): AppState {
   };
 }
 
-/** The "Not yet: <food>. Available at N months." phrase for one block finding. */
-function blockReason(block: Finding): string {
-  const food = block.ingredientName;
-  if (block.availableAtMonths !== undefined) {
-    return `Not yet: ${food}. Available at ${block.availableAtMonths} months.`;
+/**
+ * The prep reminders to show on a recipe card, computed from the CURRENT safety
+ * screen at the payload age (Req 11.4 — same plan and safety reminders). The
+ * screen already de-dupes reminder messages per ingredient; a recipe can repeat
+ * a message across ingredients, so dedupe once more by message (first-seen
+ * order), matching how the recipe page / grocery list present reminders.
+ */
+function recipeReminderMessages(recipe: Recipe, ageMonths: number): string[] {
+  const seen = new Set<string>();
+  const messages: string[] = [];
+  for (const reminder of screenRecipe(recipe, ageMonths).reminders) {
+    if (seen.has(reminder.message)) continue;
+    seen.add(reminder.message);
+    messages.push(reminder.message);
   }
-  return `Not yet: ${food}.`;
+  return messages;
 }
 
 /** Human heading for a grocery category (matches Grocery.tsx). */
@@ -131,10 +140,13 @@ export default function SharedView() {
   const recipeById = (id: string): Recipe | undefined =>
     payload.recipes.find((r) => r.id === id);
 
-  // Re-run the CURRENT safety screen for every recipe at the payload age; a
-  // recipe is ghosted when any block finding applies (Req 11.4 — viewer runs
-  // its own rules).
-  const screenFor = (recipe: Recipe) => screenRecipe(recipe, ageMonths);
+  // Re-run the CURRENT safety screen for every recipe at the payload age,
+  // reusing the SAME recipeView/ghostReason helpers the owner's views use so a
+  // recipe is ghosted on a block OR a recorded reaction (payload.foods carries
+  // reactions), and the reason text matches (Req 11.4 — viewer runs its own
+  // rules). ageMonths is passed as the override because the synthetic state has
+  // no child to derive age from.
+  const viewFor = (recipe: Recipe) => recipeView(recipe, state, ageMonths);
 
   // Active slots in MEAL_TYPES order for a stable grid.
   const activeSlots = MEAL_TYPES.filter((meal) =>
@@ -179,14 +191,11 @@ export default function SharedView() {
                       const recipeId = plan.days[day]?.[meal];
                       const recipe =
                         recipeId !== undefined ? recipeById(recipeId) : undefined;
-                      const screen =
-                        recipe !== undefined ? screenFor(recipe) : null;
-                      const ghosted =
-                        screen !== null && screen.blocks.length > 0;
+                      const view =
+                        recipe !== undefined ? viewFor(recipe) : null;
+                      const ghosted = view !== null && view.isGhosted;
                       const reason =
-                        ghosted && screen !== null
-                          ? screen.blocks.map(blockReason).join(' ')
-                          : '';
+                        ghosted && view !== null ? ghostReason(view) : '';
                       return (
                         <li key={meal} className={styles.slot}>
                           <span className={styles.slotMeal}>
@@ -231,11 +240,10 @@ export default function SharedView() {
         ) : (
           <ul className={styles.recipeList}>
             {payload.recipes.map((recipe) => {
-              const screen = screenFor(recipe);
-              const ghosted = screen.blocks.length > 0;
-              const reason = ghosted
-                ? screen.blocks.map(blockReason).join(' ')
-                : '';
+              const view = viewFor(recipe);
+              const ghosted = view.isGhosted;
+              const reason = ghosted ? ghostReason(view) : '';
+              const reminders = recipeReminderMessages(recipe, ageMonths);
               return (
                 <li key={recipe.id} className={styles.recipeCard}>
                   <h3 className={styles.recipeTitle}>{recipe.title}</h3>
@@ -243,6 +251,18 @@ export default function SharedView() {
                     <p className={styles.ghostReason}>{reason}</p>
                   )}
                   <p className={styles.recipeMeta}>{recipe.texture}</p>
+                  {reminders.length > 0 && (
+                    <>
+                      <h4 className={styles.recipeSubheading}>Prep reminders</h4>
+                      <ul className={styles.reminderList}>
+                        {reminders.map((message) => (
+                          <li key={message} className={styles.reminderText}>
+                            {message}
+                          </li>
+                        ))}
+                      </ul>
+                    </>
+                  )}
                   <h4 className={styles.recipeSubheading}>Ingredients</h4>
                   <ul className={styles.ingredientList}>
                     {recipe.ingredients.map((ingredient, i) => (

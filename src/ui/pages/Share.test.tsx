@@ -135,8 +135,13 @@ describe('Share page', () => {
 
   it('surfaces the privacy note about name and birth date (Req 11.3)', () => {
     renderShare(shortState());
-    expect(
-      screen.getByText(/does not include your child.?s name or birth date/i),
-    ).toBeInTheDocument();
+    const note = screen.getByText(
+      /does not include your child.?s name or birth date/i,
+    );
+    expect(note).toBeInTheDocument();
+    // The note accurately states the link carries which foods were tried AND
+    // which caused a reaction (the payload carries reaction records).
+    expect(note).toHaveTextContent(/tried/i);
+    expect(note).toHaveTextContent(/reaction/i);
   });
 });
