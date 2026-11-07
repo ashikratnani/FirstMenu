@@ -72,6 +72,53 @@ describe('Sources page', () => {
     }
   });
 
+  it("renders each rule's cited sources as links inside that rule's own list item", () => {
+    renderSources();
+
+    // The "Safety rules" list has exactly one <li> per rule, in RULES order.
+    // Scoping to each rule's own <li> (not the whole page) means this test
+    // fails if the per-rule sources were rendered as plain text, even though
+    // the References list still carries links.
+    const ruleHeading = screen.getByRole('heading', { name: /safety rules/i });
+    const ruleList = ruleHeading.nextElementSibling;
+    expect(ruleList?.tagName).toBe('UL');
+    const ruleItems = [...(ruleList?.querySelectorAll(':scope > li') ?? [])];
+    expect(ruleItems.length).toBe(RULES.length);
+
+    // Sanity check: at least one rule cites a source whose urls[] carries more
+    // than one URL, so the multi-URL path (e.g. AAP-milk) is exercised.
+    const hasMultiUrlSource = RULES.some((rule) =>
+      rule.sources.some((id) => sourceUrls(SOURCES[id]).length > 1),
+    );
+    expect(hasMultiUrlSource).toBe(true);
+
+    RULES.forEach((rule, index) => {
+      const item = ruleItems[index];
+      // Confirm we are scoped to the correct rule's list item.
+      expect(item.textContent).toContain(rule.label);
+
+      // Every URL this rule cites, derived from rules.ts.
+      const expectedUrls = rule.sources.flatMap((id) =>
+        sourceUrls(SOURCES[id]),
+      );
+      expect(expectedUrls.length).toBeGreaterThan(0);
+
+      const anchors = [...item.querySelectorAll('a')];
+      const hrefs = anchors.map((a) => a.getAttribute('href'));
+
+      for (const url of expectedUrls) {
+        const matching = anchors.filter((a) => a.getAttribute('href') === url);
+        // The link for this URL must live WITHIN this rule's <li>.
+        expect(
+          matching.length,
+          `rule "${rule.label}" should link to ${url} within its own list item; found hrefs: ${hrefs.join(', ')}`,
+        ).toBeGreaterThan(0);
+        // External links must be safe.
+        expect(matching[0]).toHaveAttribute('rel', 'noopener noreferrer');
+      }
+    });
+  });
+
   it('de-duplicates sources cited by more than one rule in the references list', () => {
     renderSources();
     // The References list has exactly one <li> per DISTINCT cited source, so a
