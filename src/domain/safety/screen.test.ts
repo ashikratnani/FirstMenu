@@ -50,7 +50,6 @@ describe('screenIngredient - matching table (must fire / must not fire)', () => 
     // squash is a vegetable, not wheat, so it must NOT fire the wheat door.
     ['spaghetti squash', [], ['allergen-wheat']],
     ['roasted spaghetti squash', [], ['allergen-wheat']],
-    ['spaghetti', [], ['allergen-wheat']],
   ];
 
   for (const [name, mustFire, mustNotFire] of table) {
