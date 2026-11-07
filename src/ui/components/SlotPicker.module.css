@@ -1,0 +1,109 @@
+/*
+ * Slot picker (Task 10.2). A light, bright panel listing candidate recipes for
+ * one plan slot. Eligible recipes are selectable buttons; ghosted recipes are
+ * disabled and show their reason (Req 5.2). Usable at 360px (Req 14.6); any
+ * motion inherits the reduced-motion rule from theme.css.
+ */
+
+.picker {
+  margin-top: calc(var(--space) * 0.5);
+  padding: var(--space);
+  border: 1px solid #cdbdf0;
+  border-radius: var(--radius);
+  background: #faf7ff;
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(var(--space) * 0.5);
+  margin-bottom: calc(var(--space) * 0.5);
+}
+
+.heading {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--color-heading);
+}
+
+.close {
+  padding: calc(var(--space) * 0.25) calc(var(--space) * 0.75);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface, #fff);
+  color: var(--color-heading);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.close:hover,
+.close:focus-visible {
+  border-color: var(--color-heading);
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--space) * 0.5);
+}
+
+.item {
+  display: flex;
+}
+
+.option {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--space) * 0.25);
+  width: 100%;
+  text-align: left;
+  padding: calc(var(--space) * 0.75);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface, #fff);
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.option:hover:not(:disabled),
+.option:focus-visible:not(:disabled) {
+  border-color: var(--color-heading);
+}
+
+.option:disabled,
+.option.ghost {
+  cursor: not-allowed;
+  background: #f4f1fb;
+  border-color: #cdbdf0;
+  color: var(--color-muted);
+}
+
+.title {
+  font-weight: 600;
+  color: var(--color-heading);
+}
+
+.reason {
+  font-size: 0.82rem;
+  color: var(--color-text);
+}
+
+.door {
+  align-self: flex-start;
+  padding: calc(var(--space) * 0.2) calc(var(--space) * 0.5);
+  border-radius: var(--radius);
+  font-size: 0.78rem;
+  font-weight: 600;
+  background: #f7ecd9;
+  color: #8a6d3b;
+}
+
+.empty {
+  margin: 0;
+  color: var(--color-muted);
+}
