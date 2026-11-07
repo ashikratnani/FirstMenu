@@ -90,13 +90,19 @@ describe('terms are lowercase and singular', () => {
 });
 
 // Release gate (design "Testing Strategy"): a rule may not cite a source that
-// lacks a URL. Switched on in task 17.0; kept skipped during development.
-describe.skip('release gate (task 17.0): every cited source has a URL', () => {
+// lacks a URL. Switched on in task 17.0.
+describe('release gate (task 17.0): every cited source has a URL', () => {
   it('every source cited by a rule resolves to a URL', () => {
     for (const rule of RULES) {
       for (const sourceId of rule.sources as SourceId[]) {
         expect(SOURCES[sourceId]?.url).toMatch(/^https?:\/\//);
       }
+    }
+  });
+
+  it('every new-food-spacing cited source resolves to a URL', () => {
+    for (const sourceId of NEW_FOOD_SPACING_SOURCES) {
+      expect(SOURCES[sourceId]?.url).toMatch(/^https?:\/\//);
     }
   });
 });
