@@ -63,10 +63,10 @@ Deadline: Friday, December 4, 2026, 2:00 PM PT. Target submission: Thursday, Dec
   - [x] 7.1 Build onboarding: birth date, optional name, the under-6 and 12-plus notices, and a tried-foods checklist with the nine allergens first. Add a Settings page to edit these later.
     - _Requirements: 1.1, 1.4, 1.5, 1.6, 7.2_
 
-- [ ] 8. Foods and first tastes
-  - [ ] 8.1 Implement `domain/foods.ts`: `foodKeyFor`, descriptor stripping, ignored foods, `collectFoods`, `foodStatus`. Add tests.
+- [x] 8. Foods and first tastes
+  - [x] 8.1 Implement `domain/foods.ts`: `foodKeyFor`, descriptor stripping, ignored foods, `collectFoods`, `foodStatus`. Add tests.
     - _Requirements: 3.3, 7.1, 7.3, 7.6_
-  - [ ] 8.2 Build the Foods page: doors, monsters and ghosts with text labels; "tried, no reaction" and "noticed a reaction" actions; clearing a reaction; allergen guidance including the peanut note.
+  - [x] 8.2 Build the Foods page: doors, monsters and ghosts with text labels; "tried, no reaction" and "noticed a reaction" actions; clearing a reaction; allergen guidance including the peanut note.
     - _Requirements: 5.7, 7.3 – 7.7, 14.3_
 
 - [ ] 9. Recipe library and recipe page

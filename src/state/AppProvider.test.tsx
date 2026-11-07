@@ -138,6 +138,38 @@ describe('reducer actions', () => {
     expect(reducer(state, { type: 'clearFoodRecord', key: 'nope' })).toBe(state);
   });
 
+  it('clearReaction removes a logged reaction record (Req 7.6/8.2)', () => {
+    const state = run(base(), [
+      {
+        type: 'setFoodRecord',
+        key: 'allergen:egg',
+        record: { status: 'reaction', date: '2026-01-05', note: 'hives' },
+      },
+    ]);
+    const after = reducer(state, { type: 'clearReaction', key: 'allergen:egg' });
+    expect(after.foods['allergen:egg']).toBeUndefined();
+  });
+
+  it('clearReaction never drops a tried record (preserves it as a no-op)', () => {
+    const state = run(base(), [
+      {
+        type: 'setFoodRecord',
+        key: 'carrot',
+        record: { status: 'tried', date: '2026-01-10' },
+      },
+    ]);
+    const after = reducer(state, { type: 'clearReaction', key: 'carrot' });
+    // A 'tried' record is not a reaction: clearReaction leaves it intact.
+    expect(after.foods.carrot).toEqual({ status: 'tried', date: '2026-01-10' });
+    // Same object identity: the reducer short-circuits to a no-op.
+    expect(after).toBe(state);
+  });
+
+  it('clearReaction is a no-op for an unknown key', () => {
+    const state = base();
+    expect(reducer(state, { type: 'clearReaction', key: 'nope' })).toBe(state);
+  });
+
   it('setSlot and clearSlot assign and remove a recipe at day+meal', () => {
     let state = reducer(base(), {
       type: 'setSlot',

@@ -47,6 +47,7 @@ export type AppAction =
   | { type: 'deleteCustomRecipe'; id: string }
   | { type: 'setFoodRecord'; key: string; record: FoodRecord }
   | { type: 'clearFoodRecord'; key: string }
+  | { type: 'clearReaction'; key: string }
   | { type: 'setSlot'; slot: SlotRef; recipeId: string }
   | { type: 'clearSlot'; slot: SlotRef }
   | { type: 'setActiveSlots'; activeSlots: MealType[] }
@@ -140,6 +141,19 @@ export function reducer(state: AppState, action: AppAction): AppState {
       // second line of defence). No-op when the key is absent or a reaction.
       const existing = state.foods[action.key];
       if (!existing || existing.status !== 'tried') return state;
+      const foods = { ...state.foods };
+      delete foods[action.key];
+      return { ...state, foods };
+    }
+
+    case 'clearReaction': {
+      // Remove a food record ONLY when it is a logged 'reaction', so the Foods
+      // page can let the user clear a safety flag they recorded (Req 7.6/8.2).
+      // This is the explicit counterpart to clearFoodRecord (which clears only
+      // a mistaken 'tried'): neither path silently drops the other's record.
+      // No-op when the key is absent or the record is not a reaction.
+      const existing = state.foods[action.key];
+      if (!existing || existing.status !== 'reaction') return state;
       const foods = { ...state.foods };
       delete foods[action.key];
       return { ...state, foods };
