@@ -1,0 +1,72 @@
+// Memoized, React-free selectors for DERIVED data that is never stored
+// (design.md: age, stage, combined recipe set, per-recipe screen results are
+// computed, not persisted). Pure TS so they unit-test without rendering.
+
+import { ageInMonths, stageFor } from '../domain/age';
+import { screenRecipe, type ScreenResult } from '../domain/safety/screen';
+import type { AppState, Recipe, StageId } from '../domain/types';
+import { BUILTIN_RECIPES } from '../data/recipes';
+
+/**
+ * Memoize a one-argument selector by reference identity of its input. The
+ * cache holds only the last input/output pair, so repeated calls with the same
+ * state object return the SAME output reference (letting React skip work), and
+ * a new state object recomputes. A tiny helper to avoid a new dependency.
+ */
+function memoizeByInput<I, O>(fn: (input: I) => O): (input: I) => O {
+  let lastInput: I | undefined;
+  let lastOutput: O;
+  let hasValue = false;
+  return (input: I): O => {
+    if (hasValue && input === lastInput) return lastOutput;
+    lastInput = input;
+    lastOutput = fn(input);
+    hasValue = true;
+    return lastOutput;
+  };
+}
+
+/**
+ * Child age in whole months as of the plan's startDate, or null when there is
+ * no child yet. Not memoized itself (cheap); used by the memoized selectors.
+ */
+export function selectAgeMonths(state: AppState): number | null {
+  if (!state.child) return null;
+  return ageInMonths(state.child.birthDate, state.plan.startDate);
+}
+
+/** Current stage for the child, or null when there is no child. */
+export function selectStage(state: AppState): StageId | null {
+  const months = selectAgeMonths(state);
+  if (months === null) return null;
+  return stageFor(months);
+}
+
+/**
+ * The app's full recipe set: built-ins plus the user's custom recipes. Memoized
+ * on the whole state; a new result is produced only when the state object
+ * changes (and in practice only customRecipes matters here).
+ */
+export const selectAllRecipes: (state: AppState) => Recipe[] = memoizeByInput(
+  (state: AppState) => [...BUILTIN_RECIPES, ...state.customRecipes],
+);
+
+export interface RecipeScreen {
+  recipe: Recipe;
+  result: ScreenResult;
+}
+
+/**
+ * Screen every recipe at the child's current age so a birthDate or recipe
+ * change updates every view (Req 1.6, 5.4). With no child yet, each recipe is
+ * screened at age 0 (the strictest interpretation; screen.ts clamps NaN/neg to
+ * 0 anyway). Memoized on the state reference.
+ */
+export const selectRecipeScreenResults: (state: AppState) => RecipeScreen[] =
+  memoizeByInput((state: AppState) => {
+    const ageMonths = selectAgeMonths(state) ?? 0;
+    return selectAllRecipes(state).map((recipe) => ({
+      recipe,
+      result: screenRecipe(recipe, ageMonths),
+    }));
+  });
