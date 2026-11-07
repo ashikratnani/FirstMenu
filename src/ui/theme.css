@@ -1,17 +1,58 @@
 /*
- * Theme tokens. Light, welcoming palette (creams, soft oranges, lavender) per
- * design.md. Full tokens and AA-contrast checks arrive in task 6; this is the
- * baseline so the app has styling hooks and the build pulls in CSS.
+ * Theme tokens (Task 6.1). Light, welcoming palette in creams, soft oranges and
+ * lavender (design "Visual rules"). Rounded shapes; no night/haunted imagery.
  *
  * No web fonts or any assets loaded from third-party hosts (Req 12.2, 12.3).
+ *
+ * Accessibility (Req 14.4): every foreground/background text pair below meets
+ * WCAG 2.1 AA (>= 4.5:1 for normal text, >= 3:1 for large text and UI
+ * components). Computed contrast ratios are documented beside each key pair.
+ *
+ *   TEXT ON BACKGROUNDS (need >= 4.5:1)
+ *   --color-text    #2b2330 on --color-bg      #fff8f0 = 14.39:1 (AA pass)
+ *   --color-text    #2b2330 on --color-surface #ffffff = 15.15:1 (AA pass)
+ *   --color-heading #4a2f5e on --color-bg      #fff8f0 = 10.72:1 (AA pass)
+ *   --color-heading #4a2f5e on --color-surface #ffffff = 11.29:1 (AA pass)
+ *   --color-muted   #5c5560 on --color-bg      #fff8f0 =  6.82:1 (AA pass)
+ *   --color-muted   #5c5560 on --color-surface #ffffff =  7.18:1 (AA pass)
+ *   --color-nav-text #3a2f44 on --color-nav-bg #efe7f7 = 10.45:1 (AA pass)
+ *   --color-on-accent #ffffff on --color-accent #b4541a = 4.97:1 (AA pass)
+ *
+ *   UI COMPONENTS / LARGE TEXT (need >= 3:1)
+ *   --color-accent  #b4541a on --color-bg      #fff8f0 =  4.72:1 (AA pass)
+ *   --color-border  #9c8574 on --color-surface #ffffff =  3.49:1 (AA pass)
+ *   --color-focus   #5a3d8c on --color-bg      #fff8f0 =  8.04:1 (AA pass)
  */
 :root {
+  /* Surfaces: light creams. */
   --color-bg: #fff8f0;
   --color-surface: #ffffff;
+
+  /* Foreground text. */
   --color-text: #2b2330;
-  --color-accent: #e8803a;
+  --color-heading: #4a2f5e; /* lavender-leaning heading ink */
+  --color-muted: #5c5560; /* secondary text, footer, notes */
+
+  /* Accent: soft orange. Darkened enough that white text on it is AA. */
+  --color-accent: #b4541a;
   --color-accent-soft: #f6d9c4;
+  --color-on-accent: #ffffff;
+
+  /* Lavender accents (badges, nav). */
   --color-lavender: #e7e0f3;
+  --color-nav-bg: #efe7f7;
+  --color-nav-text: #3a2f44;
+
+  /* Borders and focus ring. */
+  --color-border: #9c8574;
+  --color-focus: #5a3d8c;
+
+  /* Theme surfaces for later illustration states (task 15). Defined here so
+   * components share tokens; text placed on them must still meet AA. */
+  --color-ghost-surface: #e7e0f3; /* friendly ghost card (lavender) */
+  --color-door-surface: #f6d9c4; /* mystery door (soft orange) */
+  --color-monster-surface: #d9efd6; /* friendly monster (soft green) */
+  --color-pumpkin-surface: #f7c9a0; /* pumpkin badge (warm orange) */
 
   --radius: 12px;
   --space: 8px;
@@ -26,8 +67,16 @@ body {
   min-height: 100vh;
 }
 
-/* Animations (door opening, ghost floating) are disabled under reduced motion
- * (Req 14.5). The rule lives here so later components inherit the behavior. */
+/* Keep the shell from overflowing narrow viewports (Req 14.6: usable at 360px). */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Animations (door opening, ghost floating, added in task 15) are CSS only and
+ * disabled under reduced motion (Req 14.5). The rule lives here so every later
+ * component inherits the behavior. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

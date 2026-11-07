@@ -180,6 +180,14 @@ describe('reducer actions', () => {
     expect(state.foods.carrot.note).toBe('rash');
   });
 
+  it('acknowledgeDisclaimer sets disclaimerAcknowledged true and is idempotent (Req 13.1)', () => {
+    expect(base().disclaimerAcknowledged).toBe(false);
+    const once = reducer(base(), { type: 'acknowledgeDisclaimer' });
+    expect(once.disclaimerAcknowledged).toBe(true);
+    const twice = reducer(once, { type: 'acknowledgeDisclaimer' });
+    expect(twice.disclaimerAcknowledged).toBe(true);
+  });
+
   it('is immutable: the input state is not mutated', () => {
     const start = base();
     const snapshot = JSON.stringify(start);

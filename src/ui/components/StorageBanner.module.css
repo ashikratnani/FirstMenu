@@ -1,0 +1,14 @@
+/*
+ * Storage-unavailable banner (Task 6.2, Req 12.7). A visible, high-contrast
+ * notice using AA-contrast tokens. Not an error-red block; the app still works
+ * in memory, so it reads as an informational warning.
+ */
+
+.banner {
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  padding: calc(var(--space) * 0.75) var(--space);
+  border-radius: var(--radius);
+  margin: var(--space) 0;
+  font-weight: 600;
+}
