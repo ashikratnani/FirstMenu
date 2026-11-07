@@ -48,9 +48,9 @@ export interface Source {
 
 // Sources table (design.md "Sources"), plus the sources confirmed in task 3.2
 // (retrieved 2026-11-07). The four previously-placeholder "confirm source"
-// rules now cite real published URLs: FDA raw-milk and FDA safe-food-handling
-// for the unpasteurized / egg-cooking / cook-through rules, and AAP "Starting
-// Solid Foods" for the 3-day new-food spacing value.
+// rules now cite real published URLs: FDA raw-milk for the unpasteurized rule,
+// FDA safe-food-handling for the egg-cooking / cook-through doneness rules, and
+// AAP "Starting Solid Foods" for the 3-day new-food spacing value.
 export const SOURCES: Record<SourceId, Source> = {
   'AAP-honey': {
     title: "AAP HealthyChildren: Caring for your child's cold",
@@ -117,8 +117,9 @@ export const SOURCES: Record<SourceId, Source> = {
     url: 'https://childcareta.acf.hhs.gov/cfoc/basic/chapter/4/4.5.0.10',
   },
   // Retained for history. No active rule references this placeholder: the four
-  // "confirm source" rules were repointed to FDA-raw-milk / FDA-safe-food-handling
-  // in task 3.2. Kept so share links / notes referencing the id still resolve.
+  // "confirm source" rules were repointed to FDA-raw-milk (unpasteurized) and
+  // FDA-safe-food-handling (egg / meat doneness) in task 3.2. Kept so share
+  // links / notes referencing the id still resolve.
   'CDC-food-safety': {
     title: 'CDC: Food safety (placeholder, superseded by FDA sources in task 3.2)',
     url: 'https://www.cdc.gov/food-safety/index.html',
@@ -312,7 +313,7 @@ const REMINDER_RULES: SafetyRule[] = [
     terms: ['egg'],
     label: 'Cook eggs through',
     message: 'Cook until white and yolk are firm.',
-    sources: ['FDA-raw-milk', 'FDA-safe-food-handling'],
+    sources: ['FDA-safe-food-handling'],
   },
   {
     id: 'cook-through',
@@ -320,7 +321,7 @@ const REMINDER_RULES: SafetyRule[] = [
     terms: ['chicken', 'beef', 'pork', 'turkey', 'lamb', 'fish', 'salmon', 'cod', 'trout', 'tilapia', 'shrimp'],
     label: 'Cook meat through',
     message: 'Cook through and remove all bones.',
-    sources: ['FDA-raw-milk', 'FDA-safe-food-handling'],
+    sources: ['FDA-safe-food-handling'],
   },
   {
     id: 'cows-milk',

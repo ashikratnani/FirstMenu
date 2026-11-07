@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { screenIngredient } from './screen';
-import { RULES, RULESET_VERSION, SOURCES, type SourceId } from './rules';
+import {
+  NEW_FOOD_SPACING_SOURCES,
+  RULES,
+  RULESET_VERSION,
+  SOURCES,
+  type SourceId,
+} from './rules';
 import { tokenize } from './normalize';
 
 // Strictest age so every age-limited rule applies when we test term firing.
@@ -44,6 +50,15 @@ describe('sources', () => {
       for (const sourceId of rule.sources) {
         expect(SOURCES[sourceId], `${rule.id} cites unknown source ${sourceId}`).toBeDefined();
       }
+    }
+  });
+
+  it('references only new-food-spacing source ids that exist in SOURCES', () => {
+    for (const sourceId of NEW_FOOD_SPACING_SOURCES) {
+      expect(
+        SOURCES[sourceId],
+        `new-food spacing cites unknown source ${sourceId}`,
+      ).toBeDefined();
     }
   });
 
