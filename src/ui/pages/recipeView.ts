@@ -92,8 +92,15 @@ export interface RecipeView {
  * A door badge means an ingredient food is still a mystery door (untried).
  * A pumpkin badge means recipe.storage.freezerMonths is a positive number.
  */
-export function recipeView(recipe: Recipe, state: AppState): RecipeView {
-  const ageMonths = selectAgeMonths(state) ?? 0;
+export function recipeView(
+  recipe: Recipe,
+  state: AppState,
+  ageMonthsOverride?: number,
+): RecipeView {
+  // Most callers (Recipes/Home) derive age from the child via the state. The
+  // shared view has NO child, so it passes payload.ageMonths explicitly as the
+  // override; when omitted behavior is unchanged (selectAgeMonths(state) ?? 0).
+  const ageMonths = ageMonthsOverride ?? selectAgeMonths(state) ?? 0;
   const result = screenRecipe(recipe, ageMonths);
 
   let reactionFoodKey: string | null = null;

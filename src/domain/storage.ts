@@ -76,7 +76,7 @@ const ingredientSchema = z.object({
   category: groceryCategorySchema,
 });
 
-const recipeSchema = z.object({
+export const recipeSchema = z.object({
   id: z.string(),
   origin: z.enum(['builtin', 'custom']),
   source: recipeSourceSchema.optional(),
@@ -101,7 +101,7 @@ const childProfileSchema = z.object({
   birthDate: ymdDateSchema,
 });
 
-const foodRecordSchema = z.object({
+export const foodRecordSchema = z.object({
   status: z.enum(['tried', 'reaction']),
   // A real calendar date, same boundary rule as birthDate: a bad food date
   // must never reach the UI's date logic.
@@ -109,7 +109,7 @@ const foodRecordSchema = z.object({
   note: z.string().optional(),
 });
 
-const weekPlanSchema = z.object({
+export const weekPlanSchema = z.object({
   // Age is computed from plan.startDate (ageInMonths(child.birthDate,
   // plan.startDate)); a malformed/empty start date would yield a NaN age and
   // stageFor(NaN) -> '9-12' (the LESS strict stage). Reject bad dates here at

@@ -102,12 +102,12 @@ describe('App', () => {
         </MemoryRouter>
       </AppProvider>,
     );
-    // The shared view renders; the gate did NOT redirect to /onboarding.
+    // 'some-encoded-data' is not a valid link, so the shared view renders its
+    // "can't be read" error (Req 11.5) — but it DID render, proving the gate
+    // did NOT redirect this un-onboarded user to /onboarding.
+    expect(screen.getByText(/can.?t be read/i)).toBeInTheDocument();
     expect(
-      screen.getByRole('heading', { name: /shared plan/i }),
-    ).toBeInTheDocument();
-    expect(
-      screen.queryByRole('heading', { name: /welcome to firstmenu/i }),
+      screen.queryByText(/welcome to firstmenu/i),
     ).not.toBeInTheDocument();
   });
 

@@ -16,16 +16,16 @@ import Onboarding from './ui/pages/Onboarding';
 import Sources from './ui/pages/Sources';
 
 // Onboarding gate (Task 7.1, Req 1.1): until the child profile is set
-// (state.onboarded), every route except /onboarding (and /shared/* read-only
-// views) redirects to /onboarding so a first-run user reaches setup instead of
-// an empty plan. Rendered inside Layout so the app shell (and its first-run
-// disclaimer) is never blanked. Routes under <SharedView> stay reachable
-// un-onboarded so a share link can be opened without a local profile.
+// (state.onboarded), every route except /onboarding redirects to /onboarding so
+// a first-run user reaches setup instead of an empty plan. Rendered inside
+// Layout so the app shell (and its first-run disclaimer) is never blanked. The
+// /shared/:data read-only view is NOT under this gate at all — it is its own
+// top-level route outside Layout (see below), so a share link opens for anyone,
+// onboarded or not, with no primary nav or first-run chrome.
 function OnboardingGate() {
   const { onboarded } = useAppState();
   const { pathname } = useLocation();
-  const exempt =
-    pathname === '/onboarding' || pathname.startsWith('/shared/');
+  const exempt = pathname === '/onboarding';
   if (!onboarded && !exempt) {
     return <Navigate to="/onboarding" replace />;
   }
@@ -39,22 +39,25 @@ function OnboardingGate() {
 export default function App() {
   return (
     <Routes>
+      {/* The read-only shared view is its own top-level route OUTSIDE Layout
+          (Task 6 note): a clean recipient view with no primary nav and no
+          first-run disclaimer chrome, naturally gate-exempt (Req 11.4). */}
+      <Route path="/shared/:data" element={<SharedView />} />
       <Route element={<Layout />}>
         <Route element={<OnboardingGate />}>
-        <Route path="/" element={<Home />} />
-        <Route path="/recipes" element={<Recipes />} />
-        <Route path="/recipes/new" element={<RecipeEditor />} />
-        <Route path="/recipes/:id" element={<RecipeDetail />} />
-        <Route path="/recipes/:id/edit" element={<RecipeEditor />} />
-        <Route path="/foods" element={<Foods />} />
-        <Route path="/prep" element={<Prep />} />
-        <Route path="/grocery" element={<Grocery />} />
-        <Route path="/share" element={<Share />} />
-        <Route path="/shared/:data" element={<SharedView />} />
-        <Route path="/print" element={<Print />} />
-        <Route path="/settings" element={<Settings />} />
-        <Route path="/onboarding" element={<Onboarding />} />
-        <Route path="/sources" element={<Sources />} />
+          <Route path="/" element={<Home />} />
+          <Route path="/recipes" element={<Recipes />} />
+          <Route path="/recipes/new" element={<RecipeEditor />} />
+          <Route path="/recipes/:id" element={<RecipeDetail />} />
+          <Route path="/recipes/:id/edit" element={<RecipeEditor />} />
+          <Route path="/foods" element={<Foods />} />
+          <Route path="/prep" element={<Prep />} />
+          <Route path="/grocery" element={<Grocery />} />
+          <Route path="/share" element={<Share />} />
+          <Route path="/print" element={<Print />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/onboarding" element={<Onboarding />} />
+          <Route path="/sources" element={<Sources />} />
         </Route>
       </Route>
     </Routes>
