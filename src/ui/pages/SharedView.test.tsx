@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
@@ -65,6 +65,23 @@ function renderShared(fragment: string) {
       </Routes>
     </MemoryRouter>,
   );
+}
+
+/**
+ * Find the Recipes-section card (the <li> recipe card) for a given recipe
+ * title. The shared view renders each recipe as an <li class=recipeCard> whose
+ * only level-3 heading is the recipe title; climb from that heading to its card
+ * <li> so assertions can be scoped to THIS recipe with `within(card)`. Scoping
+ * matters because the shared grocery list repeats the same reminder text, so a
+ * whole-page match would pass even if the card's reminder block were removed.
+ */
+function recipeCard(title: string): HTMLElement {
+  const heading = screen.getByRole('heading', { level: 3, name: title });
+  const card = heading.closest('li');
+  if (card === null) {
+    throw new Error(`No recipe card found for "${title}"`);
+  }
+  return card as HTMLElement;
 }
 
 afterEach(() => {
@@ -226,10 +243,50 @@ describe('SharedView (read-only shared link)', () => {
     const { encoded } = encodeSharePayload(state);
     renderShared(encoded);
 
-    // The reminder appears at least once (the recipe card; the grocery list may
-    // repeat it). The point is it is now on the recipe card too.
+    // Scope to the "Grape Yogurt" recipe CARD. The shared grocery list repeats
+    // the same reminder text, so a whole-page match would still pass even if
+    // the card's reminder block were removed. Asserting inside the card proves
+    // the reminder is on the recipe card itself, under its own "Prep reminders"
+    // heading.
+    const card = recipeCard('Grape Yogurt');
     expect(
-      screen.getAllByText('Quarter lengthwise before serving.').length,
-    ).toBeGreaterThan(0);
+      within(card).getByRole('heading', { name: /prep reminders/i }),
+    ).toBeInTheDocument();
+    expect(
+      within(card).getByText('Quarter lengthwise before serving.'),
+    ).toBeInTheDocument();
+  });
+
+  it('shows NO "Prep reminders" on a recipe card with no reminders (Req 11.4)', () => {
+    // "Sweet Pea Mash" uses peas + water, which fire no safety reminders at the
+    // payload age. Its recipe card must NOT render a "Prep reminders" heading
+    // or reminder block, even though other recipes/sections on the page may.
+    const days: AppState['plan']['days'] = Array.from({ length: 7 }, () => ({}));
+    days[2] = { dinner: 'custom-sweet-pea-mash' };
+    const state = sampleState({
+      customRecipes: [customRecipe()],
+      plan: {
+        startDate: '2026-01-15',
+        prepDate: '2026-01-14',
+        activeSlots: ['dinner'],
+        days,
+      },
+    });
+
+    const { encoded } = encodeSharePayload(state);
+    renderShared(encoded);
+
+    // The card renders (with its ingredients/steps)...
+    const card = recipeCard('Sweet Pea Mash');
+    expect(
+      within(card).getByRole('heading', { name: /ingredients/i }),
+    ).toBeInTheDocument();
+    // ...but has NO "Prep reminders" heading and no reminder text.
+    expect(
+      within(card).queryByRole('heading', { name: /prep reminders/i }),
+    ).toBeNull();
+    expect(
+      within(card).queryByText('Quarter lengthwise before serving.'),
+    ).toBeNull();
   });
 });
