@@ -19,6 +19,7 @@ import { computePrepList, type CookSession } from '../../domain/prep';
 import type { Recipe } from '../../domain/types';
 import { freezerBadgeText } from './recipeView';
 import { dayDateLabel } from './weekView';
+import { LanternArt } from '../components/foodArt';
 import styles from './Prep.module.css';
 
 /** Plain, non-health logistics label for where a cooked session is kept. */
@@ -180,6 +181,7 @@ export default function Prep() {
                       <span className={styles.reminderDate}>
                         {dayDateLabel(reminder.date)}
                       </span>
+                      <LanternArt />
                       <span className={styles.reminderText}>{text}</span>
                     </li>
                   );

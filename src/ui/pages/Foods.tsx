@@ -186,7 +186,13 @@ export default function Foods() {
                 ? `${label} — tried on ${when}`
                 : `${label} — tried, no reaction`;
               return (
-                <FriendlyMonster key={view.key} label={name}>
+                <FriendlyMonster
+                  key={view.key}
+                  label={name}
+                  group={
+                    view.isAllergen ? view.allergenGroup ?? undefined : undefined
+                  }
+                >
                   {tryControls(view.key)}
                 </FriendlyMonster>
               );
