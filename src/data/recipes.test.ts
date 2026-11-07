@@ -162,7 +162,7 @@ describe('BUILTIN_RECIPES - servings (Option A deterministic estimate, issue #9)
   it('estimateServings rounds total yield to whole 2 oz portions, minimum 1', () => {
     expect(INFANT_PORTION_OZ).toBe(2);
     expect(estimateServings(0)).toBe(1); // never below 1
-    expect(estimateServings(1)).toBe(1); // round(0.5) then floored up to the min
+    expect(estimateServings(1)).toBe(1); // round(0.5) = 1 (Math.round rounds halves up)
     expect(estimateServings(15)).toBe(8); // round(7.5) = 8
     expect(estimateServings(24)).toBe(12);
     expect(estimateServings(37)).toBe(19); // round(18.5) = 19

@@ -55,7 +55,7 @@
 // (applied uniformly to every recipe, nutritional precision is not the point):
 //
 //   1 cup            = 8 oz        1 tbsp = 0.5 oz      1 tsp = 0 oz (negligible)
-//   1 lb             = 16 oz       1 (4 oz) jar = 4 oz
+//   1 lb             = 16 oz       1 (4 oz) jar = 4 oz   1 pinch = 0 oz (negligible)
 //   1 egg / egg yolk = 1 oz  (piece)
 //   1 apple          = 5 oz  (piece)
 //   1 sweet potato   = 5 oz  (piece)
@@ -111,11 +111,11 @@ export const BUILTIN_RECIPES: Recipe[] = [
     mealTypes: ['lunch', 'dinner'],
     ingredients: [
       { name: 'carrots, peeled and sliced', quantity: 1, unit: 'cup', category: 'produce' },
-      { name: 'apple, peeled, cored and quartered', quantity: 1, unit: 'piece', category: 'produce' },
+      { name: 'medium apple, peeled, cored and quartered', quantity: 1, unit: 'piece', category: 'produce' },
       { name: 'water', quantity: 0.25, unit: 'cup', category: 'other' },
     ],
     steps: [
-      'Put the carrots, apple and water in a baking dish or a microwave-safe container.',
+      'Add the carrots and apple to a baking dish or microwave-safe container, then pour the water over them.',
       'Cover and cook until tender: bake about 45 minutes at 350\u00b0F, or microwave about 8 minutes on high.',
       'Puree or mash with a fork, stirring in some of the cooking liquid until the texture is right for your baby.',
     ],
@@ -142,7 +142,7 @@ export const BUILTIN_RECIPES: Recipe[] = [
     stages: ['6-8', '9-12'],
     mealTypes: ['lunch', 'dinner'],
     ingredients: [
-      { name: 'sweet potato', quantity: 1, unit: 'piece', category: 'produce' },
+      { name: 'small sweet potato', quantity: 1, unit: 'piece', category: 'produce' },
       { name: 'cooked chicken, cut into bite-size pieces', quantity: 0.25, unit: 'cup', category: 'protein' },
       { name: 'cooked brown rice', quantity: 0.5, unit: 'cup', category: 'grains' },
       { name: 'breastmilk, water or prepared formula', quantity: 0.5, unit: 'cup', category: 'other' },
@@ -307,7 +307,10 @@ export const BUILTIN_RECIPES: Recipe[] = [
     texture: 'soft finger food',
     // Source yield: "Makes approximately twelve 4\" pancakes".
     servings: 12,
-    storage: { fridgeDays: 2, freezerMonths: 1 },
+    // Contains 3 egg yolks, so use the shorter 1-day fridge window from the
+    // homemade-guidance page (meats/eggs/fish/chicken within 1 day), matching
+    // the puff recipes which also contain egg yolks.
+    storage: { fridgeDays: 1, freezerMonths: 1 },
   },
   {
     // Soft, spoonable pudding -> fine from 6 months; also works at 9-12. Source
@@ -417,10 +420,10 @@ export const BUILTIN_RECIPES: Recipe[] = [
     ],
     steps: [
       'Heat the oven to 350\u00b0F and line a cookie sheet with parchment paper.',
-      'Put all the ingredients in a blender or food processor and blend until smooth.',
+      'Combine everything in a food processor or blender and run it until the mixture is completely smooth.',
       'Pour the batter into a zip-top bag and snip a tiny bit off one bottom corner.',
       'Squeeze small dots of batter onto the lined cookie sheet.',
-      'Bake at 350\u00b0F for 10 minutes, then lower the heat to 250\u00b0F and bake 20 minutes more.',
+      'Start baking at 350\u00b0F for the first 10 minutes, then turn the oven down to 250\u00b0F and give the puffs another 20 minutes.',
       'Let the puffs cool, then lift the parchment to loosen them. Cool completely before storing.',
     ],
     texture: 'soft finger food',
@@ -457,10 +460,10 @@ export const BUILTIN_RECIPES: Recipe[] = [
     ],
     steps: [
       'Heat the oven to 350\u00b0F and line a cookie sheet with parchment paper.',
-      'Put all the ingredients in a blender or food processor and blend until smooth.',
+      'Combine everything in a food processor or blender and run it until the mixture is completely smooth.',
       'Pour the batter into a zip-top bag and snip a tiny bit off one bottom corner.',
       'Squeeze small dots of batter onto the lined cookie sheet.',
-      'Bake at 350\u00b0F for 10 minutes, then lower the heat to 250\u00b0F and bake 20 minutes more.',
+      'Start baking at 350\u00b0F for the first 10 minutes, then turn the oven down to 250\u00b0F and give the puffs another 20 minutes.',
       'Let the puffs cool, then lift the parchment to loosen them. Cool completely before storing.',
     ],
     texture: 'soft finger food',
