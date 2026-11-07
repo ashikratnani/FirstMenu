@@ -395,19 +395,26 @@ describe('exportState / importState (Req 12.5)', () => {
   });
 
   it('rejects an import with an empty plan.startDate and leaves stored data unchanged', () => {
-    // Pre-seed storage with a known-good state through loadState's write path.
-    const storage = makeStorage();
+    // Seed the REAL storage importState could reach (globalThis.localStorage),
+    // not a detached stub it never touches. A previous version asserted against
+    // a local makeStorage() that importState has no reference to, so the
+    // "leaves stored data unchanged" claim could never fail. Mirror the purity
+    // test: seed the actual firstmenu key, attempt a bad import, and assert the
+    // stored value is byte-for-byte unchanged.
     const good = validState();
-    saveState(good, storage);
-    const before = storage.getItem(STORAGE_KEY);
+    const before = JSON.stringify(good);
+    globalThis.localStorage.setItem(STORAGE_KEY, before);
+    try {
+      const bad = { ...validState(), plan: { ...validState().plan, startDate: '' } };
+      const result = importState(JSON.stringify(bad));
 
-    const bad = { ...validState(), plan: { ...validState().plan, startDate: '' } };
-    const result = importState(JSON.stringify(bad));
-
-    expect(result.ok).toBe(false);
-    // importState is pure, so the stored data is untouched.
-    expect(storage.getItem(STORAGE_KEY)).toBe(before);
-    expect(JSON.parse(storage.getItem(STORAGE_KEY)!)).toEqual(good);
+      expect(result.ok).toBe(false);
+      // importState is pure, so the stored data is untouched (byte-for-byte).
+      expect(globalThis.localStorage.getItem(STORAGE_KEY)).toBe(before);
+      expect(JSON.parse(globalThis.localStorage.getItem(STORAGE_KEY)!)).toEqual(good);
+    } finally {
+      globalThis.localStorage.removeItem(STORAGE_KEY);
+    }
   });
 
   it('rejects an import with an impossible plan.startDate (2026-02-30)', () => {

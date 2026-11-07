@@ -289,6 +289,82 @@ describe('AppProvider persistence and context', () => {
   });
 });
 
+describe('AppProvider corrupt-data load notice (design Error Handling)', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  function wrapper(storage: Storage) {
+    return ({ children }: { children: ReactNode }) => (
+      <AppProvider storage={storage}>{children}</AppProvider>
+    );
+  }
+
+  it('on corrupt stored data: sets corruptNotice and backs the raw value up under corruptBackupKey', () => {
+    const storage = makeStorage();
+    // Seed a corrupt raw value (non-JSON) under the app key BEFORE rendering,
+    // so loadState hits its parse-failure/backup path at mount.
+    const rawCorrupt = 'not json {';
+    storage.setItem(STORAGE_KEY, rawCorrupt);
+
+    const { result } = renderHook(() => useApp(), {
+      wrapper: wrapper(storage),
+    });
+
+    expect(result.current.corruptNotice).toBe(true);
+    // The backup key has the firstmenu:backup-<timestamp> shape.
+    expect(result.current.corruptBackupKey).toMatch(/^firstmenu:backup-\d+$/);
+    // The backup preserves the ORIGINAL raw corrupt value, byte-for-byte.
+    const backupKey = result.current.corruptBackupKey!;
+    expect(storage.getItem(backupKey)).toBe(rawCorrupt);
+  });
+
+  it('on corrupt JSON that fails the schema: still backs up the exact raw value', () => {
+    const storage = makeStorage();
+    // Valid JSON, but not a valid AppState (fails the zod schema).
+    const rawCorrupt = JSON.stringify({ schemaVersion: 1, not: 'a real state' });
+    storage.setItem(STORAGE_KEY, rawCorrupt);
+
+    const { result } = renderHook(() => useApp(), {
+      wrapper: wrapper(storage),
+    });
+
+    expect(result.current.corruptNotice).toBe(true);
+    expect(result.current.corruptBackupKey).toMatch(/^firstmenu:backup-\d+$/);
+    expect(storage.getItem(result.current.corruptBackupKey!)).toBe(rawCorrupt);
+  });
+
+  it('on valid stored data: corruptNotice is false and corruptBackupKey is null', () => {
+    const storage = makeStorage();
+    const good = base();
+    good.groceryChecked = ['stored-item'];
+    storage.setItem(STORAGE_KEY, JSON.stringify(good));
+
+    const { result } = renderHook(() => useApp(), {
+      wrapper: wrapper(storage),
+    });
+
+    expect(result.current.corruptNotice).toBe(false);
+    expect(result.current.corruptBackupKey).toBeNull();
+    // The valid stored state loaded as-is.
+    expect(result.current.state.groceryChecked).toContain('stored-item');
+  });
+
+  it('with no stored data: corruptNotice is false and corruptBackupKey is null', () => {
+    const storage = makeStorage();
+
+    const { result } = renderHook(() => useApp(), {
+      wrapper: wrapper(storage),
+    });
+
+    expect(result.current.corruptNotice).toBe(false);
+    expect(result.current.corruptBackupKey).toBeNull();
+  });
+});
+
 describe('AppProvider import/export (Req 12.5)', () => {
   beforeEach(() => {
     vi.useFakeTimers();
