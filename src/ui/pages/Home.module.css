@@ -1,0 +1,38 @@
+/*
+ * Week home screen (Task 6.1 placeholder). Per design "Theme mapping" the week
+ * home screen is a plain, bright grid of day cards with no themed scene. The
+ * real week view (slots, badges, cards) arrives in task 10.
+ *
+ * Fluid grid that stays usable at 360px width (Req 14.6): auto-fill columns
+ * that stack to a single column on narrow screens.
+ */
+
+.weekGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: var(--space);
+  padding: 0;
+  margin: var(--space) 0 0;
+  list-style: none;
+}
+
+.dayCard {
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: var(--space);
+  min-height: 96px;
+}
+
+.dayName {
+  margin: 0 0 calc(var(--space) * 0.5);
+  font-size: 1rem;
+  color: var(--color-heading);
+}
+
+.dayNote {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--color-muted);
+}
