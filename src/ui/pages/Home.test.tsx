@@ -332,10 +332,15 @@ describe('Home week view', () => {
     );
     expect(captured!.plan.days[0].breakfast).toBeUndefined();
 
-    // Prep-date input dispatches setPrepDate.
+    // Prep-date input dispatches setPrepDate with the committed value. A date
+    // input commits a whole value at once; clearing it sends "" which the
+    // reducer now rejects as a no-op (guards prep.ts against NaN offsets), so a
+    // valid replacement must still go through.
     const prep = screen.getByLabelText('Prep day');
-    await user.clear(prep);
-    await user.type(prep, '2030-01-02');
+    const prepBefore = captured!.plan.prepDate;
+    fireEvent.change(prep, { target: { value: '' } });
+    expect(captured!.plan.prepDate).toBe(prepBefore); // cleared -> no-op
+    fireEvent.change(prep, { target: { value: '2030-01-02' } });
     expect(captured!.plan.prepDate).toBe('2030-01-02');
   });
 });
