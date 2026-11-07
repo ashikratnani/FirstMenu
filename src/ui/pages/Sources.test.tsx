@@ -74,10 +74,34 @@ describe('Sources page', () => {
 
   it('de-duplicates sources cited by more than one rule in the references list', () => {
     renderSources();
-    // Every distinct source cited is a real published URL in the references.
+    // The References list has exactly one <li> per DISTINCT cited source, so a
+    // source cited by several rules still appears once. The expected count is
+    // derived from rules.ts so the test cannot drift from the data.
     const ids = distinctCitedSourceIds();
     expect(ids.length).toBeGreaterThan(0);
-    const references = screen.getByRole('heading', { name: /references/i });
-    expect(references).toBeInTheDocument();
+
+    const referencesHeading = screen.getByRole('heading', {
+      name: /references/i,
+    });
+    // The list immediately following the References heading holds the entries.
+    const referenceList = referencesHeading.nextElementSibling;
+    expect(referenceList?.tagName).toBe('UL');
+    const items = referenceList?.querySelectorAll('li') ?? [];
+    expect(items.length).toBe(ids.length);
+
+    // Sanity check: at least one source is cited by more than one rule, so the
+    // de-duplication is actually exercised (otherwise the assertion is trivial).
+    const citations: SourceId[] = RULES.flatMap((rule) => rule.sources);
+    const hasSharedSource = citations.length > ids.length;
+    expect(hasSharedSource).toBe(true);
+
+    // Every distinct cited source id is represented exactly once in the list.
+    for (const id of ids) {
+      const title = SOURCES[id].title;
+      const matching = [...items].filter((li) =>
+        li.textContent?.includes(title),
+      );
+      expect(matching.length).toBe(1);
+    }
   });
 });

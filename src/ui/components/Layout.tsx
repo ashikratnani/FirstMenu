@@ -8,6 +8,7 @@
 // Nav uses real NavLink anchors so it is reachable and operable by keyboard;
 // the active route is marked with aria-current="page" (Req 14.4).
 
+import { useRef } from 'react';
 import { Link, NavLink, Outlet } from 'react-router-dom';
 import styles from './Layout.module.css';
 import Disclaimer, { FirstRunDisclaimer } from './Disclaimer';
@@ -26,9 +27,22 @@ const NAV_ITEMS: ReadonlyArray<{ to: string; label: string; end?: boolean }> = [
 ];
 
 export default function Layout() {
+  // Under HashRouter a plain href="#main" mutates the hash and is interpreted
+  // as a route change (to /main), which matches nothing and blanks the page.
+  // Instead we preventDefault and move focus to <main> directly (Req 14.4).
+  const mainRef = useRef<HTMLElement>(null);
+
   return (
     <div className={styles.shell}>
-      <a className={styles.skipLink} href="#main">
+      <a
+        className={styles.skipLink}
+        href="#main"
+        onClick={(event) => {
+          event.preventDefault();
+          mainRef.current?.focus();
+          mainRef.current?.scrollIntoView?.();
+        }}
+      >
         Skip to content
       </a>
 
@@ -50,7 +64,7 @@ export default function Layout() {
         </nav>
       </header>
 
-      <main id="main" className={styles.main}>
+      <main id="main" ref={mainRef} tabIndex={-1} className={styles.main}>
         {/* Storage-unavailable banner (Req 12.7) and first-run disclaimer
             (Req 13.1) show above the routed page on every route. */}
         <StorageBanner />

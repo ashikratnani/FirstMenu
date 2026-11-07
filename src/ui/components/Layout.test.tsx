@@ -1,26 +1,34 @@
-import { render, screen, within } from '@testing-library/react';
-import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { fireEvent, render, screen, within } from '@testing-library/react';
+import {
+  HashRouter,
+  MemoryRouter,
+  Route,
+  Routes,
+} from 'react-router-dom';
 import { describe, expect, it } from 'vitest';
 import { AppProvider } from '../../state/AppProvider';
 import Layout from './Layout';
+
+/** An in-memory Storage so tests never touch real localStorage. */
+function makeStorage(): Storage {
+  const map = new Map<string, string>();
+  return {
+    get length() {
+      return map.size;
+    },
+    clear: () => map.clear(),
+    getItem: (k: string) => map.get(k) ?? null,
+    key: (i: number) => [...map.keys()][i] ?? null,
+    removeItem: (k: string) => map.delete(k),
+    setItem: (k: string, v: string) => void map.set(k, v),
+  } satisfies Storage;
+}
 
 // Render the shell with a trivial routed child so <Outlet/> has something to
 // show. Uses an in-memory Storage so AppProvider does not touch real
 // localStorage (matching the component-test pattern in App.test.tsx).
 function renderShell(initialPath = '/') {
-  const storage = (() => {
-    const map = new Map<string, string>();
-    return {
-      get length() {
-        return map.size;
-      },
-      clear: () => map.clear(),
-      getItem: (k: string) => map.get(k) ?? null,
-      key: (i: number) => [...map.keys()][i] ?? null,
-      removeItem: (k: string) => map.delete(k),
-      setItem: (k: string, v: string) => void map.set(k, v),
-    } satisfies Storage;
-  })();
+  const storage = makeStorage();
 
   return render(
     <AppProvider storage={storage}>
@@ -81,5 +89,37 @@ describe('Layout (app shell)', () => {
     const nav = screen.getByRole('navigation', { name: /primary/i });
     const recipesLink = within(nav).getByRole('link', { name: /recipes/i });
     expect(recipesLink).toHaveAttribute('aria-current', 'page');
+  });
+
+  // Regression test for the HashRouter skip-link bug: a plain href="#main"
+  // under HashRouter is read as a route change to /main, which matches nothing
+  // and blanks the page. The skip link must preventDefault and move focus to
+  // <main> instead (Req 14.4), so the page content stays and focus lands on
+  // the main region. Rendered under a REAL HashRouter (not MemoryRouter).
+  it('skip link keeps the page content and focuses main under HashRouter', () => {
+    render(
+      <AppProvider storage={makeStorage()}>
+        <HashRouter>
+          <Routes>
+            <Route element={<Layout />}>
+              <Route path="/" element={<p>home content</p>} />
+            </Route>
+          </Routes>
+        </HashRouter>
+      </AppProvider>,
+    );
+
+    const skip = screen.getByRole('link', { name: /skip to content/i });
+    fireEvent.click(skip);
+
+    // The routed page content is still present (the page did not blank).
+    expect(screen.getByText(/home content/i)).toBeInTheDocument();
+    expect(
+      screen.getByRole('navigation', { name: /primary/i }),
+    ).toBeInTheDocument();
+
+    // Focus moved to the main landmark.
+    const main = screen.getByRole('main');
+    expect(document.activeElement).toBe(main);
   });
 });

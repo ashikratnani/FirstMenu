@@ -48,12 +48,23 @@ export default function Sources() {
             <p className={styles.ruleMessage}>{rule.message}</p>
             <p className={styles.ruleSources}>
               Source{rule.sources.length > 1 ? 's' : ''}:{' '}
-              {rule.sources.map((id, i) => (
-                <span key={id}>
-                  {i > 0 ? ', ' : ''}
-                  {SOURCES[id].title}
-                </span>
-              ))}
+              {rule.sources.map((id, i) => {
+                const source = SOURCES[id];
+                const urls = sourceUrls(source);
+                return (
+                  <span key={id}>
+                    {i > 0 ? ', ' : ''}
+                    {urls.map((url, j) => (
+                      <span key={url}>
+                        {j > 0 ? ' ' : ''}
+                        <a href={url} target="_blank" rel="noopener noreferrer">
+                          {source.title}
+                        </a>
+                      </span>
+                    ))}
+                  </span>
+                );
+              })}
             </p>
           </li>
         ))}

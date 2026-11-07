@@ -37,8 +37,10 @@ function renderApp(initialPath = '/') {
 describe('App', () => {
   it('renders the home page heading', () => {
     renderApp();
+    // Home renders the week grid under the heading "This week"; the shared
+    // header's "FirstMenu" h1 is a different heading, so target Home's own.
     expect(
-      screen.getByRole('heading', { name: /firstmenu/i }),
+      screen.getByRole('heading', { name: /this week/i }),
     ).toBeInTheDocument();
   });
 
