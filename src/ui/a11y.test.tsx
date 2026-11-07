@@ -173,26 +173,45 @@ function renderApp(path: string, seed: AppState) {
 }
 
 describe('Accessibility: axe on every main page (color-contrast disabled)', () => {
-  // Each entry is [label, path]; all render through the shell with the same
-  // onboarded seed so the OnboardingGate lets the page render.
-  const pages: ReadonlyArray<[string, string]> = [
-    ['Home (week)', '/'],
-    ['Recipes', '/recipes'],
-    ['RecipeDetail', `/recipes/${BUILTIN_RECIPE_ID}`],
-    ['Foods', '/foods'],
-    ['Prep', '/prep'],
-    ['Grocery', '/grocery'],
-    ['Share', '/share'],
-    ['Print', '/print'],
-    ['Settings', '/settings'],
-    ['Sources', '/sources'],
+  // Each entry is [label, path, heading]; all render through the shell with the
+  // same onboarded seed so the OnboardingGate lets the page render. `heading`
+  // is the page's real, unique level-1 heading text (the exact h1 each page
+  // component renders). It is asserted BEFORE axe so a gate redirect or broken
+  // route can't let axe silently pass on the wrong page's markup — axe only
+  // runs once the intended page has actually rendered.
+  const pages: ReadonlyArray<[string, string, RegExp]> = [
+    ['Home (week)', '/', /^this week$/i],
+    ['Recipes', '/recipes', /^recipes$/i],
+    // RecipeDetail's h1 is the recipe title, not a generic page title.
+    ['RecipeDetail', `/recipes/${BUILTIN_RECIPE_ID}`, /^carrots and apples$/i],
+    ['New recipe (editor)', '/recipes/new', /^new recipe$/i],
+    [
+      'Edit recipe (editor)',
+      '/recipes/custom-sweet-pea-mash/edit',
+      /^edit recipe$/i,
+    ],
+    ['Foods', '/foods', /^foods$/i],
+    ['Prep', '/prep', /^prep$/i],
+    ['Grocery', '/grocery', /^grocery$/i],
+    ['Share', '/share', /^share$/i],
+    ['Print', '/print', /^print your week$/i],
+    ['Settings', '/settings', /^settings$/i],
+    ['Sources', '/sources', /^sources$/i],
   ];
 
-  it.each(pages)('%s has no axe violations', async (_label, path) => {
-    const { container } = renderApp(path, seededState());
-    const results = await axe(container, AXE_OPTIONS);
-    expect(results).toHaveNoViolations();
-  });
+  it.each(pages)(
+    '%s has no axe violations',
+    async (_label, path, heading) => {
+      const { container } = renderApp(path, seededState());
+      // Confirm the intended page actually rendered (its unique h1 is present)
+      // before running axe, so axe can't pass on a redirect/error page.
+      expect(
+        screen.getByRole('heading', { level: 1, name: heading }),
+      ).toBeInTheDocument();
+      const results = await axe(container, AXE_OPTIONS);
+      expect(results).toHaveNoViolations();
+    },
+  );
 
   it('Onboarding (not onboarded) has no axe violations', async () => {
     // Render with onboarded:false so the onboarding form shows instead of the
