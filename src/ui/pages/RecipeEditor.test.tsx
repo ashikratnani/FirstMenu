@@ -123,7 +123,10 @@ describe('RecipeEditor', () => {
     renderApp(seedState(8), '/recipes/new');
 
     await user.type(screen.getByLabelText('Title'), 'Honey Oats');
+    await user.click(screen.getByLabelText('6-8 months'));
+    await user.click(screen.getByLabelText('Breakfast'));
     await user.type(screen.getByLabelText('Ingredient 1 name'), 'honey');
+    await user.type(screen.getByLabelText('Step 1'), 'Mix.');
     await user.click(screen.getByRole('button', { name: 'Save recipe' }));
 
     const findings = screen.getByRole('region', {
@@ -143,6 +146,8 @@ describe('RecipeEditor', () => {
     const { getState } = renderApp(seedState(8), '/recipes/new');
 
     await user.type(screen.getByLabelText('Title'), 'Yogurt Bowl');
+    await user.click(screen.getByLabelText('6-8 months'));
+    await user.click(screen.getByLabelText('Breakfast'));
     await user.type(
       screen.getByLabelText('Ingredient 1 name'),
       'plain whole-milk yogurt',
@@ -151,6 +156,7 @@ describe('RecipeEditor', () => {
       screen.getByLabelText('Counts as (food override)'),
       'yogurt',
     );
+    await user.type(screen.getByLabelText('Step 1'), 'Spoon into a bowl.');
     await user.click(screen.getByRole('button', { name: 'Save recipe' }));
 
     const saved = getState().customRecipes[0];
@@ -202,6 +208,110 @@ describe('RecipeEditor', () => {
     // ...and the library (navigated to) renders the human-readable notice.
     const notice = screen.getByRole('status');
     expect(within(notice).getByText('Day 2, Breakfast')).toBeInTheDocument();
+  });
+
+  it('shows the derived "counts as" food for an ingredient name', async () => {
+    const user = userEvent.setup();
+    renderApp(seedState(8), '/recipes/new');
+
+    await user.type(
+      screen.getByLabelText('Ingredient 1 name'),
+      'mashed sweet potato',
+    );
+    // The derived food (from foodKeyFor) is shown so the user can see what the
+    // ingredient counts as before optionally overriding it.
+    expect(screen.getByText(/Counts as: sweet potato/)).toBeInTheDocument();
+  });
+
+  it('names an allergen derived food by its group in the counts-as hint', async () => {
+    const user = userEvent.setup();
+    renderApp(seedState(8), '/recipes/new');
+
+    await user.type(screen.getByLabelText('Ingredient 1 name'), 'egg noodles');
+    // egg noodles -> egg + wheat allergen groups, labeled (not raw keys).
+    expect(screen.getByText(/Counts as: egg, wheat/)).toBeInTheDocument();
+  });
+
+  it('saving a new recipe twice does not create a duplicate', async () => {
+    const user = userEvent.setup();
+    const { getState } = renderApp(seedState(8), '/recipes/new');
+
+    await user.type(screen.getByLabelText('Title'), 'Oat Mash');
+    await user.click(screen.getByLabelText('6-8 months'));
+    await user.click(screen.getByLabelText('Breakfast'));
+    await user.type(screen.getByLabelText('Ingredient 1 name'), 'oats');
+    await user.type(screen.getByLabelText('Step 1'), 'Cook the oats.');
+
+    await user.click(screen.getByRole('button', { name: 'Save recipe' }));
+    expect(getState().customRecipes).toHaveLength(1);
+
+    // A second save of the SAME form must update, not insert a duplicate.
+    await user.click(screen.getByRole('button', { name: 'Save recipe' }));
+    const custom = getState().customRecipes;
+    expect(custom).toHaveLength(1);
+    expect(custom[0].title).toBe('Oat Mash');
+  });
+
+  it('rejects a save when required fields are missing and shows messages', async () => {
+    const user = userEvent.setup();
+    const { getState } = renderApp(seedState(8), '/recipes/new');
+
+    // Save the empty form: nothing is dispatched and per-field messages appear.
+    await user.click(screen.getByRole('button', { name: 'Save recipe' }));
+
+    expect(getState().customRecipes).toHaveLength(0);
+    expect(screen.getByText('Add a title.')).toBeInTheDocument();
+    expect(screen.getByText('Choose at least one stage.')).toBeInTheDocument();
+    expect(
+      screen.getByText('Choose at least one meal type.'),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText('Add at least one ingredient.'),
+    ).toBeInTheDocument();
+    expect(screen.getByText('Add at least one step.')).toBeInTheDocument();
+    // The safety screen panel is not shown for a rejected save.
+    expect(
+      screen.queryByRole('region', { name: 'Safety screen results' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('saves when all required fields are present', async () => {
+    const user = userEvent.setup();
+    const { getState } = renderApp(seedState(8), '/recipes/new');
+
+    await user.type(screen.getByLabelText('Title'), 'Pear Mash');
+    await user.click(screen.getByLabelText('6-8 months'));
+    await user.click(screen.getByLabelText('Lunch'));
+    await user.type(screen.getByLabelText('Ingredient 1 name'), 'pear');
+    await user.type(screen.getByLabelText('Step 1'), 'Mash the pear.');
+
+    await user.click(screen.getByRole('button', { name: 'Save recipe' }));
+
+    expect(getState().customRecipes).toHaveLength(1);
+    expect(getState().customRecipes[0].title).toBe('Pear Mash');
+    expect(screen.queryByText('Add a title.')).not.toBeInTheDocument();
+  });
+
+  it('shows the SCREEN_LIMITS caveat (not an invented all-clear) when nothing fires', async () => {
+    const user = userEvent.setup();
+    renderApp(seedState(8), '/recipes/new');
+
+    await user.type(screen.getByLabelText('Title'), 'Pear Mash');
+    await user.click(screen.getByLabelText('6-8 months'));
+    await user.click(screen.getByLabelText('Lunch'));
+    await user.type(screen.getByLabelText('Ingredient 1 name'), 'pear');
+    await user.type(screen.getByLabelText('Step 1'), 'Mash the pear.');
+    await user.click(screen.getByRole('button', { name: 'Save recipe' }));
+
+    const findings = screen.getByRole('region', {
+      name: 'Safety screen results',
+    });
+    expect(
+      within(findings).getByText(/checks ingredient names against a fixed list/),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText(/No safety flags for this recipe/),
+    ).not.toBeInTheDocument();
   });
 
   it('redirects to a not-found view when editing a built-in id', () => {

@@ -4,12 +4,22 @@
 // including a per-ingredient "counts as" food override (Ingredient.food) and
 // dynamic ingredient/step rows.
 //
+// Before a save the required fields are validated (title, >=1 stage, >=1 meal
+// type, >=1 ingredient with a name, >=1 step; Req 2.2/3.1); a missing field
+// blocks the save and shows a per-field message. Each ingredient row also shows
+// the food it "counts as", derived from its name via the real foodKeyFor (Req
+// 3.3), which the user can override (Ingredient.food).
+//
 // On SAVE the real safety screen runs (screenRecipe) and the findings are shown
 // on the page: block reasons (with the age the food becomes available),
-// per-ingredient prep reminders, and allergen reminders. Saving is NOT gated on
-// the findings - a recipe with a block is saved and simply ghosted like a
-// built-in (enforced in recipeView.ts / planning). The editor never offers a
-// control to bypass a block (autonomy.md: never weaken the safety screen).
+// per-ingredient prep reminders, and allergen reminders. When nothing fires the
+// panel reuses the shared SCREEN_LIMITS caveat (Req 13.2) rather than inventing
+// an all-clear sentence (autonomy.md: health wording comes from the spec).
+// Saving is NOT gated on the findings - a recipe with a block is saved and
+// simply ghosted like a built-in (enforced in recipeView.ts / planning). The
+// editor never offers a control to bypass a block (autonomy.md: never weaken
+// the safety screen). Saving a brand-new recipe reuses the first-save id on
+// subsequent saves, so a double-save updates one recipe (no duplicate).
 //
 // Edit mode also offers Delete, which routes through the AppProvider context
 // helper so the plan slots the recipe occupied are emptied AND surfaced via the
@@ -21,6 +31,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useApp } from '../../state/AppProvider';
 import { selectAgeMonths } from '../../state/selectors';
 import { screenRecipe, type ScreenResult } from '../../domain/safety/screen';
+import { foodKeyFor, foodLabel } from '../../domain/foods';
 import type {
   GroceryCategory,
   Ingredient,
@@ -29,6 +40,7 @@ import type {
   StageId,
 } from '../../domain/types';
 import { MEAL_TYPES, STAGES, mealTypeLabel, stageLabel } from './recipeView';
+import { SCREEN_LIMITS } from '../components/Disclaimer';
 import styles from './RecipeEditor.module.css';
 
 const GROCERY_CATEGORIES: readonly GroceryCategory[] = [
@@ -60,6 +72,21 @@ interface IngredientForm {
   category: GroceryCategory;
 }
 
+/**
+ * The food each ingredient "counts as", derived from its current name via the
+ * real foodKeyFor (Req 3.3). Multi-group names (e.g. "egg noodles" -> egg +
+ * wheat) are labeled and joined, so the user sees what the name maps to and can
+ * override it. Returns '' for a blank name.
+ */
+function derivedCountsAs(name: string): string {
+  if (name.trim() === '') return '';
+  const keys = foodKeyFor({ name: name.trim(), category: 'other' });
+  return keys
+    .map(foodLabel)
+    .filter((label) => label.length > 0)
+    .join(', ');
+}
+
 const emptyIngredient = (): IngredientForm => ({
   name: '',
   food: '',
@@ -67,6 +94,47 @@ const emptyIngredient = (): IngredientForm => ({
   unit: '',
   category: 'produce',
 });
+
+/** Per-field validation messages shown when a save is rejected. */
+interface FormErrors {
+  title?: string;
+  stages?: string;
+  mealTypes?: string;
+  ingredients?: string;
+  steps?: string;
+}
+
+/**
+ * Validate the required fields before a save (Req 2.2, 3.1): a recipe needs a
+ * title, at least one stage, at least one meal type, at least one ingredient
+ * with a name, and at least one step. Returns a per-field message map; an empty
+ * map means the form is valid.
+ */
+function validateForm(form: {
+  title: string;
+  stages: StageId[];
+  mealTypes: MealType[];
+  ingredients: IngredientForm[];
+  steps: string[];
+}): FormErrors {
+  const errors: FormErrors = {};
+  if (form.title.trim() === '') {
+    errors.title = 'Add a title.';
+  }
+  if (form.stages.length === 0) {
+    errors.stages = 'Choose at least one stage.';
+  }
+  if (form.mealTypes.length === 0) {
+    errors.mealTypes = 'Choose at least one meal type.';
+  }
+  if (form.ingredients.every((row) => row.name.trim() === '')) {
+    errors.ingredients = 'Add at least one ingredient.';
+  }
+  if (form.steps.every((step) => step.trim() === '')) {
+    errors.steps = 'Add at least one step.';
+  }
+  return errors;
+}
 
 /** Prefill the ingredient form rows from a saved recipe's ingredients. */
 function toIngredientForms(ingredients: Ingredient[]): IngredientForm[] {
@@ -207,6 +275,15 @@ export default function RecipeEditor() {
   // Findings shown after a save (null until the first save on this page).
   const [screen, setScreen] = useState<ScreenResult | null>(null);
 
+  // The id currently being edited. In edit mode this is the route id; on
+  // /recipes/new it is null until the FIRST successful save mints a uuid, after
+  // which it is reused so re-saving UPDATES the same recipe instead of minting
+  // a new uuid each time (no duplicate on double-save).
+  const [savedId, setSavedId] = useState<string | null>(null);
+
+  // Per-field validation messages, populated when a save is rejected.
+  const [errors, setErrors] = useState<FormErrors>({});
+
   // Edit mode pointing at a non-existent / built-in id: nothing to edit.
   if (isEditMode && !editing) {
     return (
@@ -264,7 +341,28 @@ export default function RecipeEditor() {
 
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
-    const recipeId = editing?.id ?? crypto.randomUUID();
+
+    // Block the save and surface per-field messages when required fields are
+    // missing (Req 2.2, 3.1). The safety screen is NOT run and nothing is
+    // dispatched while the form is invalid.
+    const validation = validateForm({
+      title,
+      stages,
+      mealTypes,
+      ingredients,
+      steps,
+    });
+    setErrors(validation);
+    if (Object.keys(validation).length > 0) {
+      setScreen(null);
+      return;
+    }
+
+    // Reuse the id already being edited (route id in edit mode, or the id the
+    // first save on /recipes/new minted). Only mint a fresh uuid the very first
+    // time a brand-new recipe is saved, so saving twice updates one recipe
+    // rather than creating a duplicate.
+    const recipeId = editing?.id ?? savedId ?? crypto.randomUUID();
     const recipe = buildRecipe(
       {
         title,
@@ -285,6 +383,7 @@ export default function RecipeEditor() {
     // them (a block simply ghosts the recipe later).
     const result = screenRecipe(recipe, selectAgeMonths(state) ?? 0);
     setScreen(result);
+    setSavedId(recipeId);
     dispatch({ type: 'saveCustomRecipe', recipe });
   };
 
@@ -313,9 +412,15 @@ export default function RecipeEditor() {
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            required
+            aria-invalid={errors.title ? true : undefined}
+            aria-describedby={errors.title ? 'recipe-title-error' : undefined}
             autoComplete="off"
           />
+          {errors.title && (
+            <p id="recipe-title-error" className={styles.error} role="alert">
+              {errors.title}
+            </p>
+          )}
         </div>
 
         <fieldset className={styles.fieldset}>
@@ -336,6 +441,11 @@ export default function RecipeEditor() {
               );
             })}
           </ul>
+          {errors.stages && (
+            <p className={styles.error} role="alert">
+              {errors.stages}
+            </p>
+          )}
         </fieldset>
 
         <fieldset className={styles.fieldset}>
@@ -356,6 +466,11 @@ export default function RecipeEditor() {
               );
             })}
           </ul>
+          {errors.mealTypes && (
+            <p className={styles.error} role="alert">
+              {errors.mealTypes}
+            </p>
+          )}
         </fieldset>
 
         <fieldset className={styles.fieldset}>
@@ -363,6 +478,7 @@ export default function RecipeEditor() {
           <ul className={styles.rows}>
             {ingredients.map((row, index) => {
               const rowId = `ingredient-${index}`;
+              const derivedFood = derivedCountsAs(row.name);
               return (
                 <li key={index} className={styles.ingredientRow}>
                   <div className={styles.field}>
@@ -454,8 +570,15 @@ export default function RecipeEditor() {
                       onChange={(e) =>
                         updateIngredient(index, { food: e.target.value })
                       }
+                      placeholder={derivedFood || undefined}
                       autoComplete="off"
                     />
+                    {derivedFood && (
+                      <p className={styles.countsAsHint}>
+                        Counts as: {derivedFood}
+                        {row.food.trim() === '' ? ' (derived from the name)' : ''}
+                      </p>
+                    )}
                   </div>
 
                   <button
@@ -477,6 +600,11 @@ export default function RecipeEditor() {
           >
             Add ingredient
           </button>
+          {errors.ingredients && (
+            <p className={styles.error} role="alert">
+              {errors.ingredients}
+            </p>
+          )}
         </fieldset>
 
         <fieldset className={styles.fieldset}>
@@ -514,6 +642,11 @@ export default function RecipeEditor() {
           <button type="button" className={styles.addButton} onClick={addStep}>
             Add step
           </button>
+          {errors.steps && (
+            <p className={styles.error} role="alert">
+              {errors.steps}
+            </p>
+          )}
         </fieldset>
 
         <div className={styles.field}>
@@ -673,9 +806,7 @@ export default function RecipeEditor() {
           {screen.blocks.length === 0 &&
             screen.reminders.length === 0 &&
             screen.allergens.length === 0 && (
-              <p className={styles.noFindings}>
-                No safety flags for this recipe at the current age.
-              </p>
+              <p className={styles.noFindings}>{SCREEN_LIMITS}</p>
             )}
 
           <p className={styles.viewLink}>

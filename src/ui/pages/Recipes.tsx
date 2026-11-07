@@ -9,7 +9,8 @@
 // 14.3); the illustrations are decorative/aria-hidden:
 //   - a GHOST state ("Not yet: ...") when the recipe is ghosted (a block
 //     finding OR an ingredient food with a recorded reaction);
-//   - a DOOR badge ("New food") when the recipe uses an untried food;
+//   - a DOOR badge ("New food: <food>") naming each untried food the recipe
+//     uses (Req 7.3);
 //   - a PUMPKIN badge ("Freezes for N months") when freezer-friendly.
 // Ghosting/door/pumpkin logic lives in recipeView.ts so it stays aligned with
 // screen.ts and foods.ts (no new ghosting rule invented).
@@ -23,6 +24,7 @@ import { GhostArt, PumpkinArt } from '../components/foodArt';
 import {
   MEAL_TYPES,
   STAGES,
+  doorBadgeText,
   emptiedSlotLabel,
   freezerBadgeText,
   ghostReason,
@@ -37,11 +39,20 @@ import styles from './Recipes.module.css';
 
 /** One recipe card: a list item linking to the recipe page, with its badges. */
 function RecipeCard({ view }: { view: RecipeView }) {
-  const { recipe, isGhosted, usesUntriedFood, freezerMonths } = view;
+  const { recipe, isGhosted, usesUntriedFood, untriedFoodLabels, freezerMonths } =
+    view;
   const reason = isGhosted ? ghostReason(view) : null;
+  const doorText = usesUntriedFood ? doorBadgeText(untriedFoodLabels) : null;
+  const freezerText =
+    freezerMonths !== null ? freezerBadgeText(freezerMonths) : null;
 
-  // Accessible name carries the title plus any ghost state (Req 14.3).
-  const accessibleName = reason ? `${recipe.title}. ${reason}` : recipe.title;
+  // The card link's accessible name must carry EVERY visible state (Req 14.3):
+  // the title, the ghost reason, and the door / freezer badge text. An
+  // aria-label overrides the content, so we compose it from all of them rather
+  // than let the badge text go unspoken.
+  const accessibleName = [recipe.title, reason, doorText, freezerText]
+    .filter((part): part is string => part !== null)
+    .join('. ');
 
   return (
     <li className={styles.card}>
@@ -58,13 +69,11 @@ function RecipeCard({ view }: { view: RecipeView }) {
           </span>
         )}
         <span className={styles.badges}>
-          {usesUntriedFood && (
-            <span className={styles.badgeDoor}>New food</span>
-          )}
-          {freezerMonths !== null && (
+          {doorText && <span className={styles.badgeDoor}>{doorText}</span>}
+          {freezerText && (
             <span className={styles.badgeFreezer}>
               <PumpkinArt />
-              {freezerBadgeText(freezerMonths)}
+              {freezerText}
             </span>
           )}
         </span>

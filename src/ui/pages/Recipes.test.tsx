@@ -184,11 +184,55 @@ describe('Recipes library page', () => {
     expect(egg).toBeInTheDocument();
   });
 
-  it('shows a door badge for a recipe using an untried food', () => {
-    // No foods tried, so a built-in puree uses untried foods -> door badge.
+  it('shows a door badge NAMING each untried food the recipe uses', () => {
+    // No foods tried, so a built-in puree uses untried foods -> door badge that
+    // names them (Req 7.3), not a bare "New food".
     renderRecipes(seedState(8));
     const carrots = screen.getByRole('link', { name: /Carrots and Apples/ });
-    expect(within(carrots).getByText('New food')).toBeInTheDocument();
+    const badge = within(carrots).getByText(/^New food:/);
+    expect(badge).toHaveTextContent('New food: carrot, apple');
+  });
+
+  it('names an allergen untried food by its group label in the door badge', () => {
+    // Egg (10 months, untried, no reaction) -> door badge "New food: egg", not
+    // the raw "allergen:egg" key.
+    renderRecipes(seedState(10, [EGG_RECIPE]));
+    const egg = screen.getByRole('link', { name: /Egg Scramble/ });
+    expect(within(egg).getByText('New food: egg')).toBeInTheDocument();
+  });
+
+  it('includes the door and freezer badge text in the card accessible name', () => {
+    // The aria-label overrides the content, so screen readers must still hear
+    // the badge state (Req 14.3): door naming the food and freezer months.
+    renderRecipes(seedState(8));
+    const carrots = screen.getByRole('link', { name: /Carrots and Apples/ });
+    const name = carrots.getAttribute('aria-label') ?? '';
+    expect(name).toContain('New food: carrot, apple');
+    expect(name).toContain('Freezes for 1 month');
+  });
+
+  it('lists ALL blocking ingredients in a ghost reason', () => {
+    // A recipe with two blocked ingredients (honey + raw egg under-age is not a
+    // block, so use two block foods: honey and added salt) shows each.
+    const multiBlock: Recipe = {
+      id: 'custom-multi-block',
+      origin: 'custom',
+      title: 'Honey Salt Mash',
+      stages: ['6-8', '9-12'],
+      mealTypes: ['breakfast'],
+      ingredients: [
+        { name: 'honey', category: 'pantry' },
+        { name: 'salt', category: 'pantry' },
+      ],
+      steps: ['Mix.'],
+      texture: 'smooth',
+      servings: 1,
+    };
+    renderRecipes(seedState(8, [multiBlock]));
+    const card = screen.getByRole('link', { name: /Honey Salt Mash/ });
+    const name = card.getAttribute('aria-label') ?? '';
+    expect(name).toContain('Not yet: honey.');
+    expect(name).toContain('Not yet: salt.');
   });
 
   it('shows a pumpkin badge "Freezes for N months" for a freezer-friendly recipe', () => {

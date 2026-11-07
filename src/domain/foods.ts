@@ -33,6 +33,18 @@ export function allergenKey(group: AllergenGroup): string {
   return `${ALLERGEN_KEY_PREFIX}${group}`;
 }
 
+/**
+ * Human label for a food key. An `allergen:<group>` key resolves to its group
+ * label (e.g. "egg"), matching how the Foods page shows allergen keys; a plain
+ * food key is already human-readable and is returned unchanged.
+ */
+export function foodLabel(key: string): string {
+  if (key.startsWith(ALLERGEN_KEY_PREFIX)) {
+    return key.slice(ALLERGEN_KEY_PREFIX.length);
+  }
+  return key;
+}
+
 /** The allergen rules from the shared rule table (kind === 'allergen'). */
 const ALLERGEN_RULES: SafetyRule[] = RULES.filter(
   (rule): rule is SafetyRule & { allergenGroup: AllergenGroup } =>
