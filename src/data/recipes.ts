@@ -21,15 +21,49 @@
 //  3. The safety screen is run at the youngest age of each tagged stage (6 months
 //     for '6-8', 9 months for '9-12'). Where an ingredient would block, we use
 //     only the source's own safe option (e.g. water instead of apple juice,
-//     plain instead of vanilla yogurt) or drop a droppable blocked ingredient
-//     and record it in `source.adaptations`. Any recipe that would need other
-//     changes is SKIPPED. (No recipe below has a block at its tagged ages.)
-//  4. Stages are tagged from the source's age guidance/texture: smooth purees
-//     -> '6-8' (and also fine as '9-12'); finger foods / pancakes / baked puffs
-//     / meatballs -> '9-12'. Per-recipe rationale is noted in comments.
-//  5. Storage times come from the source page; each recipe that sets storage
-//     records a `source.storageSource` URL.
+//     plain instead of vanilla yogurt). We never silently drop a non-blocked
+//     source ingredient. Any recipe that would need other changes is SKIPPED.
+//     (No recipe below has a block at its tagged ages.)
+//  4. Stages are tagged from the source's age guidance and texture. The
+//     infantfoods.html page states only that its recipes are "suitable for
+//     infants over 6 months of age"; it gives NO explicit 9-12 age. The baked /
+//     finger-food recipes (pancakes, meatballs, puffs) are therefore tagged
+//     '9-12' BY TEXTURE (finger foods / baked items older infants can self-feed),
+//     not from an explicit source age. Smooth purees -> '6-8' (and also fine as
+//     '9-12'). Per-recipe rationale is noted in comments.
+//  5. Storage times: where the recipe's own source does not state fridge/freezer
+//     times for the COOKED dish, we fall back to the Minnesota WIC homemade baby
+//     food guidance (babyfood.html): refrigerate no more than 2 days, with
+//     meats/eggs/fish/chicken used within 1 day, and freeze for up to 1 month.
+//     The infantfoods.html "Storing Leftover Infant Foods" 3-5 day / 4-6 month
+//     ranges describe jarred-leftover storage, NOT these cooked recipes, so we do
+//     not use them. Each recipe that sets storage records a `source.storageSource`
+//     URL pointing at the homemade-guidance page (babyfood.html).
 //  6. publisher / url / retrieved recorded honestly (retrieved on fetch date).
+//
+// SERVINGS (maintainer Option A, issue #9)
+// --------------------------------------------------------------------
+// The Minnesota WIC baby-food recipes give no serving/yield counts (the one
+// exception is Cereal Pancakes, which states "Makes approximately twelve 4\"
+// pancakes"). For every other recipe we ESTIMATE servings deterministically from
+// the ingredient quantities so the number is reproducible and auditable:
+//
+//   servings = max(1, round(totalYieldOz / INFANT_PORTION_OZ))
+//
+// with a 2 oz (~60 ml) infant portion. The total cooked yield in ounces is the
+// sum of each ingredient quantity converted with ONE fixed conversion table
+// (applied uniformly to every recipe, nutritional precision is not the point):
+//
+//   1 cup            = 8 oz        1 tbsp = 0.5 oz      1 tsp = 0 oz (negligible)
+//   1 lb             = 16 oz       1 (4 oz) jar = 4 oz
+//   1 egg / egg yolk = 1 oz  (piece)
+//   1 apple          = 5 oz  (piece)
+//   1 sweet potato   = 5 oz  (piece)
+//
+// Each estimated recipe carries its YIELD_OZ in a comment so the arithmetic can
+// be checked, and an adaptations note that the serving count is an estimate. The
+// matching test (recipes.test.ts) recomputes servings from YIELD_OZ via the same
+// helper so the pinned numbers cannot silently drift.
 
 import type { Recipe } from '../domain/types';
 
@@ -38,11 +72,30 @@ const INFANTFOODS_URL = 'https://www.health.state.mn.us/people/wic/recipes/infan
 const PUBLISHER = 'Minnesota Department of Health, WIC Program';
 const RETRIEVED = '2026-11-07';
 
+/** A single infant serving, in ounces (~60 ml). Used by {@link estimateServings}. */
+export const INFANT_PORTION_OZ = 2;
+
+/**
+ * Deterministic serving estimate for recipes whose source gives no yield
+ * (maintainer Option A, issue #9): round total cooked yield (oz) down/up to the
+ * nearest whole 2 oz infant portion, never below 1. See the SERVINGS block at
+ * the top of this file for the fixed oz conversion table used to derive yieldOz.
+ */
+export function estimateServings(yieldOz: number): number {
+  return Math.max(1, Math.round(yieldOz / INFANT_PORTION_OZ));
+}
+
+/** Note appended to adaptations when servings are estimated (not from the source). */
+const SERVINGS_ESTIMATE_NOTE =
+  'Serving count is an estimate (source gives no yield): total cooked yield \u00f7 a 2 oz infant portion.';
+
 export const BUILTIN_RECIPES: Recipe[] = [
   // --- Minnesota WIC "Homemade Baby Food" (babyfood.html) -------------------
   {
     // Smooth puree/mash with no added salt, sugar or honey -> fine from 6 months;
     // still appropriate (mashed) at 9-12, so tagged both stages.
+    // YIELD_OZ = carrots 1 cup (8) + apple 1 piece (5) + water 1/4 cup (2) = 15
+    // -> estimateServings(15) = round(7.5) = 8.
     id: 'b-carrots-and-apples',
     origin: 'builtin',
     source: {
@@ -50,7 +103,7 @@ export const BUILTIN_RECIPES: Recipe[] = [
       publisher: PUBLISHER,
       url: BABYFOOD_URL,
       retrieved: RETRIEVED,
-      adaptations: [],
+      adaptations: [SERVINGS_ESTIMATE_NOTE],
       storageSource: BABYFOOD_URL,
     },
     title: 'Carrots and Apples',
@@ -67,12 +120,14 @@ export const BUILTIN_RECIPES: Recipe[] = [
       'Puree or mash with a fork, stirring in some of the cooking liquid until the texture is right for your baby.',
     ],
     texture: 'smooth puree or mash',
-    servings: 4,
+    servings: estimateServings(15),
     storage: { fridgeDays: 2, freezerMonths: 1 },
   },
   {
     // Blended/mashed to desired smoothness, no added salt/sugar/honey -> 6 months
     // and up; also works mashed at 9-12. Tagged both stages.
+    // YIELD_OZ = sweet potato 1 piece (5) + chicken 1/4 cup (2) + brown rice
+    // 1/2 cup (4) + liquid 1/2 cup (4) = 15 -> estimateServings(15) = 8.
     id: 'b-sweet-potato-chicken',
     origin: 'builtin',
     source: {
@@ -80,10 +135,10 @@ export const BUILTIN_RECIPES: Recipe[] = [
       publisher: PUBLISHER,
       url: BABYFOOD_URL,
       retrieved: RETRIEVED,
-      adaptations: [],
+      adaptations: [SERVINGS_ESTIMATE_NOTE],
       storageSource: BABYFOOD_URL,
     },
-    title: 'Sweet Potato and Chicken',
+    title: 'Sweet Potato Chicken',
     stages: ['6-8', '9-12'],
     mealTypes: ['lunch', 'dinner'],
     ingredients: [
@@ -98,13 +153,16 @@ export const BUILTIN_RECIPES: Recipe[] = [
       'Blend, mash or grind until as smooth as you want.',
     ],
     texture: 'smooth puree or mash',
-    servings: 2,
-    // Meat is present, so use the shorter 1-day fridge window from the page.
+    servings: estimateServings(15),
+    // Chicken is present, so use the shorter 1-day fridge window from the
+    // homemade-guidance page (meats/eggs/fish/chicken within 1 day).
     storage: { fridgeDays: 1, freezerMonths: 1 },
   },
   {
     // Mix & Match Meal, instantiated as the source's own suggested combination
     // "Beef, peas, and potatoes". Blended/mashed, no added salt/sugar/honey.
+    // YIELD_OZ = beef 1 cup (8) + potatoes 1/2 cup (4) + peas 3/4 cup (6) +
+    // liquid 3/4 cup (6) = 24 -> estimateServings(24) = 12.
     id: 'b-beef-peas-potatoes',
     origin: 'builtin',
     source: {
@@ -112,7 +170,10 @@ export const BUILTIN_RECIPES: Recipe[] = [
       publisher: PUBLISHER,
       url: BABYFOOD_URL,
       retrieved: RETRIEVED,
-      adaptations: ['Instantiated the page\u2019s suggested combination: beef, peas and potatoes'],
+      adaptations: [
+        'Instantiated the page\u2019s suggested combination: beef, peas and potatoes',
+        SERVINGS_ESTIMATE_NOTE,
+      ],
       storageSource: BABYFOOD_URL,
     },
     title: 'Beef, Peas and Potatoes',
@@ -129,11 +190,13 @@ export const BUILTIN_RECIPES: Recipe[] = [
       'Blend, grind or mash until as smooth as you want.',
     ],
     texture: 'smooth puree or mash',
-    servings: 3,
+    servings: estimateServings(24),
     storage: { fridgeDays: 1, freezerMonths: 1 },
   },
   {
     // Mix & Match Meal -> "Chicken, broccoli, and rice" combination.
+    // YIELD_OZ = chicken 1 cup (8) + rice 1/2 cup (4) + broccoli 3/4 cup (6) +
+    // liquid 3/4 cup (6) = 24 -> estimateServings(24) = 12.
     id: 'b-chicken-broccoli-rice',
     origin: 'builtin',
     source: {
@@ -141,7 +204,10 @@ export const BUILTIN_RECIPES: Recipe[] = [
       publisher: PUBLISHER,
       url: BABYFOOD_URL,
       retrieved: RETRIEVED,
-      adaptations: ['Instantiated the page\u2019s suggested combination: chicken, broccoli and rice'],
+      adaptations: [
+        'Instantiated the page\u2019s suggested combination: chicken, broccoli and rice',
+        SERVINGS_ESTIMATE_NOTE,
+      ],
       storageSource: BABYFOOD_URL,
     },
     title: 'Chicken, Broccoli and Rice',
@@ -158,7 +224,7 @@ export const BUILTIN_RECIPES: Recipe[] = [
       'Blend, grind or mash until as smooth as you want.',
     ],
     texture: 'smooth puree or mash',
-    servings: 3,
+    servings: estimateServings(24),
     storage: { fridgeDays: 1, freezerMonths: 1 },
   },
   {
@@ -166,6 +232,8 @@ export const BUILTIN_RECIPES: Recipe[] = [
     // token "macaroni" is not in the wheat allergen rule's terms, so the screen
     // fires no wheat allergen here; wheat coverage for this batch comes from the
     // flour and baby cereal in b-cereal-pancakes. No block at the tagged ages.
+    // YIELD_OZ = beef 1 cup (8) + macaroni 1/2 cup (4) + squash 3/4 cup (6) +
+    // liquid 3/4 cup (6) = 24 -> estimateServings(24) = 12.
     id: 'b-beef-squash-macaroni',
     origin: 'builtin',
     source: {
@@ -173,7 +241,10 @@ export const BUILTIN_RECIPES: Recipe[] = [
       publisher: PUBLISHER,
       url: BABYFOOD_URL,
       retrieved: RETRIEVED,
-      adaptations: ['Instantiated the page\u2019s suggested combination: beef, squash and macaroni'],
+      adaptations: [
+        'Instantiated the page\u2019s suggested combination: beef, squash and macaroni',
+        SERVINGS_ESTIMATE_NOTE,
+      ],
       storageSource: BABYFOOD_URL,
     },
     title: 'Beef, Squash and Macaroni',
@@ -190,16 +261,18 @@ export const BUILTIN_RECIPES: Recipe[] = [
       'Blend, grind or mash until as smooth as you want.',
     ],
     texture: 'smooth puree or mash',
-    servings: 3,
+    servings: estimateServings(24),
     storage: { fridgeDays: 1, freezerMonths: 1 },
   },
 
   // --- Minnesota WIC "Infant Food Recipes" (infantfoods.html) ---------------
   {
-    // Griddle pancakes are a soft finger food -> '9-12'. Source lists "water or
-    // apple juice"; apple juice blocks under 12 months, so we use water (the
-    // source's own option) and record the adaptation. vanilla extract and
-    // cinnamon are not blocks.
+    // Griddle pancakes are a soft finger food; tagged '9-12' BY TEXTURE (the page
+    // states only "over 6 months", with no explicit 9-12 age). Source lists
+    // "water or apple juice"; apple juice blocks under 12 months, so we use water
+    // (the source's own option). vanilla extract and cinnamon are not blocks.
+    // The source states a yield ("Makes approximately twelve 4\" pancakes"), so
+    // servings is the SOURCE yield (12), not an estimate.
     id: 'b-cereal-pancakes',
     origin: 'builtin',
     source: {
@@ -207,8 +280,8 @@ export const BUILTIN_RECIPES: Recipe[] = [
       publisher: PUBLISHER,
       url: INFANTFOODS_URL,
       retrieved: RETRIEVED,
-      adaptations: ['Water instead of apple juice'],
-      storageSource: INFANTFOODS_URL,
+      adaptations: ['Water instead of apple juice', 'Butter instead of margarine'],
+      storageSource: BABYFOOD_URL,
     },
     title: 'Cereal Pancakes',
     stages: ['9-12'],
@@ -216,7 +289,7 @@ export const BUILTIN_RECIPES: Recipe[] = [
     ingredients: [
       { name: 'flour', quantity: 1, unit: 'cup', category: 'grains' },
       { name: 'baby cereal (rice or oatmeal)', quantity: 0.5, unit: 'cup', category: 'grains' },
-      { name: 'jar of infant bananas', quantity: 1, unit: 'piece', category: 'produce' },
+      { name: '(4 oz) jar of infant bananas', quantity: 1, unit: 'jar', category: 'produce' },
       { name: 'melted butter', quantity: 1, unit: 'tbsp', category: 'dairy-eggs' },
       { name: 'egg yolks', quantity: 3, unit: 'piece', category: 'dairy-eggs' },
       { name: 'cinnamon (optional)', quantity: 0.25, unit: 'tsp', category: 'pantry' },
@@ -232,13 +305,16 @@ export const BUILTIN_RECIPES: Recipe[] = [
       'Let each pancake cool before serving it to your baby.',
     ],
     texture: 'soft finger food',
+    // Source yield: "Makes approximately twelve 4\" pancakes".
     servings: 12,
-    storage: { fridgeDays: 5, freezerMonths: 6 },
+    storage: { fridgeDays: 2, freezerMonths: 1 },
   },
   {
     // Soft, spoonable pudding -> fine from 6 months; also works at 9-12. Source
     // lists "vanilla (or plain) yogurt"; we use plain yogurt (its own option) to
-    // avoid added sugar, and record the adaptation.
+    // avoid added sugar.
+    // YIELD_OZ = rice cereal 1 cup (8) + yogurt 1 cup (8) + applesauce 2 (4 oz)
+    // jars (8) + cinnamon 1 tsp (0) = 24 -> estimateServings(24) = 12.
     id: 'b-apple-rice-pudding',
     origin: 'builtin',
     source: {
@@ -246,8 +322,8 @@ export const BUILTIN_RECIPES: Recipe[] = [
       publisher: PUBLISHER,
       url: INFANTFOODS_URL,
       retrieved: RETRIEVED,
-      adaptations: ['Plain yogurt instead of vanilla yogurt'],
-      storageSource: INFANTFOODS_URL,
+      adaptations: ['Plain yogurt instead of vanilla yogurt', SERVINGS_ESTIMATE_NOTE],
+      storageSource: BABYFOOD_URL,
     },
     title: 'Apple Rice Pudding',
     stages: ['6-8', '9-12'],
@@ -255,23 +331,28 @@ export const BUILTIN_RECIPES: Recipe[] = [
     ingredients: [
       { name: 'prepared infant rice cereal', quantity: 1, unit: 'cup', category: 'grains' },
       { name: 'plain yogurt', quantity: 1, unit: 'cup', category: 'dairy-eggs' },
-      { name: 'jars infant applesauce', quantity: 2, unit: 'piece', category: 'produce' },
+      { name: '(4 oz) jars infant applesauce', quantity: 2, unit: 'jar', category: 'produce' },
       { name: 'cinnamon', quantity: 1, unit: 'tsp', category: 'pantry' },
     ],
     steps: [
       'In a large bowl, stir the rice cereal together with the applesauce.',
-      'Stir in the cinnamon and plain yogurt until well mixed.',
+      'Mix in the cinnamon and plain yogurt until everything is evenly combined.',
       'Spoon into dishes and serve.',
     ],
     texture: 'soft, spoonable',
-    servings: 4,
-    storage: { fridgeDays: 5, freezerMonths: 6 },
+    servings: estimateServings(24),
+    storage: { fridgeDays: 2, freezerMonths: 1 },
   },
   {
-    // Baked meatballs are a soft finger food -> '9-12'. Source lists "Pinch of
-    // spice such as pepper, garlic powder, and oregano"; we drop the added
-    // seasoning and record the adaptation. Cheese and egg are allergens/reminders,
-    // not blocks.
+    // Baked meatballs are a soft finger food; tagged '9-12' BY TEXTURE (the page
+    // states only "over 6 months", no explicit 9-12 age). We keep the source's
+    // "pinch of spice such as pepper, garlic powder, and oregano" as listed:
+    // none of those block, and dropping a non-blocked source ingredient is not a
+    // change the source offers (Requirement 2.9). Cheese and egg are
+    // allergens/reminders, not blocks.
+    // YIELD_OZ = ground meat 1.25 lb (20) + baby cereal 1/2 cup (4) + cheese
+    // 1 cup (8) + pureed veg 1 (4 oz) jar (4) + egg 1 piece (1) = 37
+    // -> estimateServings(37) = round(18.5) = 19.
     id: 'b-meat-balls',
     origin: 'builtin',
     source: {
@@ -279,33 +360,39 @@ export const BUILTIN_RECIPES: Recipe[] = [
       publisher: PUBLISHER,
       url: INFANTFOODS_URL,
       retrieved: RETRIEVED,
-      adaptations: ['Left out the added seasoning (pepper, garlic powder, oregano)'],
-      storageSource: INFANTFOODS_URL,
+      adaptations: [SERVINGS_ESTIMATE_NOTE],
+      storageSource: BABYFOOD_URL,
     },
-    title: 'Baby Meatballs',
+    title: 'Meat Balls',
     stages: ['9-12'],
     mealTypes: ['lunch', 'dinner'],
     ingredients: [
       { name: 'lean ground beef, turkey or chicken', quantity: 1.25, unit: 'lb', category: 'protein' },
       { name: 'baby cereal (rice or oatmeal)', quantity: 0.5, unit: 'cup', category: 'grains' },
       { name: 'shredded white cheddar or mozzarella cheese', quantity: 1, unit: 'cup', category: 'dairy-eggs' },
-      { name: 'jar of pureed baby food vegetables', quantity: 1, unit: 'piece', category: 'produce' },
+      { name: '(4 oz) jar of pureed baby food vegetables', quantity: 1, unit: 'jar', category: 'produce' },
       { name: 'egg, beaten', quantity: 1, unit: 'piece', category: 'dairy-eggs' },
+      { name: 'pinch of spice such as pepper, garlic powder, and oregano', quantity: 1, unit: 'pinch', category: 'pantry' },
     ],
     steps: [
       'In a bowl, mix the baby cereal and the jar of vegetables together until smooth.',
-      'Add the ground meat, cheese and beaten egg, and mix with clean hands until well combined.',
+      'Add the ground meat, cheese, beaten egg and the pinch of spice, and mix with clean hands until well combined.',
       'Scoop small portions and roll them into balls about the size of a small egg.',
       'Place the meatballs on a baking sheet and bake at 400\u00b0F until browned and cooked through, about 20 to 25 minutes.',
       'Wash your hands and all surfaces well before and after handling raw meat. Cut each meatball to a safe size before serving.',
     ],
     texture: 'soft finger food',
-    servings: 6,
-    storage: { fridgeDays: 5, freezerMonths: 6 },
+    servings: estimateServings(37),
+    storage: { fridgeDays: 1, freezerMonths: 1 },
   },
   {
-    // Baked "finger puffs" -> soft finger food, '9-12'. No added salt/sugar/honey;
-    // egg yolk and milk/butter are allergens/reminders, not blocks.
+    // Baked "finger puffs" -> soft finger food; tagged '9-12' BY TEXTURE (the page
+    // states only "over 6 months", no explicit 9-12 age). No added
+    // salt/sugar/honey; egg yolk and milk/butter are allergens/reminders, not
+    // blocks.
+    // YIELD_OZ = rice cereal 1/2 cup (4) + egg yolks 2 pieces (2) + applesauce
+    // 1/2 cup (4) + spinach 1 cup (8) + milk 2 tbsp (1) + butter 1 tbsp (0.5) +
+    // baking powder 1 tsp (0) = 19.5 -> estimateServings(19.5) = round(9.75) = 10.
     id: 'b-spinach-apple-puffs',
     origin: 'builtin',
     source: {
@@ -313,10 +400,10 @@ export const BUILTIN_RECIPES: Recipe[] = [
       publisher: PUBLISHER,
       url: INFANTFOODS_URL,
       retrieved: RETRIEVED,
-      adaptations: [],
-      storageSource: INFANTFOODS_URL,
+      adaptations: [SERVINGS_ESTIMATE_NOTE],
+      storageSource: BABYFOOD_URL,
     },
-    title: 'Spinach and Apple Puffs',
+    title: 'Spinach & Apple Puffs',
     stages: ['9-12'],
     mealTypes: ['snack'],
     ingredients: [
@@ -337,11 +424,15 @@ export const BUILTIN_RECIPES: Recipe[] = [
       'Let the puffs cool, then lift the parchment to loosen them. Cool completely before storing.',
     ],
     texture: 'soft finger food',
-    servings: 4,
-    storage: { fridgeDays: 5, freezerMonths: 6 },
+    servings: estimateServings(19.5),
+    storage: { fridgeDays: 1, freezerMonths: 1 },
   },
   {
-    // Baked "finger puffs" -> soft finger food, '9-12'.
+    // Baked "finger puffs" -> soft finger food; tagged '9-12' BY TEXTURE (the page
+    // states only "over 6 months", no explicit 9-12 age).
+    // YIELD_OZ = rice cereal 1/2 cup (4) + egg yolks 2 pieces (2) + sweet potato
+    // 1/2 cup (4) + applesauce 1/4 cup (2) + butter 1 tbsp (0.5) + baking powder
+    // 1 tsp (0) + cinnamon 1/4 tsp (0) = 12.5 -> estimateServings(12.5) = round(6.25) = 6.
     id: 'b-sweet-potato-puffs',
     origin: 'builtin',
     source: {
@@ -349,8 +440,8 @@ export const BUILTIN_RECIPES: Recipe[] = [
       publisher: PUBLISHER,
       url: INFANTFOODS_URL,
       retrieved: RETRIEVED,
-      adaptations: [],
-      storageSource: INFANTFOODS_URL,
+      adaptations: [SERVINGS_ESTIMATE_NOTE],
+      storageSource: BABYFOOD_URL,
     },
     title: 'Sweet Potato Puffs',
     stages: ['9-12'],
@@ -373,7 +464,7 @@ export const BUILTIN_RECIPES: Recipe[] = [
       'Let the puffs cool, then lift the parchment to loosen them. Cool completely before storing.',
     ],
     texture: 'soft finger food',
-    servings: 4,
-    storage: { fridgeDays: 5, freezerMonths: 6 },
+    servings: estimateServings(12.5),
+    storage: { fridgeDays: 1, freezerMonths: 1 },
   },
 ];

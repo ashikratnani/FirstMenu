@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { AllergenGroup, GroceryCategory, MealType, StageId } from '../domain/types';
 import { screenRecipe } from '../domain/safety/screen';
-import { BUILTIN_RECIPES } from './recipes';
+import { BUILTIN_RECIPES, INFANT_PORTION_OZ, estimateServings } from './recipes';
 
 // ---------------------------------------------------------------------------
 // COVERAGE SCOPE: OPTION 4 REDUCED FIRST BATCH (maintainer decision, issue #7)
@@ -122,6 +122,82 @@ describe('BUILTIN_RECIPES - invariants (every shipped recipe)', () => {
         recipe.source?.storageSource && recipe.source.storageSource.trim().length > 0,
         `${recipe.id} sets storage times, so it must cite a storageSource`,
       ).toBe(true);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// SERVINGS (maintainer Option A, issue #9)
+// ---------------------------------------------------------------------------
+// The source gives no yield for the baby-food recipes, so servings are ESTIMATED
+// deterministically: servings = max(1, round(totalYieldOz / 2 oz portion)). This
+// table recomputes each recipe's servings from the SAME documented YIELD_OZ used
+// in the data-file comments (see the SERVINGS block in recipes.ts for the oz
+// conversion table), so the pinned serving numbers cannot silently drift. The one
+// recipe with a source-stated yield (Cereal Pancakes: "about twelve 4\" pancakes")
+// uses that source yield directly and is NOT marked as an estimate.
+
+/** Expected serving derivation per recipe id. */
+type ServingsExpectation =
+  | { kind: 'estimate'; yieldOz: number }
+  | { kind: 'source'; servings: number };
+
+const SERVINGS_BY_ID: Record<string, ServingsExpectation> = {
+  'b-carrots-and-apples': { kind: 'estimate', yieldOz: 15 },
+  'b-sweet-potato-chicken': { kind: 'estimate', yieldOz: 15 },
+  'b-beef-peas-potatoes': { kind: 'estimate', yieldOz: 24 },
+  'b-chicken-broccoli-rice': { kind: 'estimate', yieldOz: 24 },
+  'b-beef-squash-macaroni': { kind: 'estimate', yieldOz: 24 },
+  'b-cereal-pancakes': { kind: 'source', servings: 12 },
+  'b-apple-rice-pudding': { kind: 'estimate', yieldOz: 24 },
+  'b-meat-balls': { kind: 'estimate', yieldOz: 37 },
+  'b-spinach-apple-puffs': { kind: 'estimate', yieldOz: 19.5 },
+  'b-sweet-potato-puffs': { kind: 'estimate', yieldOz: 12.5 },
+};
+
+const SERVINGS_ESTIMATE_NOTE =
+  'Serving count is an estimate (source gives no yield): total cooked yield \u00f7 a 2 oz infant portion.';
+
+describe('BUILTIN_RECIPES - servings (Option A deterministic estimate, issue #9)', () => {
+  it('estimateServings rounds total yield to whole 2 oz portions, minimum 1', () => {
+    expect(INFANT_PORTION_OZ).toBe(2);
+    expect(estimateServings(0)).toBe(1); // never below 1
+    expect(estimateServings(1)).toBe(1); // round(0.5) then floored up to the min
+    expect(estimateServings(15)).toBe(8); // round(7.5) = 8
+    expect(estimateServings(24)).toBe(12);
+    expect(estimateServings(37)).toBe(19); // round(18.5) = 19
+    expect(estimateServings(12.5)).toBe(6); // round(6.25) = 6
+  });
+
+  it('every recipe has a pinned servings expectation', () => {
+    const expected = new Set(Object.keys(SERVINGS_BY_ID));
+    const actual = new Set(BUILTIN_RECIPES.map((r) => r.id));
+    expect(actual).toEqual(expected);
+  });
+
+  it('each recipe servings matches the rule (or the source yield) and cannot drift', () => {
+    for (const recipe of BUILTIN_RECIPES) {
+      const expectation = SERVINGS_BY_ID[recipe.id];
+      expect(expectation, `${recipe.id} must have a servings expectation`).toBeDefined();
+      if (!expectation) continue;
+
+      if (expectation.kind === 'source') {
+        // Source states the yield -> use it verbatim, and do NOT flag an estimate.
+        expect(recipe.servings, `${recipe.id} uses the source yield`).toBe(expectation.servings);
+        expect(
+          recipe.source?.adaptations ?? [],
+          `${recipe.id} source yield must NOT be marked an estimate`,
+        ).not.toContain(SERVINGS_ESTIMATE_NOTE);
+      } else {
+        // No source yield -> deterministic estimate, flagged in adaptations.
+        expect(recipe.servings, `${recipe.id} servings = estimate from yieldOz`).toBe(
+          estimateServings(expectation.yieldOz),
+        );
+        expect(
+          recipe.source?.adaptations ?? [],
+          `${recipe.id} estimated servings must be disclosed in adaptations`,
+        ).toContain(SERVINGS_ESTIMATE_NOTE);
+      }
     }
   });
 });
