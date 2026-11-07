@@ -85,10 +85,10 @@ Deadline: Friday, December 4, 2026, 2:00 PM PT. Target submission: Thursday, Dec
   - [x] 10.3 Component tests: a ghosted recipe can't be added; a reaction ghosts planned slots.
     - _Requirements: 5.2, 5.4, 7.6_
 
-- [ ] 11. Prep list
-  - [ ] 11.1 Implement `domain/prep.ts` (servings, cook sessions, fridge/freezer/fresh rules, batches, thaw reminders) with tests.
+- [x] 11. Prep list
+  - [x] 11.1 Implement `domain/prep.ts` (servings, cook sessions, fridge/freezer/fresh rules, batches, thaw reminders) with tests.
     - _Requirements: 9.2, 9.4_
-  - [ ] 11.2 Build the Prep page with an editable prep day.
+  - [x] 11.2 Build the Prep page with an editable prep day.
     - _Requirements: 9.2, 9.3, 9.5_
 
 - [ ] 12. Grocery list
