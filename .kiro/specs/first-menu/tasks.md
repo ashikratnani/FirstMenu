@@ -45,12 +45,12 @@ Deadline: Friday, December 4, 2026, 2:00 PM PT. Target submission: Thursday, Dec
   - [ ] 4.3 Open a `Recipe review` issue listing every built-in recipe with its source link, stage tags and adaptations, for the maintainer and his wife to review. This doesn't block later tasks. Apply their feedback in a follow-up PR when it arrives, and tick this task then.
     - _Requirements: 2.2, 2.9_
 
-- [ ] 5. State and storage
-  - [ ] 5.1 Implement `domain/storage.ts`: schema version, `migrate`, zod validation, corrupt-data backup, debounced save, storage-unavailable detection. Add tests.
+- [x] 5. State and storage
+  - [x] 5.1 Implement `domain/storage.ts`: schema version, `migrate`, zod validation, corrupt-data backup, debounced save, storage-unavailable detection. Add tests.
     - _Requirements: 12.1, 12.6, 12.7_
-  - [ ] 5.2 Implement `AppProvider` with reducer actions (set child, save/delete custom recipe, set food record, set slot, clear slot, set active slots, new week, set prep date, toggle grocery item) and the memoized selectors.
+  - [x] 5.2 Implement `AppProvider` with reducer actions (set child, save/delete custom recipe, set food record, set slot, clear slot, set active slots, new week, set prep date, toggle grocery item) and the memoized selectors.
     - _Requirements: 1.6, 3.1, 3.5, 5.4, 8.4, 8.5, 8.6_
-  - [ ] 5.3 Add export to JSON and import with validation. Test that a bad file leaves the data unchanged.
+  - [x] 5.3 Add export to JSON and import with validation. Test that a bad file leaves the data unchanged.
     - _Requirements: 12.4, 12.5_
 
 - [ ] 6. App shell
