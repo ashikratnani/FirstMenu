@@ -101,6 +101,20 @@ export default function Home() {
         </fieldset>
 
         <div className={styles.prepControl}>
+          <label htmlFor="start-date" className={styles.controlLabel}>
+            Start day
+          </label>
+          <input
+            id="start-date"
+            type="date"
+            value={plan.startDate}
+            onChange={(e) =>
+              dispatch({ type: 'setStartDate', startDate: e.target.value })
+            }
+          />
+        </div>
+
+        <div className={styles.prepControl}>
           <label htmlFor="prep-date" className={styles.controlLabel}>
             Prep day
           </label>
@@ -136,8 +150,10 @@ export default function Home() {
         <section className={styles.spacingWarning} role="status">
           <p className={styles.spacingText}>
             New foods are planned fewer than {spacing.spacingDays} days apart:{' '}
-            {spacing.foodLabels.join(', ')}. Try spacing new foods at least{' '}
-            {spacing.spacingDays} days apart.
+            {spacing.foodLabels
+              .map((label, i) => `${label} (${dayLabel(spacing.firstDays[i])})`)
+              .join(', ')}
+            . Try spacing new foods at least {spacing.spacingDays} days apart.
           </p>
           <p className={styles.spacingSources}>
             Source
@@ -214,6 +230,7 @@ export default function Home() {
                           // prompt (Req 5.4/7.6).
                           <div
                             className={styles.slotGhost}
+                            role="group"
                             aria-label={`${recipe.title}. ${ghostReason(
                               view,
                             )}`}

@@ -193,6 +193,89 @@ describe('newFoodSpacingWarning', () => {
     expect(result).not.toBeNull();
     expect(result!.foods).toEqual(['pear', 'squash']);
     expect(result!.foodLabels).toEqual(['pear', 'squash']);
+    // Req 7.8: the warning also names the DAY each food is first introduced,
+    // as a 0-based day index aligned with `foods`.
+    expect(result!.firstDays).toEqual([0, 1]);
+  });
+
+  it('reports each food first day index in the same order as foods (Req 7.8)', () => {
+    // squash on day 1, pear on day 2 -> gap 1 < 3; ordered by first day then
+    // key, so squash (day 1) precedes pear (day 2).
+    let plan = withBreakfast(emptyPlan(), 2, 'r-pear');
+    plan = withBreakfast(plan, 1, 'r-squash');
+    const result = newFoodSpacingWarning(
+      plan,
+      recipes,
+      stateWithFoods(),
+      ageMonths,
+    );
+    expect(result).not.toBeNull();
+    expect(result!.foods).toEqual(['squash', 'pear']);
+    expect(result!.firstDays).toEqual([1, 2]);
+    expect(result!.firstDays).toHaveLength(result!.foods.length);
+  });
+
+  it('uses the EARLIEST day when a food is planned on multiple days (Req 7.8)', () => {
+    // pear on days 0 and 4, squash on day 1 -> pear's first day is 0.
+    let plan = withBreakfast(emptyPlan(), 0, 'r-pear');
+    plan = withBreakfast(plan, 4, 'r-pear');
+    plan = withBreakfast(plan, 1, 'r-squash');
+    const result = newFoodSpacingWarning(
+      plan,
+      recipes,
+      stateWithFoods(),
+      ageMonths,
+    );
+    expect(result).not.toBeNull();
+    expect(result!.foods).toEqual(['pear', 'squash']);
+    expect(result!.firstDays).toEqual([0, 1]);
+  });
+
+  it('excludes foods from an already-ghosted planned recipe (will not be served)', () => {
+    // A recipe with BOTH a new food (squash) and a block-covered food (honey)
+    // is ghosted, so neither of its foods counts; pear alone -> no warning.
+    const GHOSTED = {
+      ...foodRecipe('r-ghosted', 'squash'),
+      ingredients: [
+        { name: 'squash', category: 'produce' as const },
+        { name: 'honey', category: 'pantry' as const },
+      ],
+    };
+    let plan = withBreakfast(emptyPlan(), 0, 'r-pear');
+    plan = withBreakfast(plan, 1, 'r-ghosted');
+    const result = newFoodSpacingWarning(
+      plan,
+      [PEAR, GHOSTED],
+      stateWithFoods(),
+      ageMonths,
+    );
+    expect(result).toBeNull();
+  });
+
+  it('excludes foods from a recipe ghosted by a recorded reaction', () => {
+    // A recipe whose ingredient (squash) has a recorded reaction is ghosted, so
+    // its other new food (pear-in-same-recipe) is not introduced.
+    const REACTED = {
+      ...foodRecipe('r-reacted', 'squash'),
+      ingredients: [
+        { name: 'squash', category: 'produce' as const },
+        { name: 'kiwi', category: 'produce' as const },
+      ],
+    };
+    const PLAIN_PEAR = foodRecipe('r-pear2', 'pear');
+    let plan = withBreakfast(emptyPlan(), 0, 'r-pear2');
+    plan = withBreakfast(plan, 1, 'r-reacted');
+    const foods: Record<string, FoodRecord> = {
+      squash: { status: 'reaction', date: '2025-12-01' },
+    };
+    const result = newFoodSpacingWarning(
+      plan,
+      [PLAIN_PEAR, REACTED],
+      stateWithFoods(foods),
+      ageMonths,
+    );
+    // kiwi (the reacted recipe's untried food) is excluded; pear alone -> null.
+    expect(result).toBeNull();
   });
 
   it('does not treat an already-tried (monster) food as new', () => {

@@ -6,6 +6,7 @@
 
 import { z } from 'zod';
 import type { AppState, WeekPlan } from './types';
+import { defaultStartDate } from './plan';
 
 export const STORAGE_KEY = 'firstmenu';
 export const SCHEMA_VERSION = 1 as const;
@@ -187,7 +188,10 @@ export function defaultState(now: Date = new Date()): AppState {
     onboarded: false,
     customRecipes: [],
     foods: {},
-    plan: defaultPlan(todayYmd(now)),
+    // Req 8.1: a fresh plan starts today if that is a Monday, else the next
+    // Monday (defaultStartDate). defaultPlan keeps prepDate = startDate - 1 day,
+    // matching defaultPrepDate from plan.ts.
+    plan: defaultPlan(defaultStartDate(todayYmd(now))),
     groceryChecked: [],
     disclaimerAcknowledged: false,
   };

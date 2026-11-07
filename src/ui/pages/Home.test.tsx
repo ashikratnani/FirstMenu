@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, expect, it, beforeEach } from 'vitest';
@@ -283,6 +283,34 @@ describe('Home week view', () => {
     expect(warning).toHaveTextContent(/fewer than 3 days apart/);
     expect(warning).toHaveTextContent(/oat/);
     expect(warning).toHaveTextContent(/egg/);
+    // Req 7.8: the warning names the DAY each food is first introduced, using
+    // the existing dayLabel wording ("Day 1"/"Day 2").
+    expect(warning).toHaveTextContent(/oat \(Day 1\)/);
+    expect(warning).toHaveTextContent(/egg \(Day 2\)/);
+  });
+
+  it('the start-date control dispatches setStartDate (Req 8.1)', () => {
+    renderHome(seedState(10, [OATS_RECIPE], ['breakfast']));
+    const start = screen.getByLabelText('Start day');
+    fireEvent.change(start, { target: { value: '2026-03-16' } });
+    expect(captured!.plan.startDate).toBe('2026-03-16');
+    // prepDate follows the new start (the day before).
+    expect(captured!.plan.prepDate).toBe('2026-03-15');
+  });
+
+  it('a ghosted planned slot exposes its accessible name via role="group" (Req 14.3)', () => {
+    // Egg has a recorded reaction -> EGG_RECIPE is ghosted at Day 1 breakfast.
+    renderHome(
+      seedState(10, [EGG_RECIPE], ['breakfast'], daysWith('custom-egg'), {
+        'allergen:egg': { status: 'reaction', date: '2026-11-10' },
+      }),
+    );
+    // A group with the recipe title + ghost reason as its accessible name, so a
+    // screen reader reliably announces the slot's state.
+    const group = screen.getByRole('group', {
+      name: /Egg Breakfast\. Not yet: egg\. Reaction recorded\./,
+    });
+    expect(group).toBeInTheDocument();
   });
 
   it('the new-week keep/empty and prep-date controls dispatch the matching actions', async () => {

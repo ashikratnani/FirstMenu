@@ -94,8 +94,10 @@ describe('defaultState', () => {
     expect(state.foods).toEqual({});
     expect(state.groceryChecked).toEqual([]);
     expect(state.plan.days).toHaveLength(7);
-    expect(state.plan.startDate).toBe('2026-01-15');
-    expect(state.plan.prepDate).toBe('2026-01-14'); // day before start
+    // Req 8.1: 2026-01-15 is a Thursday, so a fresh plan anchors to the next
+    // Monday (2026-01-19); prepDate is the day before.
+    expect(state.plan.startDate).toBe('2026-01-19');
+    expect(state.plan.prepDate).toBe('2026-01-18'); // day before start
   });
 });
 

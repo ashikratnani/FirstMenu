@@ -24,6 +24,7 @@ import {
   type SourceId,
 } from './safety/rules';
 import { foodKeyFor, foodLabel, foodStatus, isIgnoredFood } from './foods';
+import { screenRecipe } from './safety/screen';
 
 // ---------------------------------------------------------------------------
 // Timezone-safe YYYY-MM-DD helpers (mirror AppProvider.shiftYmd / age.parseYMD)
@@ -135,6 +136,12 @@ export interface NewFoodSpacingWarning {
   foods: string[];
   /** Human labels for `foods`, in the same order (via foodLabel). */
   foodLabels: string[];
+  /**
+   * The plan day INDEX (0..6) each food in `foods` is first introduced on, in
+   * the same order as `foods`. Req 7.8: the warning names the foods AND the
+   * days. The UI maps the index to a human day label (dayLabel).
+   */
+  firstDays: number[];
   /** The required gap between new foods (NEW_FOOD_SPACING_DAYS from rules.ts). */
   spacingDays: number;
   /** Published sources for the spacing value (NEW_FOOD_SPACING_SOURCES). */
@@ -147,12 +154,40 @@ function recipeById(recipes: Recipe[], id: string): Recipe | undefined {
 }
 
 /**
+ * Whether a planned recipe is GHOSTED for the current state, using the SAME
+ * honest rule the recipe view uses (recipeView.ts): a recipe is ghosted when
+ * the safety screen reports any block finding OR one of its ingredient foods
+ * has a recorded 'reaction'. A ghosted recipe is not going to be served, so its
+ * foods are not really being introduced — the spacing calc skips it. This is a
+ * pure, domain-only check (no UI import), so plan.ts stays React-free.
+ */
+function isRecipeGhosted(
+  recipe: Recipe,
+  state: AppState,
+  ageMonths: number,
+): boolean {
+  if (screenRecipe(recipe, ageMonths).blocks.length > 0) return true;
+  for (const ingredient of recipe.ingredients) {
+    for (const key of foodKeyFor(ingredient)) {
+      if (
+        foodStatus(key, state, ageMonths) === 'ghost' &&
+        state.foods[key]?.status === 'reaction'
+      ) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+/**
  * The earliest day index (0..6) each DISTINCT untried food appears in the plan.
  *
  * An "untried food" is a food key whose foodStatus(key, state, ageMonths) ===
  * 'door': a food not yet tried and not blocked. Already-tried 'monster' foods
  * and blocked/reaction 'ghost' foods are excluded, so only genuinely new foods
- * count toward the spacing rule. Only the plan's active slots are considered.
+ * count toward the spacing rule. Only the plan's active slots are considered,
+ * and GHOSTED planned recipes are skipped entirely (they will not be served).
  * Ignored foods (water, breast milk, formula, ice) and empty keys never derive
  * a door; foodKeyFor already handles that, and we guard defensively too.
  */
@@ -170,6 +205,9 @@ function firstDayByUntriedFood(
       if (recipeId === undefined) continue;
       const recipe = recipeById(recipes, recipeId);
       if (recipe === undefined) continue;
+      // A ghosted planned recipe will not be served, so its foods are not
+      // actually being introduced — exclude them from the spacing calc.
+      if (isRecipeGhosted(recipe, state, ageMonths)) continue;
 
       for (const ingredient of recipe.ingredients) {
         for (const key of foodKeyFor(ingredient)) {
@@ -221,11 +259,13 @@ export function newFoodSpacingWarning(
 
   if (tooClose.size === 0) return null;
 
-  const foods = ordered.filter(([key]) => tooClose.has(key)).map(([key]) => key);
+  const involved = ordered.filter(([key]) => tooClose.has(key));
+  const foods = involved.map(([key]) => key);
 
   return {
     foods,
     foodLabels: foods.map((key) => foodLabel(key)),
+    firstDays: involved.map(([, dayIndex]) => dayIndex),
     spacingDays: NEW_FOOD_SPACING_DAYS,
     sources: NEW_FOOD_SPACING_SOURCES,
   };
