@@ -381,6 +381,87 @@ const ALLERGEN_RULES: SafetyRule[] = ALLERGEN_SPECS.map((spec) => ({
 /** The complete, ordered rule list used by the screen. */
 export const RULES: SafetyRule[] = [...BLOCK_RULES, ...REMINDER_RULES, ...ALLERGEN_RULES];
 
+/** A representative blocked food surfaced from a BLOCK rule (for the Foods page). */
+export interface BlockRuleFood {
+  /** The food key, a plain lowercase term the safety screen also matches. */
+  key: string;
+  /** The rule's short label (e.g. "Honey"). */
+  label: string;
+  /** The rule's plain-language reason. */
+  message: string;
+  /** Age (months) under which the block applies, or undefined for no age limit. */
+  underMonths?: number;
+}
+
+/**
+ * One representative blocked food per BLOCK rule, derived from the rule's FIRST
+ * term (Requirement 5.7: the child's blocked foods must be visible even when no
+ * recipe uses them). The first term is a lowercase, singular food word that the
+ * safety screen matches back to the SAME block rule, so the Foods page can list
+ * it as a ghost with the rule's reason and available-at age.
+ *
+ * This reads the existing BLOCK_RULES; it does NOT change the RULES table, the
+ * matching, or RULESET_VERSION.
+ */
+export function blockRuleFoods(): BlockRuleFood[] {
+  return BLOCK_RULES.map((rule) => ({
+    key: rule.terms[0],
+    label: rule.label,
+    message: rule.message,
+    underMonths: rule.underMonths,
+  }));
+}
+
+// Allergen-door guidance (Requirement 7.7). Per design.md ("Foods and first
+// tastes": "Allergen door guidance text (Requirement 7.7) lives next to the
+// rules and cites AAP-allergens and NIAID-peanut") this HEALTH wording lives
+// next to the rule table so its single source of truth is here.
+//
+// autonomy.md ("do not invent new health/safety wording"): the two strings
+// below are taken DIRECTLY from Requirement 7.7, which states the substance
+// verbatim enough to use: every allergen door shows "introduce one at a time,
+// keep offering it regularly once tolerated, and serve it in a safe form", and
+// "The peanut door SHALL also say to ask a pediatrician first if the baby has
+// severe eczema or an egg allergy." No extra medical guidance is added.
+
+/** Shape of the guidance shown on an allergen door (Requirement 7.7). */
+export interface AllergenGuidance {
+  /** Generic guidance shown on every allergen door. */
+  generic: string;
+  /** Extra note shown only on the peanut door, or undefined otherwise. */
+  peanutNote?: string;
+  /** Published sources cited by the guidance. */
+  sources: SourceId[];
+}
+
+/**
+ * Generic allergen-door guidance shown for every one of the nine groups
+ * (Requirement 7.7, verbatim substance). Cites AAP-allergens and NIAID-peanut.
+ */
+export const ALLERGEN_GENERIC_GUIDANCE =
+  'Introduce one at a time, keep offering it regularly once tolerated, and serve it in a safe form.';
+
+/**
+ * Extra note shown only on the peanut door (Requirement 7.7, verbatim
+ * substance). Cites NIAID-peanut (and AAP-allergens).
+ */
+export const ALLERGEN_PEANUT_NOTE =
+  'For peanut, ask a pediatrician first if the baby has severe eczema or an egg allergy.';
+
+/**
+ * Guidance for a given allergen group: the generic text for all nine groups,
+ * plus the peanut-only addendum for the `peanut` group (Requirement 7.7). The
+ * cited sources are the same AAP-allergens and NIAID-peanut the allergen rules
+ * carry.
+ */
+export function allergenGuidance(group: AllergenGroup): AllergenGuidance {
+  return {
+    generic: ALLERGEN_GENERIC_GUIDANCE,
+    peanutNote: group === 'peanut' ? ALLERGEN_PEANUT_NOTE : undefined,
+    sources: ALLERGEN_SOURCES,
+  };
+}
+
 /**
  * Bumped whenever the rules change (steering/safety-rules.md). Share links
  * carry this so a viewer can tell their rules differ from the link's.
