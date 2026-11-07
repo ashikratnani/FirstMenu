@@ -8,14 +8,17 @@
 //      sessions (ghosted slots already excluded). For each session, resolve its
 //      recipe by recipeId and add each ingredient's quantity * session.batches
 //      (when a quantity is set).
-//   2. Line key = foodKey + '|' + normalizedUnit. foodKeyFor(ingredient) can
-//      return MORE THAN ONE food key (an ingredient may map to several allergen
-//      groups, e.g. "egg noodles" -> egg AND wheat); the ingredient's quantity
-//      is added to EACH returned key's line, so a multi-allergen ingredient
-//      shows under every group it counts as. normalizedUnit trims+lowercases
-//      the unit ('cup' and 'Cup' merge) with a single no-unit token for
-//      missing/empty units. There is NO unit conversion: "1 cup" and "200 g" of
-//      the same food stay two lines (Req 10.2).
+//   2. Line key = foodKey + '|' + normalizedUnit, where foodKey is the
+//      ingredient's SINGLE derived food name (groceryFoodKey): the `food`
+//      override when set, else the name-derived key. The grocery list merges by
+//      food NAME by design (issue #26 / Req 10.2), NOT by allergen group, so
+//      yogurt, cheese, butter and milk are separate lines and a multi-allergen
+//      ingredient (e.g. "egg noodles") is one line counted once. Allergen
+//      grouping (foodKeyFor) drives only the Foods / first-taste doors, never
+//      the shopping list. normalizedUnit trims+lowercases the unit ('cup' and
+//      'Cup' merge) with a single no-unit token for missing/empty units. There
+//      is NO unit conversion: "1 cup" and "200 g" of the same food stay two
+//      lines (Req 10.2).
 //   3. Merge quantities across sessions/recipes/ingredients that share a line
 //      key. A line with no known quantity is "as needed" (asNeeded, no
 //      quantity). A line that mixes known-quantity and no-quantity
@@ -30,7 +33,7 @@
 // reconcileGroceryChecks keeps only the checked line keys that still exist in a
 // freshly computed list (Req 10.5).
 
-import { foodKeyFor, foodLabel } from './foods';
+import { foodLabel, groceryFoodKey } from './foods';
 import { computePrepList } from './prep';
 import { screenRecipe } from './safety/screen';
 import type { AppState, GroceryCategory, Ingredient, Recipe, WeekPlan } from './types';
@@ -50,9 +53,9 @@ import type { AppState, GroceryCategory, Ingredient, Recipe, WeekPlan } from './
 export interface GroceryLine {
   /** foodKey + '|' + normalizedUnit; the stable key persisted in groceryChecked. */
   key: string;
-  /** The food part of the key (e.g. 'allergen:egg' or a plain derived key). */
+  /** The derived food name part of the key (e.g. 'cheese', 'macaroni'). */
   foodKey: string;
-  /** Human-readable food label (foodLabel(foodKey), e.g. 'egg'). */
+  /** Human-readable food label (foodLabel(foodKey), e.g. 'cheese'). */
   label: string;
   /** The display unit (original casing of the first contribution), or undefined. */
   unit?: string;
@@ -153,8 +156,9 @@ function remindersByIngredientIndex(
 
 /**
  * Add one ingredient's contribution (scaled by `batches`) to the accumulators.
- * The ingredient is added to EVERY food key foodKeyFor returns (a multi-allergen
- * ingredient counts under each group).
+ * The ingredient is added to EXACTLY ONE food line, keyed by its derived food
+ * name (groceryFoodKey); allergen grouping never splits a grocery line (issue
+ * #26 / Req 10.2), so a multi-allergen ingredient is counted once.
  */
 function addIngredient(
   acc: Map<string, LineAccumulator>,
@@ -162,44 +166,52 @@ function addIngredient(
   batches: number,
   reminders: string[],
 ): void {
-  const foodKeys = foodKeyFor(ingredient);
+  const foodKey = groceryFoodKey(ingredient);
+  if (foodKey.length === 0) return;
+
   const hasQuantity = ingredient.quantity !== undefined;
   const scaledQuantity = hasQuantity ? (ingredient.quantity as number) * batches : 0;
 
-  for (const foodKey of foodKeys) {
-    if (foodKey.length === 0) continue;
-    const key = lineKey(foodKey, ingredient.unit);
+  const key = lineKey(foodKey, ingredient.unit);
 
-    let entry = acc.get(key);
-    if (entry === undefined) {
-      entry = {
-        key,
-        foodKey,
-        unit: undefined,
-        quantitySum: 0,
-        hasQuantity: false,
-        hasNoQuantity: false,
-        category: ingredient.category,
-        reminders: new Set<string>(),
-      };
-      acc.set(key, entry);
-    }
-
-    // Keep the first non-empty display unit casing we see.
-    if (entry.unit === undefined && ingredient.unit !== undefined) {
-      const trimmed = ingredient.unit.trim();
-      if (trimmed.length > 0) entry.unit = trimmed;
-    }
-
-    if (hasQuantity) {
-      entry.quantitySum += scaledQuantity;
-      entry.hasQuantity = true;
-    } else {
-      entry.hasNoQuantity = true;
-    }
-
-    for (const message of reminders) entry.reminders.add(message);
+  let entry = acc.get(key);
+  if (entry === undefined) {
+    entry = {
+      key,
+      foodKey,
+      unit: undefined,
+      quantitySum: 0,
+      hasQuantity: false,
+      hasNoQuantity: false,
+      category: ingredient.category,
+      reminders: new Set<string>(),
+    };
+    acc.set(key, entry);
   }
+
+  // Keep the first non-empty display unit casing we see.
+  if (entry.unit === undefined && ingredient.unit !== undefined) {
+    const trimmed = ingredient.unit.trim();
+    if (trimmed.length > 0) entry.unit = trimmed;
+  }
+
+  if (hasQuantity) {
+    entry.quantitySum += scaledQuantity;
+    entry.hasQuantity = true;
+  } else {
+    entry.hasNoQuantity = true;
+  }
+
+  for (const message of reminders) entry.reminders.add(message);
+}
+
+/**
+ * Round a summed quantity to at most 2 decimals, dropping float noise so
+ * 0.1 + 0.1 + 0.1 shows as 0.3 and integers stay integers. Math.round keeps
+ * the result a clean number with no trailing zeros (2 stays 2, not "2.00").
+ */
+function roundQuantity(value: number): number {
+  return Math.round(value * 100) / 100;
 }
 
 /** Finalize an accumulator into an immutable GroceryLine. */
@@ -216,7 +228,7 @@ function toLine(acc: LineAccumulator): GroceryLine {
   if (acc.unit !== undefined) line.unit = acc.unit;
   // Keep the known sum whenever any contribution had a quantity (mixed lines
   // keep it too, flagged asNeeded).
-  if (acc.hasQuantity) line.quantity = acc.quantitySum;
+  if (acc.hasQuantity) line.quantity = roundQuantity(acc.quantitySum);
   return line;
 }
 

@@ -276,12 +276,55 @@ describe('computeGroceryList: ghosted slots', () => {
 });
 
 // ---------------------------------------------------------------------------
-// multi-allergen ingredient contributes to each food key's line
+// grocery lines key by FOOD NAME, not allergen group (issue #26 / Req 10.2)
 // ---------------------------------------------------------------------------
 
-describe('computeGroceryList: multi-allergen ingredient', () => {
-  it('adds the quantity under each allergen group a food maps to', () => {
-    // "egg noodle" maps to both allergen:egg and allergen:wheat.
+describe('computeGroceryList: merges by food name, not allergen group', () => {
+  it('keeps distinct dairy foods as separate food-name lines', () => {
+    // All dairy (allergen:dairy under the old keying), but each is its own
+    // real food: yogurt, cheese, butter, milk must NOT collapse to one line.
+    const recipe = makeRecipe('r-a', {
+      storage: { fridgeDays: 7 },
+      ingredients: [
+        ing('plain yogurt', 'dairy-eggs', 100, 'g'),
+        ing('cheddar cheese', 'dairy-eggs', 50, 'g'),
+        ing('unsalted butter', 'dairy-eggs', 20, 'g'),
+        ing('whole milk', 'dairy-eggs', 200, 'g'),
+      ],
+    });
+    const plan = withBreakfast(emptyPlan(), 0, 'r-a');
+
+    const groups = computeGroceryList(plan, [recipe], stateWithFoods(), AGE);
+    // No allergen-group line exists anymore.
+    expect(findLine(groups, 'allergen:dairy', 'g')).toBeUndefined();
+    expect(findLine(groups, 'yogurt', 'g')?.quantity).toBe(100);
+    expect(findLine(groups, 'cheddar cheese', 'g')?.quantity).toBe(50);
+    expect(findLine(groups, 'butter', 'g')?.quantity).toBe(20);
+    expect(findLine(groups, 'milk', 'g')?.quantity).toBe(200);
+    // Labels are the readable food names, not an allergen group label.
+    expect(findLine(groups, 'cheddar cheese', 'g')?.label).toBe('cheddar cheese');
+  });
+
+  it('keeps distinct grain foods (flour vs macaroni) as separate lines', () => {
+    const recipe = makeRecipe('r-a', {
+      storage: { fridgeDays: 7 },
+      ingredients: [
+        ing('flour', 'grains', 100, 'g'),
+        ing('macaroni', 'grains', 80, 'g'),
+      ],
+    });
+    const plan = withBreakfast(emptyPlan(), 0, 'r-a');
+
+    const groups = computeGroceryList(plan, [recipe], stateWithFoods(), AGE);
+    expect(findLine(groups, 'allergen:wheat', 'g')).toBeUndefined();
+    expect(findLine(groups, 'flour', 'g')?.quantity).toBe(100);
+    expect(findLine(groups, 'macaroni', 'g')?.quantity).toBe(80);
+  });
+
+  it('counts a multi-allergen ingredient once, as a single food line', () => {
+    // "egg noodles" maps to both allergen:egg AND allergen:wheat under
+    // foodKeyFor, but the grocery list keys by the derived food name so it is
+    // ONE line counted once (no double-counting).
     const recipe = makeRecipe('r-a', {
       storage: { fridgeDays: 7 },
       ingredients: [ing('egg noodles', 'grains', 100, 'g')],
@@ -289,8 +332,55 @@ describe('computeGroceryList: multi-allergen ingredient', () => {
     const plan = withBreakfast(emptyPlan(), 0, 'r-a');
 
     const groups = computeGroceryList(plan, [recipe], stateWithFoods(), AGE);
-    expect(findLine(groups, 'allergen:egg', 'g')?.quantity).toBe(100);
-    expect(findLine(groups, 'allergen:wheat', 'g')?.quantity).toBe(100);
+    expect(findLine(groups, 'allergen:egg', 'g')).toBeUndefined();
+    expect(findLine(groups, 'allergen:wheat', 'g')).toBeUndefined();
+    const lines = flattenGroceryGroups(groups);
+    expect(lines).toHaveLength(1);
+    expect(lines[0].foodKey).toBe('egg noodle');
+    expect(lines[0].quantity).toBe(100);
+  });
+
+  it('keys by the ingredient `food` override when set', () => {
+    const recipe = makeRecipe('r-a', {
+      storage: { fridgeDays: 7 },
+      ingredients: [{ name: 'cheddar cheese', category: 'dairy-eggs', food: 'Cheese', quantity: 30, unit: 'g' }],
+    });
+    const plan = withBreakfast(emptyPlan(), 0, 'r-a');
+
+    const groups = computeGroceryList(plan, [recipe], stateWithFoods(), AGE);
+    expect(findLine(groups, 'cheese', 'g')?.quantity).toBe(30);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// summed quantities are rounded (no float noise)
+// ---------------------------------------------------------------------------
+
+describe('computeGroceryList: rounds summed quantities', () => {
+  it('rounds 0.1 + 0.1 + 0.1 to 0.3 (not 0.30000000000000004)', () => {
+    const recipe = makeRecipe('r-a', {
+      storage: { fridgeDays: 7 },
+      ingredients: [
+        ing('oil', 'pantry', 0.1, 'cup'),
+        ing('oil', 'pantry', 0.1, 'cup'),
+        ing('oil', 'pantry', 0.1, 'cup'),
+      ],
+    });
+    const plan = withBreakfast(emptyPlan(), 0, 'r-a');
+
+    const groups = computeGroceryList(plan, [recipe], stateWithFoods(), AGE);
+    expect(findLine(groups, 'oil', 'cup')?.quantity).toBe(0.3);
+  });
+
+  it('keeps whole-number sums as integers', () => {
+    const recipe = makeRecipe('r-a', {
+      storage: { fridgeDays: 7 },
+      ingredients: [ing('apple', 'produce', 1, 'piece'), ing('apple', 'produce', 1, 'piece')],
+    });
+    const plan = withBreakfast(emptyPlan(), 0, 'r-a');
+
+    const groups = computeGroceryList(plan, [recipe], stateWithFoods(), AGE);
+    expect(findLine(groups, 'apple', 'piece')?.quantity).toBe(2);
   });
 });
 

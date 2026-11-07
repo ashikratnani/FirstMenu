@@ -359,7 +359,7 @@ Output: a list of cook sessions by date (`{ date, recipeId, batches, store: 'fri
 ### Grocery list (`grocery.ts`)
 
 1. For each cook session, add each ingredient × `batches`.
-2. Line key = `foodKey + '|' + normalizedUnit`. Merge quantities with the same key. Lines with no quantity become "as needed"; if any merged line has no quantity, the total shows the known sum plus "and more as needed".
+2. Line key = `foodKey + '|' + normalizedUnit`, where `foodKey` is the ingredient's derived **food name** (its `food` override when set, else the name-derived key) — **not** the allergen group key. Allergen grouping is for the Foods doors, not the shopping list, so each ingredient contributes to exactly one grocery line (a multi-allergen ingredient like "egg noodles" is counted once; issue #26 / Req 10.2). Merge quantities with the same key. Lines with no quantity become "as needed"; if any merged line has no quantity, the total shows the known sum plus "and more as needed".
 3. Group by `category` in a fixed order: produce, protein, dairy-eggs, grains, pantry, frozen, other.
 4. Attach every prep reminder from the merged ingredients.
 5. Reconcile checks: keep `groceryChecked` entries whose line key still exists (Requirement 10.5).
