@@ -2,46 +2,29 @@
 // Settings page (Settings.tsx), kept in a non-component module so both pages
 // (and their tests) import the SAME constants and derivations.
 //
-// ===========================================================================
-// !!! PENDING MAINTAINER CONFIRMATION — DO NOT SHIP AS FINAL COPY !!!
-//
-// HEALTH/SAFETY wording note (autonomy.md "Stop and ask"): the under-6
-// (Req 1.4) and 12+ (Req 1.5) notices below are health/safety wording. The
-// requirements describe the CONDITION but give no verbatim string, so
-// UNDER_6_NOTICE / OVER_12_NOTICE are an agent-authored CLOSE PARAPHRASE of the
-// requirement text — kept deliberately minimal and factual, with NO extra
-// guidance invented beyond Req 1.4 / 1.5.
-//
-// autonomy.md requires NEW health/safety wording to be routed through a
-// maintainer "Decision needed:" issue before merge. The final sign-off on the
-// exact two strings below (confirming or replacing them against Req 1.4 / 1.5)
-// is tracked in GitHub issue #16:
-//
-//   "Decision needed: under-6 / 12+ notice wording"
-//
-// Until that issue is resolved, treat this copy as PROVISIONAL. See the task
-// findings for the quoted strings and requirement text. Do not add new health
-// guidance here.
-// ===========================================================================
+// HEALTH/SAFETY wording note: the UNDER_6_NOTICE (Req 1.4) and OVER_12_NOTICE
+// (Req 1.5) strings below are the maintainer-approved final wording, signed off
+// in GitHub issue #16. They are health wording, so change them only with
+// maintainer sign-off.
 
 import { ageInMonths } from '../../domain/age';
 import { RULES } from '../../domain/safety/rules';
 import type { AllergenGroup } from '../../domain/types';
 
-// --- Health-adjacent notice wording (paraphrases Req 1.4 / 1.5) ------------
+// --- Health-adjacent notice wording (maintainer-approved, Req 1.4 / 1.5) ----
 
 /**
- * Req 1.4 (paraphrase, pending maintainer confirmation): shown when the entered
- * birth date implies an age below 6 months. Onboarding/planning is still
- * allowed; this is a factual notice, not a block.
+ * Req 1.4 maintainer-approved wording: shown when the entered birth date
+ * implies an age below 6 months. Onboarding/planning is still allowed; this is
+ * a factual notice, not a block.
  */
 export const UNDER_6_NOTICE =
   'Most babies start solids around 6 months. Talk to your pediatrician before starting solids.';
 
 /**
- * Req 1.5 (paraphrase, pending maintainer confirmation): shown when the entered
- * birth date implies an age of 12 months or more. The safety rules still apply
- * for the child's actual age.
+ * Req 1.5 maintainer-approved wording: shown when the entered birth date
+ * implies an age of 12 months or more. The safety rules still apply for the
+ * child's actual age.
  */
 export const OVER_12_NOTICE =
   'FirstMenu is designed for babies 6 to 12 months old.';
