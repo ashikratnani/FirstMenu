@@ -413,3 +413,71 @@ export function createDebouncedSaver(
 
   return saver;
 }
+
+// ---------------------------------------------------------------------------
+// Export / Import (Req 12.5)
+// ---------------------------------------------------------------------------
+
+export interface ExportResult {
+  /** Suggested download filename: `firstmenu-backup-YYYY-MM-DD.json`. */
+  filename: string;
+  /** The serialized AppState (the file contents). */
+  json: string;
+}
+
+/**
+ * Serialize the AppState for download. Pure TS: returns the filename and JSON
+ * string so a later UI task can trigger the actual download (no DOM/Blob use
+ * here). `now` is injectable for deterministic tests; the date is formatted
+ * without timezone drift (same convention as age.ts), not via toISOString.
+ */
+export function exportState(state: AppState, now: Date = new Date()): ExportResult {
+  return {
+    filename: `firstmenu-backup-${todayYmd(now)}.json`,
+    json: JSON.stringify(state),
+  };
+}
+
+export type ImportResult =
+  | { ok: true; state: AppState }
+  | { ok: false; reason: string };
+
+/**
+ * Parse, migrate, and zod-validate a user-supplied JSON string using the SAME
+ * schema as loadState. On success returns the validated AppState; on failure
+ * (non-JSON, un-migratable version, or any zod error including a malformed or
+ * empty birthDate) returns a human-readable reason (Req 12.5). Pure: it never
+ * writes to storage or mutates anything — the caller replaces state only when
+ * `ok` is true.
+ */
+export function importState(rawJson: string): ImportResult {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(rawJson);
+  } catch {
+    return { ok: false, reason: 'File is not valid JSON.' };
+  }
+
+  const fromVersion =
+    typeof parsed === 'object' &&
+    parsed !== null &&
+    typeof (parsed as { schemaVersion?: unknown }).schemaVersion === 'number'
+      ? (parsed as { schemaVersion: number }).schemaVersion
+      : 0;
+
+  const migrated = migrate(parsed, fromVersion);
+  const result = appStateSchema.safeParse(migrated);
+  if (!result.success) {
+    return { ok: false, reason: formatZodReason(result.error) };
+  }
+  return { ok: true, state: result.data };
+}
+
+/** Turn a zod error into a short, human-readable reason for the UI. */
+function formatZodReason(error: z.ZodError): string {
+  const first = error.issues[0];
+  if (!first) return 'File is not a valid FirstMenu backup.';
+  const path = first.path.join('.');
+  const where = path ? ` (at ${path})` : '';
+  return `File is not a valid FirstMenu backup: ${first.message}${where}.`;
+}

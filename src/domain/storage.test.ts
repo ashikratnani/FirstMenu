@@ -4,6 +4,8 @@ import {
   appStateSchema,
   createDebouncedSaver,
   defaultState,
+  exportState,
+  importState,
   isStorageAvailable,
   loadState,
   migrate,
@@ -264,5 +266,90 @@ describe('createDebouncedSaver', () => {
     save(validState());
     save.flush();
     expect(spy).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('exportState / importState (Req 12.5)', () => {
+  it('exportState produces a dated filename and valid AppState JSON', () => {
+    const state = validState();
+    const { filename, json } = exportState(state, FIXED_NOW);
+
+    expect(filename).toBe('firstmenu-backup-2026-01-15.json');
+    // The JSON parses back to the same AppState.
+    expect(JSON.parse(json)).toEqual(state);
+    // And is itself accepted by the schema.
+    expect(appStateSchema.safeParse(JSON.parse(json)).success).toBe(true);
+  });
+
+  it('exportState does not use DOM/Blob — it only returns strings', () => {
+    const { filename, json } = exportState(validState(), FIXED_NOW);
+    expect(typeof filename).toBe('string');
+    expect(typeof json).toBe('string');
+  });
+
+  it('round-trips export -> import to an equal AppState', () => {
+    const state = validState();
+    const { json } = exportState(state, FIXED_NOW);
+    const result = importState(json);
+
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.state).toEqual(state);
+    }
+  });
+
+  it('imports a valid file to ok:true with the parsed AppState', () => {
+    const state = validState();
+    const result = importState(JSON.stringify(state));
+
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.state).toEqual(state);
+    }
+  });
+
+  it('rejects non-JSON text with ok:false and a reason', () => {
+    const result = importState('this is not json {');
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.reason).toMatch(/json/i);
+    }
+  });
+
+  it('rejects JSON missing required fields with ok:false and a reason', () => {
+    const result = importState(JSON.stringify({ schemaVersion: 1 }));
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(typeof result.reason).toBe('string');
+      expect(result.reason.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('rejects a bad enum value with ok:false and a reason', () => {
+    const bad = { ...validState(), plan: { ...validState().plan, activeSlots: ['brunch'] } };
+    const result = importState(JSON.stringify(bad));
+    expect(result.ok).toBe(false);
+  });
+
+  it('rejects a malformed/empty birthDate with ok:false and a reason', () => {
+    const emptyBirth = { ...validState(), child: { name: 'Baby', birthDate: '' } };
+    const malformedBirth = {
+      ...validState(),
+      child: { name: 'Baby', birthDate: '2026-13-40' },
+    };
+
+    const emptyResult = importState(JSON.stringify(emptyBirth));
+    const malformedResult = importState(JSON.stringify(malformedBirth));
+
+    expect(emptyResult.ok).toBe(false);
+    expect(malformedResult.ok).toBe(false);
+  });
+
+  it('importState never writes to storage (pure)', () => {
+    const storage = makeStorage();
+    const spy = vi.spyOn(storage, 'setItem');
+    importState('not json');
+    importState(JSON.stringify(validState()));
+    expect(spy).not.toHaveBeenCalled();
   });
 });

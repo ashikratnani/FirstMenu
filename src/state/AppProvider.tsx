@@ -24,8 +24,11 @@ import type {
 import { BUILTIN_RECIPES } from '../data/recipes';
 import {
   createDebouncedSaver,
+  exportState,
+  importState,
   isStorageAvailable,
   loadState,
+  type ExportResult,
 } from '../domain/storage';
 
 // ---------------------------------------------------------------------------
@@ -48,7 +51,8 @@ export type AppAction =
   | { type: 'setActiveSlots'; activeSlots: MealType[] }
   | { type: 'newWeek'; mode: 'keep' | 'empty' }
   | { type: 'setPrepDate'; prepDate: string }
-  | { type: 'toggleGroceryItem'; key: string };
+  | { type: 'toggleGroceryItem'; key: string }
+  | { type: 'replaceState'; state: AppState };
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -184,6 +188,12 @@ export function reducer(state: AppState, action: AppAction): AppState {
       return { ...state, groceryChecked: checked };
     }
 
+    case 'replaceState': {
+      // Wholesale replacement after a validated import (Req 12.5). The caller
+      // (importData) only dispatches this with an already-validated AppState.
+      return action.state;
+    }
+
     default: {
       // Exhaustiveness: a new action type without a case is a compile error.
       const _never: never = action;
@@ -239,6 +249,9 @@ export function reconcilePlanRecipes(state: AppState): ReconcileResult {
 // Context
 // ---------------------------------------------------------------------------
 
+/** Outcome of an importData() call, for the UI to react to. */
+export type ImportOutcome = { ok: true } | { ok: false; reason: string };
+
 export interface AppContextValue {
   state: AppState;
   dispatch: React.Dispatch<AppAction>;
@@ -248,6 +261,16 @@ export interface AppContextValue {
   corruptNotice: boolean;
   /** Slots emptied on load because they referenced an unknown recipe (Req 3.5). */
   emptiedSlots: ReconcileResult['emptiedSlots'];
+  /** Serialize the current state for download (filename + JSON). */
+  exportData: () => ExportResult;
+  /**
+   * Validate and import a JSON string. On success the whole state is replaced;
+   * on failure the existing state is left completely unchanged and the reason
+   * is returned (and exposed via `importError`). Req 12.5.
+   */
+  importData: (rawJson: string) => ImportOutcome;
+  /** The reason of the most recent failed import, if any. */
+  importError: string | null;
 }
 
 const AppContext = createContext<AppContextValue | null>(null);
@@ -323,6 +346,32 @@ export function AppProvider({ children, storage }: AppProviderProps) {
     };
   }, []);
 
+  // Reason of the most recent failed import (Req 12.5). Cleared on success.
+  const [importError, setImportError] = useState<string | null>(null);
+
+  // Keep a ref to the latest state so exportData always serializes current
+  // state without being recreated on every render.
+  const stateRef = useRef(state);
+  stateRef.current = state;
+
+  const exportData = useRef<() => ExportResult>(() =>
+    exportState(stateRef.current),
+  ).current;
+
+  const importData = useRef<(rawJson: string) => ImportOutcome>(
+    (rawJson: string) => {
+      const result = importState(rawJson);
+      if (!result.ok) {
+        // Failure: leave existing state (and storage) untouched (Req 12.5).
+        setImportError(result.reason);
+        return { ok: false, reason: result.reason };
+      }
+      setImportError(null);
+      dispatch({ type: 'replaceState', state: result.state });
+      return { ok: true };
+    },
+  ).current;
+
   const value = useMemo<AppContextValue>(
     () => ({
       state,
@@ -330,8 +379,19 @@ export function AppProvider({ children, storage }: AppProviderProps) {
       storageBanner,
       corruptNotice: initial.corrupt,
       emptiedSlots: initial.emptiedSlots,
+      exportData,
+      importData,
+      importError,
     }),
-    [state, storageBanner, initial.corrupt, initial.emptiedSlots],
+    [
+      state,
+      storageBanner,
+      initial.corrupt,
+      initial.emptiedSlots,
+      exportData,
+      importData,
+      importError,
+    ],
   );
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

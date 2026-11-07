@@ -288,3 +288,106 @@ describe('AppProvider persistence and context', () => {
     expect(container.textContent).toContain('hello');
   });
 });
+
+describe('AppProvider import/export (Req 12.5)', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  function wrapper(storage: Storage) {
+    return ({ children }: { children: ReactNode }) => (
+      <AppProvider storage={storage}>{children}</AppProvider>
+    );
+  }
+
+  /** A known-good imported state that differs from the default. */
+  function goodImport(): AppState {
+    const state = base();
+    state.child = { name: 'Imported', birthDate: '2025-03-01' };
+    state.onboarded = true;
+    state.groceryChecked = ['imported-item'];
+    return state;
+  }
+
+  it('a BAD import leaves state and localStorage unchanged (Req 12.5)', () => {
+    const storage = makeStorage();
+    const { result } = renderHook(() => useApp(), {
+      wrapper: wrapper(storage),
+    });
+
+    // Seed a known-good state via a dispatch and let it persist.
+    act(() => {
+      result.current.dispatch({ type: 'toggleGroceryItem', key: 'milk' });
+    });
+    act(() => {
+      vi.advanceTimersByTime(300);
+    });
+
+    const stateBefore = result.current.state;
+    const stateSnapshot = JSON.stringify(stateBefore);
+    const storageSnapshot = storage.getItem(STORAGE_KEY);
+
+    // Import an invalid file.
+    let outcome: { ok: boolean } = { ok: true };
+    act(() => {
+      outcome = result.current.importData('not valid json {');
+    });
+
+    expect(outcome.ok).toBe(false);
+    expect(result.current.importError).toBeTruthy();
+    // State object identity AND contents are unchanged (no replacement).
+    expect(result.current.state).toBe(stateBefore);
+    expect(JSON.stringify(result.current.state)).toBe(stateSnapshot);
+    // localStorage was not touched by the failed import.
+    expect(storage.getItem(STORAGE_KEY)).toBe(storageSnapshot);
+  });
+
+  it('a GOOD import replaces the whole state and clears any prior error', () => {
+    const storage = makeStorage();
+    const { result } = renderHook(() => useApp(), {
+      wrapper: wrapper(storage),
+    });
+
+    // First a bad import to set an error.
+    act(() => {
+      result.current.importData('nope');
+    });
+    expect(result.current.importError).toBeTruthy();
+
+    const imported = goodImport();
+    let outcome: { ok: boolean } = { ok: false };
+    act(() => {
+      outcome = result.current.importData(JSON.stringify(imported));
+    });
+
+    expect(outcome.ok).toBe(true);
+    expect(result.current.importError).toBeNull();
+    expect(result.current.state).toEqual(imported);
+
+    // The replacement is persisted after the debounce.
+    act(() => {
+      vi.advanceTimersByTime(300);
+    });
+    const saved = JSON.parse(storage.getItem(STORAGE_KEY)!) as AppState;
+    expect(saved).toEqual(imported);
+  });
+
+  it('exportData serializes the current state', () => {
+    const storage = makeStorage();
+    const { result } = renderHook(() => useApp(), {
+      wrapper: wrapper(storage),
+    });
+
+    act(() => {
+      result.current.dispatch({ type: 'toggleGroceryItem', key: 'eggs' });
+    });
+
+    const { filename, json } = result.current.exportData();
+    expect(filename).toMatch(/^firstmenu-backup-\d{4}-\d{2}-\d{2}\.json$/);
+    const parsed = JSON.parse(json) as AppState;
+    expect(parsed.groceryChecked).toContain('eggs');
+  });
+});
