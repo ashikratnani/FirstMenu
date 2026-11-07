@@ -123,9 +123,9 @@ Deadline: Friday, December 4, 2026, 2:00 PM PT. Target submission: Thursday, Dec
     - _Requirements: 15.1, 15.2_
 
 - [ ] 18. Hackathon deliverables
-  - [ ] 18.1 Update `README.md`: what the app does, app URL, screenshots, disclaimer, safety and recipe sources, license.
+  - [x] 18.1 Update `README.md`: what the app does, app URL, screenshots, disclaimer, safety and recipe sources, license.
     - _Requirements: 13.1, 15.4_
-  - [ ] 18.2 Write `docs/kiro-usage.md`: how the spec drove the build, the steering files, the `pr-reviewer` agent and its review loop (with links to example review comments), and examples of Kiro-generated code and tests.
+  - [x] 18.2 Write `docs/kiro-usage.md`: how the spec drove the build, the steering files, the `pr-reviewer` agent and its review loop (with links to example review comments), and examples of Kiro-generated code and tests.
     - _Requirements: 15.4_
-  - [ ] 18.3 Draft a demo script under 3 minutes (setup, ghosted honey, grapes reminder, first-taste door opening, plan, prep and grocery list, share link). You record it and upload it publicly to YouTube.
+  - [x] 18.3 Draft a demo script under 3 minutes (setup, ghosted honey, grapes reminder, first-taste door opening, plan, prep and grocery list, share link). You record it and upload it publicly to YouTube.
   - [ ] 18.4 Submit by Thursday, December 3: app URL, YouTube link, repo link, write-up.
