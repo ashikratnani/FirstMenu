@@ -151,16 +151,56 @@ describe('Print page', () => {
     expect(screen.getByText('Nothing to buy this week.')).toBeInTheDocument();
   });
 
-  it('Print button calls window.print()', () => {
-    // jsdom leaves window.print undefined, so define it before spying.
-    window.print = () => {};
-    const spy = vi.spyOn(window, 'print').mockImplementation(() => {});
+  it('shows a prep reminder on the grocery line', () => {
+    // Grapes trigger a reminder under 48 months (default seed age is 8 months).
+    // Make the grape the quantified ingredient so it produces a grocery line
+    // and the reminder is attached to that line (Req 6.1/11.7).
+    const recipe = makeRecipe('r-grape', [ing('grapes', 'produce', 50, 'g')]);
+    renderPrint(
+      seedState(8, [recipe], daysWithBreakfast([{ day: 0, recipeId: 'r-grape' }])),
+    );
 
-    renderPrint(seedState(8, []));
+    // The grocery line for the grape is present (label is singularized).
+    const grocery = screen.getByRole('region', { name: 'Grocery' });
+    expect(grocery).toHaveTextContent('grape');
+    // The reminder message renders verbatim on the printed grocery line.
+    expect(
+      screen.getByText('Quarter lengthwise before serving.'),
+    ).toBeInTheDocument();
+  });
 
-    fireEvent.click(screen.getByRole('button', { name: 'Print' }));
+  describe('Print button', () => {
+    // vi.restoreAllMocks() restores spies but not a plain property assignment,
+    // so capture and restore the original window.print to avoid leaking a fake
+    // into later tests.
+    const original = window.print;
+    afterEach(() => {
+      window.print = original;
+    });
 
-    expect(spy).toHaveBeenCalledTimes(1);
+    it('calls window.print() once when present', () => {
+      // jsdom leaves window.print undefined, so define it before spying.
+      window.print = () => {};
+      const spy = vi.spyOn(window, 'print').mockImplementation(() => {});
+
+      renderPrint(seedState(8, []));
+
+      fireEvent.click(screen.getByRole('button', { name: 'Print' }));
+
+      expect(spy).toHaveBeenCalledTimes(1);
+    });
+
+    it('does not throw when window.print is undefined', () => {
+      // Exercise the printNow() guard: when the browser has no print(), the
+      // click must be a no-op rather than throwing.
+      (window as unknown as { print?: () => void }).print = undefined;
+
+      renderPrint(seedState(8, []));
+
+      expect(() =>
+        fireEvent.click(screen.getByRole('button', { name: 'Print' })),
+      ).not.toThrow();
+    });
   });
 
   it('renders the shared disclaimer on the printout', () => {
