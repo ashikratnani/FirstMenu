@@ -103,8 +103,8 @@ Deadline: Friday, December 4, 2026, 2:00 PM PT. Target submission: Thursday, Dec
   - [x] 13.2 Build the Share page (copy link, warning) and the read-only shared view. Test that the shared view writes nothing to storage.
     - _Requirements: 11.4, 11.5_
 
-- [ ] 14. Print view
-  - [ ] 14.1 Build the print route and print CSS: week grid, prep list, grocery list, reminders, text-only states.
+- [x] 14. Print view
+  - [x] 14.1 Build the print route and print CSS: week grid, prep list, grocery list, reminders, text-only states.
     - _Requirements: 6.1, 11.7_
 
 - [ ] 15. Theme art

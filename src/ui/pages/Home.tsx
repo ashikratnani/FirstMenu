@@ -143,6 +143,10 @@ export default function Home() {
           >
             Start next week (empty)
           </button>
+          {/* Opens the printable week view (Task 14.1, Req 6.1). */}
+          <Link to="/print" className={styles.printLink}>
+            Print
+          </Link>
         </div>
       </section>
 

@@ -35,7 +35,7 @@ export default function Layout() {
   return (
     <div className={styles.shell}>
       <a
-        className={styles.skipLink}
+        className={`${styles.skipLink} print-hide`}
         href="#main"
         onClick={(event) => {
           event.preventDefault();
@@ -46,7 +46,7 @@ export default function Layout() {
         Skip to content
       </a>
 
-      <header className={styles.header}>
+      <header className={`${styles.header} print-hide`}>
         <h1 className={styles.appName}>
           <Link to="/">FirstMenu</Link>
         </h1>
@@ -72,8 +72,10 @@ export default function Layout() {
         <Outlet />
       </main>
 
-      {/* Footer disclaimer renders on every page (Req 13.1, 13.2). */}
-      <footer className={styles.footer}>
+      {/* Footer disclaimer renders on every page (Req 13.1, 13.2). The print
+          page carries its OWN disclaimer, so the shell footer is hidden when
+          printing (print-hide). */}
+      <footer className={`${styles.footer} print-hide`}>
         <Disclaimer />
       </footer>
     </div>

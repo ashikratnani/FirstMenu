@@ -39,7 +39,7 @@ export function FirstRunDisclaimer() {
 
   return (
     <section
-      className={styles.firstRun}
+      className={`${styles.firstRun} print-hide`}
       role="alertdialog"
       aria-labelledby="first-run-disclaimer-title"
       aria-describedby="first-run-disclaimer-body"

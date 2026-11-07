@@ -15,7 +15,7 @@ export default function StorageBanner() {
   if (!storageBanner) return null;
 
   return (
-    <div className={styles.banner} role="status">
+    <div className={`${styles.banner} print-hide`} role="status">
       {STORAGE_UNAVAILABLE_MESSAGE}
     </div>
   );
