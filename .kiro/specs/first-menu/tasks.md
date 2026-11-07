@@ -91,10 +91,10 @@ Deadline: Friday, December 4, 2026, 2:00 PM PT. Target submission: Thursday, Dec
   - [x] 11.2 Build the Prep page with an editable prep day.
     - _Requirements: 9.2, 9.3, 9.5_
 
-- [ ] 12. Grocery list
-  - [ ] 12.1 Implement `domain/grocery.ts` (merge by food and unit, "as needed", category grouping, reminders, check reconciliation) with tests.
+- [x] 12. Grocery list
+  - [x] 12.1 Implement `domain/grocery.ts` (merge by food and unit, "as needed", category grouping, reminders, check reconciliation) with tests.
     - _Requirements: 10.1 – 10.6_
-  - [ ] 12.2 Build the Grocery page with check-off.
+  - [x] 12.2 Build the Grocery page with check-off.
     - _Requirements: 10.3, 10.5, 10.6_
 
 - [ ] 13. Share link

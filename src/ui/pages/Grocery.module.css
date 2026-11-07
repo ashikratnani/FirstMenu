@@ -1,0 +1,86 @@
+/*
+ * Grocery screen (Task 12.2). Mirrors Prep.module.css tokens and structure: one
+ * section per category heading, then a single-column list of check-off lines.
+ * Per design "Theme mapping" every state (checked / quantity / as-needed /
+ * reminder) is carried by TEXT + the checkbox accessible name, never by color
+ * alone. Stays usable at 360px width (Req 14.6): single-column lists.
+ */
+
+.empty {
+  margin: var(--space) 0;
+  color: var(--color-muted);
+}
+
+.sectionHeading {
+  margin: var(--space) 0 calc(var(--space) * 0.5);
+  font-size: 1.1rem;
+  color: var(--color-heading);
+}
+
+.lineList {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--space) * 0.5);
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.line {
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: var(--space);
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--space) * 0.3);
+}
+
+.lineLabel {
+  display: flex;
+  align-items: flex-start;
+  gap: calc(var(--space) * 0.5);
+  cursor: pointer;
+}
+
+.checkbox {
+  margin-top: 0.2em;
+  width: 1.1em;
+  height: 1.1em;
+  flex: 0 0 auto;
+}
+
+.lineText {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--space) * 0.15);
+}
+
+.lineName {
+  font-weight: 600;
+  color: var(--color-heading);
+}
+
+.lineAmount {
+  font-size: 0.9rem;
+  color: var(--color-text);
+}
+
+.reminderList {
+  padding: 0 0 0 calc(1.1em + var(--space) * 0.5);
+  margin: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--space) * 0.2);
+}
+
+.reminderText {
+  font-size: 0.85rem;
+  color: var(--color-text);
+}
+
+.footer {
+  margin-top: calc(var(--space) * 2);
+}

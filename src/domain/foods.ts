@@ -300,6 +300,26 @@ export function foodKeyFor(ingredient: Ingredient): string[] {
 }
 
 /**
+ * The SINGLE food key the grocery list merges an ingredient under (issue #26 /
+ * Req 10.2). Unlike {@link foodKeyFor}, this NEVER short-circuits to an
+ * `allergen:<group>` key and NEVER returns more than one key: the shopping list
+ * must merge by the real food, so yogurt, cheese, butter and milk are separate
+ * lines and a multi-allergen ingredient (e.g. "egg noodles") is one line
+ * counted once. Allergen grouping stays exclusively for the Foods / first-taste
+ * doors (foodKeyFor is unchanged).
+ *
+ * The key is `ingredient.food` (trimmed + lowercased) when the user set a
+ * "counts as" override, else the name-derived key ({@link deriveKeyFromName}).
+ * The key is already human-readable, so foodLabel returns it unchanged.
+ */
+export function groceryFoodKey(ingredient: Ingredient): string {
+  if (ingredient.food !== undefined && ingredient.food.trim().length > 0) {
+    return ingredient.food.trim().toLowerCase();
+  }
+  return deriveKeyFromName(ingredient.name);
+}
+
+/**
  * The set of foods shown on the Foods page: every ingredient of every passed
  * recipe, mapped through foodKeyFor, flattened over multi-group results, with
  * ignored foods and empty keys removed, deduplicated. Returns keys in
