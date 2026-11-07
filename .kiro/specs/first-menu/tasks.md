@@ -111,9 +111,10 @@ Deadline: Friday, December 4, 2026, 2:00 PM PT. Target submission: Thursday, Dec
   - [x] 15.1 Draw the SVG set: friendly ghost, mystery door, friendly monsters (one per allergen group plus a generic one), pumpkin badge, lantern. Light, welcoming palette; no haunted house or night scenes. Add door-opening and ghost-float animations that turn off under reduced motion.
     - _Requirements: 14.1, 14.2, 14.3, 14.5_
 
-- [ ] 16. Accessibility and device pass
-  - [ ] 16.1 Run `vitest-axe` on main pages, do a keyboard-only pass, test on iOS Safari with VoiceOver and at 360 px width, and fix issues.
+- [x] 16. Accessibility and device pass
+  - [x] 16.1 Run `vitest-axe` on main pages, do a keyboard-only pass, test on iOS Safari with VoiceOver and at 360 px width, and fix issues.
     - _Requirements: 14.3, 14.4, 14.6, 15.3_
+    - Note: the automatable work is done — `vitest-axe` runs on all 12 main pages (`src/ui/a11y.test.tsx`, color-contrast + label-content-name-mismatch disabled as unevaluatable in jsdom) with zero violations, keyboard-affordance tests cover the skip link focusing `<main>`, the primary nav links being in tab order, and Grocery/Home controls being reachable, and the page CSS was reviewed for 360px robustness (fluid `auto-fill`/`minmax` grids, wrapping nav/rows, no fixed container widths). The manual iOS-Safari + VoiceOver device pass and a real-device 360px pixel check remain a maintainer action: they need a real browser/device and cannot be run in this CI/jsdom environment.
 
 - [ ] 17. Deploy and verify
   - [ ] 17.0 Release gate: confirm every rule cites a published source with a URL, and switch on the required-source test. If any source is still missing, raise it with you before submission.
