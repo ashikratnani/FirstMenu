@@ -160,8 +160,12 @@ function recipeById(recipes: Recipe[], id: string): Recipe | undefined {
  * has a recorded 'reaction'. A ghosted recipe is not going to be served, so its
  * foods are not really being introduced — the spacing calc skips it. This is a
  * pure, domain-only check (no UI import), so plan.ts stays React-free.
+ *
+ * Exported so other pure domain modules (e.g. prep.ts) reuse the SAME ghost
+ * rule instead of copying it. recipeView.ts encodes the same rule for the UI;
+ * the domain uses this one. Keep the two in sync if the rule ever changes.
  */
-function isRecipeGhosted(
+export function isRecipeGhosted(
   recipe: Recipe,
   state: AppState,
   ageMonths: number,
