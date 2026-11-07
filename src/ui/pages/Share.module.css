@@ -1,0 +1,89 @@
+/*
+ * Share page (Task 13.2). A plain owner page: an intro, the copy-link control
+ * with a manual fallback field, an optional length warning, and the privacy
+ * note. Reuses the shared theme tokens; stays usable at 360px width (Req 14.6)
+ * with a single-column layout and a full-width URL field.
+ */
+
+.intro {
+  margin: var(--space) 0;
+  color: var(--color-text);
+}
+
+.sectionHeading {
+  margin: var(--space) 0 calc(var(--space) * 0.5);
+  font-size: 1.1rem;
+  color: var(--color-heading);
+}
+
+.linkBlock,
+.privacy {
+  margin: var(--space) 0;
+}
+
+.copyRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space);
+  margin-bottom: calc(var(--space) * 0.75);
+}
+
+.copyButton {
+  padding: calc(var(--space) * 0.5) var(--space);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface, #fff);
+  color: var(--color-heading);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.copyButton:hover,
+.copyButton:focus-visible {
+  border-color: var(--color-heading);
+}
+
+.copied {
+  font-weight: 600;
+  color: var(--color-heading);
+}
+
+.fieldLabel {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-heading);
+  margin-bottom: calc(var(--space) * 0.25);
+}
+
+.urlField {
+  width: 100%;
+  box-sizing: border-box;
+  padding: calc(var(--space) * 0.5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  font-family: monospace;
+  font-size: 0.85rem;
+  color: var(--color-text);
+  background: var(--color-surface);
+}
+
+.warning {
+  margin: var(--space) 0;
+  padding: var(--space);
+  border: 1px solid #cdbdf0;
+  border-radius: var(--radius);
+  background: #f4f1fb;
+}
+
+.warningText {
+  margin: 0;
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.privacyNote {
+  margin: 0;
+  color: var(--color-muted);
+}

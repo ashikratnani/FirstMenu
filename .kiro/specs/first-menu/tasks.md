@@ -97,10 +97,10 @@ Deadline: Friday, December 4, 2026, 2:00 PM PT. Target submission: Thursday, Dec
   - [x] 12.2 Build the Grocery page with check-off.
     - _Requirements: 10.3, 10.5, 10.6_
 
-- [ ] 13. Share link
-  - [ ] 13.1 Implement `domain/share.ts` (payload, encode, decode, validation, length warning) with tests for round-trip, tampered links and absence of name and birth date.
+- [x] 13. Share link
+  - [x] 13.1 Implement `domain/share.ts` (payload, encode, decode, validation, length warning) with tests for round-trip, tampered links and absence of name and birth date.
     - _Requirements: 11.1 – 11.3, 11.5, 11.6_
-  - [ ] 13.2 Build the Share page (copy link, warning) and the read-only shared view. Test that the shared view writes nothing to storage.
+  - [x] 13.2 Build the Share page (copy link, warning) and the read-only shared view. Test that the shared view writes nothing to storage.
     - _Requirements: 11.4, 11.5_
 
 - [ ] 14. Print view
