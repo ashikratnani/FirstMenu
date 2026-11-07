@@ -102,13 +102,19 @@ const childProfileSchema = z.object({
 
 const foodRecordSchema = z.object({
   status: z.enum(['tried', 'reaction']),
-  date: z.string(),
+  // A real calendar date, same boundary rule as birthDate: a bad food date
+  // must never reach the UI's date logic.
+  date: ymdDateSchema,
   note: z.string().optional(),
 });
 
 const weekPlanSchema = z.object({
-  startDate: z.string(),
-  prepDate: z.string(),
+  // Age is computed from plan.startDate (ageInMonths(child.birthDate,
+  // plan.startDate)); a malformed/empty start date would yield a NaN age and
+  // stageFor(NaN) -> '9-12' (the LESS strict stage). Reject bad dates here at
+  // the storage boundary so corrupt/imported plans can never open that hole.
+  startDate: ymdDateSchema,
+  prepDate: ymdDateSchema,
   activeSlots: z.array(mealTypeSchema),
   // A day is a Partial<Record<MealType, recipeId>>; exactly 7 of them.
   // partialRecord (not record) so a day may omit meal keys.

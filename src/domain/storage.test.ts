@@ -14,6 +14,7 @@ import {
   SCHEMA_VERSION,
   STORAGE_KEY,
 } from './storage';
+import { selectAgeMonths, selectStage } from '../state/selectors';
 
 const FIXED_NOW = new Date(2026, 0, 15); // 2026-01-15 local
 
@@ -117,6 +118,54 @@ describe('appStateSchema birthDate validation (Task 2 forward note)', () => {
   it('accepts a real YYYY-MM-DD birthDate', () => {
     const ok = { ...validState(), child: { birthDate: '2025-06-01' } };
     expect(appStateSchema.safeParse(ok).success).toBe(true);
+  });
+});
+
+describe('appStateSchema plan/food date validation (Task 5 date gap)', () => {
+  it('rejects an empty plan.startDate', () => {
+    const bad = { ...validState(), plan: { ...validState().plan, startDate: '' } };
+    expect(appStateSchema.safeParse(bad).success).toBe(false);
+  });
+
+  it('rejects a garbage plan.startDate', () => {
+    const bad = {
+      ...validState(),
+      plan: { ...validState().plan, startDate: 'garbage' },
+    };
+    expect(appStateSchema.safeParse(bad).success).toBe(false);
+  });
+
+  it('rejects an impossible plan.startDate (2026-02-30)', () => {
+    const bad = {
+      ...validState(),
+      plan: { ...validState().plan, startDate: '2026-02-30' },
+    };
+    expect(appStateSchema.safeParse(bad).success).toBe(false);
+  });
+
+  it('rejects an empty plan.prepDate', () => {
+    const bad = { ...validState(), plan: { ...validState().plan, prepDate: '' } };
+    expect(appStateSchema.safeParse(bad).success).toBe(false);
+  });
+
+  it('rejects a FoodRecord with an empty date', () => {
+    const bad = {
+      ...validState(),
+      foods: { carrot: { status: 'tried' as const, date: '' } },
+    };
+    expect(appStateSchema.safeParse(bad).success).toBe(false);
+  });
+
+  it('rejects a FoodRecord with an impossible date (2026-02-30)', () => {
+    const bad = {
+      ...validState(),
+      foods: { carrot: { status: 'tried' as const, date: '2026-02-30' } },
+    };
+    expect(appStateSchema.safeParse(bad).success).toBe(false);
+  });
+
+  it('accepts real plan and food dates', () => {
+    expect(appStateSchema.safeParse(validState()).success).toBe(true);
   });
 });
 
@@ -345,11 +394,97 @@ describe('exportState / importState (Req 12.5)', () => {
     expect(malformedResult.ok).toBe(false);
   });
 
-  it('importState never writes to storage (pure)', () => {
+  it('rejects an import with an empty plan.startDate and leaves stored data unchanged', () => {
+    // Pre-seed storage with a known-good state through loadState's write path.
     const storage = makeStorage();
-    const spy = vi.spyOn(storage, 'setItem');
-    importState('not json');
-    importState(JSON.stringify(validState()));
-    expect(spy).not.toHaveBeenCalled();
+    const good = validState();
+    saveState(good, storage);
+    const before = storage.getItem(STORAGE_KEY);
+
+    const bad = { ...validState(), plan: { ...validState().plan, startDate: '' } };
+    const result = importState(JSON.stringify(bad));
+
+    expect(result.ok).toBe(false);
+    // importState is pure, so the stored data is untouched.
+    expect(storage.getItem(STORAGE_KEY)).toBe(before);
+    expect(JSON.parse(storage.getItem(STORAGE_KEY)!)).toEqual(good);
+  });
+
+  it('rejects an import with an impossible plan.startDate (2026-02-30)', () => {
+    const bad = {
+      ...validState(),
+      plan: { ...validState().plan, startDate: '2026-02-30' },
+    };
+    const result = importState(JSON.stringify(bad));
+    expect(result.ok).toBe(false);
+  });
+
+  it('rejects an import with a bad FoodRecord date', () => {
+    const bad = {
+      ...validState(),
+      foods: { carrot: { status: 'tried' as const, date: 'garbage' } },
+    };
+    const result = importState(JSON.stringify(bad));
+    expect(result.ok).toBe(false);
+  });
+
+  it('regression: a bad stored/imported plan date can never yield a NaN age / 9-12 stage', () => {
+    // Before the fix, a plan.startDate of '' passed the schema, so loadState
+    // and importState both accepted it; ageInMonths(birthDate, '') -> NaN and
+    // stageFor(NaN) -> '9-12'. Now the bad date is rejected at the boundary.
+    const badStart = {
+      ...validState(),
+      plan: { ...validState().plan, startDate: '' },
+    };
+
+    // Import path: rejected, so no NaN-age state is ever produced.
+    expect(importState(JSON.stringify(badStart)).ok).toBe(false);
+
+    // Load path: corrupt -> backup + fresh default (which has a real date).
+    const storage = makeStorage();
+    storage.setItem(STORAGE_KEY, JSON.stringify(badStart));
+    const loaded = loadState(storage, FIXED_NOW);
+    expect(loaded.corrupt).toBe(true);
+    expect(loaded.state).toEqual(defaultState(FIXED_NOW));
+
+    // The resulting state has a well-formed start date, so the selector that
+    // computes age/stage can never see the NaN hole.
+    const months = selectAgeMonths(loaded.state);
+    // No child in a default state, so age is null (definitely not NaN).
+    expect(months).toBeNull();
+    // And with a child + the real default date, age is a finite number.
+    const withChild: AppState = {
+      ...loaded.state,
+      child: { name: 'Baby', birthDate: '2025-06-01' },
+    };
+    const ageWithChild = selectAgeMonths(withChild);
+    expect(Number.isNaN(ageWithChild)).toBe(false);
+    expect(selectStage(withChild)).toBe('6-8');
+  });
+
+  it('importState never writes to the storage it would use (pure)', () => {
+    // importState takes no Storage argument, so a spy on a detached stub could
+    // never catch a write — that was the vacuous version of this test. The only
+    // storage importState could ever reach is globalThis.localStorage, so spy
+    // on THAT and assert it is never touched, for both a bad and a good import.
+    const setSpy = vi.spyOn(globalThis.localStorage, 'setItem');
+    const removeSpy = vi.spyOn(globalThis.localStorage, 'removeItem');
+    try {
+      const before = globalThis.localStorage.getItem(STORAGE_KEY);
+
+      // Cover every branch importState can take: non-JSON, a zod FAILURE
+      // (the branch most likely to grow an accidental write), and success.
+      importState('not json');
+      importState(JSON.stringify({ ...validState(), plan: { ...validState().plan, startDate: '' } }));
+      importState(JSON.stringify(validState()));
+
+      expect(setSpy).not.toHaveBeenCalled();
+      expect(removeSpy).not.toHaveBeenCalled();
+      // And nothing landed under the real app key.
+      expect(globalThis.localStorage.getItem(STORAGE_KEY)).toBe(before);
+    } finally {
+      setSpy.mockRestore();
+      removeSpy.mockRestore();
+    }
   });
 });

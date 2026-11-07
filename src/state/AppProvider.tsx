@@ -259,6 +259,13 @@ export interface AppContextValue {
   storageBanner: boolean;
   /** Set on load when corrupt data was found and backed up. */
   corruptNotice: boolean;
+  /**
+   * The `firstmenu:backup-<timestamp>` key the corrupt raw data was copied to
+   * on load, if any. Lets a later UI offer to export the backup (design Error
+   * Handling). Null when no corrupt data was backed up. Derived UI state only;
+   * never persisted into AppState.
+   */
+  corruptBackupKey: string | null;
   /** Slots emptied on load because they referenced an unknown recipe (Req 3.5). */
   emptiedSlots: ReconcileResult['emptiedSlots'];
   /** Serialize the current state for download (filename + JSON). */
@@ -286,6 +293,7 @@ function buildInitial(storage?: Storage): {
   state: AppState;
   storageUnavailable: boolean;
   corrupt: boolean;
+  corruptBackupKey: string | null;
   emptiedSlots: ReconcileResult['emptiedSlots'];
 } {
   const loaded = loadState(storage);
@@ -294,6 +302,7 @@ function buildInitial(storage?: Storage): {
     state: reconciled.state,
     storageUnavailable: loaded.storageUnavailable,
     corrupt: loaded.corrupt,
+    corruptBackupKey: loaded.backupKey ?? null,
     emptiedSlots: reconciled.emptiedSlots,
   };
 }
@@ -312,6 +321,7 @@ export function AppProvider({ children, storage }: AppProviderProps) {
   // import that reconciles stale recipe references surfaces the same
   // emptied-slot notice a load does (Req 3.5). Seeded from the initial load.
   const [corruptNotice] = useState(initial.corrupt);
+  const [corruptBackupKey] = useState(initial.corruptBackupKey);
   const [emptiedSlots, setEmptiedSlots] = useState(initial.emptiedSlots);
 
   // Probe storage availability exactly once (not on every render), combined
@@ -389,6 +399,7 @@ export function AppProvider({ children, storage }: AppProviderProps) {
       dispatch,
       storageBanner,
       corruptNotice,
+      corruptBackupKey,
       emptiedSlots,
       exportData,
       importData,
@@ -398,6 +409,7 @@ export function AppProvider({ children, storage }: AppProviderProps) {
       state,
       storageBanner,
       corruptNotice,
+      corruptBackupKey,
       emptiedSlots,
       exportData,
       importData,
