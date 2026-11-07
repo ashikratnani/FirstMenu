@@ -375,6 +375,40 @@ describe('AppProvider import/export (Req 12.5)', () => {
     expect(saved).toEqual(imported);
   });
 
+  it('a GOOD import reconciles stale recipe refs and surfaces emptied slots (Req 3.5)', () => {
+    const storage = makeStorage();
+    const { result } = renderHook(() => useApp(), {
+      wrapper: wrapper(storage),
+    });
+
+    // No emptied slots initially (fresh default load).
+    expect(result.current.emptiedSlots).toEqual([]);
+
+    // A valid backup whose plan references a recipe id absent from both
+    // BUILTIN_RECIPES and the imported customRecipes.
+    const imported = goodImport();
+    imported.plan.days[0] = {
+      lunch: 'ghost-recipe',
+      dinner: 'b-carrots-and-apples',
+    };
+
+    let outcome: { ok: boolean } = { ok: false };
+    act(() => {
+      outcome = result.current.importData(JSON.stringify(imported));
+    });
+
+    expect(outcome.ok).toBe(true);
+    // The dangling slot is emptied, the known one kept.
+    expect(result.current.state.plan.days[0].lunch).toBeUndefined();
+    expect(result.current.state.plan.days[0].dinner).toBe(
+      'b-carrots-and-apples',
+    );
+    // The emptied-slot notice is surfaced through context, mirroring load.
+    expect(result.current.emptiedSlots).toEqual([
+      { day: 0, meal: 'lunch', recipeId: 'ghost-recipe' },
+    ]);
+  });
+
   it('exportData serializes the current state', () => {
     const storage = makeStorage();
     const { result } = renderHook(() => useApp(), {

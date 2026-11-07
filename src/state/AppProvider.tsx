@@ -308,6 +308,12 @@ export function AppProvider({ children, storage }: AppProviderProps) {
 
   const [state, dispatch] = useReducer(reducer, initial.state);
 
+  // Load-time/import notices live in React state (not a frozen ref) so an
+  // import that reconciles stale recipe references surfaces the same
+  // emptied-slot notice a load does (Req 3.5). Seeded from the initial load.
+  const [corruptNotice] = useState(initial.corrupt);
+  const [emptiedSlots, setEmptiedSlots] = useState(initial.emptiedSlots);
+
   // Probe storage availability exactly once (not on every render), combined
   // with whether load already detected storage unavailable (Req 12.7).
   const storageUnavailableRef = useRef<boolean | null>(null);
@@ -366,8 +372,13 @@ export function AppProvider({ children, storage }: AppProviderProps) {
         setImportError(result.reason);
         return { ok: false, reason: result.reason };
       }
+      // Reconcile stale recipe references on the validated import the same
+      // way the load path does, so a dangling plan slot is emptied and the
+      // emptied-slot notice is surfaced through context (Req 3.5).
+      const reconciled = reconcilePlanRecipes(result.state);
       setImportError(null);
-      dispatch({ type: 'replaceState', state: result.state });
+      setEmptiedSlots(reconciled.emptiedSlots);
+      dispatch({ type: 'replaceState', state: reconciled.state });
       return { ok: true };
     },
   ).current;
@@ -377,8 +388,8 @@ export function AppProvider({ children, storage }: AppProviderProps) {
       state,
       dispatch,
       storageBanner,
-      corruptNotice: initial.corrupt,
-      emptiedSlots: initial.emptiedSlots,
+      corruptNotice,
+      emptiedSlots,
       exportData,
       importData,
       importError,
@@ -386,8 +397,8 @@ export function AppProvider({ children, storage }: AppProviderProps) {
     [
       state,
       storageBanner,
-      initial.corrupt,
-      initial.emptiedSlots,
+      corruptNotice,
+      emptiedSlots,
       exportData,
       importData,
       importError,
