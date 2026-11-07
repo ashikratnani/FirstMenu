@@ -74,6 +74,38 @@ body {
   box-sizing: border-box;
 }
 
+/*
+ * Print rules (Task 14.1, Req 6.1). When printing (the print view is opened
+ * from the plan with a Print button), hide the app-shell chrome and strip
+ * color fills/background illustrations so the printout is clean black-on-white.
+ * CSS-module class names are hashed at build, so the chrome carries a stable,
+ * non-hashed `print-hide` hook (applied in Layout/StorageBanner/Disclaimer and
+ * on the Print page's own Print button). The page's own print-friendly layout
+ * lives in Print.module.css; these rules are global and screen-neutral.
+ */
+@media print {
+  /* Hide app-shell chrome: skip link, header/nav, footer, storage banner,
+     first-run disclaimer and the Print button itself. */
+  .print-hide {
+    display: none !important;
+  }
+
+  /* Clean black-on-white: drop page background tint and illustrations. */
+  :root {
+    background-color: #fff;
+  }
+
+  body {
+    background: #fff;
+    color: #000;
+  }
+
+  /* Illustrations/decorative art carry aria-hidden; never print them. */
+  [aria-hidden='true'] {
+    display: none !important;
+  }
+}
+
 /* Animations (door opening, ghost floating, added in task 15) are CSS only and
  * disabled under reduced motion (Req 14.5). The rule lives here so every later
  * component inherits the behavior. */
