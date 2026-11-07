@@ -97,6 +97,7 @@
   text-decoration: underline;
 }
 
+.sessionServings,
 .sessionBatches {
   font-size: 0.9rem;
   color: var(--color-text);

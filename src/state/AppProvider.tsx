@@ -221,6 +221,10 @@ export function reducer(state: AppState, action: AppAction): AppState {
     }
 
     case 'setPrepDate': {
+      // Req 9.3: let the user choose the prep day. Validate it is a real
+      // YYYY-MM-DD (like setStartDate); a bad value (e.g. a cleared input
+      // sending "") is a no-op so prep.ts never sees NaN day offsets.
+      if (!isYmdDate(action.prepDate)) return state;
       return { ...state, plan: { ...state.plan, prepDate: action.prepDate } };
     }
 

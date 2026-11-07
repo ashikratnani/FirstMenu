@@ -232,6 +232,18 @@ describe('reducer actions', () => {
     expect(next.plan.prepDate).toBe('2026-01-10');
   });
 
+  it('setPrepDate ignores a malformed/empty date (no-op)', () => {
+    const start = base();
+    // A cleared <input type="date"> sends "" — must not corrupt prepDate (it
+    // would make every prep.ts day offset NaN). Also reject impossible and
+    // garbage dates, mirroring setStartDate.
+    for (const prepDate of ['', '2026-02-30', 'garbage']) {
+      const after = reducer(start, { type: 'setPrepDate', prepDate });
+      expect(after.plan.prepDate).toBe(start.plan.prepDate);
+      expect(after).toBe(start);
+    }
+  });
+
   it('setStartDate sets the start date and anchors prepDate to the day before (Req 8.1)', () => {
     const next = reducer(base(), {
       type: 'setStartDate',

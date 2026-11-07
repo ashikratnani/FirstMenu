@@ -105,7 +105,7 @@ describe('computePrepList: fridge-only', () => {
     expect(result.thawReminders).toEqual([]);
     expect(result.sessions).toEqual([
       // servingsNeeded = 3, servings=2 -> ceil(3/2)=2 batches.
-      { date: '2026-01-04', recipeId: 'r-pear', batches: 2, store: 'fridge' },
+      { date: '2026-01-04', recipeId: 'r-pear', batches: 2, servings: 3, store: 'fridge' },
     ]);
   });
 
@@ -120,7 +120,7 @@ describe('computePrepList: fridge-only', () => {
 
     const result = computePrepList(plan, [recipe], stateWithFoods(), AGE);
     expect(result.sessions).toEqual([
-      { date: '2026-01-04', recipeId: 'r-stew', batches: 2, store: 'fridge' },
+      { date: '2026-01-04', recipeId: 'r-stew', batches: 2, servings: 5, store: 'fridge' },
     ]);
     expect(result.thawReminders).toEqual([]);
   });
@@ -136,7 +136,7 @@ describe('computePrepList: fridge-only', () => {
     const result = computePrepList(plan, [recipe], stateWithFoods(), AGE);
     // servings guarded to 1 -> ceil(2/1)=2 batches.
     expect(result.sessions).toEqual([
-      { date: '2026-01-04', recipeId: 'r-zero', batches: 2, store: 'fridge' },
+      { date: '2026-01-04', recipeId: 'r-zero', batches: 2, servings: 2, store: 'fridge' },
     ]);
   });
 });
@@ -160,7 +160,7 @@ describe('computePrepList: freezer', () => {
     const result = computePrepList(plan, [recipe], stateWithFoods(), AGE);
     expect(result.sessions).toEqual([
       // One prep-day session, all 3 servings, store 'freezer' (a portion frozen).
-      { date: '2026-01-04', recipeId: 'r-chicken', batches: 3, store: 'freezer' },
+      { date: '2026-01-04', recipeId: 'r-chicken', batches: 3, servings: 3, store: 'freezer' },
     ]);
     // Day 5 is 2026-01-10; thaw the day before -> 2026-01-09.
     expect(result.thawReminders).toEqual([
@@ -180,7 +180,7 @@ describe('computePrepList: freezer', () => {
 
     const result = computePrepList(plan, [recipe], stateWithFoods(), AGE);
     expect(result.sessions).toEqual([
-      { date: '2026-01-04', recipeId: 'r-fish', batches: 3, store: 'freezer' },
+      { date: '2026-01-04', recipeId: 'r-fish', batches: 3, servings: 3, store: 'freezer' },
     ]);
     // Day 2 = 2026-01-07 -> thaw 2026-01-06; day 4 = 2026-01-09 -> thaw 2026-01-08.
     expect(result.thawReminders).toEqual([
@@ -200,7 +200,7 @@ describe('computePrepList: freezer', () => {
 
     const result = computePrepList(plan, [recipe], stateWithFoods(), AGE);
     expect(result.sessions).toEqual([
-      { date: '2026-01-04', recipeId: 'r-stew', batches: 1, store: 'freezer' },
+      { date: '2026-01-04', recipeId: 'r-stew', batches: 1, servings: 2, store: 'freezer' },
     ]);
     // Day 0 = 2026-01-05 -> thaw 2026-01-04; day 3 = 2026-01-08 -> thaw 2026-01-07.
     expect(result.thawReminders).toEqual([
@@ -225,8 +225,8 @@ describe('computePrepList: cook-fresh', () => {
     expect(result.thawReminders).toEqual([]);
     expect(result.sessions).toEqual([
       // Day 0 = 2026-01-05, day 2 = 2026-01-07; sessions on the use day itself.
-      { date: '2026-01-05', recipeId: 'r-fresh', batches: 1, store: 'serve' },
-      { date: '2026-01-07', recipeId: 'r-fresh', batches: 1, store: 'serve' },
+      { date: '2026-01-05', recipeId: 'r-fresh', batches: 1, servings: 1, store: 'serve' },
+      { date: '2026-01-07', recipeId: 'r-fresh', batches: 1, servings: 1, store: 'serve' },
     ]);
   });
 
@@ -245,9 +245,9 @@ describe('computePrepList: cook-fresh', () => {
     expect(result.thawReminders).toEqual([]);
     expect(result.sessions).toEqual([
       // First session starts day 0 (2026-01-05), 3 servings -> ceil(3/2)=2 batches.
-      { date: '2026-01-05', recipeId: 'r-group', batches: 2, store: 'serve' },
+      { date: '2026-01-05', recipeId: 'r-group', batches: 2, servings: 3, store: 'serve' },
       // Second session starts day 5 (2026-01-10), 2 servings -> 1 batch.
-      { date: '2026-01-10', recipeId: 'r-group', batches: 1, store: 'serve' },
+      { date: '2026-01-10', recipeId: 'r-group', batches: 1, servings: 2, store: 'serve' },
     ]);
   });
 });
@@ -269,7 +269,7 @@ describe('computePrepList: ghosted slots excluded', () => {
     const result = computePrepList(plan, [honey, pear], stateWithFoods(), AGE);
     // Honey is ghosted at 8 months -> only pear is scheduled.
     expect(result.sessions).toEqual([
-      { date: '2026-01-04', recipeId: 'r-pear', batches: 1, store: 'fridge' },
+      { date: '2026-01-04', recipeId: 'r-pear', batches: 1, servings: 1, store: 'fridge' },
     ]);
     expect(result.thawReminders).toEqual([]);
   });
@@ -288,7 +288,7 @@ describe('computePrepList: ghosted slots excluded', () => {
     };
     const result = computePrepList(plan, [reacted, pear], stateWithFoods(foods), AGE);
     expect(result.sessions).toEqual([
-      { date: '2026-01-04', recipeId: 'r-pear', batches: 1, store: 'fridge' },
+      { date: '2026-01-04', recipeId: 'r-pear', batches: 1, servings: 1, store: 'fridge' },
     ]);
   });
 
@@ -300,7 +300,7 @@ describe('computePrepList: ghosted slots excluded', () => {
     const plan = withBreakfast(emptyPlan(), 0, 'r-honey');
     const result = computePrepList(plan, [honey], stateWithFoods(), 12);
     expect(result.sessions).toEqual([
-      { date: '2026-01-04', recipeId: 'r-honey', batches: 1, store: 'fridge' },
+      { date: '2026-01-04', recipeId: 'r-honey', batches: 1, servings: 1, store: 'fridge' },
     ]);
   });
 });
@@ -328,7 +328,7 @@ describe('computePrepList: prepDate change', () => {
     const farPlan: WeekPlan = { ...base, prepDate: '2026-01-01' };
     const far = computePrepList(farPlan, [recipe], stateWithFoods(), AGE);
     expect(far.sessions).toEqual([
-      { date: '2026-01-01', recipeId: 'r-chicken', batches: 1, store: 'freezer' },
+      { date: '2026-01-01', recipeId: 'r-chicken', batches: 1, servings: 1, store: 'freezer' },
     ]);
     // Day 1 = 2026-01-06 -> thaw the day before -> 2026-01-05.
     expect(far.thawReminders).toEqual([
@@ -348,7 +348,7 @@ describe('computePrepList: prepDate change', () => {
     };
     const result = computePrepList(plan, [recipe], stateWithFoods(), AGE);
     expect(result.sessions).toEqual([
-      { date: '2026-01-07', recipeId: 'r-chicken', batches: 1, store: 'fridge' },
+      { date: '2026-01-07', recipeId: 'r-chicken', batches: 1, servings: 1, store: 'fridge' },
     ]);
     expect(result.thawReminders).toEqual([]);
   });
@@ -381,5 +381,55 @@ describe('computePrepList: ordering', () => {
       { date: '2026-01-04', recipeId: 'r-a' },
       { date: '2026-01-04', recipeId: 'r-b' },
     ]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Servings-needed (Req 9.2) and loop-termination guard
+// ---------------------------------------------------------------------------
+
+describe('computePrepList: servings-needed field', () => {
+  it('reports servings covered per session (summing repeat uses)', () => {
+    // Cook-fresh grouping: fridgeDays 2 groups days 0,1,2 (3 servings) then 5,6
+    // (2 servings). Each session's `servings` is the count it covers.
+    const recipe = makeRecipe('r-group', 'group', {
+      servings: 2,
+      storage: { fridgeDays: 2 },
+    });
+    let plan = emptyPlan();
+    for (const d of [0, 1, 2, 5, 6]) plan = withBreakfast(plan, d, 'r-group');
+
+    const result = computePrepList(plan, [recipe], stateWithFoods(), AGE);
+    expect(result.sessions.map((s) => s.servings)).toEqual([3, 2]);
+  });
+
+  it('a fridge-only session reports total servingsNeeded', () => {
+    const recipe = makeRecipe('r-stew', 'stew', {
+      servings: 4,
+      storage: { fridgeDays: 7 },
+    });
+    let plan = emptyPlan();
+    for (let d = 0; d < 5; d += 1) plan = withBreakfast(plan, d, 'r-stew');
+    const result = computePrepList(plan, [recipe], stateWithFoods(), AGE);
+    expect(result.sessions[0].servings).toBe(5);
+  });
+});
+
+describe('computePrepList: terminates with a bad/NaN-inducing prepDate', () => {
+  it('returns without hanging when prepDate is not a real date (cook-fresh, no freezer)', () => {
+    // Belt-and-suspenders: the reducer rejects a bad prepDate, but if one ever
+    // reaches prep.ts every day offset is NaN. For a cook-fresh recipe (no
+    // freezerMonths) the grouping loop must still consume >=1 use per session
+    // and terminate instead of pushing sessions until the heap is exhausted.
+    const recipe = makeRecipe('r-fresh', 'fresh', { servings: 1 });
+    let plan: WeekPlan = { ...emptyPlan(), prepDate: '' };
+    for (const d of [0, 1, 2]) plan = withBreakfast(plan, d, 'r-fresh');
+
+    const result = computePrepList(plan, [recipe], stateWithFoods(), AGE);
+    // One session per use (the window test is NaN/false so no grouping), but it
+    // DOES terminate and covers each use exactly once.
+    expect(result.sessions).toHaveLength(3);
+    expect(result.sessions.every((s) => s.recipeId === 'r-fresh')).toBe(true);
+    expect(result.sessions.reduce((sum, s) => sum + s.servings, 0)).toBe(3);
   });
 });

@@ -45,8 +45,10 @@ export interface CookSession {
   date: string;
   /** The recipe cooked. */
   recipeId: string;
-  /** Number of batches to cook (ceil(servingsInSession / recipe.servings)). */
+  /** Number of batches to cook (ceil(servings / recipe.servings)). */
   batches: number;
+  /** Number of servings this session covers (Req 9.2; sums repeat uses). */
+  servings: number;
   /** Where the cooked food is kept until served. */
   store: 'fridge' | 'freezer' | 'serve';
 }
@@ -176,6 +178,7 @@ function scheduleRecipe(
       date: plan.prepDate,
       recipeId: recipe.id,
       batches: batchesFor(recipe, servingsNeeded),
+      servings: servingsNeeded,
       store: 'fridge',
     });
     return;
@@ -196,6 +199,7 @@ function scheduleRecipe(
       date: plan.prepDate,
       recipeId: recipe.id,
       batches: batchesFor(recipe, servingsNeeded),
+      servings: servingsNeeded,
       store: anyFrozen ? 'freezer' : 'fridge',
     });
     return;
@@ -205,11 +209,16 @@ function scheduleRecipe(
   // use day and cover every remaining use within fridgeDays of that start (or
   // only the same day when fridgeDays is unset). The session is cooked and
   // served from the fridge over its window, so store is 'serve'.
+  const window = fridgeDays ?? 0;
   let index = 0;
   while (index < uses.length) {
     const start = uses[index];
-    const window = fridgeDays ?? 0;
-    let servingsInSession = 0;
+    // Always consume the session's first use BEFORE the window test so index
+    // strictly increases every outer iteration. This guarantees termination
+    // even if offsets are NaN (a bad/empty prepDate makes every offset NaN and
+    // `NaN <= window` is false); without this the loop could run away (OOM).
+    index += 1;
+    let servingsInSession = 1;
     while (index < uses.length && uses[index].offset - start.offset <= window) {
       servingsInSession += 1;
       index += 1;
@@ -218,6 +227,7 @@ function scheduleRecipe(
       date: start.date,
       recipeId: recipe.id,
       batches: batchesFor(recipe, servingsInSession),
+      servings: servingsInSession,
       store: 'serve',
     });
   }

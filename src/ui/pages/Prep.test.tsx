@@ -135,12 +135,16 @@ describe('Prep page', () => {
     );
 
     const session = screen.getByRole('group', { name: /Veggie Stew/ });
-    expect(session).toHaveAccessibleName(/Veggie Stew\. 1 batch\. Keep in the fridge\./);
+    expect(session).toHaveAccessibleName(
+      /Veggie Stew\. 1 serving\. 1 batch\. Keep in the fridge\./,
+    );
     // The recipe title links to its detail page.
     expect(within(session).getByRole('link', { name: 'Veggie Stew' })).toHaveAttribute(
       'href',
       '/recipes/custom-stew',
     );
+    // Req 9.2: the servings needed is shown next to the batches.
+    expect(within(session).getByText('1 serving')).toBeInTheDocument();
     expect(within(session).getByText('1 batch')).toBeInTheDocument();
     expect(within(session).getByText('Keep in the fridge')).toBeInTheDocument();
     // The prep-day date label ("Sun Mar 1") is shown for the session.
@@ -150,6 +154,23 @@ describe('Prep page', () => {
     expect(
       within(session).getByText('Cool fully before freezing.'),
     ).toBeInTheDocument();
+  });
+
+  it('shows the servings-needed count when a recipe is used several times (Req 9.2)', () => {
+    // Stew planned on days 0,1,2 (offsets 1,2,3). fridgeDays 1 only covers
+    // offset 1, so the fresh-cook fallback does not apply here — but freezer is
+    // set, so it is ONE prep-day session covering all 3 servings.
+    renderPrep(
+      seedState(8, [FREEZER_RECIPE], ['dinner'], daysWithDinner([
+        { day: 0, recipeId: 'custom-stew' },
+        { day: 1, recipeId: 'custom-stew' },
+        { day: 2, recipeId: 'custom-stew' },
+      ])),
+    );
+
+    const session = screen.getByRole('group', { name: /Veggie Stew/ });
+    expect(within(session).getByText('3 servings')).toBeInTheDocument();
+    expect(session).toHaveAccessibleName(/Veggie Stew\. 3 servings\./);
   });
 
   it('freezes far-off uses with a thaw reminder, and editing the prep day recomputes the list', () => {

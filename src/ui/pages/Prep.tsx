@@ -38,6 +38,11 @@ function batchesLabel(batches: number): string {
   return `${batches} ${batches === 1 ? 'batch' : 'batches'}`;
 }
 
+/** "N serving" / "N servings" for a session's servings-needed count (Req 9.2). */
+function servingsLabel(servings: number): string {
+  return `${servings} ${servings === 1 ? 'serving' : 'servings'}`;
+}
+
 export default function Prep() {
   const { state, dispatch } = useApp();
   const recipes = selectAllRecipes(state);
@@ -95,6 +100,7 @@ export default function Prep() {
                   const title = recipe?.title ?? session.recipeId;
                   const store = storeLabel(session.store);
                   const batches = batchesLabel(session.batches);
+                  const servings = servingsLabel(session.servings);
                   const freezerMonths = recipe?.storage?.freezerMonths;
                   return (
                     <li
@@ -107,7 +113,7 @@ export default function Prep() {
                       <div
                         className={styles.sessionBody}
                         role="group"
-                        aria-label={`${title}. ${batches}. ${store}.`}
+                        aria-label={`${title}. ${servings}. ${batches}. ${store}.`}
                       >
                         {recipe !== undefined ? (
                           <Link
@@ -119,6 +125,9 @@ export default function Prep() {
                         ) : (
                           <span className={styles.sessionTitle}>{title}</span>
                         )}
+                        <span className={styles.sessionServings}>
+                          {servings}
+                        </span>
                         <span className={styles.sessionBatches}>{batches}</span>
                         <span className={styles.sessionStore}>{store}</span>
                         {typeof freezerMonths === 'number' &&
