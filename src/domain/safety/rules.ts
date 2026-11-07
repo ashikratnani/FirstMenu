@@ -381,6 +381,37 @@ const ALLERGEN_RULES: SafetyRule[] = ALLERGEN_SPECS.map((spec) => ({
 /** The complete, ordered rule list used by the screen. */
 export const RULES: SafetyRule[] = [...BLOCK_RULES, ...REMINDER_RULES, ...ALLERGEN_RULES];
 
+/** A representative blocked food surfaced from a BLOCK rule (for the Foods page). */
+export interface BlockRuleFood {
+  /** The food key, a plain lowercase term the safety screen also matches. */
+  key: string;
+  /** The rule's short label (e.g. "Honey"). */
+  label: string;
+  /** The rule's plain-language reason. */
+  message: string;
+  /** Age (months) under which the block applies, or undefined for no age limit. */
+  underMonths?: number;
+}
+
+/**
+ * One representative blocked food per BLOCK rule, derived from the rule's FIRST
+ * term (Requirement 5.7: the child's blocked foods must be visible even when no
+ * recipe uses them). The first term is a lowercase, singular food word that the
+ * safety screen matches back to the SAME block rule, so the Foods page can list
+ * it as a ghost with the rule's reason and available-at age.
+ *
+ * This reads the existing BLOCK_RULES; it does NOT change the RULES table, the
+ * matching, or RULESET_VERSION.
+ */
+export function blockRuleFoods(): BlockRuleFood[] {
+  return BLOCK_RULES.map((rule) => ({
+    key: rule.terms[0],
+    label: rule.label,
+    message: rule.message,
+    underMonths: rule.underMonths,
+  }));
+}
+
 // Allergen-door guidance (Requirement 7.7). Per design.md ("Foods and first
 // tastes": "Allergen door guidance text (Requirement 7.7) lives next to the
 // rules and cites AAP-allergens and NIAID-peanut") this HEALTH wording lives

@@ -288,7 +288,7 @@ export const BUILTIN_RECIPES: Recipe[] = [
     mealTypes: ['breakfast'],
     ingredients: [
       { name: 'flour', quantity: 1, unit: 'cup', category: 'grains' },
-      { name: 'baby cereal (rice or oatmeal)', quantity: 0.5, unit: 'cup', category: 'grains' },
+      { name: 'baby cereal (rice or oatmeal)', food: 'oat', quantity: 0.5, unit: 'cup', category: 'grains' },
       { name: '(4 oz) jar of infant bananas', quantity: 1, unit: 'jar', category: 'produce' },
       { name: 'melted butter', quantity: 1, unit: 'tbsp', category: 'dairy-eggs' },
       { name: 'egg yolks', quantity: 3, unit: 'piece', category: 'dairy-eggs' },
@@ -371,9 +371,9 @@ export const BUILTIN_RECIPES: Recipe[] = [
     mealTypes: ['lunch', 'dinner'],
     ingredients: [
       { name: 'lean ground beef, turkey or chicken', quantity: 1.25, unit: 'lb', category: 'protein' },
-      { name: 'baby cereal (rice or oatmeal)', quantity: 0.5, unit: 'cup', category: 'grains' },
+      { name: 'baby cereal (rice or oatmeal)', food: 'oat', quantity: 0.5, unit: 'cup', category: 'grains' },
       { name: 'shredded white cheddar or mozzarella cheese', quantity: 1, unit: 'cup', category: 'dairy-eggs' },
-      { name: '(4 oz) jar of pureed baby food vegetables', quantity: 1, unit: 'jar', category: 'produce' },
+      { name: '(4 oz) jar of pureed baby food vegetables', food: 'vegetable', quantity: 1, unit: 'jar', category: 'produce' },
       { name: 'egg, beaten', quantity: 1, unit: 'piece', category: 'dairy-eggs' },
       { name: 'pinch of spice such as pepper, garlic powder, and oregano', quantity: 1, unit: 'pinch', category: 'pantry' },
     ],

@@ -6,6 +6,7 @@ import { ageInMonths, stageFor } from '../domain/age';
 import { screenRecipe, type ScreenResult } from '../domain/safety/screen';
 import {
   allFoodKeys,
+  blockFoodKeys,
   foodStatus,
   ALLERGEN_KEY_PREFIX,
   type FoodStatus,
@@ -108,7 +109,15 @@ export interface FoodView {
 export const selectFoodViews: (state: AppState) => FoodView[] = memoizeByInput(
   (state: AppState) => {
     const ageMonths = selectAgeMonths(state) ?? 0;
-    const keys = allFoodKeys(selectAllRecipes(state), state);
+    // Union the recipe + recorded keys with the representative blocked foods
+    // for this age (Req 5.7), so blocked foods (honey, juice, added sugar,
+    // salt, high-mercury fish, unpasteurized, choking hazards) always show as
+    // ghosts even when no recipe uses them. Dedupe, preserving first-seen
+    // order (recipe/recorded keys first, then any new blocked-food keys).
+    const baseKeys = allFoodKeys(selectAllRecipes(state), state);
+    const seen = new Set(baseKeys);
+    const blockKeys = blockFoodKeys(ageMonths).filter((k) => !seen.has(k));
+    const keys = [...baseKeys, ...blockKeys];
     return keys.map((key) => {
       const isAllergen = key.startsWith(ALLERGEN_KEY_PREFIX);
       const allergenGroup = isAllergen

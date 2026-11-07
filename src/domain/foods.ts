@@ -12,7 +12,7 @@
 
 import type { AllergenGroup, AppState, Ingredient, Recipe } from './types';
 import { matchesTerm, normalize } from './safety/normalize';
-import { RULES, type SafetyRule } from './safety/rules';
+import { RULES, blockRuleFoods, type SafetyRule } from './safety/rules';
 import { screenIngredient } from './safety/screen';
 
 // Re-export the allergen-door guidance that lives next to the rules
@@ -67,8 +67,51 @@ export const DESCRIPTOR_WORDS: readonly string[] = [
   'baby',
 ];
 
-/** The two-word descriptor phrase, stripped before single-word descriptors. */
-const DESCRIPTOR_PHRASES: readonly string[] = ['low sodium'];
+/**
+ * Preparation / packaging adjectives dropped from a derived key in addition to
+ * DESCRIPTOR_WORDS. These appear in the real built-in recipe names and never
+ * belong in a food key: "infant"/"prepared" describe jarred or boxed baby
+ * food; "cubed"/"lean"/"shredded"/"melted"/"beaten" are prep states;
+ * "single"/"grain" come from the hyphenated "single-grain"; "optional" is a
+ * note. Kept separate from DESCRIPTOR_WORDS (which is the produce-descriptor
+ * list its own test enumerates one-by-one).
+ */
+const PREP_WORDS: readonly string[] = [
+  'infant',
+  'prepared',
+  'cubed',
+  'lean',
+  'shredded',
+  'melted',
+  'beaten',
+  'single',
+  'grain',
+  'optional',
+];
+
+/**
+ * Two-word descriptor phrases, stripped (as whole phrases) before the single-
+ * word descriptor list. "single grain" is here too so the normalized form of
+ * "single-grain rice cereal" ("single grain rice cereal") loses the whole
+ * phrase in one pass.
+ */
+const DESCRIPTOR_PHRASES: readonly string[] = ['low sodium', 'single grain'];
+
+/**
+ * Container / quantity phrases dropped from a derived key, longest first so
+ * "jars of" is removed before "jar". These front a packaged ingredient name
+ * ("jar of infant bananas", "jars infant applesauce", "can of ...").
+ */
+const CONTAINER_PHRASES: readonly string[] = [
+  'jars of',
+  'jar of',
+  'cans of',
+  'can of',
+  'jars',
+  'jar',
+  'cans',
+  'can',
+];
 
 /** Unit-like tokens dropped from derived keys (Ingredient.unit vocabulary). */
 const UNIT_WORDS: ReadonlySet<string> = new Set([
@@ -124,14 +167,23 @@ function allergenRuleFires(rule: SafetyRule, name: string): boolean {
 /**
  * Reverse the plural-aware matching in normalize.ts to get a stable singular
  * key token: "carrots" -> "carrot", "potatoes" -> "potato", "berries" ->
- * "berry". Mirrors tokenMatches' `s` / `es` / `ies` forms. Short tokens and
- * "ss" endings (e.g. "grass") are left alone.
+ * "berry". Mirrors tokenMatches' `s` / `es` / `ies` forms.
+ *
+ * Words that END IN A DOUBLE "s" are NEVER stripped, so a non-plural like
+ * "molasses" (and "glass", "grass") stays intact. This matters for safety:
+ * "molasses" is an added-sugar BLOCK term, and turning it into "molass" would
+ * break block coverage of the derived key and let it show as a door instead of
+ * a ghost. The "ss"/"sses" guard therefore runs BEFORE the generic "es"/"s"
+ * stripping (and "sses" is intentionally NOT treated as a plural "es" ending).
  */
 function singularizeToken(token: string): string {
   if (token.length <= 3) return token;
+  // Keep words ending in a double-s intact: "molasses", "glasses", "grass".
+  // Checking before the generic rules keeps block terms like "molasses"
+  // block-covered after key derivation.
+  if (token.endsWith('ss') || token.endsWith('sses')) return token;
   if (token.endsWith('ies')) return token.slice(0, -3) + 'y';
-  if (/(oes|xes|ches|shes|sses|zes)$/.test(token)) return token.slice(0, -2);
-  if (token.endsWith('ss')) return token;
+  if (/(oes|xes|ches|shes|zes)$/.test(token)) return token.slice(0, -2);
   if (token.endsWith('s')) return token.slice(0, -1);
   return token;
 }
@@ -149,21 +201,45 @@ function isNumberToken(token: string): boolean {
  * singularizes the remaining tokens and collapses whitespace.
  */
 function deriveKeyFromName(name: string): string {
+  // Drop parenthetical notes AND their contents first, on the RAW name, so a
+  // size like "(4 oz)" or a note like "(optional)"/"(rice or oatmeal)" never
+  // leaks tokens into the key. Done before the comma split because a
+  // parenthetical can contain commas.
+  let raw = name.replace(/\([^)]*\)/g, ' ');
+
+  // Drop a "such as ..." tail (e.g. "spice such as pepper, garlic ...") so the
+  // key is just the thing being described, not the examples.
+  raw = raw.replace(/\bsuch as\b.*$/i, ' ');
+
   // Keep text before the first comma so "medium apple, peeled, cored and
   // quartered" -> "medium apple" before descriptor stripping.
-  const beforeComma = name.split(',')[0] ?? name;
+  const beforeComma = raw.split(',')[0] ?? raw;
   let text = normalize(beforeComma);
 
-  // Strip two-word descriptor phrases first (normalized, space-collapsed).
+  // Strip container / quantity phrases ("jar of", "jars", "can of", ...) that
+  // front a packaged ingredient name. Longest phrases first.
+  for (const phrase of CONTAINER_PHRASES) {
+    const n = normalize(phrase);
+    text = text.replace(new RegExp(`(^| )${n}( |$)`, 'g'), ' ').trim();
+  }
+
+  // Strip two-word descriptor phrases (normalized, space-collapsed).
   for (const phrase of DESCRIPTOR_PHRASES) {
     const n = normalize(phrase);
     text = text.replace(new RegExp(`(^| )${n}( |$)`, 'g'), ' ');
   }
 
-  const descriptors = new Set(DESCRIPTOR_WORDS.map((w) => normalize(w)));
+  // Drop a leading "of" left behind by a container phrase ("of infant bananas"
+  // -> "infant bananas"); never treat "of" as part of a food key.
+  text = text.replace(/^of /, ' ').trim();
+
+  const descriptors = new Set(
+    [...DESCRIPTOR_WORDS, ...PREP_WORDS].map((w) => normalize(w)),
+  );
   const tokens = text
     .split(' ')
     .filter((t) => t.length > 0)
+    .filter((t) => t !== 'of')
     .filter((t) => !descriptors.has(t))
     .filter((t) => !isNumberToken(t))
     .filter((t) => !UNIT_WORDS.has(t))
@@ -254,6 +330,31 @@ export function allFoodKeys(recipes: Recipe[], state: AppState): string[] {
     .filter((key) => !seen.has(key) && !isIgnoredFood(key))
     .sort();
   return [...fromRecipes, ...extra];
+}
+
+/**
+ * The representative blocked-food keys that apply at `ageMonths` (Requirement
+ * 5.7: the child's blocked foods must be visible). One key per BLOCK rule
+ * (its first term, from {@link blockRuleFoods}), kept only while the rule is
+ * block-covered at this age so, e.g., honey drops off the list once the child
+ * turns 12 months. ALLERGEN rules are never included (allergens are doors
+ * unless a reaction is recorded), because block-rule foods come only from
+ * BLOCK rules.
+ *
+ * Returned in rule order and deduplicated. The Foods page UNIONs these with the
+ * recipe + recorded keys so blocked foods appear as ghosts even when no recipe
+ * uses them.
+ */
+export function blockFoodKeys(ageMonths: number): string[] {
+  const seen = new Set<string>();
+  const keys: string[] = [];
+  for (const food of blockRuleFoods()) {
+    if (seen.has(food.key)) continue;
+    if (!isBlockCovered(food.key, ageMonths)) continue;
+    seen.add(food.key);
+    keys.push(food.key);
+  }
+  return keys;
 }
 
 /** A food's status for the child (design.md "Foods and first tastes"). */

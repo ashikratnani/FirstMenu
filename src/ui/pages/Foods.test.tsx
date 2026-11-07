@@ -68,6 +68,21 @@ function seedState(ageMonths = 8): AppState {
   };
 }
 
+/**
+ * A seed state with ONLY the built-in recipes (no custom honey recipe). Used to
+ * prove Req 5.7: blocked foods must be visible as ghosts even when no recipe
+ * contains them.
+ */
+function builtinOnlyState(ageMonths = 8): AppState {
+  const s = defaultState(new Date());
+  return {
+    ...s,
+    child: { name: 'Baby', birthDate: birthDateMonthsAgo(ageMonths) },
+    onboarded: true,
+    customRecipes: [],
+  };
+}
+
 function renderFoods(seed?: AppState) {
   return render(
     <AppProvider storage={makeStorage(seed)}>
@@ -186,6 +201,43 @@ describe('Foods page', () => {
     // Block ghosts are not user-clearable.
     expect(
       within(honeyGhost).queryByRole('button', { name: /clear reaction/i }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('surfaces blocked foods as ghosts from the safety rules alone (Req 5.7, no injected recipe)', () => {
+    // Built-in recipes contain NO blocked ingredients, so the only way honey
+    // (and the other block foods) appear is because the Foods page surfaces
+    // each block rule's representative food as a ghost for the child's age.
+    renderFoods(builtinOnlyState(8));
+
+    // Honey: under-12 block, shown with its reason and available-at age.
+    const honeyGhost = screen.getByRole('listitem', {
+      name: /Not yet: honey\. Available at 12 months\./,
+    });
+    expect(within(honeyGhost).getByText(/infant botulism/i)).toBeInTheDocument();
+    // Not user-clearable (it is a block, not a reaction).
+    expect(
+      within(honeyGhost).queryByRole('button', { name: /clear reaction/i }),
+    ).not.toBeInTheDocument();
+
+    // Other representative block foods also appear under "Not yet".
+    for (const term of ['juice', 'sugar', 'salt', 'popcorn']) {
+      expect(
+        screen.getByRole('listitem', {
+          name: new RegExp(`Not yet: ${term}\\.`, 'i'),
+        }),
+      ).toBeInTheDocument();
+    }
+    // A blocked food must NEVER appear as a "New food" door.
+    expect(
+      screen.queryByRole('listitem', { name: /New food: honey/i }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('a block that has lifted for the age is no longer ghosted (honey at 12 months)', () => {
+    renderFoods(builtinOnlyState(12));
+    expect(
+      screen.queryByRole('listitem', { name: /Not yet: honey/i }),
     ).not.toBeInTheDocument();
   });
 

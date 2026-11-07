@@ -6,12 +6,14 @@ import {
   allergenKey,
   collectFoods,
   allFoodKeys,
+  blockFoodKeys,
   DESCRIPTOR_WORDS,
   foodKeyFor,
   foodStatus,
   isBlockCovered,
   isIgnoredFood,
 } from './foods';
+import { RULES } from './safety/rules';
 import { BUILTIN_RECIPES } from '../data/recipes';
 import type { AppState, Ingredient, Recipe, WeekPlan } from './types';
 
@@ -282,6 +284,142 @@ describe('foodStatus', () => {
   it('allergen keys are never block-covered', () => {
     expect(isBlockCovered('allergen:peanut', 6)).toBe(false);
     expect(foodStatus('allergen:peanut', makeState(), 6)).toBe('door');
+  });
+});
+
+describe('block coverage survives key derivation (every block term is a ghost, never a door)', () => {
+  // Item 2 regression guard: deriving a food key from a block term must leave
+  // the key block-covered, so no block term is ever shown as a "New food" door
+  // with a "Tried, no reaction" button. Molasses is the term that originally
+  // broke (singularizeToken turned it into "molass"); the test covers EVERY
+  // block term so no future over-singularization can regress coverage.
+  const blockRules = RULES.filter((r) => r.kind === 'block');
+
+  for (const rule of blockRules) {
+    for (const term of rule.terms) {
+      it(`block term "${term}" (${rule.id}) never derives a plain new-food door`, () => {
+        // Age 0 is under every block rule's underMonths, so a plain derived key
+        // for a block term must be block-covered (a ghost), never a door. A few
+        // block terms are ALSO allergens ("soy sauce", "fish sauce", "king
+        // mackerel", "bigeye tuna", "raw milk"); allergen-first precedence keys
+        // those to `allergen:<group>`, which is an allergen door (never a plain
+        // new-food door) and is acceptable. What must NOT happen is a block term
+        // deriving to a plain key that screens clean (the molasses bug).
+        const keys = foodKeyFor(ing(term));
+        for (const key of keys) {
+          if (key.startsWith('allergen:')) continue; // allergen door is fine
+          expect(isBlockCovered(key, 0)).toBe(true);
+          expect(foodStatus(key, makeState(), 0)).toBe('ghost');
+        }
+      });
+    }
+  }
+
+  it('molasses specifically stays "molasses" (not "molass") and is block-covered', () => {
+    expect(foodKeyFor(ing('molasses'))).toEqual(['molasses']);
+    expect(isBlockCovered('molasses', 0)).toBe(true);
+    // A custom recipe with molasses shows it as a ghost, never a door.
+    expect(foodStatus('molasses', makeState(), 10)).toBe('ghost');
+  });
+});
+
+describe('built-in recipes derive clean food keys (Item 3)', () => {
+  // Pin the FULL set of food keys collected from the built-in recipes so the
+  // earlier nonsense keys ("of infant banana", "cereal rice or oatmeal",
+  // "cinnamon optional", "of food vegetable", "of spice such as pepper",
+  // "cubed beef", "lean beef") can never come back.
+  it('pins the collected key set', () => {
+    expect(collectFoods(BUILTIN_RECIPES)).toEqual([
+      'carrot',
+      'apple',
+      'sweet potato',
+      'chicken',
+      'brown rice',
+      'beef',
+      'potato',
+      'pea',
+      'rice',
+      'broccoli',
+      'macaroni',
+      'squash',
+      'allergen:wheat',
+      'oat',
+      'banana',
+      'allergen:dairy',
+      'allergen:egg',
+      'cinnamon',
+      'vanilla extract',
+      'rice cereal',
+      'applesauce',
+      'vegetable',
+      'spice',
+      'spinach',
+      'baking powder',
+    ]);
+  });
+
+  it('produces no nonsense keys', () => {
+    const keys = collectFoods(BUILTIN_RECIPES);
+    for (const bad of [
+      'of infant banana',
+      'cereal rice or oatmeal',
+      'cinnamon optional',
+      'of food vegetable',
+      'of spice such as pepper',
+      'cubed beef',
+      'lean beef',
+    ]) {
+      expect(keys).not.toContain(bad);
+    }
+    // No key starts with a stray "of".
+    expect(keys.some((k) => k.startsWith('of '))).toBe(false);
+  });
+
+  it('an onboarding-tried banana lines up with the recipe banana (one card, not two)', () => {
+    const keys = collectFoods(BUILTIN_RECIPES);
+    // The cereal-pancakes recipe's "(4 oz) jar of infant bananas" derives the
+    // SAME key onboarding records for "Banana".
+    expect(keys).toContain('banana');
+    const state = makeState({ banana: { status: 'tried', date: '2026-01-01' } });
+    const all = allFoodKeys(BUILTIN_RECIPES, state);
+    // banana appears exactly once (no duplicate door + monster).
+    expect(all.filter((k) => k === 'banana')).toHaveLength(1);
+  });
+
+  it("an onboarding-tried oat lines up with the recipe's oat key", () => {
+    const keys = collectFoods(BUILTIN_RECIPES);
+    expect(keys).toContain('oat');
+    const state = makeState({ oat: { status: 'tried', date: '2026-01-01' } });
+    const all = allFoodKeys(BUILTIN_RECIPES, state);
+    expect(all.filter((k) => k === 'oat')).toHaveLength(1);
+  });
+});
+
+describe('blockFoodKeys — representative blocked foods for an age (Req 5.7)', () => {
+  it('includes honey under 12 months and drops it at 12', () => {
+    expect(blockFoodKeys(6)).toContain('honey');
+    expect(blockFoodKeys(12)).not.toContain('honey');
+  });
+
+  it('includes the other block foods while their rules apply', () => {
+    const keys = blockFoodKeys(6);
+    // first term of each age-limited block rule applicable at 6 months
+    for (const key of ['honey', 'juice', 'sugar', 'stevia', 'salt', 'popcorn']) {
+      expect(keys).toContain(key);
+    }
+    // rules with no age limit always apply
+    expect(keys).toContain('shark');
+    expect(keys).toContain('raw milk');
+  });
+
+  it('never includes an allergen key (allergens are doors, not blocks)', () => {
+    expect(blockFoodKeys(6).some((k) => k.startsWith('allergen:'))).toBe(false);
+  });
+
+  it('every returned key is block-covered at that age', () => {
+    for (const key of blockFoodKeys(6)) {
+      expect(isBlockCovered(key, 6)).toBe(true);
+    }
   });
 });
 
