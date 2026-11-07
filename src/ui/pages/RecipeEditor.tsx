@@ -102,13 +102,14 @@ interface FormErrors {
   mealTypes?: string;
   ingredients?: string;
   steps?: string;
+  texture?: string;
 }
 
 /**
  * Validate the required fields before a save (Req 2.2, 3.1): a recipe needs a
  * title, at least one stage, at least one meal type, at least one ingredient
- * with a name, and at least one step. Returns a per-field message map; an empty
- * map means the form is valid.
+ * with a name, at least one step, and a texture note. Returns a per-field
+ * message map; an empty map means the form is valid.
  */
 function validateForm(form: {
   title: string;
@@ -116,6 +117,7 @@ function validateForm(form: {
   mealTypes: MealType[];
   ingredients: IngredientForm[];
   steps: string[];
+  texture: string;
 }): FormErrors {
   const errors: FormErrors = {};
   if (form.title.trim() === '') {
@@ -132,6 +134,9 @@ function validateForm(form: {
   }
   if (form.steps.every((step) => step.trim() === '')) {
     errors.steps = 'Add at least one step.';
+  }
+  if (form.texture.trim() === '') {
+    errors.texture = 'Add a texture note.';
   }
   return errors;
 }
@@ -351,6 +356,7 @@ export default function RecipeEditor() {
       mealTypes,
       ingredients,
       steps,
+      texture,
     });
     setErrors(validation);
     if (Object.keys(validation).length > 0) {
@@ -478,7 +484,14 @@ export default function RecipeEditor() {
           <ul className={styles.rows}>
             {ingredients.map((row, index) => {
               const rowId = `ingredient-${index}`;
+              // The food the recipe will actually save (Req 3.3): the user's
+              // override when set, otherwise the name-derived default. Shown as
+              // the "Counts as" hint so it always matches what buildRecipe
+              // persists as Ingredient.food. The name-derived value is also the
+              // placeholder/default when no override is set.
+              const override = row.food.trim();
               const derivedFood = derivedCountsAs(row.name);
+              const countsAs = override === '' ? derivedFood : override;
               return (
                 <li key={index} className={styles.ingredientRow}>
                   <div className={styles.field}>
@@ -573,10 +586,10 @@ export default function RecipeEditor() {
                       placeholder={derivedFood || undefined}
                       autoComplete="off"
                     />
-                    {derivedFood && (
+                    {countsAs && (
                       <p className={styles.countsAsHint}>
-                        Counts as: {derivedFood}
-                        {row.food.trim() === '' ? ' (derived from the name)' : ''}
+                        Counts as: {countsAs}
+                        {override === '' ? ' (derived from the name)' : ''}
                       </p>
                     )}
                   </div>
@@ -659,8 +672,17 @@ export default function RecipeEditor() {
             type="text"
             value={texture}
             onChange={(e) => setTexture(e.target.value)}
+            aria-invalid={errors.texture ? true : undefined}
+            aria-describedby={
+              errors.texture ? 'recipe-texture-error' : undefined
+            }
             autoComplete="off"
           />
+          {errors.texture && (
+            <p id="recipe-texture-error" className={styles.error} role="alert">
+              {errors.texture}
+            </p>
+          )}
         </div>
 
         <div className={styles.field}>

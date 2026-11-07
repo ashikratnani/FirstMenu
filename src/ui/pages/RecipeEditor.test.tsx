@@ -127,6 +127,7 @@ describe('RecipeEditor', () => {
     await user.click(screen.getByLabelText('Breakfast'));
     await user.type(screen.getByLabelText('Ingredient 1 name'), 'honey');
     await user.type(screen.getByLabelText('Step 1'), 'Mix.');
+    await user.type(screen.getByLabelText('Texture'), 'thick');
     await user.click(screen.getByRole('button', { name: 'Save recipe' }));
 
     const findings = screen.getByRole('region', {
@@ -157,6 +158,7 @@ describe('RecipeEditor', () => {
       'yogurt',
     );
     await user.type(screen.getByLabelText('Step 1'), 'Spoon into a bowl.');
+    await user.type(screen.getByLabelText('Texture'), 'smooth');
     await user.click(screen.getByRole('button', { name: 'Save recipe' }));
 
     const saved = getState().customRecipes[0];
@@ -241,6 +243,7 @@ describe('RecipeEditor', () => {
     await user.click(screen.getByLabelText('Breakfast'));
     await user.type(screen.getByLabelText('Ingredient 1 name'), 'oats');
     await user.type(screen.getByLabelText('Step 1'), 'Cook the oats.');
+    await user.type(screen.getByLabelText('Texture'), 'thick');
 
     await user.click(screen.getByRole('button', { name: 'Save recipe' }));
     expect(getState().customRecipes).toHaveLength(1);
@@ -269,6 +272,7 @@ describe('RecipeEditor', () => {
       screen.getByText('Add at least one ingredient.'),
     ).toBeInTheDocument();
     expect(screen.getByText('Add at least one step.')).toBeInTheDocument();
+    expect(screen.getByText('Add a texture note.')).toBeInTheDocument();
     // The safety screen panel is not shown for a rejected save.
     expect(
       screen.queryByRole('region', { name: 'Safety screen results' }),
@@ -284,12 +288,98 @@ describe('RecipeEditor', () => {
     await user.click(screen.getByLabelText('Lunch'));
     await user.type(screen.getByLabelText('Ingredient 1 name'), 'pear');
     await user.type(screen.getByLabelText('Step 1'), 'Mash the pear.');
+    await user.type(screen.getByLabelText('Texture'), 'smooth');
 
     await user.click(screen.getByRole('button', { name: 'Save recipe' }));
 
     expect(getState().customRecipes).toHaveLength(1);
     expect(getState().customRecipes[0].title).toBe('Pear Mash');
     expect(screen.queryByText('Add a title.')).not.toBeInTheDocument();
+  });
+
+  it('rejects a save when the texture note is empty (Req 2.2)', async () => {
+    const user = userEvent.setup();
+    const { getState } = renderApp(seedState(8), '/recipes/new');
+
+    // All other required fields present, but texture left blank.
+    await user.type(screen.getByLabelText('Title'), 'Pear Mash');
+    await user.click(screen.getByLabelText('6-8 months'));
+    await user.click(screen.getByLabelText('Lunch'));
+    await user.type(screen.getByLabelText('Ingredient 1 name'), 'pear');
+    await user.type(screen.getByLabelText('Step 1'), 'Mash the pear.');
+
+    await user.click(screen.getByRole('button', { name: 'Save recipe' }));
+
+    // Nothing dispatched and the safety screen did not run.
+    expect(getState().customRecipes).toHaveLength(0);
+    expect(
+      screen.queryByRole('region', { name: 'Safety screen results' }),
+    ).not.toBeInTheDocument();
+
+    // A per-field alert is shown and wired to the texture input.
+    const alert = screen.getByText('Add a texture note.');
+    expect(alert).toBeInTheDocument();
+    expect(alert).toHaveAttribute('role', 'alert');
+    const textureInput = screen.getByLabelText('Texture');
+    expect(textureInput).toHaveAttribute('aria-invalid', 'true');
+    expect(textureInput).toHaveAttribute(
+      'aria-describedby',
+      'recipe-texture-error',
+    );
+  });
+
+  it('saves when the texture note is filled (Req 2.2)', async () => {
+    const user = userEvent.setup();
+    const { getState } = renderApp(seedState(8), '/recipes/new');
+
+    await user.type(screen.getByLabelText('Title'), 'Pear Mash');
+    await user.click(screen.getByLabelText('6-8 months'));
+    await user.click(screen.getByLabelText('Lunch'));
+    await user.type(screen.getByLabelText('Ingredient 1 name'), 'pear');
+    await user.type(screen.getByLabelText('Step 1'), 'Mash the pear.');
+    await user.type(screen.getByLabelText('Texture'), 'smooth puree');
+
+    await user.click(screen.getByRole('button', { name: 'Save recipe' }));
+
+    expect(getState().customRecipes).toHaveLength(1);
+    expect(getState().customRecipes[0].texture).toBe('smooth puree');
+    expect(screen.queryByText('Add a texture note.')).not.toBeInTheDocument();
+  });
+
+  it('shows the override (not the name-derived food) in the counts-as hint and saves it (Req 3.3)', async () => {
+    const user = userEvent.setup();
+    const { getState } = renderApp(seedState(8), '/recipes/new');
+
+    await user.type(
+      screen.getByLabelText('Ingredient 1 name'),
+      'mashed sweet potato',
+    );
+    // With no override the hint derives from the name.
+    expect(screen.getByText(/Counts as: sweet potato/)).toBeInTheDocument();
+
+    // Setting an override flips the hint to the actual food that will save.
+    await user.type(
+      screen.getByLabelText('Counts as (food override)'),
+      'potato',
+    );
+    expect(screen.getByText(/Counts as: potato/)).toBeInTheDocument();
+    expect(
+      screen.queryByText(/Counts as: sweet potato/),
+    ).not.toBeInTheDocument();
+    // The override hint drops the "(derived from the name)" suffix.
+    expect(
+      screen.queryByText(/derived from the name/),
+    ).not.toBeInTheDocument();
+
+    // And the hint matches what buildRecipe persists as Ingredient.food.
+    await user.type(screen.getByLabelText('Title'), 'Potato Mash');
+    await user.click(screen.getByLabelText('6-8 months'));
+    await user.click(screen.getByLabelText('Lunch'));
+    await user.type(screen.getByLabelText('Step 1'), 'Mash it.');
+    await user.type(screen.getByLabelText('Texture'), 'smooth');
+    await user.click(screen.getByRole('button', { name: 'Save recipe' }));
+
+    expect(getState().customRecipes[0].ingredients[0].food).toBe('potato');
   });
 
   it('shows the SCREEN_LIMITS caveat (not an invented all-clear) when nothing fires', async () => {
@@ -301,6 +391,7 @@ describe('RecipeEditor', () => {
     await user.click(screen.getByLabelText('Lunch'));
     await user.type(screen.getByLabelText('Ingredient 1 name'), 'pear');
     await user.type(screen.getByLabelText('Step 1'), 'Mash the pear.');
+    await user.type(screen.getByLabelText('Texture'), 'smooth');
     await user.click(screen.getByRole('button', { name: 'Save recipe' }));
 
     const findings = screen.getByRole('region', {
