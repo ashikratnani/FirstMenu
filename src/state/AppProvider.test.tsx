@@ -198,15 +198,17 @@ describe('reducer actions', () => {
       { type: 'setSlot', slot: { day: 0, meal: 'lunch' }, recipeId: 'b-carrots-and-apples' },
       { type: 'toggleGroceryItem', key: 'milk' },
     ]);
-    const startBefore = state.plan.startDate; // 2026-01-15
-    const prepBefore = state.plan.prepDate; // 2026-01-14
+    // defaultState(2026-01-15, a Thursday) anchors startDate to the next
+    // Monday (2026-01-19) per Req 8.1; prepDate is the day before.
+    const startBefore = state.plan.startDate; // 2026-01-19
+    const prepBefore = state.plan.prepDate; // 2026-01-18
 
     state = reducer(state, { type: 'newWeek', mode: 'keep' });
 
-    expect(state.plan.startDate).toBe('2026-01-22');
-    expect(state.plan.prepDate).toBe('2026-01-21');
-    expect(startBefore).toBe('2026-01-15');
-    expect(prepBefore).toBe('2026-01-14');
+    expect(state.plan.startDate).toBe('2026-01-26');
+    expect(state.plan.prepDate).toBe('2026-01-25');
+    expect(startBefore).toBe('2026-01-19');
+    expect(prepBefore).toBe('2026-01-18');
     // Days kept.
     expect(state.plan.days[0].lunch).toBe('b-carrots-and-apples');
     // Grocery cleared.
@@ -228,6 +230,26 @@ describe('reducer actions', () => {
   it('setPrepDate sets the prep date', () => {
     const next = reducer(base(), { type: 'setPrepDate', prepDate: '2026-01-10' });
     expect(next.plan.prepDate).toBe('2026-01-10');
+  });
+
+  it('setStartDate sets the start date and anchors prepDate to the day before (Req 8.1)', () => {
+    const next = reducer(base(), {
+      type: 'setStartDate',
+      startDate: '2026-02-09',
+    });
+    expect(next.plan.startDate).toBe('2026-02-09');
+    expect(next.plan.prepDate).toBe('2026-02-08');
+  });
+
+  it('setStartDate ignores a malformed date (no-op)', () => {
+    const start = base();
+    const bad = reducer(start, { type: 'setStartDate', startDate: '' });
+    expect(bad.plan.startDate).toBe(start.plan.startDate);
+    const bad2 = reducer(start, {
+      type: 'setStartDate',
+      startDate: '2026-02-30',
+    });
+    expect(bad2.plan.startDate).toBe(start.plan.startDate);
   });
 
   it('toggleGroceryItem adds then removes a key', () => {

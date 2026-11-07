@@ -22,6 +22,7 @@ import type {
   Recipe,
 } from '../domain/types';
 import { BUILTIN_RECIPES } from '../data/recipes';
+import { computeNextWeekPlan } from '../domain/plan';
 import {
   createDebouncedSaver,
   exportState,
@@ -53,6 +54,7 @@ export type AppAction =
   | { type: 'setActiveSlots'; activeSlots: MealType[] }
   | { type: 'newWeek'; mode: 'keep' | 'empty' }
   | { type: 'setPrepDate'; prepDate: string }
+  | { type: 'setStartDate'; startDate: string }
   | { type: 'toggleGroceryItem'; key: string }
   | { type: 'acknowledgeDisclaimer' }
   | { type: 'replaceState'; state: AppState };
@@ -69,6 +71,27 @@ function shiftYmd(date: string, days: number): string {
   const m = String(shifted.getUTCMonth() + 1).padStart(2, '0');
   const d = String(shifted.getUTCDate()).padStart(2, '0');
   return `${y}-${m}-${d}`;
+}
+
+/**
+ * True only for a syntactically valid YYYY-MM-DD that is also a real calendar
+ * date (mirrors the storage zod `ymdDateSchema` refine). Date actions guard on
+ * this so a malformed value from an <input type="date"> can never corrupt a
+ * plan date (the storage schema validates on load/import; this guards writes).
+ */
+function isYmdDate(value: string): boolean {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+  if (!match) return false;
+  const [, y, m, d] = match;
+  const year = Number(y);
+  const month = Number(m);
+  const day = Number(d);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  return (
+    date.getUTCFullYear() === year &&
+    date.getUTCMonth() === month - 1 &&
+    date.getUTCDate() === day
+  );
 }
 
 /** Known recipe ids = built-ins plus the given custom recipes. */
@@ -186,28 +209,35 @@ export function reducer(state: AppState, action: AppAction): AppState {
     }
 
     case 'newWeek': {
-      // Req 8.5: BOTH modes clear groceryChecked. 'keep' shifts dates +7 and
-      // keeps the day plans; 'empty' clears the days to 7 empty objects.
-      if (action.mode === 'keep') {
-        return {
-          ...state,
-          plan: {
-            ...state.plan,
-            startDate: shiftYmd(state.plan.startDate, 7),
-            prepDate: shiftYmd(state.plan.prepDate, 7),
-          },
-          groceryChecked: [],
-        };
-      }
+      // Req 8.5: the plan date/day math is the single source of truth in
+      // computeNextWeekPlan (plan.ts); the reducer owns ONLY the groceryChecked
+      // reset, which both modes perform (groceryChecked lives on AppState, not
+      // on WeekPlan).
       return {
         ...state,
-        plan: { ...state.plan, days: Array.from({ length: 7 }, () => ({})) },
+        plan: computeNextWeekPlan(state.plan, action.mode),
         groceryChecked: [],
       };
     }
 
     case 'setPrepDate': {
       return { ...state, plan: { ...state.plan, prepDate: action.prepDate } };
+    }
+
+    case 'setStartDate': {
+      // Req 8.1: let the user choose the week's start date. Validate it is a
+      // real YYYY-MM-DD (like setPrepDate); a bad value is a no-op. Keep
+      // prepDate sensible by anchoring it to the day before the new start,
+      // matching defaultPrepDate.
+      if (!isYmdDate(action.startDate)) return state;
+      return {
+        ...state,
+        plan: {
+          ...state.plan,
+          startDate: action.startDate,
+          prepDate: shiftYmd(action.startDate, -1),
+        },
+      };
     }
 
     case 'toggleGroceryItem': {

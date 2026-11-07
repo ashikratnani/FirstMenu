@@ -1,15 +1,119 @@
 /*
- * Week home screen (Task 6.1 placeholder). Per design "Theme mapping" the week
- * home screen is a plain, bright grid of day cards with no themed scene. The
- * real week view (slots, badges, cards) arrives in task 10.
+ * Week home screen (Task 10.2). Per design "Theme mapping" the week home screen
+ * is a plain, bright grid of day cards with NO themed scene; the ghost/door
+ * states are carried by card text + accessible name. Above the grid sit the
+ * plan controls (meal toggles, prep date, new-week) and, when relevant, the
+ * new-food spacing warning.
  *
  * Fluid grid that stays usable at 360px width (Req 14.6): auto-fill columns
- * that stack to a single column on narrow screens.
+ * that stack to a single column on narrow screens. Any motion inherits the
+ * reduced-motion rule from theme.css.
  */
+
+.controls {
+  margin: var(--space) 0;
+  padding: var(--space);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space);
+  align-items: flex-end;
+}
+
+.controlsHeading {
+  flex-basis: 100%;
+  margin: 0;
+  font-size: 1rem;
+  color: var(--color-heading);
+}
+
+.slotToggles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--space) * 0.75);
+  margin: 0;
+  padding: calc(var(--space) * 0.5) var(--space);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+}
+
+.legend {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-heading);
+  padding: 0 calc(var(--space) * 0.5);
+}
+
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--space) * 0.35);
+  font-size: 0.9rem;
+}
+
+.prepControl {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--space) * 0.25);
+}
+
+.controlLabel {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-heading);
+}
+
+.newWeek {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--space) * 0.5);
+}
+
+.newWeekButton {
+  padding: calc(var(--space) * 0.5) var(--space);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface, #fff);
+  color: var(--color-heading);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.newWeekButton:hover,
+.newWeekButton:focus-visible {
+  border-color: var(--color-heading);
+}
+
+.spacingWarning {
+  margin: 0 0 var(--space);
+  padding: var(--space);
+  border: 1px solid #cdbdf0;
+  border-radius: var(--radius);
+  background: #f4f1fb;
+}
+
+.spacingText {
+  margin: 0 0 calc(var(--space) * 0.5);
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.spacingSources {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--color-muted);
+}
+
+.noSlots {
+  margin: var(--space) 0;
+  color: var(--color-muted);
+}
 
 .weekGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   gap: var(--space);
   padding: 0;
   margin: var(--space) 0 0;
@@ -31,8 +135,93 @@
   color: var(--color-heading);
 }
 
-.dayNote {
-  margin: 0;
-  font-size: 0.85rem;
+.dayDate {
+  font-size: 0.8rem;
+  font-weight: 400;
   color: var(--color-muted);
+}
+
+.slotList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--space) * 0.5);
+}
+
+.slot {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--space) * 0.25);
+}
+
+.slotMeal {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--color-muted);
+}
+
+.slotEmpty,
+.slotFilled,
+.slotGhost {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--space) * 0.25);
+}
+
+.slotGhost {
+  padding: calc(var(--space) * 0.5);
+  border: 1px solid #cdbdf0;
+  border-radius: var(--radius);
+  background: #f4f1fb;
+}
+
+.slotTitle {
+  font-weight: 600;
+  color: var(--color-heading);
+  text-decoration: none;
+}
+
+.slotTitle:hover,
+.slotTitle:focus-visible {
+  text-decoration: underline;
+}
+
+.ghostReason {
+  font-size: 0.82rem;
+  color: var(--color-text);
+}
+
+.slotActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--space) * 0.35);
+}
+
+.addButton,
+.changeButton,
+.replaceButton,
+.clearButton {
+  padding: calc(var(--space) * 0.25) calc(var(--space) * 0.6);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface, #fff);
+  color: var(--color-heading);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.addButton:hover,
+.addButton:focus-visible,
+.changeButton:hover,
+.changeButton:focus-visible,
+.replaceButton:hover,
+.replaceButton:focus-visible,
+.clearButton:hover,
+.clearButton:focus-visible {
+  border-color: var(--color-heading);
 }

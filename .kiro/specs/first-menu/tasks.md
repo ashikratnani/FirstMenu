@@ -77,12 +77,12 @@ Deadline: Friday, December 4, 2026, 2:00 PM PT. Target submission: Thursday, Dec
   - [x] 9.3 Build the custom recipe editor: all fields, a "counts as" food per ingredient, screening on save with findings shown, and delete with emptied-slot notice.
     - _Requirements: 3.1 – 3.5, 4.9, 5.6_
 
-- [ ] 10. Week plan
-  - [ ] 10.1 Implement `domain/plan.ts`: default start date, new week (keep or empty), new-food spacing warnings. Add tests.
+- [x] 10. Week plan
+  - [x] 10.1 Implement `domain/plan.ts`: default start date, new week (keep or empty), new-food spacing warnings. Add tests.
     - _Requirements: 7.8, 8.1, 8.5_
-  - [ ] 10.2 Build the week view (a plain, bright grid of day cards) and slot picker: slot toggles, eligible recipes first, ghosts disabled with reasons, door markers, ghosted-slot replacement prompt, spacing warning.
+  - [x] 10.2 Build the week view (a plain, bright grid of day cards) and slot picker: slot toggles, eligible recipes first, ghosts disabled with reasons, door markers, ghosted-slot replacement prompt, spacing warning.
     - _Requirements: 5.2, 5.4, 7.8, 8.2 – 8.4_
-  - [ ] 10.3 Component tests: a ghosted recipe can't be added; a reaction ghosts planned slots.
+  - [x] 10.3 Component tests: a ghosted recipe can't be added; a reaction ghosts planned slots.
     - _Requirements: 5.2, 5.4, 7.6_
 
 - [ ] 11. Prep list
