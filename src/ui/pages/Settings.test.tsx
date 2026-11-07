@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
-import { describe, expect, it, beforeEach } from 'vitest';
+import { describe, expect, it, beforeEach, afterEach, vi } from 'vitest';
 import Settings from './Settings';
 import {
   ALLERGEN_GROUPS,
@@ -61,6 +61,9 @@ function renderSettings(seed: AppState) {
 describe('Settings', () => {
   beforeEach(() => {
     captured = null;
+  });
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it('prefills name and birth date from state', () => {
@@ -189,16 +192,28 @@ describe('Settings', () => {
   });
 
   it('computes the age notice from plan.startDate, not today (Req 1.2)', () => {
-    // plan.startDate is fixed at 2026-11-01 (see onboardedState). Pick a birth
-    // date whose age DIFFERS between today and that start date: born
-    // 2026-07-01 -> 4 whole months on 2026-11-01 (under 6, UNDER_6_NOTICE),
-    // but well over 6 months old relative to any realistic "today" that this
-    // test runs on (years later). The notice must follow plan.startDate.
+    // The clock is faked so "today" and plan.startDate land on OPPOSITE sides
+    // of the under-6 boundary, which is the only way this test can actually
+    // tell the two apart:
+    //   birthDate      = 2026-07-01
+    //   plan.startDate = 2026-11-01 (see onboardedState) -> 4 whole months
+    //                    -> under 6, UNDER_6_NOTICE
+    //   today (faked)  = 2027-06-01                       -> 11 whole months
+    //                    -> NOT under 6, no notice
+    // If the notice (and "Current age") were computed from today it would be
+    // 11 months and show no under-6 notice; computing from plan.startDate it
+    // is 4 months and shows UNDER_6_NOTICE. Asserting UNDER_6_NOTICE therefore
+    // fails if the code regressed to using today instead of plan.startDate.
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2027, 5, 1)); // 2027-06-01 local
+
     const seed = onboardedState('2026-07-01');
     renderSettings(seed);
 
-    // Current age is computed from plan.startDate -> 4 months (under 6).
+    // Current age is computed from plan.startDate -> 4 months (under 6), not
+    // the 11 months "today" would give.
     expect(screen.getByText(/current age: 4 months/i)).toBeInTheDocument();
+    expect(screen.queryByText(/current age: 11 months/i)).not.toBeInTheDocument();
     // And the notice agrees with that start-date age, NOT today's age.
     expect(screen.getByText(UNDER_6_NOTICE)).toBeInTheDocument();
     expect(screen.queryByText(OVER_12_NOTICE)).not.toBeInTheDocument();

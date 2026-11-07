@@ -11,11 +11,13 @@ import {
   OVER_12_NOTICE,
 } from './childProfile';
 import { AppProvider, useApp } from '../../state/AppProvider';
+import { STORAGE_KEY, defaultState } from '../../domain/storage';
 import type { AppState } from '../../domain/types';
 
 /** An in-memory Storage so tests never touch real localStorage. */
-function makeStorage(): Storage {
+function makeStorage(seed?: AppState): Storage {
   const map = new Map<string, string>();
+  if (seed) map.set(STORAGE_KEY, JSON.stringify(seed));
   return {
     get length() {
       return map.size;
@@ -40,9 +42,9 @@ function HomeStub() {
   return <h1>Home stub</h1>;
 }
 
-function renderOnboarding() {
+function renderOnboarding(seed?: AppState) {
   return render(
-    <AppProvider storage={makeStorage()}>
+    <AppProvider storage={makeStorage(seed)}>
       <MemoryRouter initialEntries={['/onboarding']}>
         <StateProbe />
         <Routes>
@@ -100,6 +102,40 @@ describe('Onboarding', () => {
     fireEvent.change(birth, { target: { value: birthDateMonthsAgo(14) } });
     expect(screen.getByText(OVER_12_NOTICE)).toBeInTheDocument();
     expect(screen.queryByText(UNDER_6_NOTICE)).not.toBeInTheDocument();
+  });
+
+  it('computes the age notice from plan.startDate, not today (Req 1.2)', () => {
+    // The clock is faked so the entered birth date gives DIFFERENT whole-month
+    // ages when measured from today vs. from plan.startDate, landing on
+    // opposite sides of the under-6 boundary. This is the only setup that can
+    // tell the two apart:
+    //   seeded plan.startDate = 2026-11-01
+    //   entered birthDate     = 2026-07-01 -> 4 whole months on 2026-11-01
+    //                           -> under 6, UNDER_6_NOTICE
+    //   today (faked)         = 2027-06-01 -> 11 whole months
+    //                           -> NOT under 6, no notice
+    // Onboarding computes the live notice as
+    // ageMonthsForBirthDate(birthDate, state.plan.startDate), so it must show
+    // UNDER_6_NOTICE. If it regressed to measuring against today the age would
+    // be 11 months and no under-6 notice would appear, failing this test.
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2027, 5, 1)); // 2027-06-01 local
+
+    // Seed state so plan.startDate is a fixed 2026-11-01 (not the faked today).
+    const seed: AppState = (() => {
+      const s = defaultState(new Date(2026, 10, 1));
+      return { ...s, plan: { ...s.plan, startDate: '2026-11-01' } };
+    })();
+    renderOnboarding(seed);
+
+    fireEvent.change(screen.getByLabelText(/birth date/i), {
+      target: { value: '2026-07-01' },
+    });
+
+    // The notice follows the plan.startDate age (4 months, under 6), NOT the
+    // 11-month age "today" would give.
+    expect(screen.getByText(UNDER_6_NOTICE)).toBeInTheDocument();
+    expect(screen.queryByText(OVER_12_NOTICE)).not.toBeInTheDocument();
   });
 
   it('lists the nine allergen groups first, in rule order', () => {
