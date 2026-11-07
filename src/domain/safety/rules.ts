@@ -356,7 +356,7 @@ const ALLERGEN_SPECS: AllergenSpec[] = [
   { group: 'soy', terms: ['soy', 'soya', 'tofu', 'edamame', 'tempeh', 'miso'] },
   {
     group: 'wheat',
-    terms: ['wheat', 'flour', 'bread', 'pasta', 'couscous', 'semolina', 'noodle', 'breadcrumb', 'cracker'],
+    terms: ['wheat', 'flour', 'bread', 'pasta', 'couscous', 'semolina', 'noodle', 'breadcrumb', 'cracker', 'macaroni', 'spaghetti', 'penne'],
     except: ['almond', 'oat', 'rice', 'coconut', 'chickpea', 'corn', 'buckwheat'],
   },
   {
@@ -466,4 +466,4 @@ export function allergenGuidance(group: AllergenGroup): AllergenGuidance {
  * Bumped whenever the rules change (steering/safety-rules.md). Share links
  * carry this so a viewer can tell their rules differ from the link's.
  */
-export const RULESET_VERSION = 1;
+export const RULESET_VERSION = 2;
