@@ -46,6 +46,7 @@ export type AppAction =
   | { type: 'saveCustomRecipe'; recipe: Recipe }
   | { type: 'deleteCustomRecipe'; id: string }
   | { type: 'setFoodRecord'; key: string; record: FoodRecord }
+  | { type: 'clearFoodRecord'; key: string }
   | { type: 'setSlot'; slot: SlotRef; recipeId: string }
   | { type: 'clearSlot'; slot: SlotRef }
   | { type: 'setActiveSlots'; activeSlots: MealType[] }
@@ -129,6 +130,19 @@ export function reducer(state: AppState, action: AppAction): AppState {
         ...state,
         foods: { ...state.foods, [action.key]: action.record },
       };
+    }
+
+    case 'clearFoodRecord': {
+      // Remove a food record so a mistakenly-checked "tried" food can be
+      // undone from Settings. Only a 'tried' record is cleared: a logged
+      // 'reaction' is a safety signal and must never be silently dropped
+      // here (callers gate on status before dispatching, and this guard is a
+      // second line of defence). No-op when the key is absent or a reaction.
+      const existing = state.foods[action.key];
+      if (!existing || existing.status !== 'tried') return state;
+      const foods = { ...state.foods };
+      delete foods[action.key];
+      return { ...state, foods };
     }
 
     case 'setSlot': {

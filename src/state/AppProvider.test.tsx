@@ -96,6 +96,48 @@ describe('reducer actions', () => {
     expect(state.plan.days[1].lunch).toBe('b-carrots-and-apples');
   });
 
+  it('setFoodRecord then clearFoodRecord adds and removes a tried record', () => {
+    let state = reducer(base(), {
+      type: 'setFoodRecord',
+      key: 'allergen:egg',
+      record: { status: 'tried', date: '2026-01-10' },
+    });
+    expect(state.foods['allergen:egg']).toEqual({
+      status: 'tried',
+      date: '2026-01-10',
+    });
+
+    state = reducer(state, { type: 'clearFoodRecord', key: 'allergen:egg' });
+    expect(state.foods['allergen:egg']).toBeUndefined();
+  });
+
+  it('clearFoodRecord never removes a logged reaction', () => {
+    const state = run(base(), [
+      {
+        type: 'setFoodRecord',
+        key: 'allergen:peanut',
+        record: { status: 'reaction', date: '2026-01-05', note: 'hives' },
+      },
+    ]);
+    const after = reducer(state, {
+      type: 'clearFoodRecord',
+      key: 'allergen:peanut',
+    });
+    // A reaction is a safety signal: clearFoodRecord leaves it intact.
+    expect(after.foods['allergen:peanut']).toEqual({
+      status: 'reaction',
+      date: '2026-01-05',
+      note: 'hives',
+    });
+    // Same object identity: the reducer short-circuits to a no-op.
+    expect(after).toBe(state);
+  });
+
+  it('clearFoodRecord is a no-op for an unknown key', () => {
+    const state = base();
+    expect(reducer(state, { type: 'clearFoodRecord', key: 'nope' })).toBe(state);
+  });
+
   it('setSlot and clearSlot assign and remove a recipe at day+meal', () => {
     let state = reducer(base(), {
       type: 'setSlot',

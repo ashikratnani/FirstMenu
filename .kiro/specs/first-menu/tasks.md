@@ -59,8 +59,8 @@ Deadline: Friday, December 4, 2026, 2:00 PM PT. Target submission: Thursday, Dec
   - [x] 6.2 Add the first-run disclaimer, footer disclaimer, storage banner and the Sources page generated from `rules.ts`.
     - _Requirements: 4.7, 12.7, 13.1, 13.2, 13.3_
 
-- [ ] 7. Onboarding and child profile
-  - [ ] 7.1 Build onboarding: birth date, optional name, the under-6 and 12-plus notices, and a tried-foods checklist with the nine allergens first. Add a Settings page to edit these later.
+- [x] 7. Onboarding and child profile
+  - [x] 7.1 Build onboarding: birth date, optional name, the under-6 and 12-plus notices, and a tried-foods checklist with the nine allergens first. Add a Settings page to edit these later.
     - _Requirements: 1.1, 1.4, 1.5, 1.6, 7.2_
 
 - [ ] 8. Foods and first tastes
