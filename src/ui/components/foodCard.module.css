@@ -28,7 +28,7 @@
  * neutralizes animation-duration, and the explicit guard below sets
  * `animation: none` so no motion runs when the user requests reduced motion.
  */
-.ghost .foodArt {
+.ghost :global(.foodArt) {
   animation: ghost-float 3.2s ease-in-out infinite;
   transform-origin: center;
   will-change: transform;
@@ -45,7 +45,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ghost .foodArt {
+  .ghost :global(.foodArt) {
     animation: none;
   }
 }

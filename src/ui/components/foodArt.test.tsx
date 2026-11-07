@@ -10,6 +10,7 @@ import {
 import FriendlyMonster from './FriendlyMonster';
 import GhostCard from './GhostCard';
 import MysteryDoor from './MysteryDoor';
+import cardStyles from './foodCard.module.css';
 // Load the stylesheets as raw text (Vite `?raw`) so we can assert, without
 // running CSS, that the animations exist and are gated by reduced motion.
 import themeCss from '../theme.css?raw';
@@ -136,5 +137,50 @@ describe('animations are CSS-only and gated by reduced motion (Req 14.5)', () =>
     // foodCard.module.css: an explicit reduced-motion guard for ghost-float.
     expect(cardCss).toMatch(/prefers-reduced-motion:\s*reduce/);
     expect(cardCss).toMatch(/animation:\s*none/);
+  });
+
+  /*
+   * Regression guard for the dead-selector defect: the ghost-float rule lives
+   * in a CSS Module, so a bare `.foodArt` would be HASHED and never match the
+   * SVG's literal `foodArt` class. The rule must scope the float under the
+   * hashed `.ghost` while keeping `.foodArt` literal via `:global(.foodArt)`,
+   * so the compiled selector actually binds to the rendered ghost art. These
+   * assertions fail if the scoping regresses to the inert `.ghost .foodArt`.
+   */
+  it('ghost-float scopes the literal .foodArt via :global so it binds', () => {
+    // Both the animation declaration and its reduced-motion guard must use
+    // `.ghost :global(.foodArt)` — a bare `.foodArt` here is hashed and dead.
+    const floatRules = cardCss.match(/\.ghost[^{]*\{[^}]*ghost-float[^}]*\}/g);
+    expect(floatRules).not.toBeNull();
+    expect(cardCss).toMatch(
+      /\.ghost\s+:global\(\.foodArt\)\s*\{[^}]*animation:\s*ghost-float/,
+    );
+    expect(cardCss).toMatch(
+      /\.ghost\s+:global\(\.foodArt\)\s*\{\s*animation:\s*none/,
+    );
+    // The module must NOT contain a hashed (non-:global) `.ghost .foodArt`
+    // selector, which would be the inert form that never matched the SVG.
+    expect(cardCss).not.toMatch(/\.ghost\s+\.foodArt\b/);
+  });
+
+  it('GhostCard renders the exact DOM the ghost-float selector targets', () => {
+    // The compiled selector is `._ghost_<hash> .foodArt`: a hashed `.ghost`
+    // wrapper (from the CSS Module) containing the SVG's LITERAL `foodArt`
+    // class. Assert that shape against the real rendered consumer so a hashed
+    // or renamed art class — the original dead-selector bug — fails here.
+    const { container } = render(
+      <ul>
+        <GhostCard label="Not yet: honey. Available at 12 months." />
+      </ul>,
+    );
+    const ghost = container.querySelector(`.${cardStyles.ghost}`);
+    expect(ghost).not.toBeNull();
+    // The ghost wrapper class is the hashed module class, not a literal.
+    expect(cardStyles.ghost).not.toBe('ghost');
+    // The decorative art inside carries the unhashed literal `foodArt` class,
+    // which `:global(.foodArt)` in the module keeps intact so the float binds.
+    const art = ghost?.querySelector('svg.foodArt');
+    expect(art).not.toBeNull();
+    expect(art?.getAttribute('class')).toBe('foodArt');
   });
 });
