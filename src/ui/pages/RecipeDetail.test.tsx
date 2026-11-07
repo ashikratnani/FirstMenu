@@ -1,0 +1,224 @@
+import { render, screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { describe, expect, it } from 'vitest';
+import RecipeDetail from './RecipeDetail';
+import Recipes from './Recipes';
+import { AppProvider } from '../../state/AppProvider';
+import { STORAGE_KEY, defaultState } from '../../domain/storage';
+import { NOT_MEDICAL_ADVICE } from '../components/Disclaimer';
+import type { AppState, Recipe } from '../../domain/types';
+
+/** An in-memory Storage so tests never touch real localStorage. */
+function makeStorage(seed?: AppState): Storage {
+  const map = new Map<string, string>();
+  if (seed) map.set(STORAGE_KEY, JSON.stringify(seed));
+  return {
+    get length() {
+      return map.size;
+    },
+    clear: () => map.clear(),
+    getItem: (k: string) => map.get(k) ?? null,
+    key: (i: number) => [...map.keys()][i] ?? null,
+    removeItem: (k: string) => map.delete(k),
+    setItem: (k: string, v: string) => void map.set(k, v),
+  } satisfies Storage;
+}
+
+/** A birth date string `months` whole months before today (local time). */
+function birthDateMonthsAgo(months: number): string {
+  const now = new Date();
+  const d = new Date(now.getFullYear(), now.getMonth() - months, now.getDate());
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+/** A custom recipe containing honey -> blocks under 12 months -> ghosted. */
+const HONEY_RECIPE: Recipe = {
+  id: 'custom-honey',
+  origin: 'custom',
+  title: 'Honey Oat Mash',
+  stages: ['6-8', '9-12'],
+  mealTypes: ['breakfast'],
+  ingredients: [
+    { name: 'honey', category: 'pantry' },
+    { name: 'oats', category: 'grains' },
+  ],
+  steps: ['Mix.'],
+  texture: 'smooth',
+  servings: 1,
+  storage: { fridgeDays: 2 },
+};
+
+/** A custom recipe with grapes -> "Quarter lengthwise before serving." prep. */
+const GRAPE_RECIPE: Recipe = {
+  id: 'custom-grapes',
+  origin: 'custom',
+  title: 'Grape Mash',
+  stages: ['9-12'],
+  mealTypes: ['snack'],
+  ingredients: [
+    { name: 'red grapes', quantity: 6, unit: 'piece', category: 'produce' },
+    { name: 'plain yogurt', quantity: 0.5, unit: 'cup', category: 'dairy-eggs' },
+  ],
+  steps: ['Quarter the grapes.', 'Stir into the yogurt.'],
+  texture: 'soft',
+  servings: 1,
+};
+
+function seedState(ageMonths = 8, customRecipes: Recipe[] = []): AppState {
+  const s = defaultState(new Date());
+  return {
+    ...s,
+    child: { name: 'Baby', birthDate: birthDateMonthsAgo(ageMonths) },
+    onboarded: true,
+    customRecipes,
+  };
+}
+
+function renderDetail(id: string, seed?: AppState) {
+  return render(
+    <AppProvider storage={makeStorage(seed)}>
+      <MemoryRouter initialEntries={[`/recipes/${id}`]}>
+        <Routes>
+          <Route path="/recipes/:id" element={<RecipeDetail />} />
+          <Route path="/recipes" element={<Recipes />} />
+        </Routes>
+      </MemoryRouter>
+    </AppProvider>,
+  );
+}
+
+describe('RecipeDetail page', () => {
+  it('renders a built-in recipe: ingredients, steps, storage, source and disclaimer', () => {
+    renderDetail('b-carrots-and-apples', seedState(8));
+
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'Carrots and Apples' }),
+    ).toBeInTheDocument();
+
+    // Ingredients with quantity labels.
+    expect(
+      screen.getByText(/carrots, peeled and sliced/),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/1 cup/)).toBeInTheDocument();
+
+    // Steps (ordered list).
+    const stepsHeading = screen.getByRole('heading', { name: 'Steps' });
+    const stepsList = stepsHeading.nextElementSibling;
+    expect(stepsList?.tagName).toBe('OL');
+    expect(stepsList?.querySelectorAll('li').length).toBe(3);
+
+    // Storage text (fridge 2 days, freezer 1 month).
+    expect(
+      screen.getByText('Keeps in the fridge for 2 days'),
+    ).toBeInTheDocument();
+    expect(screen.getByText('Freezes for 1 month')).toBeInTheDocument();
+
+    // Source link + adaptations.
+    const sourceLink = screen.getByRole('link', { name: 'Carrots and Apples' });
+    expect(sourceLink).toHaveAttribute(
+      'href',
+      'https://www.health.state.mn.us/people/wic/recipes/babyfood.html',
+    );
+    expect(sourceLink).toHaveAttribute('rel', 'noopener noreferrer');
+    expect(sourceLink).toHaveAttribute('target', '_blank');
+    expect(
+      screen.getByRole('heading', { name: 'Adaptations' }),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/Serving count is an estimate/)).toBeInTheDocument();
+
+    // Shared disclaimer in the footer.
+    expect(screen.getByText(NOT_MEDICAL_ADVICE)).toBeInTheDocument();
+  });
+
+  it('shows a per-ingredient prep reminder for an ingredient that triggers one', () => {
+    // carrots + apple both trigger the hard-produce "Cook until soft" reminder.
+    renderDetail('b-carrots-and-apples', seedState(8));
+    expect(
+      screen.getAllByText('Prep: Cook until soft or grate finely.').length,
+    ).toBeGreaterThan(0);
+  });
+
+  it('shows a grape prep reminder on a custom recipe', () => {
+    renderDetail('custom-grapes', seedState(10, [GRAPE_RECIPE]));
+    expect(
+      screen.getByText('Prep: Quarter lengthwise before serving.'),
+    ).toBeInTheDocument();
+  });
+
+  it('shows block reasons with the availability note for a ghosted recipe', () => {
+    renderDetail('custom-honey', seedState(8, [HONEY_RECIPE]));
+
+    expect(
+      screen.getByRole('heading', { name: 'Not yet' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/Honey can cause infant botulism/),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/Available at 12 months\./),
+    ).toBeInTheDocument();
+  });
+
+  it('does not ghost the honey recipe once the child is old enough', () => {
+    renderDetail('custom-honey', seedState(13, [HONEY_RECIPE]));
+    expect(
+      screen.queryByRole('heading', { name: 'Not yet' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('a built-in recipe exposes no Edit or Delete control', () => {
+    renderDetail('b-carrots-and-apples', seedState(8));
+    expect(
+      screen.queryByRole('button', { name: 'Delete' }),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Edit' })).not.toBeInTheDocument();
+  });
+
+  it('a custom recipe exposes Edit (to /recipes/:id/edit) and Delete', async () => {
+    const user = userEvent.setup();
+    renderDetail('custom-grapes', seedState(10, [GRAPE_RECIPE]));
+
+    expect(screen.getByRole('link', { name: 'Edit' })).toHaveAttribute(
+      'href',
+      '/recipes/custom-grapes/edit',
+    );
+
+    // Delete navigates back to the library.
+    await user.click(screen.getByRole('button', { name: 'Delete' }));
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'Recipes' }),
+    ).toBeInTheDocument();
+  });
+
+  it('deleting a plan-used custom recipe surfaces the emptied-slot notice (Req 3.5)', async () => {
+    const user = userEvent.setup();
+    const seed = seedState(10, [GRAPE_RECIPE]);
+    // The custom recipe occupies a plan slot.
+    seed.plan.days[2] = { snack: 'custom-grapes' };
+
+    renderDetail('custom-grapes', seed);
+
+    await user.click(screen.getByRole('button', { name: 'Delete' }));
+
+    // Landed on the library, which shows the emptied-slot notice naming the slot.
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'Recipes' }),
+    ).toBeInTheDocument();
+    const notice = screen.getByRole('status');
+    expect(within(notice).getByText('Day 3, Snack')).toBeInTheDocument();
+  });
+
+  it('renders a clear not-found message for an unknown id', () => {
+    renderDetail('does-not-exist', seedState(8));
+    const heading = screen.getByRole('heading', { name: 'Recipe not found' });
+    expect(heading).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Back to recipes' })).toHaveAttribute(
+      'href',
+      '/recipes',
+    );
+  });
+});

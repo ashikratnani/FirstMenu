@@ -7,6 +7,7 @@ import {
   type Source,
   type SourceId,
 } from '../../domain/safety/rules';
+import { BUILTIN_RECIPES } from '../../data/recipes';
 import Sources from './Sources';
 
 /** All URLs a source cites (urls[] when present, else the single url). */
@@ -149,6 +150,38 @@ describe('Sources page', () => {
         li.textContent?.includes(title),
       );
       expect(matching.length).toBe(1);
+    }
+  });
+
+  it('renders a de-duplicated "Recipe sources" section with real links', () => {
+    renderSources();
+
+    const heading = screen.getByRole('heading', { name: /recipe sources/i });
+    const list = heading.nextElementSibling;
+    expect(list?.tagName).toBe('UL');
+
+    // Expected distinct recipe-source URLs, derived from the data so the test
+    // cannot drift from BUILTIN_RECIPES.
+    const expectedUrls = [
+      ...new Set(
+        BUILTIN_RECIPES.map((r) => r.source?.url).filter(
+          (u): u is string => typeof u === 'string',
+        ),
+      ),
+    ];
+    expect(expectedUrls.length).toBeGreaterThan(0);
+
+    const items = [...(list?.querySelectorAll(':scope > li') ?? [])];
+    // One <li> per distinct recipe-source URL (de-duplicated).
+    expect(items.length).toBe(expectedUrls.length);
+
+    for (const url of expectedUrls) {
+      const links = screen
+        .getAllByRole('link')
+        .filter((a) => a.getAttribute('href') === url);
+      expect(links.length).toBeGreaterThan(0);
+      expect(links[0]).toHaveAttribute('rel', 'noopener noreferrer');
+      expect(links[0]).toHaveAttribute('target', '_blank');
     }
   });
 });

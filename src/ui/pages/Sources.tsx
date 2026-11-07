@@ -7,11 +7,30 @@
 // from RULES/SOURCES so adding or changing a rule updates this page.
 
 import { RULES, SOURCES, type Source, type SourceId } from '../../domain/safety/rules';
+import { BUILTIN_RECIPES } from '../../data/recipes';
+import type { RecipeSource } from '../../domain/types';
 import styles from './Sources.module.css';
 
 /** All URLs a source cites (urls[] when present, else the single url). */
 function sourceUrls(source: Source): string[] {
   return source.urls && source.urls.length > 0 ? source.urls : [source.url];
+}
+
+/**
+ * Every built-in recipe's published source, de-duplicated by url in first-seen
+ * order. Derived from BUILTIN_RECIPES so adding a built-in recipe updates this
+ * list without touching the page (Req 6.2).
+ */
+function recipeSources(): RecipeSource[] {
+  const seen = new Set<string>();
+  const ordered: RecipeSource[] = [];
+  for (const recipe of BUILTIN_RECIPES) {
+    const source = recipe.source;
+    if (!source || seen.has(source.url)) continue;
+    seen.add(source.url);
+    ordered.push(source);
+  }
+  return ordered;
 }
 
 /** The distinct source ids cited across every rule, in first-seen order. */
@@ -31,6 +50,7 @@ function citedSourceIds(): SourceId[] {
 
 export default function Sources() {
   const distinctSourceIds = citedSourceIds();
+  const recipeSourceList = recipeSources();
 
   return (
     <>
@@ -91,6 +111,21 @@ export default function Sources() {
             </li>
           );
         })}
+      </ul>
+
+      <h2>Recipe sources</h2>
+      <ul className={styles.referenceList}>
+        {recipeSourceList.map((source) => (
+          <li key={source.url} className={styles.reference}>
+            <a href={source.url} target="_blank" rel="noopener noreferrer">
+              {source.title}
+            </a>
+            <span className={styles.retrieved}>
+              {' '}
+              — {source.publisher} (retrieved {source.retrieved})
+            </span>
+          </li>
+        ))}
       </ul>
     </>
   );

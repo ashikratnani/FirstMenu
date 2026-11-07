@@ -1,0 +1,172 @@
+/*
+ * Recipe library layout (Task 9.1). A bright, light page: a header with a
+ * "New recipe" action, stage + meal-type filters, then a responsive grid of
+ * recipe cards usable at 360px (Req 14.6). No themed haunted imagery; the
+ * ghost/door/pumpkin states are carried by the card text and accessible name.
+ */
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space);
+}
+
+.newButton {
+  display: inline-block;
+  padding: calc(var(--space) * 0.5) var(--space);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface, #fff);
+  color: var(--color-heading);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.newButton:hover,
+.newButton:focus-visible {
+  border-color: var(--color-heading);
+}
+
+.intro {
+  margin: 0 0 var(--space);
+  color: var(--color-text);
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space);
+  margin: 0 0 calc(var(--space) * 1.5);
+}
+
+.filterGroup {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--space) * 0.25);
+}
+
+.filterLabel {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-heading);
+}
+
+.grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--space);
+}
+
+.card {
+  display: flex;
+}
+
+.cardLink {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--space) * 0.5);
+  width: 100%;
+  padding: var(--space);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface, #fff);
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.cardLink:hover,
+.cardLink:focus-visible {
+  border-color: var(--color-heading);
+}
+
+.cardLink.ghost {
+  background: #f4f1fb;
+  border-color: #cdbdf0;
+}
+
+.title {
+  font-weight: 600;
+  color: var(--color-heading);
+}
+
+.ghostReason {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--space) * 0.5);
+  font-size: 0.85rem;
+  color: var(--color-text);
+}
+
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--space) * 0.5);
+}
+
+.badgeDoor,
+.badgeFreezer {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--space) * 0.25);
+  padding: calc(var(--space) * 0.2) calc(var(--space) * 0.5);
+  border-radius: var(--radius);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.badgeDoor {
+  background: #f7ecd9;
+  color: #8a6d3b;
+}
+
+.badgeFreezer {
+  background: #fdeede;
+  color: #b9601f;
+}
+
+.empty {
+  margin: 0;
+  color: var(--color-muted);
+}
+
+/* Emptied-slot notice shown after deleting a recipe used in the plan (Req
+ * 3.5/5.6). Reads context emptiedSlots and lists each slot in day+meal form. */
+.emptiedNotice {
+  margin: 0 0 calc(var(--space) * 1.5);
+  padding: var(--space);
+  border: 1px solid #cdbdf0;
+  border-radius: var(--radius);
+  background: #f4f1fb;
+}
+
+.emptiedTitle {
+  margin: 0 0 calc(var(--space) * 0.5);
+  font-weight: 600;
+  color: var(--color-heading);
+}
+
+.emptiedList {
+  margin: 0 0 var(--space);
+  padding-left: calc(var(--space) * 1.25);
+  color: var(--color-text);
+}
+
+.emptiedDismiss {
+  padding: calc(var(--space) * 0.35) var(--space);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface, #fff);
+  color: var(--color-heading);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.emptiedDismiss:hover,
+.emptiedDismiss:focus-visible {
+  border-color: var(--color-heading);
+}

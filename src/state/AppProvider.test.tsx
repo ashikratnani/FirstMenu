@@ -369,6 +369,63 @@ describe('AppProvider persistence and context', () => {
     );
     expect(container.textContent).toContain('hello');
   });
+
+  it('deleteCustomRecipe helper empties slots AND surfaces them via emptiedSlots (Req 3.5)', () => {
+    const storage = makeStorage();
+    const { result } = renderHook(() => useApp(), {
+      wrapper: wrapper(storage),
+    });
+
+    // Seed a custom recipe placed in two slots plus one unrelated built-in.
+    act(() => {
+      result.current.dispatch({
+        type: 'saveCustomRecipe',
+        recipe: customRecipe,
+      });
+      result.current.dispatch({
+        type: 'setSlot',
+        slot: { day: 0, meal: 'lunch' },
+        recipeId: 'custom-1',
+      });
+      result.current.dispatch({
+        type: 'setSlot',
+        slot: { day: 2, meal: 'dinner' },
+        recipeId: 'custom-1',
+      });
+      result.current.dispatch({
+        type: 'setSlot',
+        slot: { day: 1, meal: 'lunch' },
+        recipeId: 'b-carrots-and-apples',
+      });
+    });
+
+    // No emptied slots yet (a fresh load).
+    expect(result.current.emptiedSlots).toEqual([]);
+
+    act(() => {
+      result.current.deleteCustomRecipe('custom-1');
+    });
+
+    // Reducer emptied the slots and dropped the recipe.
+    expect(result.current.state.customRecipes).toHaveLength(0);
+    expect(result.current.state.plan.days[0].lunch).toBeUndefined();
+    expect(result.current.state.plan.days[2].dinner).toBeUndefined();
+    expect(result.current.state.plan.days[1].lunch).toBe(
+      'b-carrots-and-apples',
+    );
+
+    // The helper surfaced the emptied slots for the notice.
+    expect(result.current.emptiedSlots).toEqual([
+      { day: 0, meal: 'lunch', recipeId: 'custom-1' },
+      { day: 2, meal: 'dinner', recipeId: 'custom-1' },
+    ]);
+
+    // Dismissing clears the notice.
+    act(() => {
+      result.current.dismissEmptiedSlots();
+    });
+    expect(result.current.emptiedSlots).toEqual([]);
+  });
 });
 
 describe('AppProvider corrupt-data load notice (design Error Handling)', () => {

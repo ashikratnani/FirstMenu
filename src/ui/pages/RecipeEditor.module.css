@@ -1,0 +1,208 @@
+/*
+ * Custom recipe editor layout (Task 9.3). A single-column form usable at 360px
+ * (Req 14.6): labelled fields, grouped fieldsets for stages/meal types/
+ * ingredients/steps/storage, and a findings panel shown after a save. No themed
+ * imagery; block/reminder/allergen findings are carried by visible text.
+ */
+
+.back {
+  margin: 0 0 var(--space);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space);
+  max-width: 40rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--space) * 0.25);
+}
+
+.label {
+  font-weight: 600;
+  color: var(--color-heading);
+  font-size: 0.9rem;
+}
+
+.input {
+  padding: calc(var(--space) * 0.5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface, #fff);
+  color: var(--color-text);
+  font: inherit;
+}
+
+.fieldset {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: var(--space);
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--space) * 0.5);
+}
+
+.legend {
+  font-weight: 600;
+  color: var(--color-heading);
+  padding: 0 calc(var(--space) * 0.25);
+}
+
+.checkRow {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space);
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--space) * 0.5);
+}
+
+.rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space);
+}
+
+.ingredientRow,
+.stepRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--space) * 0.5);
+  padding: calc(var(--space) * 0.5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+}
+
+.ingredientRow .field {
+  flex: 1 1 8rem;
+}
+
+.stepRow .field {
+  flex: 1 1 100%;
+}
+
+.addButton,
+.removeButton {
+  align-self: flex-start;
+  padding: calc(var(--space) * 0.35) var(--space);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface, #fff);
+  color: var(--color-heading);
+  font: inherit;
+  cursor: pointer;
+}
+
+.removeButton {
+  align-self: flex-end;
+}
+
+.addButton:hover,
+.addButton:focus-visible,
+.removeButton:hover,
+.removeButton:focus-visible {
+  border-color: var(--color-heading);
+}
+
+.removeButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space);
+}
+
+.submit {
+  padding: calc(var(--space) * 0.5) var(--space);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-accent, var(--color-surface));
+  color: var(--color-text);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.delete {
+  padding: calc(var(--space) * 0.5) var(--space);
+  border: 1px solid #c05454;
+  border-radius: var(--radius);
+  background: var(--color-surface, #fff);
+  color: #a33a3a;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.findings {
+  margin-top: calc(var(--space) * 1.5);
+  padding: var(--space);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface, #fff);
+  max-width: 40rem;
+}
+
+.savedNote {
+  margin: 0 0 var(--space);
+  color: var(--color-heading);
+  font-weight: 600;
+}
+
+.block {
+  margin: 0 0 var(--space);
+  padding: var(--space);
+  border: 1px solid #cdbdf0;
+  border-radius: var(--radius);
+  background: #f4f1fb;
+}
+
+.blockHeading {
+  margin: 0 0 calc(var(--space) * 0.5);
+  color: var(--color-heading);
+}
+
+.findingHeading {
+  margin: var(--space) 0 calc(var(--space) * 0.5);
+  color: var(--color-heading);
+}
+
+.findingList {
+  margin: 0;
+  padding-left: calc(var(--space) * 1.25);
+  color: var(--color-text);
+}
+
+.findingLabel {
+  font-weight: 600;
+}
+
+.availableAt {
+  font-weight: 600;
+}
+
+.noFindings {
+  margin: 0;
+  color: var(--color-muted);
+}
+
+.viewLink {
+  margin: var(--space) 0 0;
+}

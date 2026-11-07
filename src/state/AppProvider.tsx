@@ -303,6 +303,17 @@ export interface AppContextValue {
   corruptBackupKey: string | null;
   /** Slots emptied on load because they referenced an unknown recipe (Req 3.5). */
   emptiedSlots: ReconcileResult['emptiedSlots'];
+  /**
+   * Delete a custom recipe AND surface the plan slots it occupied through
+   * `emptiedSlots` (Req 3.5 for an in-session delete). The pure reducer already
+   * empties those slots; this helper additionally computes which slots
+   * referenced the id (same {day, meal, recipeId} shape reconcilePlanRecipes
+   * produces) and publishes them to the emptied-slot notice before dispatching
+   * the reducer's `deleteCustomRecipe` action.
+   */
+  deleteCustomRecipe: (id: string) => void;
+  /** Clear the emptied-slot notice once the user has seen/dismissed it. */
+  dismissEmptiedSlots: () => void;
   /** Serialize the current state for download (filename + JSON). */
   exportData: () => ExportResult;
   /**
@@ -428,6 +439,29 @@ export function AppProvider({ children, storage }: AppProviderProps) {
     },
   ).current;
 
+  // Delete a custom recipe and surface the slots it occupied (Req 3.5). The
+  // reducer is pure and already empties those slots; this helper computes the
+  // emptied-slot list from the CURRENT state (via stateRef so the callback is
+  // stable) and publishes it to the notice before dispatching. Mirrors the
+  // {day, meal, recipeId} shape reconcilePlanRecipes produces.
+  const deleteCustomRecipe = useRef<(id: string) => void>((id: string) => {
+    const current = stateRef.current;
+    const slots: ReconcileResult['emptiedSlots'] = [];
+    current.plan.days.forEach((day, dayIndex) => {
+      for (const meal of Object.keys(day) as MealType[]) {
+        if (day[meal] === id) {
+          slots.push({ day: dayIndex, meal, recipeId: id });
+        }
+      }
+    });
+    setEmptiedSlots(slots);
+    dispatch({ type: 'deleteCustomRecipe', id });
+  }).current;
+
+  const dismissEmptiedSlots = useRef<() => void>(() => {
+    setEmptiedSlots([]);
+  }).current;
+
   const value = useMemo<AppContextValue>(
     () => ({
       state,
@@ -436,6 +470,8 @@ export function AppProvider({ children, storage }: AppProviderProps) {
       corruptNotice,
       corruptBackupKey,
       emptiedSlots,
+      deleteCustomRecipe,
+      dismissEmptiedSlots,
       exportData,
       importData,
       importError,
@@ -446,6 +482,8 @@ export function AppProvider({ children, storage }: AppProviderProps) {
       corruptNotice,
       corruptBackupKey,
       emptiedSlots,
+      deleteCustomRecipe,
+      dismissEmptiedSlots,
       exportData,
       importData,
       importError,
