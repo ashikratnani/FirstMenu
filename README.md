@@ -39,12 +39,12 @@ Shots to add:
 
 **Safety screen.** Every rule in the safety list cites at least one published source from a recognized public-health authority, and the full list is shown in the app on the **Sources** page (generated directly from the rules in `src/domain/safety/rules.ts`). The guidelines the rules draw on are:
 
-- **AAP** (American Academy of Pediatrics / HealthyChildren) — honey, fruit juice, added sugar, cow's milk, choking hazards, starting solids and allergen introduction.
-- **CDC** — choking hazards and introducing solid foods.
-- **FDA / EPA** — fish and mercury advice, raw/unpasteurized milk, and safe food handling.
-- **WHO** — complementary feeding of infants and young children 6–23 months (2023).
-- **NIAID** — peanut allergy prevention.
-- **HHS** — *Caring for Our Children* standards for foods that are choking hazards.
+- **AAP** (American Academy of Pediatrics / HealthyChildren): honey, fruit juice, added sugar, cow's milk, choking hazards, starting solids and allergen introduction.
+- **CDC**: choking hazards and introducing solid foods.
+- **FDA / EPA**: fish and mercury advice, raw/unpasteurized milk, and safe food handling.
+- **WHO**: complementary feeding of infants and young children 6 to 23 months (2023).
+- **NIAID**: peanut allergy prevention.
+- **HHS**: *Caring for Our Children* standards for foods that are choking hazards.
 
 The safety screen checks ingredient names against this fixed list and can miss foods or preparations that are not on it. See the in-app **Sources** page for the exact rule-by-rule citations and links.
 
