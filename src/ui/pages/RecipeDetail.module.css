@@ -1,0 +1,161 @@
+/*
+ * Recipe detail page (Task 9.2). Single-column reading layout on the shared
+ * light palette tokens. The ghost/block panel is visually distinct so block
+ * reasons read as prominent "not yet" state near the top; prep reminders use
+ * the lantern accent so they stand out beside their ingredient.
+ */
+
+.page {
+  display: block;
+}
+
+.back {
+  margin: 0 0 var(--space);
+}
+
+.back a {
+  color: var(--color-accent);
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space);
+  color: var(--color-muted);
+  margin: 0 0 var(--space);
+}
+
+/* Ghost / block panel ------------------------------------------------------ */
+.ghost {
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: var(--space);
+  margin: var(--space) 0 calc(var(--space) * 1.5);
+}
+
+.ghostHeading {
+  margin: 0 0 calc(var(--space) * 0.5);
+  font-size: 1.1rem;
+  color: var(--color-heading);
+}
+
+.blockList {
+  margin: 0;
+  padding-left: calc(var(--space) * 1.25);
+}
+
+.blockList li {
+  margin-bottom: calc(var(--space) * 0.25);
+}
+
+.blockLabel {
+  font-weight: 600;
+  color: var(--color-heading);
+}
+
+.availableAt {
+  color: var(--color-muted);
+}
+
+.ghostReason {
+  margin: 0;
+}
+
+/* Ingredients -------------------------------------------------------------- */
+.ingredients {
+  list-style: disc;
+  padding-left: calc(var(--space) * 1.25);
+  margin: var(--space) 0 calc(var(--space) * 1.5);
+}
+
+.ingredient {
+  margin-bottom: calc(var(--space) * 0.5);
+}
+
+.ingredientName {
+  display: inline;
+}
+
+.prep {
+  display: block;
+  margin-top: calc(var(--space) * 0.2);
+  font-size: 0.9rem;
+  color: var(--color-accent);
+}
+
+/* Steps -------------------------------------------------------------------- */
+.steps {
+  padding-left: calc(var(--space) * 1.25);
+  margin: var(--space) 0 calc(var(--space) * 1.5);
+}
+
+.steps li {
+  margin-bottom: calc(var(--space) * 0.5);
+}
+
+/* Storage ------------------------------------------------------------------ */
+.storage {
+  list-style: none;
+  padding: 0;
+  margin: var(--space) 0;
+}
+
+.storage li {
+  margin-bottom: calc(var(--space) * 0.25);
+}
+
+.makeAhead {
+  color: var(--color-muted);
+  margin: 0 0 var(--space);
+}
+
+/* Source ------------------------------------------------------------------- */
+.source a {
+  color: var(--color-accent);
+}
+
+.source a:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.retrieved,
+.storageSource {
+  color: var(--color-muted);
+  font-size: 0.85rem;
+}
+
+.adaptationsHeading {
+  font-size: 1rem;
+  margin: var(--space) 0 calc(var(--space) * 0.25);
+  color: var(--color-heading);
+}
+
+.adaptations {
+  margin: 0 0 var(--space);
+  padding-left: calc(var(--space) * 1.25);
+}
+
+/* Custom-recipe actions ---------------------------------------------------- */
+.actions {
+  display: flex;
+  gap: var(--space);
+  align-items: center;
+  margin: calc(var(--space) * 1.5) 0;
+}
+
+.edit {
+  color: var(--color-accent);
+}
+
+.delete {
+  cursor: pointer;
+}
+
+/* Footer disclaimer -------------------------------------------------------- */
+.footer {
+  margin-top: calc(var(--space) * 2);
+  border-top: 1px solid var(--color-border);
+  padding-top: var(--space);
+}

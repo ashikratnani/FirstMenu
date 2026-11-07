@@ -45,6 +45,30 @@ export function MonsterArt() {
   );
 }
 
+/**
+ * A cheerful pumpkin — the freezer-friendly ("freezes for N months") badge on
+ * a recipe card. Decorative only (aria-hidden); the "Freezes for N months"
+ * text carries the meaning (Req 14.3). Bright, light palette, no spooky theme.
+ */
+export function PumpkinArt() {
+  return (
+    <svg
+      className="foodArt"
+      width="24"
+      height="24"
+      viewBox="0 0 40 40"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <rect x="18" y="5" width="4" height="7" rx="1.5" fill="#6b8e4e" />
+      <ellipse cx="20" cy="24" rx="14" ry="12" fill="#f0923a" />
+      <path d="M20 13 v22" stroke="#d9772a" strokeWidth="1.4" />
+      <path d="M11 17 q-3 7 0 14" fill="none" stroke="#d9772a" strokeWidth="1.4" />
+      <path d="M29 17 q3 7 0 14" fill="none" stroke="#d9772a" strokeWidth="1.4" />
+    </svg>
+  );
+}
+
 /** A friendly translucent ghost — a blocked or reaction-flagged food. */
 export function GhostArt() {
   return (

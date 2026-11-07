@@ -69,12 +69,12 @@ Deadline: Friday, December 4, 2026, 2:00 PM PT. Target submission: Thursday, Dec
   - [x] 8.2 Build the Foods page: doors, monsters and ghosts with text labels; "tried, no reaction" and "noticed a reaction" actions; clearing a reaction; allergen guidance including the peanut note.
     - _Requirements: 5.7, 7.3 – 7.7, 14.3_
 
-- [ ] 9. Recipe library and recipe page
-  - [ ] 9.1 Build the library with stage and meal-type filters, ghost cards, door badges and pumpkin badges.
+- [x] 9. Recipe library and recipe page
+  - [x] 9.1 Build the library with stage and meal-type filters, ghost cards, door badges and pumpkin badges.
     - _Requirements: 2.4, 5.1, 5.3, 7.3, 9.1_
-  - [ ] 9.2 Build the recipe page with ingredients, prep reminders, steps, storage, block reasons, the source link and adaptations, and the disclaimer. Add recipe sources to the Sources page.
+  - [x] 9.2 Build the recipe page with ingredients, prep reminders, steps, storage, block reasons, the source link and adaptations, and the disclaimer. Add recipe sources to the Sources page.
     - _Requirements: 2.7, 2.9, 5.3, 6.1, 6.2, 13.1_
-  - [ ] 9.3 Build the custom recipe editor: all fields, a "counts as" food per ingredient, screening on save with findings shown, and delete with emptied-slot notice.
+  - [x] 9.3 Build the custom recipe editor: all fields, a "counts as" food per ingredient, screening on save with findings shown, and delete with emptied-slot notice.
     - _Requirements: 3.1 – 3.5, 4.9, 5.6_
 
 - [ ] 10. Week plan
