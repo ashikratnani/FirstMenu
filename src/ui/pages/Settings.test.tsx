@@ -6,6 +6,7 @@ import Settings from './Settings';
 import {
   ALLERGEN_GROUPS,
   allergenFoodKey,
+  todayYmd,
   UNDER_6_NOTICE,
   OVER_12_NOTICE,
 } from './childProfile';
@@ -118,6 +119,57 @@ describe('Settings', () => {
     });
     // The pre-existing egg record is preserved (date unchanged).
     expect(captured!.foods[allergenFoodKey('egg')]?.date).toBe('2026-10-01');
+  });
+
+  it('unchecking a previously-tried food removes its record on save', async () => {
+    const user = userEvent.setup();
+    const seed = onboardedState('2026-01-15');
+    seed.foods = {
+      [allergenFoodKey('egg')]: { status: 'tried', date: '2026-10-01' },
+    };
+    renderSettings(seed);
+
+    const egg = screen.getByLabelText('egg') as HTMLInputElement;
+    expect(egg.checked).toBe(true);
+
+    await user.click(egg); // uncheck
+    expect(egg.checked).toBe(false);
+    await user.click(screen.getByRole('button', { name: /save/i }));
+
+    // The tried record is cleared, so the checkbox's undo affordance is honored.
+    expect(captured!.foods[allergenFoodKey('egg')]).toBeUndefined();
+  });
+
+  it('a logged reaction is never cleared by saving Settings', async () => {
+    const user = userEvent.setup();
+    const seed = onboardedState('2026-01-15');
+    seed.foods = {
+      [allergenFoodKey('peanut')]: {
+        status: 'reaction',
+        date: '2026-09-01',
+        note: 'rash',
+      },
+    };
+    renderSettings(seed);
+
+    // A reaction prefills unchecked (it is not "tried"); leaving it and saving
+    // must preserve the reaction untouched.
+    const peanut = screen.getByLabelText('peanut') as HTMLInputElement;
+    expect(peanut.checked).toBe(false);
+
+    await user.click(screen.getByRole('button', { name: /save/i }));
+
+    expect(captured!.foods[allergenFoodKey('peanut')]).toEqual({
+      status: 'reaction',
+      date: '2026-09-01',
+      note: 'rash',
+    });
+  });
+
+  it('caps the birth-date input at today so a future date cannot be picked', () => {
+    renderSettings(onboardedState('2026-01-15'));
+    const input = screen.getByLabelText(/birth date/i) as HTMLInputElement;
+    expect(input.max).toBe(todayYmd());
   });
 
   it('lists the nine allergen groups', () => {

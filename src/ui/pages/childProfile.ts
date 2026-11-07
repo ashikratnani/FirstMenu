@@ -2,12 +2,26 @@
 // Settings page (Settings.tsx), kept in a non-component module so both pages
 // (and their tests) import the SAME constants and derivations.
 //
-// HEALTH/SAFETY wording note (autonomy.md): the under-6 (Req 1.4) and 12+
-// (Req 1.5) notices are health-adjacent. The requirements describe the
-// condition but give no verbatim string, so UNDER_6_NOTICE / OVER_12_NOTICE
-// below are a close paraphrase of the requirement text, kept minimal and
-// factual with no extra guidance invented. The exact wording is PENDING
-// MAINTAINER CONFIRMATION and should be treated as not-yet-final copy.
+// ===========================================================================
+// !!! PENDING MAINTAINER CONFIRMATION — DO NOT SHIP AS FINAL COPY !!!
+//
+// HEALTH/SAFETY wording note (autonomy.md "Stop and ask"): the under-6
+// (Req 1.4) and 12+ (Req 1.5) notices below are health/safety wording. The
+// requirements describe the CONDITION but give no verbatim string, so
+// UNDER_6_NOTICE / OVER_12_NOTICE are an agent-authored CLOSE PARAPHRASE of the
+// requirement text — kept deliberately minimal and factual, with NO extra
+// guidance invented beyond Req 1.4 / 1.5.
+//
+// autonomy.md requires NEW health/safety wording to be routed through a
+// maintainer "Decision needed:" issue before merge. This agent cannot open
+// GitHub issues, so the orchestrator/maintainer MUST open:
+//
+//   "Decision needed: under-6 / 12+ notice wording"
+//
+// confirming or replacing the exact two strings below against Req 1.4 / 1.5.
+// Until then treat this copy as PROVISIONAL. See the task findings for the
+// quoted strings and requirement text. Do not add new health guidance here.
+// ===========================================================================
 
 import { ageInMonths } from '../../domain/age';
 import { RULES } from '../../domain/safety/rules';

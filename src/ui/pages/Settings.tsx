@@ -45,6 +45,14 @@ function isTried(
   return foods[key]?.status === 'tried';
 }
 
+/** Whether a food key has any record (tried OR reaction) in state. */
+function hasRecord(
+  foods: Record<string, FoodRecord>,
+  key: string,
+): boolean {
+  return foods[key] !== undefined;
+}
+
 export default function Settings() {
   const { state, dispatch } = useApp();
 
@@ -102,10 +110,17 @@ export default function Settings() {
     const today = todayYmd();
     const record: FoodRecord = { status: 'tried', date: today };
     for (const item of [...allergenItems, ...OTHER_FIRST_FOODS]) {
-      // Only write newly-checked items; do not overwrite existing records
-      // (a recorded reaction or an existing tried date stays as-is).
-      if (checked[item.key] && !isTried(state.foods, item.key)) {
+      const currentlyTried = isTried(state.foods, item.key);
+      if (checked[item.key] && !hasRecord(state.foods, item.key)) {
+        // Newly checked with no existing record: record it. Never overwrite an
+        // existing record (a logged reaction or an earlier tried date stays
+        // as-is), so we gate on hasRecord, not just isTried.
         dispatch({ type: 'setFoodRecord', key: item.key, record });
+      } else if (!checked[item.key] && currentlyTried) {
+        // Unchecked a food previously recorded as tried: clear it so the
+        // checkbox's affordance (an undo) matches its behaviour. Only 'tried'
+        // records are clearable; clearFoodRecord leaves a 'reaction' intact.
+        dispatch({ type: 'clearFoodRecord', key: item.key });
       }
     }
 
@@ -143,6 +158,7 @@ export default function Settings() {
             className={styles.input}
             type="date"
             required
+            max={todayYmd()}
             value={birthDate}
             onChange={(e) => {
               setSaved(false);

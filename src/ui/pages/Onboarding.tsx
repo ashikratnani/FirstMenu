@@ -114,6 +114,7 @@ export default function Onboarding() {
             className={styles.input}
             type="date"
             required
+            max={todayYmd()}
             value={birthDate}
             onChange={(e) => setBirthDate(e.target.value)}
           />

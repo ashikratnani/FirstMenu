@@ -6,6 +6,7 @@ import Onboarding from './Onboarding';
 import {
   ALLERGEN_GROUPS,
   allergenFoodKey,
+  todayYmd,
   UNDER_6_NOTICE,
   OVER_12_NOTICE,
 } from './childProfile';
@@ -77,6 +78,12 @@ describe('Onboarding', () => {
     expect(birth).toBeRequired();
     expect(birth.type).toBe('date');
     expect(screen.getByLabelText(/first name/i)).toBeInTheDocument();
+  });
+
+  it('caps the birth-date input at today so a future date cannot be picked', () => {
+    renderOnboarding();
+    const birth = screen.getByLabelText(/birth date/i) as HTMLInputElement;
+    expect(birth.max).toBe(todayYmd());
   });
 
   it('shows the under-6 notice for a birth date under 6 months', () => {
