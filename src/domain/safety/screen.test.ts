@@ -138,4 +138,20 @@ describe('screenRecipe', () => {
     );
     expect(quarterReminders).toHaveLength(1);
   });
+
+  it('keeps the same reminder message once PER ingredient (no recipe-wide collapse)', () => {
+    // Complementary to the per-ingredient de-dup above: the SAME message
+    // ("Quarter lengthwise before serving.") on TWO DIFFERENT ingredients must
+    // appear once PER ingredient. 'red grapes' fires the `grapes` rule and
+    // 'cherry tomatoes' fires the `cherry-tomato` rule; both emit that message.
+    // De-dup is per-ingredient (design.md ~221), so this must NOT collapse
+    // across the whole recipe. This fails if the seen-messages Set is hoisted
+    // to recipe scope (only one reminder would survive).
+    const result = screenRecipe(recipe(['red grapes', 'cherry tomatoes']), YOUNG);
+    const quarterReminders = result.reminders.filter(
+      (f) => f.message === 'Quarter lengthwise before serving.',
+    );
+    expect(quarterReminders).toHaveLength(2);
+    expect(quarterReminders.map((f) => f.ingredientIndex).sort()).toEqual([0, 1]);
+  });
 });
