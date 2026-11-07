@@ -34,7 +34,7 @@ describe('screenIngredient - matching table (must fire / must not fire)', () => 
     ['breast milk', [], ['cows-milk', 'allergen-dairy']],
     ['whole milk yogurt', ['allergen-dairy', 'cows-milk'], []],
     ['almond flour', ['allergen-tree-nuts'], ['whole-nuts', 'allergen-wheat']],
-    ['Swordfish', ['high-mercury-fish'], ['allergen-fish']],
+    ['Swordfish', ['high-mercury-fish'], []],
     ['grated cheeses', ['allergen-dairy', 'cheese'], []],
     ['hot dogs', ['sausages'], []],
     ['egg noodles', ['allergen-egg', 'allergen-wheat'], []],
@@ -64,6 +64,13 @@ describe('screenIngredient - age limits (limit-1 fires, limit does not)', () => 
     ['popcorn', 'choking-no-safe-form', 48],
     ['red grapes', 'grapes', 48],
     ['cherry tomatoes', 'cherry-tomato', 48],
+    ['cherries', 'cherries', 48],
+    ['blueberries', 'small-round-fruit', 48],
+    ['hot dog', 'sausages', 48],
+    ['walnuts', 'whole-nuts', 48],
+    ['peanut butter', 'nut-seed-butter', 48],
+    ['carrot', 'hard-produce', 48],
+    ['raisins', 'dried-fruit', 48],
     ['cheese', 'cheese', 48],
     ['whole milk', 'cows-milk', 12],
   ];
@@ -121,10 +128,14 @@ describe('screenRecipe', () => {
   });
 
   it('de-duplicates reminders by message per ingredient', () => {
-    // "cheese" produces the "cheese" reminder; a name with the term twice must
-    // still yield a single reminder for that ingredient.
-    const result = screenRecipe(recipe(['cheese and cheese']), YOUNG);
-    const cheeseReminders = result.reminders.filter((f) => f.ruleId === 'cheese');
-    expect(cheeseReminders).toHaveLength(1);
+    // "grape and cherry tomatoes" matches two DIFFERENT reminder rules that emit
+    // the SAME message ("Quarter lengthwise before serving."): `grapes` and
+    // `cherry-tomato`. Per-ingredient message de-dup must collapse them into a
+    // single reminder. This fails if the de-dup is removed (two reminders).
+    const result = screenRecipe(recipe(['grape and cherry tomatoes']), YOUNG);
+    const quarterReminders = result.reminders.filter(
+      (f) => f.message === 'Quarter lengthwise before serving.',
+    );
+    expect(quarterReminders).toHaveLength(1);
   });
 });

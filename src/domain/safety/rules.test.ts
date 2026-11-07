@@ -68,11 +68,6 @@ describe('sources', () => {
       expect(source.url, `${id} missing url`).toBeTruthy();
     }
   });
-
-  it('points no active rule at the superseded CDC-food-safety placeholder', () => {
-    const offenders = RULES.filter((r) => r.sources.includes('CDC-food-safety'));
-    expect(offenders.map((r) => r.id)).toEqual([]);
-  });
 });
 
 describe('terms are lowercase and singular', () => {

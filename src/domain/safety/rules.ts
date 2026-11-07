@@ -37,12 +37,12 @@ export type SourceId =
   | 'FDA-safe-food-handling'
   | 'CDC-choking'
   | 'CDC-solids'
-  | 'HHS-CFOC'
-  | 'CDC-food-safety';
+  | 'HHS-CFOC';
 
 export interface Source {
   title: string;
-  url: string;
+  url: string; // primary / first cited page
+  urls?: string[]; // all cited pages when a source lists more than one (design "Sources")
   retrieved?: string; // YYYY-MM-DD
 }
 
@@ -67,6 +67,10 @@ export const SOURCES: Record<SourceId, Source> = {
   'AAP-milk': {
     title: 'AAP HealthyChildren: Feeding your baby when money is tight / Cow\u2019s milk alternatives FAQ',
     url: 'https://www.healthychildren.org/English/tips-tools/ask-the-pediatrician/Pages/how-should-we-feed-our-baby-if-running-low-on-money.aspx',
+    urls: [
+      'https://www.healthychildren.org/English/tips-tools/ask-the-pediatrician/Pages/how-should-we-feed-our-baby-if-running-low-on-money.aspx',
+      'https://www.healthychildren.org/English/healthy-living/nutrition/Pages/milk-allergy-foods-and-ingredients-to-avoid.aspx',
+    ],
   },
   'AAP-choking': {
     title: 'AAP HealthyChildren: Choking prevention',
@@ -115,14 +119,6 @@ export const SOURCES: Record<SourceId, Source> = {
   'HHS-CFOC': {
     title: 'Caring for Our Children 4.5.0.10: Foods that are choking hazards',
     url: 'https://childcareta.acf.hhs.gov/cfoc/basic/chapter/4/4.5.0.10',
-  },
-  // Retained for history. No active rule references this placeholder: the four
-  // "confirm source" rules were repointed to FDA-raw-milk (unpasteurized) and
-  // FDA-safe-food-handling (egg / meat doneness) in task 3.2. Kept so share
-  // links / notes referencing the id still resolve.
-  'CDC-food-safety': {
-    title: 'CDC: Food safety (placeholder, superseded by FDA sources in task 3.2)',
-    url: 'https://www.cdc.gov/food-safety/index.html',
   },
 };
 
