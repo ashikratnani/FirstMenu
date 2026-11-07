@@ -1,0 +1,53 @@
+/*
+ * Sources page (Task 6.2). Plain, readable lists; links use the accent token
+ * and remain keyboard-focusable with a visible focus ring.
+ */
+
+.ruleList,
+.referenceList {
+  list-style: none;
+  padding: 0;
+  margin: var(--space) 0 calc(var(--space) * 2);
+}
+
+.rule {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: var(--space);
+  margin-bottom: var(--space);
+}
+
+.ruleLabel {
+  margin: 0 0 calc(var(--space) * 0.25);
+  font-size: 1rem;
+  color: var(--color-heading);
+}
+
+.ruleMessage {
+  margin: 0 0 calc(var(--space) * 0.5);
+}
+
+.ruleSources {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--color-muted);
+}
+
+.reference {
+  margin-bottom: calc(var(--space) * 0.5);
+}
+
+.reference a {
+  color: var(--color-accent);
+}
+
+.reference a:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.retrieved {
+  color: var(--color-muted);
+  font-size: 0.85rem;
+}

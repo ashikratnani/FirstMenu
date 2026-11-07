@@ -1,14 +1,17 @@
 // The app shell (Task 6.1): a skip-to-content link, a header with the app
 // name, a keyboard-navigable primary nav, a <main> landmark that renders the
-// routed page via <Outlet/>, and a footer region. The footer disclaimer,
-// first-run disclaimer and storage banner are added in Task 6.2; this leaves
-// the footer slot in place.
+// routed page via <Outlet/>, and a footer disclaimer. Task 6.2 adds the
+// footer disclaimer (Req 13.1/13.2), the first-run disclaimer (Req 13.1) and
+// the storage-unavailable banner (Req 12.7), all rendered here so they appear
+// on every page.
 //
 // Nav uses real NavLink anchors so it is reachable and operable by keyboard;
 // the active route is marked with aria-current="page" (Req 14.4).
 
 import { Link, NavLink, Outlet } from 'react-router-dom';
 import styles from './Layout.module.css';
+import Disclaimer, { FirstRunDisclaimer } from './Disclaimer';
+import StorageBanner from './StorageBanner';
 
 /** Primary navigation entries (a subset of routes that make sense as nav). */
 const NAV_ITEMS: ReadonlyArray<{ to: string; label: string; end?: boolean }> = [
@@ -48,11 +51,17 @@ export default function Layout() {
       </header>
 
       <main id="main" className={styles.main}>
+        {/* Storage-unavailable banner (Req 12.7) and first-run disclaimer
+            (Req 13.1) show above the routed page on every route. */}
+        <StorageBanner />
+        <FirstRunDisclaimer />
         <Outlet />
       </main>
 
-      {/* Footer region; the disclaimer text is added in Task 6.2. */}
-      <footer className={styles.footer} />
+      {/* Footer disclaimer renders on every page (Req 13.1, 13.2). */}
+      <footer className={styles.footer}>
+        <Disclaimer />
+      </footer>
     </div>
   );
 }

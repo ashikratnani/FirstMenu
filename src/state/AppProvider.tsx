@@ -52,6 +52,7 @@ export type AppAction =
   | { type: 'newWeek'; mode: 'keep' | 'empty' }
   | { type: 'setPrepDate'; prepDate: string }
   | { type: 'toggleGroceryItem'; key: string }
+  | { type: 'acknowledgeDisclaimer' }
   | { type: 'replaceState'; state: AppState };
 
 // ---------------------------------------------------------------------------
@@ -186,6 +187,12 @@ export function reducer(state: AppState, action: AppAction): AppState {
         ? state.groceryChecked.filter((k) => k !== action.key)
         : [...state.groceryChecked, action.key];
       return { ...state, groceryChecked: checked };
+    }
+
+    case 'acknowledgeDisclaimer': {
+      // Req 13.1: the first-run disclaimer has been acknowledged; record it so
+      // it does not reappear. Idempotent.
+      return { ...state, disclaimerAcknowledged: true };
     }
 
     case 'replaceState': {

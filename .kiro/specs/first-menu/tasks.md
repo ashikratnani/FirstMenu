@@ -53,10 +53,10 @@ Deadline: Friday, December 4, 2026, 2:00 PM PT. Target submission: Thursday, Dec
   - [x] 5.3 Add export to JSON and import with validation. Test that a bad file leaves the data unchanged.
     - _Requirements: 12.4, 12.5_
 
-- [ ] 6. App shell
-  - [ ] 6.1 Build the layout, navigation, routes, `theme.css` color tokens (checked for AA contrast) and reduced-motion handling. Use placeholder art for now.
+- [x] 6. App shell
+  - [x] 6.1 Build the layout, navigation, routes, `theme.css` color tokens (checked for AA contrast) and reduced-motion handling. Use placeholder art for now.
     - _Requirements: 14.4, 14.5, 14.6_
-  - [ ] 6.2 Add the first-run disclaimer, footer disclaimer, storage banner and the Sources page generated from `rules.ts`.
+  - [x] 6.2 Add the first-run disclaimer, footer disclaimer, storage banner and the Sources page generated from `rules.ts`.
     - _Requirements: 4.7, 12.7, 13.1, 13.2, 13.3_
 
 - [ ] 7. Onboarding and child profile
