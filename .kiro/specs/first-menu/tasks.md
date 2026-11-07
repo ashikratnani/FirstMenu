@@ -27,14 +27,14 @@ Deadline: Friday, December 4, 2026, 2:00 PM PT. Target submission: Thursday, Dec
   - [x] 2.2 Implement `ageInMonths`, `stageFor` and `defaultSlots` in `domain/age.ts`, with tests for month boundaries, end-of-month birthdays and leap years.
     - _Requirements: 1.2, 1.3, 8.2_
 
-- [ ] 3. Safety screen
-  - [ ] 3.1 Implement `safety/normalize.ts` (normalize, tokenize, plural-aware phrase matching) with unit tests.
+- [x] 3. Safety screen
+  - [x] 3.1 Implement `safety/normalize.ts` (normalize, tokenize, plural-aware phrase matching) with unit tests.
     - _Requirements: 4.1, 4.2_
-  - [ ] 3.2 Write `safety/rules.ts` with the block, reminder and allergen rules and the sources table from the design. Find sources for the rules marked "confirm source" (unpasteurized products, egg and meat cooking, 3-day new-food spacing) and record the URLs. Any still missing stay active and are tracked in a GitHub issue until task 17.0. Add `RULESET_VERSION`.
+  - [x] 3.2 Write `safety/rules.ts` with the block, reminder and allergen rules and the sources table from the design. Find sources for the rules marked "confirm source" (unpasteurized products, egg and meat cooking, 3-day new-food spacing) and record the URLs. Any still missing stay active and are tracked in a GitHub issue until task 17.0. Add `RULESET_VERSION`.
     - _Requirements: 4.3, 4.4, 4.5, 4.6, 4.7, 6.4, 7.8_
-  - [ ] 3.3 Implement `screenIngredient` and `screenRecipe` in `safety/screen.ts`, including age limits, exceptions and reminder de-duplication.
+  - [x] 3.3 Implement `screenIngredient` and `screenRecipe` in `safety/screen.ts`, including age limits, exceptions and reminder de-duplication.
     - _Requirements: 4.1 – 4.5, 4.8, 5.3, 5.5, 6.3_
-  - [ ] 3.4 Write the safety tests: every row of the matching table; each rule fires on at least one term; age limits at `limit - 1` and `limit`; every rule has a source and every source id exists; every term is lowercase and singular.
+  - [x] 3.4 Write the safety tests: every row of the matching table; each rule fires on at least one term; age limits at `limit - 1` and `limit`; every rule has a source and every source id exists; every term is lowercase and singular.
     - _Requirements: 4.1 – 4.7_
 
 - [ ] 4. Built-in recipes

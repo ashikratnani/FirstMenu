@@ -1,0 +1,388 @@
+// The fixed safety rule list and its sources (design.md, "Rule shape",
+// "Initial rule list", "Sources"). Pure TS, no React.
+//
+// Safety policy (steering/safety-rules.md): every rule MUST have a published
+// source and a test case; terms are lowercase and singular; the screen may be
+// made STRICTER but never looser. Any rule change bumps RULESET_VERSION.
+
+import type { AllergenGroup } from '../types';
+
+export type RuleKind = 'block' | 'reminder' | 'allergen';
+
+export interface SafetyRule {
+  id: string;
+  kind: RuleKind;
+  terms: string[];
+  except?: string[];
+  underMonths?: number; // rule applies while age < underMonths
+  allergenGroup?: AllergenGroup; // kind === 'allergen' only
+  label: string; // short name shown in UI, e.g. "Honey"
+  message: string; // plain-language reason or reminder
+  sources: SourceId[];
+}
+
+// Source ids. Each maps to an entry in SOURCES below.
+export type SourceId =
+  | 'AAP-honey'
+  | 'AAP-juice'
+  | 'AAP-sugar'
+  | 'AAP-milk'
+  | 'AAP-choking'
+  | 'AAP-allergens'
+  | 'AAP-solid-foods'
+  | 'NIAID-peanut'
+  | 'WHO-2023'
+  | 'FDA-EPA-fish'
+  | 'FDA-raw-milk'
+  | 'FDA-safe-food-handling'
+  | 'CDC-choking'
+  | 'CDC-solids'
+  | 'HHS-CFOC';
+
+export interface Source {
+  title: string;
+  url: string; // primary / first cited page
+  urls?: string[]; // all cited pages when a source lists more than one (design "Sources")
+  retrieved?: string; // YYYY-MM-DD
+}
+
+// Sources table (design.md "Sources"), plus the sources confirmed in task 3.2
+// (retrieved 2026-11-07). The four previously-placeholder "confirm source"
+// rules now cite real published URLs: FDA raw-milk for the unpasteurized rule,
+// FDA safe-food-handling for the egg-cooking / cook-through doneness rules, and
+// AAP "Starting Solid Foods" for the 3-day new-food spacing value.
+export const SOURCES: Record<SourceId, Source> = {
+  'AAP-honey': {
+    title: "AAP HealthyChildren: Caring for your child's cold",
+    url: 'https://www.healthychildren.org/English/health-issues/conditions/flu/Pages/caring-for-Your-childs-cold-or-flu.aspx',
+  },
+  'AAP-juice': {
+    title: 'AAP HealthyChildren: How to reduce added sugar',
+    url: 'https://www.healthychildren.org/English/healthy-living/nutrition/Pages/How-to-Reduce-Added-Sugar-in-Your-Childs-Diet.aspx',
+  },
+  'AAP-sugar': {
+    title: "AAP News: Added sugar in kids' diets",
+    url: 'https://publications.aap.org/aapnews/news/pdfDownload/7331',
+  },
+  'AAP-milk': {
+    title: 'AAP HealthyChildren: Feeding your baby when money is tight / Cow\u2019s milk alternatives FAQ',
+    url: 'https://www.healthychildren.org/English/tips-tools/ask-the-pediatrician/Pages/how-should-we-feed-our-baby-if-running-low-on-money.aspx',
+    urls: [
+      'https://www.healthychildren.org/English/tips-tools/ask-the-pediatrician/Pages/how-should-we-feed-our-baby-if-running-low-on-money.aspx',
+      'https://www.healthychildren.org/English/healthy-living/nutrition/Pages/milk-allergy-foods-and-ingredients-to-avoid.aspx',
+    ],
+  },
+  'AAP-choking': {
+    title: 'AAP HealthyChildren: Choking prevention',
+    url: 'https://www.healthychildren.org/English/health-issues/injuries-emergencies/Pages/Choking-Prevention.aspx',
+  },
+  'AAP-allergens': {
+    title: 'AAP HealthyChildren: When to introduce egg, peanut butter and other allergens',
+    url: 'https://www.healthychildren.org/English/healthy-living/nutrition/Pages/when-to-introduce-egg-peanut-butter-and-other-common-food-allergens-to-your-baby-food-allergy-prevention-tips.aspx',
+  },
+  'AAP-solid-foods': {
+    title: 'AAP HealthyChildren: Starting Solid Foods',
+    url: 'https://www.healthychildren.org/English/ages-stages/baby/feeding-nutrition/Pages/Starting-Solid-Foods.aspx',
+    retrieved: '2026-11-07',
+  },
+  'NIAID-peanut': {
+    title: 'NIAID: Addendum guidelines for the prevention of peanut allergy',
+    url: 'https://www.niaid.nih.gov/sites/default/files/peanut-allergy-prevention-guidelines-clinician-summary.pdf',
+  },
+  'WHO-2023': {
+    title: 'WHO Guideline for complementary feeding of infants and young children 6\u201323 months (2023)',
+    url: 'https://www.who.int/publications/i/item/9789240081864',
+  },
+  'FDA-EPA-fish': {
+    title: 'EPA-FDA advice about eating fish and shellfish',
+    url: 'https://www.epa.gov/choose-fish-and-shellfish-wisely/epa-fda-advice-about-eating-fish-and-shellfish',
+  },
+  'FDA-raw-milk': {
+    title:
+      'FDA: The Dangers of Raw Milk: Unpasteurized Milk Can Pose a Serious Health Risk',
+    url: 'https://www.fda.gov/food/buy-store-serve-safe-food/dangers-raw-milk-unpasteurized-milk-can-pose-serious-health-risk',
+    retrieved: '2026-11-07',
+  },
+  'FDA-safe-food-handling': {
+    title: 'FDA: Safe Food Handling',
+    url: 'https://www.fda.gov/food/buy-store-serve-safe-food/safe-food-handling',
+    retrieved: '2026-11-07',
+  },
+  'CDC-choking': {
+    title: 'CDC: Choking hazards',
+    url: 'https://www.cdc.gov/infant-toddler-nutrition/foods-and-drinks/choking-hazards.html',
+  },
+  'CDC-solids': {
+    title: 'CDC: When, what and how to introduce solid foods',
+    url: 'https://www.cdc.gov/infant-toddler-nutrition/foods-and-drinks/when-what-and-how-to-introduce-solid-foods.html',
+  },
+  'HHS-CFOC': {
+    title: 'Caring for Our Children 4.5.0.10: Foods that are choking hazards',
+    url: 'https://childcareta.acf.hhs.gov/cfoc/basic/chapter/4/4.5.0.10',
+  },
+};
+
+/**
+ * New-food spacing: wait at least 3 days between introducing new single-
+ * ingredient foods (AAP "Starting Solid Foods": "Introduce one single-ingredient
+ * new food ... every 3 to 5 days"). The plan module (task 10) imports this;
+ * the source citation lives here with the rules.
+ */
+export const NEW_FOOD_SPACING_DAYS = 3;
+export const NEW_FOOD_SPACING_SOURCES: SourceId[] = ['AAP-solid-foods'];
+
+// Block rules (ghosts). Transcribed verbatim from design.md "Block rules".
+const BLOCK_RULES: SafetyRule[] = [
+  {
+    id: 'honey',
+    kind: 'block',
+    terms: ['honey'],
+    underMonths: 12,
+    label: 'Honey',
+    message: 'Honey can cause infant botulism, even baked into food.',
+    sources: ['AAP-honey'],
+  },
+  {
+    id: 'juice',
+    kind: 'block',
+    terms: ['juice'],
+    except: ['lemon', 'lime'],
+    underMonths: 12,
+    label: 'Fruit juice',
+    message: 'No fruit juice before 12 months.',
+    sources: ['AAP-juice'],
+  },
+  {
+    id: 'added-sugar',
+    kind: 'block',
+    terms: ['sugar', 'brown sugar', 'maple syrup', 'corn syrup', 'agave', 'molasses', 'syrup'],
+    except: ['snap'],
+    underMonths: 24,
+    label: 'Added sugar',
+    message: 'No added sugar before 2 years.',
+    sources: ['AAP-sugar', 'WHO-2023'],
+  },
+  {
+    id: 'sweeteners',
+    kind: 'block',
+    terms: ['stevia', 'sucralose', 'aspartame', 'saccharin', 'sweetener'],
+    underMonths: 24,
+    label: 'Sugar substitutes',
+    message: 'No sugar substitutes for babies.',
+    sources: ['WHO-2023'],
+  },
+  {
+    id: 'added-salt',
+    kind: 'block',
+    terms: ['salt', 'salted', 'soy sauce', 'fish sauce', 'bouillon', 'stock cube'],
+    underMonths: 24,
+    label: 'Added salt',
+    message: "Don't add salt or salty sauces to baby food.",
+    sources: ['WHO-2023'],
+  },
+  {
+    id: 'high-mercury-fish',
+    kind: 'block',
+    terms: ['shark', 'swordfish', 'king mackerel', 'bigeye tuna', 'marlin', 'orange roughy', 'tilefish'],
+    label: 'High-mercury fish',
+    message: 'High in mercury. Choose lower-mercury fish.',
+    sources: ['FDA-EPA-fish'],
+  },
+  {
+    id: 'unpasteurized',
+    kind: 'block',
+    terms: ['raw milk', 'unpasteurized'],
+    label: 'Unpasteurized',
+    message: 'Only pasteurized milk and cheese.',
+    sources: ['FDA-raw-milk'],
+  },
+  {
+    id: 'choking-no-safe-form',
+    kind: 'block',
+    terms: ['popcorn', 'hard candy', 'chewing gum', 'gum', 'marshmallow'],
+    except: ['xanthan', 'guar'],
+    underMonths: 48,
+    label: 'Choking hazard',
+    message: 'Choking hazard with no safe form for babies.',
+    sources: ['AAP-choking', 'CDC-choking', 'HHS-CFOC'],
+  },
+];
+
+// Prep reminders (never block). Transcribed verbatim from design.md.
+const REMINDER_RULES: SafetyRule[] = [
+  {
+    id: 'grapes',
+    kind: 'reminder',
+    terms: ['grape', 'grape tomato'],
+    underMonths: 48,
+    label: 'Grapes',
+    message: 'Quarter lengthwise before serving.',
+    sources: ['AAP-choking', 'CDC-choking'],
+  },
+  {
+    id: 'cherry-tomato',
+    kind: 'reminder',
+    terms: ['cherry tomato'],
+    underMonths: 48,
+    label: 'Cherry tomatoes',
+    message: 'Quarter lengthwise before serving.',
+    sources: ['CDC-choking'],
+  },
+  {
+    id: 'cherries',
+    kind: 'reminder',
+    terms: ['cherry'],
+    except: ['tomato'],
+    underMonths: 48,
+    label: 'Cherries',
+    message: 'Remove pits and cut into small pieces.',
+    sources: ['CDC-choking'],
+  },
+  {
+    id: 'small-round-fruit',
+    kind: 'reminder',
+    terms: ['blueberry', 'raspberry', 'olive'],
+    underMonths: 48,
+    label: 'Small round fruit',
+    message: 'Flatten or cut into small pieces.',
+    sources: ['CDC-choking'],
+  },
+  {
+    id: 'sausages',
+    kind: 'reminder',
+    terms: ['hot dog', 'sausage'],
+    underMonths: 48,
+    label: 'Sausages',
+    message: 'Cut lengthwise into strips, then into small pieces.',
+    sources: ['AAP-choking'],
+  },
+  {
+    id: 'whole-nuts',
+    kind: 'reminder',
+    terms: ['peanut', 'almond', 'cashew', 'walnut', 'pecan', 'hazelnut', 'pistachio', 'macadamia', 'brazil nut', 'pine nut'],
+    except: ['butter', 'flour', 'meal', 'powder', 'ground', 'milk'],
+    underMonths: 48,
+    label: 'Whole nuts',
+    message: 'Only finely ground or mixed into food. Never whole or in pieces.',
+    sources: ['AAP-choking'],
+  },
+  {
+    id: 'nut-seed-butter',
+    kind: 'reminder',
+    terms: ['peanut butter', 'almond butter', 'cashew butter', 'sunflower seed butter', 'tahini'],
+    underMonths: 48,
+    label: 'Nut or seed butter',
+    message: 'Thin with water, breast milk or formula, or spread thinly. Never a spoonful.',
+    sources: ['AAP-allergens', 'CDC-choking'],
+  },
+  {
+    id: 'hard-produce',
+    kind: 'reminder',
+    terms: ['carrot', 'apple', 'celery'],
+    except: ['sauce', 'juice'],
+    underMonths: 48,
+    label: 'Hard produce',
+    message: 'Cook until soft or grate finely.',
+    sources: ['CDC-choking'],
+  },
+  {
+    id: 'dried-fruit',
+    kind: 'reminder',
+    terms: ['raisin', 'prune', 'dried fruit', 'dried apricot', 'dried mango', 'dried fig'],
+    underMonths: 48,
+    label: 'Dried fruit',
+    message: 'Chop finely or soak until soft.',
+    sources: ['CDC-choking'],
+  },
+  {
+    id: 'cheese',
+    kind: 'reminder',
+    terms: ['cheese'],
+    underMonths: 48,
+    label: 'Cheese',
+    message: 'Grate or slice thinly. Use pasteurized cheese.',
+    sources: ['CDC-choking'],
+  },
+  {
+    id: 'eggs-cooked',
+    kind: 'reminder',
+    terms: ['egg'],
+    label: 'Cook eggs through',
+    message: 'Cook until white and yolk are firm.',
+    sources: ['FDA-safe-food-handling'],
+  },
+  {
+    id: 'cook-through',
+    kind: 'reminder',
+    terms: ['chicken', 'beef', 'pork', 'turkey', 'lamb', 'fish', 'salmon', 'cod', 'trout', 'tilapia', 'shrimp'],
+    label: 'Cook meat through',
+    message: 'Cook through and remove all bones.',
+    sources: ['FDA-safe-food-handling'],
+  },
+  {
+    id: 'cows-milk',
+    kind: 'reminder',
+    terms: ['milk'],
+    except: ['breast', 'formula'],
+    underMonths: 12,
+    label: "Cow's milk",
+    message: 'Fine in cooking. Before 12 months, breast milk or formula should be the main drink.',
+    sources: ['AAP-milk'],
+  },
+];
+
+// Allergen rules (mystery doors, never block). Transcribed verbatim from
+// design.md "Allergen rules". All cite AAP-allergens and NIAID-peanut.
+const ALLERGEN_SOURCES: SourceId[] = ['AAP-allergens', 'NIAID-peanut'];
+
+interface AllergenSpec {
+  group: AllergenGroup;
+  terms: string[];
+  except?: string[];
+}
+
+const ALLERGEN_SPECS: AllergenSpec[] = [
+  { group: 'peanut', terms: ['peanut'] },
+  { group: 'egg', terms: ['egg'] },
+  {
+    group: 'dairy',
+    terms: ['milk', 'buttermilk', 'yogurt', 'yoghurt', 'cheese', 'butter', 'cream', 'ricotta', 'kefir', 'ghee'],
+    except: ['breast', 'formula', 'peanut', 'almond', 'cashew', 'nut', 'seed', 'sunflower', 'apple', 'coconut', 'oat', 'soy', 'rice'],
+  },
+  {
+    group: 'tree nuts',
+    terms: ['almond', 'cashew', 'walnut', 'pecan', 'hazelnut', 'pistachio', 'macadamia', 'brazil nut', 'pine nut'],
+  },
+  { group: 'soy', terms: ['soy', 'soya', 'tofu', 'edamame', 'tempeh', 'miso'] },
+  {
+    group: 'wheat',
+    terms: ['wheat', 'flour', 'bread', 'pasta', 'couscous', 'semolina', 'noodle', 'breadcrumb', 'cracker'],
+    except: ['almond', 'oat', 'rice', 'coconut', 'chickpea', 'corn', 'buckwheat'],
+  },
+  {
+    group: 'fish',
+    terms: ['fish', 'salmon', 'cod', 'tuna', 'tilapia', 'haddock', 'pollock', 'sardine', 'trout', 'halibut', 'catfish', 'whitefish', 'mackerel', 'anchovy', 'herring', 'flounder'],
+  },
+  { group: 'shellfish', terms: ['shrimp', 'prawn', 'crab', 'lobster', 'crawfish', 'crayfish'] },
+  { group: 'sesame', terms: ['sesame', 'tahini'] },
+];
+
+const ALLERGEN_RULES: SafetyRule[] = ALLERGEN_SPECS.map((spec) => ({
+  id: `allergen-${spec.group.replace(/\s+/g, '-')}`,
+  kind: 'allergen' as const,
+  terms: spec.terms,
+  except: spec.except,
+  allergenGroup: spec.group,
+  label: spec.group,
+  message: `Common allergen: ${spec.group}. Introduce one at a time and watch for a reaction.`,
+  sources: ALLERGEN_SOURCES,
+}));
+
+/** The complete, ordered rule list used by the screen. */
+export const RULES: SafetyRule[] = [...BLOCK_RULES, ...REMINDER_RULES, ...ALLERGEN_RULES];
+
+/**
+ * Bumped whenever the rules change (steering/safety-rules.md). Share links
+ * carry this so a viewer can tell their rules differ from the link's.
+ */
+export const RULESET_VERSION = 1;
