@@ -162,8 +162,10 @@ export const BUILTIN_RECIPES: Recipe[] = [
     storage: { fridgeDays: 1, freezerMonths: 1 },
   },
   {
-    // Mix & Match Meal -> "Beef, squash, and macaroni" combination. Macaroni adds
-    // the wheat allergen group (reminder/allergen only, no block).
+    // Mix & Match Meal -> "Beef, squash, and macaroni" combination. Note: the
+    // token "macaroni" is not in the wheat allergen rule's terms, so the screen
+    // fires no wheat allergen here; wheat coverage for this batch comes from the
+    // flour and baby cereal in b-cereal-pancakes. No block at the tagged ages.
     id: 'b-beef-squash-macaroni',
     origin: 'builtin',
     source: {
