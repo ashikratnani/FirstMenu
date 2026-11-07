@@ -15,32 +15,16 @@ import type { FoodRecord } from '../../domain/types';
 import styles from './Onboarding.module.css';
 import {
   ALLERGEN_GROUPS,
+  OTHER_FIRST_FOODS,
   ageMonthsForBirthDate,
   allergenFoodKey,
   noticeForAgeMonths,
   todayYmd,
+  type ChecklistItem,
 } from './childProfile';
 
-// A few common non-allergen first foods offered AFTER the nine allergens. The
-// nine allergens are the firm Req 7.2 requirement; these are a convenience and
-// are keyed by a plain food key (design "Foods and first tastes").
-const OTHER_FIRST_FOODS: ReadonlyArray<{ key: string; label: string }> = [
-  { key: 'sweet potato', label: 'Sweet potato' },
-  { key: 'carrot', label: 'Carrot' },
-  { key: 'apple', label: 'Apple' },
-  { key: 'banana', label: 'Banana' },
-  { key: 'oat', label: 'Oats' },
-  { key: 'avocado', label: 'Avocado' },
-];
-
-/** Checklist items: the nine allergens first (Req 7.2), then common foods. */
-interface ChecklistItem {
-  key: string;
-  label: string;
-}
-
 export default function Onboarding() {
-  const { dispatch } = useApp();
+  const { state, dispatch } = useApp();
   const navigate = useNavigate();
 
   const [name, setName] = useState('');
@@ -57,8 +41,11 @@ export default function Onboarding() {
     [],
   );
 
-  // Live age notice from the entered birth date (Req 1.4 / 1.5).
-  const ageMonths = ageMonthsForBirthDate(birthDate);
+  // Live age notice from the entered birth date (Req 1.4 / 1.5). The age is
+  // computed from the plan's start date (Req 1.2 / design: every age is
+  // relative to plan.startDate, not today) so the notice agrees with the age
+  // the rest of the app shows once onboarding completes.
+  const ageMonths = ageMonthsForBirthDate(birthDate, state.plan.startDate);
   const notice = noticeForAgeMonths(ageMonths);
 
   const toggle = (key: string) =>

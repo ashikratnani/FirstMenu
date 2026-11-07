@@ -152,10 +152,10 @@ describe('Settings', () => {
     };
     renderSettings(seed);
 
-    // A reaction prefills unchecked (it is not "tried"); leaving it and saving
-    // must preserve the reaction untouched.
-    const peanut = screen.getByLabelText('peanut') as HTMLInputElement;
-    expect(peanut.checked).toBe(false);
+    // A reaction renders as a disabled, checked control (not an editable
+    // checkbox); leaving it and saving must preserve the reaction untouched.
+    const peanut = screen.getByLabelText(/peanut/i) as HTMLInputElement;
+    expect(peanut).toBeDisabled();
 
     await user.click(screen.getByRole('button', { name: /save/i }));
 
@@ -186,5 +186,48 @@ describe('Settings', () => {
       target: { value: '2024-01-01' },
     });
     expect(screen.getByText(OVER_12_NOTICE)).toBeInTheDocument();
+  });
+
+  it('computes the age notice from plan.startDate, not today (Req 1.2)', () => {
+    // plan.startDate is fixed at 2026-11-01 (see onboardedState). Pick a birth
+    // date whose age DIFFERS between today and that start date: born
+    // 2026-07-01 -> 4 whole months on 2026-11-01 (under 6, UNDER_6_NOTICE),
+    // but well over 6 months old relative to any realistic "today" that this
+    // test runs on (years later). The notice must follow plan.startDate.
+    const seed = onboardedState('2026-07-01');
+    renderSettings(seed);
+
+    // Current age is computed from plan.startDate -> 4 months (under 6).
+    expect(screen.getByText(/current age: 4 months/i)).toBeInTheDocument();
+    // And the notice agrees with that start-date age, NOT today's age.
+    expect(screen.getByText(UNDER_6_NOTICE)).toBeInTheDocument();
+    expect(screen.queryByText(OVER_12_NOTICE)).not.toBeInTheDocument();
+  });
+
+  it('shows a reaction food as disabled with a "reaction recorded" note and does not clear it on save', async () => {
+    const user = userEvent.setup();
+    const seed = onboardedState('2026-01-15');
+    seed.foods = {
+      [allergenFoodKey('peanut')]: {
+        status: 'reaction',
+        date: '2026-09-01',
+        note: 'rash',
+      },
+    };
+    renderSettings(seed);
+
+    // The reaction food renders disabled (not a plain unchecked checkbox) and
+    // carries a visible "reaction recorded" indication.
+    const peanut = screen.getByLabelText(/peanut/i) as HTMLInputElement;
+    expect(peanut).toBeDisabled();
+    expect(screen.getByText(/reaction recorded/i)).toBeInTheDocument();
+
+    // Saving leaves the reaction record exactly as-is (never claims a change).
+    await user.click(screen.getByRole('button', { name: /save/i }));
+    expect(captured!.foods[allergenFoodKey('peanut')]).toEqual({
+      status: 'reaction',
+      date: '2026-09-01',
+      note: 'rash',
+    });
   });
 });

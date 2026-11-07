@@ -17,25 +17,13 @@ import type { FoodRecord } from '../../domain/types';
 import styles from './Settings.module.css';
 import {
   ALLERGEN_GROUPS,
+  OTHER_FIRST_FOODS,
   ageMonthsForBirthDate,
   allergenFoodKey,
   noticeForAgeMonths,
   todayYmd,
+  type ChecklistItem,
 } from './childProfile';
-
-const OTHER_FIRST_FOODS: ReadonlyArray<{ key: string; label: string }> = [
-  { key: 'sweet potato', label: 'Sweet potato' },
-  { key: 'carrot', label: 'Carrot' },
-  { key: 'apple', label: 'Apple' },
-  { key: 'banana', label: 'Banana' },
-  { key: 'oat', label: 'Oats' },
-  { key: 'avocado', label: 'Avocado' },
-];
-
-interface ChecklistItem {
-  key: string;
-  label: string;
-}
 
 /** Whether a food key is currently recorded as tried in state. */
 function isTried(
@@ -43,6 +31,14 @@ function isTried(
   key: string,
 ): boolean {
   return foods[key]?.status === 'tried';
+}
+
+/** Whether a food key has a logged reaction in state. */
+function hasReaction(
+  foods: Record<string, FoodRecord>,
+  key: string,
+): boolean {
+  return foods[key]?.status === 'reaction';
 }
 
 /** Whether a food key has any record (tried OR reaction) in state. */
@@ -88,13 +84,45 @@ export default function Settings() {
   const persistedStage = selectStage(state);
 
   // Live notice from the currently-edited birth date so the warning tracks the
-  // input, not just the last-saved value.
-  const editedMonths = ageMonthsForBirthDate(birthDate);
+  // input, not just the last-saved value. The age is computed from the plan's
+  // start date (Req 1.2 / design: every age is relative to plan.startDate, not
+  // today) so the notice agrees with the "Current age" line above it.
+  const editedMonths = ageMonthsForBirthDate(birthDate, state.plan.startDate);
   const notice = noticeForAgeMonths(editedMonths);
 
   const toggle = (key: string) => {
     setSaved(false);
     setChecked((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  /**
+   * Render one checklist row. A food with a logged reaction is shown as a
+   * DISABLED, checked control with a visible "reaction recorded" note instead
+   * of a plain editable checkbox: the reducer refuses to clear a reaction
+   * anyway, so a plain checkbox would mislead the user into thinking toggling
+   * it (and seeing "Saved.") changed anything. Disabling it keeps the save
+   * path from ever reporting a change for these foods (see handleSubmit).
+   */
+  const renderItem = (item: ChecklistItem) => {
+    const reaction = hasReaction(state.foods, item.key);
+    const inputId = `settings-tried-${item.key}`;
+    return (
+      <li key={item.key} className={styles.check}>
+        <input
+          id={inputId}
+          type="checkbox"
+          checked={reaction ? true : (checked[item.key] ?? false)}
+          disabled={reaction}
+          onChange={reaction ? undefined : () => toggle(item.key)}
+        />
+        <label htmlFor={inputId}>
+          {item.label}
+          {reaction && (
+            <span className={styles.reactionNote}> (reaction recorded)</span>
+          )}
+        </label>
+      </li>
+    );
   };
 
   function handleSubmit(event: FormEvent) {
@@ -189,36 +217,12 @@ export default function Settings() {
 
           <h2 className={styles.allergenHeading}>Common allergens</h2>
           <ul className={styles.checklist}>
-            {allergenItems.map((item) => (
-              <li key={item.key} className={styles.check}>
-                <input
-                  id={`settings-tried-${item.key}`}
-                  type="checkbox"
-                  checked={checked[item.key] ?? false}
-                  onChange={() => toggle(item.key)}
-                />
-                <label htmlFor={`settings-tried-${item.key}`}>
-                  {item.label}
-                </label>
-              </li>
-            ))}
+            {allergenItems.map((item) => renderItem(item))}
           </ul>
 
           <h2 className={styles.otherHeading}>Other common first foods</h2>
           <ul className={styles.checklist}>
-            {OTHER_FIRST_FOODS.map((item) => (
-              <li key={item.key} className={styles.check}>
-                <input
-                  id={`settings-tried-${item.key}`}
-                  type="checkbox"
-                  checked={checked[item.key] ?? false}
-                  onChange={() => toggle(item.key)}
-                />
-                <label htmlFor={`settings-tried-${item.key}`}>
-                  {item.label}
-                </label>
-              </li>
-            ))}
+            {OTHER_FIRST_FOODS.map((item) => renderItem(item))}
           </ul>
         </fieldset>
 

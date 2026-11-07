@@ -13,14 +13,15 @@
 // guidance invented beyond Req 1.4 / 1.5.
 //
 // autonomy.md requires NEW health/safety wording to be routed through a
-// maintainer "Decision needed:" issue before merge. This agent cannot open
-// GitHub issues, so the orchestrator/maintainer MUST open:
+// maintainer "Decision needed:" issue before merge. The final sign-off on the
+// exact two strings below (confirming or replacing them against Req 1.4 / 1.5)
+// is tracked in GitHub issue #16:
 //
 //   "Decision needed: under-6 / 12+ notice wording"
 //
-// confirming or replacing the exact two strings below against Req 1.4 / 1.5.
-// Until then treat this copy as PROVISIONAL. See the task findings for the
-// quoted strings and requirement text. Do not add new health guidance here.
+// Until that issue is resolved, treat this copy as PROVISIONAL. See the task
+// findings for the quoted strings and requirement text. Do not add new health
+// guidance here.
 // ===========================================================================
 
 import { ageInMonths } from '../../domain/age';
@@ -67,6 +68,33 @@ export function allergenFoodKey(group: AllergenGroup): string {
   return `allergen:${group}`;
 }
 
+// --- Tried-foods checklist (shared source of truth) -------------------------
+
+/** A single tried-foods checklist row: its food key and display label. */
+export interface ChecklistItem {
+  key: string;
+  label: string;
+}
+
+/**
+ * A few common non-allergen first foods offered AFTER the nine allergens. The
+ * nine allergens are the firm Req 7.2 requirement; these are a convenience and
+ * are keyed by a plain, simple food key (design "Foods and first tastes").
+ * Shared between onboarding and Settings so there is one source of truth.
+ *
+ * NOTE (Task 8 follow-up): these plain keys must eventually line up with
+ * whatever foodKeyFor derives from recipe ingredient names so tried foods map
+ * to their doors. Kept simple/lowercase here in anticipation of that.
+ */
+export const OTHER_FIRST_FOODS: ReadonlyArray<ChecklistItem> = [
+  { key: 'sweet potato', label: 'Sweet potato' },
+  { key: 'carrot', label: 'Carrot' },
+  { key: 'apple', label: 'Apple' },
+  { key: 'banana', label: 'Banana' },
+  { key: 'oat', label: 'Oats' },
+  { key: 'avocado', label: 'Avocado' },
+];
+
 // --- Age helpers ------------------------------------------------------------
 
 /** Today as YYYY-MM-DD in local time (matches storage.ts todayYmd seed). */
@@ -91,14 +119,16 @@ export function noticeForAgeMonths(
 }
 
 /**
- * Whole-month age for a YYYY-MM-DD birth date as of today (local time), or null
- * when the date is empty. Used by the live notice in the forms; the persisted,
- * plan-relative age shown elsewhere comes from selectAgeMonths.
+ * Whole-month age for a YYYY-MM-DD birth date relative to the plan's start date
+ * (Req 1.2 / design: every age is computed from plan.startDate, NOT today), or
+ * null when the birth date is empty. Used by the live notice in the forms so
+ * the notice and the displayed "Current age" (from selectAgeMonths, which also
+ * uses plan.startDate) always agree.
  */
 export function ageMonthsForBirthDate(
   birthDate: string,
-  today: string = todayYmd(),
+  startDate: string,
 ): number | null {
   if (!birthDate) return null;
-  return ageInMonths(birthDate, today);
+  return ageInMonths(birthDate, startDate);
 }

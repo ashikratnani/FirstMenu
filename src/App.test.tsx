@@ -91,4 +91,37 @@ describe('App', () => {
       screen.getByRole('heading', { name: /this week/i }),
     ).toBeInTheDocument();
   });
+
+  it('lets an un-onboarded user open a /shared/* link (gate exemption)', () => {
+    // A fresh (un-onboarded) storage: a /shared/... route must stay reachable
+    // so a share link opens without a local profile (Task 7.1 gate exemption).
+    render(
+      <AppProvider storage={makeStorage()}>
+        <MemoryRouter initialEntries={['/shared/some-encoded-data']}>
+          <App />
+        </MemoryRouter>
+      </AppProvider>,
+    );
+    // The shared view renders; the gate did NOT redirect to /onboarding.
+    expect(
+      screen.getByRole('heading', { name: /shared plan/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('heading', { name: /welcome to firstmenu/i }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('redirects an un-onboarded user on a normal route to /onboarding', () => {
+    // Contrast with the /shared/* exemption: a normal route DOES redirect.
+    render(
+      <AppProvider storage={makeStorage()}>
+        <MemoryRouter initialEntries={['/recipes']}>
+          <App />
+        </MemoryRouter>
+      </AppProvider>,
+    );
+    expect(
+      screen.getByRole('heading', { name: /welcome to firstmenu/i }),
+    ).toBeInTheDocument();
+  });
 });

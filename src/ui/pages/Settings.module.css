@@ -86,6 +86,13 @@
   color: var(--color-heading);
 }
 
+.reactionNote {
+  margin-left: calc(var(--space) * 0.25);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-muted);
+}
+
 .saved {
   margin: 0;
   color: var(--color-heading);
