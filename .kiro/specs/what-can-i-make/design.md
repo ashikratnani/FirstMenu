@@ -147,7 +147,10 @@ buildVocabulary(recipes: Recipe[], pantry: string[]): Vocabulary
 | bean curd | tofu |
 | lady finger, ladyfinger | stop phrase: also a sponge biscuit |
 | lemon curd | stop phrase: a sweet spread, not yogurt |
-| porridge oats, rolled oats | oats |
+| porridge oats, rolled oats, quick oats, quick cooking oats, old fashioned oats | oats |
+| iron fortified cereal, iron fortified infant cereal, baby cereal | infant cereal |
+| whole grain bread, whole wheat bread | bread |
+| smooth peanut butter, creamy peanut butter | peanut butter |
 | maize, sweetcorn | corn |
 | spring onion, scallion | green onion |
 | beetroot | beet |
@@ -168,10 +171,10 @@ Ambiguous names are not mapped. The list can also hold **stop phrases** that con
 | mash, mashed, mushy | `form:mashed` | `serveAs` includes `mashed` |
 | quick, fast, in a hurry, under 15 minutes | `quick` | time (stated or estimated) is 15 minutes or less |
 | easy, simple, no fuss | `easy` | effort is Easy |
-| iron, iron rich, iron-rich · protein · veggie, veggies, vegetable · fruit, fruity · whole grain | `tag:<tag>` | has that nutrition tag |
+| iron, iron rich · protein · veggie, veggies · fruity · whole grain | `tag:<tag>` | has that nutrition tag |
 | make ahead, make-ahead, freeze, freezer, batch, batch cook | `freezer` | `storage.freezerMonths` is set |
 
-  A test checks no phrase is also a known food or other name, so "pick up" never hides a food.
+  Phrases are stored normalized (`iron rich`, not `iron-rich`). A test checks no phrase is also a known food or other name, comparing plural-aware, so "pick up" never hides a food. "Vegetable" and "fruit" are left out as phrases because recipes use them as food names.
 
 ### Serving form (`serveAs`)
 
@@ -192,7 +195,7 @@ So every recipe always has at least one serving form (Requirement 16.13).
 ### Filters and "More ideas"
 
 - All filters must match (AND). Filters apply to Ready now, Missing one, "Recipes named …" and "More ideas".
-- **More ideas** (Requirement 16.12) appears only when at least one filter is active: recipes matching every filter with 2 or more missing foods, not ghosted, sorted by number missing, then time, effort and title, at most 10, each listing what's missing. "I have this" works on each missing food.
+- **More ideas** (Requirement 16.12) appears only when at least one filter is active, including the "Iron-rich only" toggle on its own: recipes matching every filter with 2 or more missing foods, not ghosted, sorted by number missing, then time, effort and title, at most 10, each listing what's missing. "I have this" works on each missing food.
 - With filters and no foods typed, Ready now and Missing one still use the pantry and on-hand foods.
 
 ### Parsing
@@ -201,20 +204,44 @@ Steps run in exactly this order. Phrase lists (dish-kind phrases, other names, k
 
 1. **Normalize**: lowercase, strip accents, replace hyphens and apostrophes with spaces, remove other punctuation except separators. Numbers stay as tokens for now.
 2. **Split** into segments on `,`, `;`, new lines, ` and `, ` with `, `+`, `&`.
-3. **Dish-kind phrases**: in each segment, match phrases greedily, longest first, against the token sequence *as typed*, and remove them (→ `filters`). This runs before anything is dropped, so "mashed", "baby led", "whole grain", "in a hurry" and "under 15 minutes" match.
-4. **Foods and other names**: on the remaining tokens, still before dropping anything, match known foods and other names greedily, longest first and plural-aware (`tokenMatches`), and remove them (→ `foods`). Multi-word entries come first: "ground meat" before "meat", "sweet potato" before "potato", "black bean" before "bean". This handles unseparated text like "chicken rice peas".
-5. **Drop** filler words, request words and numbers from what's left.
+3. **One longest-match pass**: in each segment, walk the tokens *as typed* (nothing dropped yet) left to right. At each position, find the longest entry starting there among dish-kind phrases, known foods, other names and stop phrases, plural-aware (`tokenMatches`). On a tie in length, a food or other name wins over a phrase. Consume the match:
+   - food or other name → `foods`
+   - stop phrase → nothing
+   - dish-kind phrase → a phrase candidate (step 4)
+   - no entry starts here → leave the token for step 5
+
+   Longest match is what makes "quick oats", "iron fortified cereal", "whole grain bread", "smooth peanut butter", "ground meat" and "sweet potato" come out as foods rather than filters or shorter foods, as long as those names are in the other-names list. It also handles unseparated text like "chicken rice peas".
+4. **Descriptor or filter**: a form, speed, effort or food-group phrase (`form:*`, `quick`, `easy`, `tag:*`) that sits directly before or after a food in the same segment describes that food and is dropped, not turned into a filter. So "mashed banana" and "pumpkin puree" give the foods banana and pumpkin with no filter, while "something mashed for dinner", "finger food" and "iron rich" alone become filters. Meal and `freezer` phrases always become filters.
+5. **Drop** filler words, request words and numbers from the tokens left over.
 6. **Title words**: remaining tokens of at least 4 letters that match a word in any recipe title (whole word, plural-aware) → `titleWords`.
-7. **Typo matching**: Damerau–Levenshtein distance against single-word known foods and other names. Allowed distance: 0 for words under 4 letters, 1 for 4–7 letters, 2 for 8 or more. If exactly one candidate has the smallest distance → `didYouMean`; otherwise `unrecognized`.
+7. **Typo matching**: Damerau–Levenshtein distance against single-word known foods and other names, never against stop phrases or dish-kind phrases. Allowed distance: 0 for words under 4 letters, 1 for 4–7 letters, 2 for 8 or more. If exactly one candidate has the smallest distance → `didYouMean`; otherwise `unrecognized`.
 8. Anything left → `unrecognized`.
 
 Because filler words are dropped only at step 5, they can still be part of a phrase or a food name ("whole grain", "ground beef", "baby spinach"), but never become foods on their own.
+
+Worked examples (required tests):
+
+| Typed | Foods | Filters |
+| --- | --- | --- |
+| leftover chicken, rice and frozen peas | chicken, rice, pea | none |
+| something for breakfast | none | Breakfast |
+| finger food with chicken | chicken | Finger food |
+| quick oats and banana | oats, banana | none |
+| something quick with eggs | egg | Quick |
+| mashed banana | banana | none |
+| pumpkin puree for dinner | pumpkin | Dinner |
+| iron fortified cereal | infant cereal | none |
+| iron rich lunch | none | Iron-rich, Lunch |
+| smooth peanut butter | peanut butter | none |
+| bean curd, lemon curd | tofu | none ("lemon curd" not recognized) |
+| brocoli | none, "Did you mean broccoli?" | none |
 
 ### Screen behavior
 
 - Results use `have = pantry ∪ onHand ∪ result.foods` while typing (Requirement 16.5).
 - Enter or "Add" moves `result.foods` into on-hand and clears the box. Tapping a "Did you mean" chip adds that food.
 - "Recipes named …" lists recipes whose titles contain any `titleWords`, ghosted ones shown as ghosts, sorted like the other groups.
+- The pantry editor (Requirement 2) opens in a dialog with its own name entry, so the Make screen itself has one text box.
 - Each filter shows as a removable chip ("Breakfast ✕", "Finger food ✕"). Removing the chip also removes its phrase from the box.
 - "More ideas" follows the rules above.
 - Parsing runs on every input change, debounced 150 ms.
