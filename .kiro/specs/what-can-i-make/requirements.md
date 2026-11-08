@@ -218,13 +218,14 @@ Terms from the v1 glossary keep their meaning. New terms:
 
 #### Acceptance Criteria
 
-1. THE app SHALL ship at least 40 built-in recipes and simple ideas in total, with at least 8 tagged for each of the four stages. This replaces the counts in v1 Requirement 2.1.
+1. THE app SHALL ship at least 100 built-in recipes and simple ideas in total, of which at most 25 are simple ideas. At least 15 SHALL be tagged for `6–8 months` and at least 25 for each of the other three stages. A recipe tagged for several stages counts toward each. This replaces the counts in v1 Requirement 2.1.
 2. BUILT-IN recipes MAY come from these sources, in addition to v1's: the USDA Child Nutrition Recipe Box from the Institute of Child Nutrition (CACFP family child care home recipes), university extension recipe sites (including Food Hero from Oregon State University), and public health feeding guides (WIC, USDA FNS) for simple ideas.
 3. A built-in recipe MAY differ from its source by scaling every quantity by the same factor to make 2 to 6 servings, recorded as an adaptation ("Scaled from 25 servings to 4"). This adds to the changes allowed by v1 Requirement 2.9.
 4. A simple idea MAY have no ingredient quantities and SHALL be labeled "Simple idea" in the app. This is an exception to v1 Requirement 2.8 for simple ideas only.
 5. EVERY built-in recipe and simple idea SHALL keep v1's sourcing rules: source title, publisher, URL and retrieval date recorded and shown; ingredients from the source; steps in the app's own words; storage times from the source or a cited food-safety source.
-6. THE built-in set SHOULD cover all nine allergen groups. IF it can't THEN the gap SHALL be reported to the maintainer with the groups missing. This replaces v1 Requirement 2.5, which v1 already relaxed in issue #7.
-7. IF the sources can't reach the counts in criterion 1 THEN work SHALL stop and the shortfall SHALL be reported to the maintainer before any other source is used.
+6. THE built-in set SHALL include, across all recipes, at least one recipe containing each of the nine allergen groups. This restores v1 Requirement 2.5, which issue #7 had relaxed.
+7. IF the sources can't reach the counts in criterion 1 or the allergen coverage in criterion 6 THEN work SHALL stop and the shortfall SHALL be reported to the maintainer before any other source is used or the set ships short.
+8. NEW built-in recipes SHALL be added in batches of about 20. EACH batch SHALL have a review issue listing its recipes with source links, stage tags and adaptations, for the primary user to review. Reviews SHALL NOT block later batches; feedback SHALL be applied when it arrives.
 
 ### Requirement 15: UI with the Astryx design system
 
@@ -237,7 +238,7 @@ Terms from the v1 glossary keep their meaning. New terms:
 3. THE app SHALL use a custom Astryx theme with the v1 palette (creams, soft oranges, lavender), meeting WCAG 2.1 AA contrast. The friendly ghosts, doors, monsters and pumpkins SHALL stay as the app's own inline SVGs.
 4. ALL fonts and styles SHALL ship with the app. THE app SHALL NOT load fonts, CSS or scripts from Google Fonts, a CDN or any other host (v1 Requirement 12.2 still applies).
 5. THE app's `vitest-axe` tests SHALL pass on every page, and every page SHALL work with a keyboard and on screens 360 px wide.
-6. THE production build's total gzipped JavaScript and CSS SHALL be no more than 150 KB larger than the v1 build. The trial SHALL record both sizes.
+6. THE production build's total gzipped JavaScript and CSS, excluding the built-in recipe data, SHALL be no more than 150 KB larger than the v1 build. The trial SHALL record both sizes. THE built-in recipe data SHALL be built as a separate file and its gzipped size reported in every PR that changes it.
 7. IF the trial fails any criterion THEN work SHALL stop on the UI change and the maintainer SHALL be asked whether to fix it, accept it, or restyle with plain CSS instead.
 8. THE primary user's specific complaints about the current UI SHALL be collected and addressed. Collecting them SHALL NOT block other work.
 
