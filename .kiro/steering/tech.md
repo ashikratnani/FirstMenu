@@ -16,12 +16,19 @@ calls an AI service.
 
 ## Stack
 
-- React + TypeScript, built with Vite. Strict TypeScript everywhere. React 18
-  until the Astryx trial (active spec task 2) upgrades it to React 19.
+- React 19 + TypeScript, built with Vite. Strict TypeScript everywhere.
 - UI components: Astryx (`@astryxdesign/core`, pinned versions) once the trial
   passes, with the FirstMenu theme in `ui/theme/`. Fonts are self-hosted
-  (`@fontsource/figtree`); never use the Astryx CDN or Google Fonts setup. The
-  trial PR updates this file with the final setup.
+  (`@fontsource/figtree`); never use the Astryx CDN or Google Fonts setup.
+  Trial setup (task 2): `ui/theme/ThemeRoot.tsx` wraps the app in `<Theme>`
+  with `@astryxdesign/theme-neutral` plus FirstMenu color overrides in
+  `ui/theme/firstmenu.css`; `ui/theme/RouterLinkProvider.tsx` makes Astryx
+  links React Router links; app-only CSS variables use the `--fm-` prefix so
+  they never clash with Astryx tokens. Astryx's `reset.css` is not loaded until
+  every page is converted (task 13). Whether Astryx stays depends on the
+  `Decision needed: Astryx trial` issue (bundle size).
+- Build checks in CI: `npm run check:contrast`, `check:external`, `check:size`.
+- Look up Astryx component docs with `npm run astryx -- component <Name>`.
 - Static hosting on GitHub Pages at `https://ashikratnani.github.io/FirstMenu/`.
 - `HashRouter` for routing. GitHub Pages has no server-side rewrites, so hash
   routes always load `index.html`.

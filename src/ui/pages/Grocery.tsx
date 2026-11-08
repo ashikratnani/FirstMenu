@@ -134,9 +134,9 @@ export default function Grocery() {
         ))
       )}
 
-      <footer className={styles.footer}>
+      <div className={styles.footer}>
         <Disclaimer />
-      </footer>
+      </div>
     </>
   );
 }

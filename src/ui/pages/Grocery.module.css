@@ -8,13 +8,13 @@
 
 .empty {
   margin: var(--space) 0;
-  color: var(--color-muted);
+  color: var(--fm-color-muted);
 }
 
 .sectionHeading {
   margin: var(--space) 0 calc(var(--space) * 0.5);
   font-size: 1.1rem;
-  color: var(--color-heading);
+  color: var(--fm-color-heading);
 }
 
 .lineList {
@@ -27,9 +27,9 @@
 }
 
 .line {
-  background: var(--color-surface);
-  color: var(--color-text);
-  border: 1px solid var(--color-border);
+  background: var(--fm-color-surface);
+  color: var(--fm-color-text);
+  border: 1px solid var(--fm-color-border);
   border-radius: var(--radius);
   padding: var(--space);
   display: flex;
@@ -59,12 +59,12 @@
 
 .lineName {
   font-weight: 600;
-  color: var(--color-heading);
+  color: var(--fm-color-heading);
 }
 
 .lineAmount {
   font-size: 0.9rem;
-  color: var(--color-text);
+  color: var(--fm-color-text);
 }
 
 .reminderList {
@@ -78,7 +78,7 @@
 
 .reminderText {
   font-size: 0.85rem;
-  color: var(--color-text);
+  color: var(--fm-color-text);
 }
 
 .footer {

@@ -208,7 +208,11 @@ describe('RecipeDetail page', () => {
     expect(
       screen.getByRole('heading', { level: 1, name: 'Recipes' }),
     ).toBeInTheDocument();
-    const notice = screen.getByRole('status');
+    // Astryx buttons carry their own hidden live region, so find the notice
+    // by its title rather than by the first status role on the page.
+    const notice = screen
+      .getByText(/A deleted recipe emptied/)
+      .closest('[role="status"]') as HTMLElement;
     expect(within(notice).getByText('Day 3, Snack')).toBeInTheDocument();
   });
 

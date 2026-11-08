@@ -74,14 +74,23 @@ describe('Layout (app shell)', () => {
   it('renders a skip-to-content link targeting the main region', () => {
     renderShell();
     const skip = screen.getByRole('link', { name: /skip to content/i });
-    expect(skip).toHaveAttribute('href', '#main');
+    const main = screen.getByRole('main');
+    // Astryx AppShell owns the skip link and the main landmark; the link must
+    // point at whatever id the main landmark has.
+    expect(main.id).not.toBe('');
+    expect(skip).toHaveAttribute('href', `#${main.id}`);
   });
 
   it('renders a main landmark containing the routed page', () => {
     renderShell();
     const main = screen.getByRole('main');
-    expect(main).toHaveAttribute('id', 'main');
     expect(within(main).getByText(/home content/i)).toBeInTheDocument();
+  });
+
+  it('shows one primary "Add recipe" action linking to the recipe editor', () => {
+    renderShell();
+    const add = screen.getByRole('link', { name: 'Add recipe' });
+    expect(add).toHaveAttribute('href', '/recipes/new');
   });
 
   it('marks the active route with aria-current', () => {

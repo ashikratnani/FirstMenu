@@ -19,29 +19,29 @@
 
 .label {
   font-weight: 600;
-  color: var(--color-heading);
+  color: var(--fm-color-heading);
 }
 
 .input {
   padding: calc(var(--space) * 0.5);
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--fm-color-border);
   border-radius: var(--radius);
-  background: var(--color-surface);
-  color: var(--color-text);
+  background: var(--fm-color-surface);
+  color: var(--fm-color-text);
   font: inherit;
 }
 
 .notice {
   margin: 0;
   padding: var(--space);
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--fm-color-border);
   border-radius: var(--radius);
-  background: var(--color-surface);
-  color: var(--color-text);
+  background: var(--fm-color-surface);
+  color: var(--fm-color-text);
 }
 
 .fieldset {
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--fm-color-border);
   border-radius: var(--radius);
   padding: var(--space);
   margin: 0;
@@ -49,14 +49,14 @@
 
 .legend {
   font-weight: 600;
-  color: var(--color-heading);
+  color: var(--fm-color-heading);
   padding: 0 calc(var(--space) * 0.25);
 }
 
 .hint {
   margin: 0 0 var(--space);
   font-size: 0.85rem;
-  color: var(--color-muted);
+  color: var(--fm-color-muted);
 }
 
 .checklist {
@@ -78,16 +78,16 @@
 .otherHeading {
   margin: var(--space) 0 calc(var(--space) * 0.5);
   font-size: 0.95rem;
-  color: var(--color-heading);
+  color: var(--fm-color-heading);
 }
 
 .submit {
   align-self: flex-start;
   padding: calc(var(--space) * 0.5) var(--space);
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--fm-color-border);
   border-radius: var(--radius);
-  background: var(--color-accent, var(--color-surface));
-  color: var(--color-text);
+  background: var(--fm-color-accent, var(--fm-color-surface));
+  color: var(--fm-color-text);
   font: inherit;
   cursor: pointer;
 }

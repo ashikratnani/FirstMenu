@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { HashRouter } from 'react-router-dom';
 import App from './App';
 import { AppProvider } from './state/AppProvider';
+import ThemeRoot from './ui/theme/ThemeRoot';
 import './ui/theme.css';
 
 const rootElement = document.getElementById('root');
@@ -14,10 +15,12 @@ if (!rootElement) {
 // (see design.md: Pages has no server-side rewrites).
 createRoot(rootElement).render(
   <StrictMode>
-    <HashRouter>
-      <AppProvider>
-        <App />
-      </AppProvider>
-    </HashRouter>
+    <ThemeRoot>
+      <HashRouter>
+        <AppProvider>
+          <App />
+        </AppProvider>
+      </HashRouter>
+    </ThemeRoot>
   </StrictMode>,
 );

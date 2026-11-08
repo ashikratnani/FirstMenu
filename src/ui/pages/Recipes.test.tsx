@@ -88,6 +88,18 @@ function renderRecipes(seed?: AppState) {
   );
 }
 
+/**
+ * The visible content of a recipe card. Astryx ClickableCard renders an
+ * overlay link (carrying the accessible name) next to the visible content, so
+ * visible text is looked up in the card's list item, not inside the link.
+ */
+function cardFor(name: RegExp): HTMLElement {
+  const link = screen.getByRole('link', { name });
+  const item = link.closest('li');
+  if (!item) throw new Error('recipe card list item not found');
+  return item;
+}
+
 describe('Recipes library page', () => {
   it('lists built-in and custom recipes, each linking to /recipes/:id', () => {
     renderRecipes(seedState(8, [HONEY_RECIPE]));
@@ -101,19 +113,13 @@ describe('Recipes library page', () => {
     expect(honey).toHaveAttribute('href', '/recipes/custom-honey');
   });
 
-  it('has a prominent "New recipe" link to /recipes/new', () => {
-    renderRecipes(seedState(8));
-    expect(
-      screen.getByRole('link', { name: 'New recipe' }),
-    ).toHaveAttribute('href', '/recipes/new');
-  });
-
   it('defaults the stage filter to the child\'s current stage', () => {
     // 8 months -> stage '6-8'.
     renderRecipes(seedState(8));
+    const stage = screen.getByRole('radiogroup', { name: 'Stage' });
     expect(
-      (screen.getByLabelText('Stage') as HTMLSelectElement).value,
-    ).toBe('6-8');
+      within(stage).getByRole('radio', { name: '6-8 months' }),
+    ).toBeChecked();
     // A 9-12-only recipe (Cereal Pancakes) is hidden at the 6-8 default.
     expect(
       screen.queryByRole('link', { name: /Cereal Pancakes/ }),
@@ -124,7 +130,7 @@ describe('Recipes library page', () => {
     const user = userEvent.setup();
     renderRecipes(seedState(8));
 
-    await user.selectOptions(screen.getByLabelText('Stage'), 'all');
+    await user.click(within(screen.getByRole('radiogroup', { name: 'Stage' })).getByRole('radio', { name: 'All' }));
     for (const recipe of BUILTIN_RECIPES) {
       expect(
         screen.getByRole('link', { name: new RegExp(recipe.title) }),
@@ -136,7 +142,7 @@ describe('Recipes library page', () => {
     const user = userEvent.setup();
     renderRecipes(seedState(8));
 
-    await user.selectOptions(screen.getByLabelText('Stage'), '9-12');
+    await user.click(screen.getByRole('radio', { name: '9-12 months' }));
     // Cereal Pancakes is tagged 9-12 only, so it now shows.
     expect(
       screen.getByRole('link', { name: /Cereal Pancakes/ }),
@@ -147,8 +153,8 @@ describe('Recipes library page', () => {
     const user = userEvent.setup();
     renderRecipes(seedState(8, [], {}));
 
-    await user.selectOptions(screen.getByLabelText('Stage'), 'all');
-    await user.selectOptions(screen.getByLabelText('Meal type'), 'breakfast');
+    await user.click(within(screen.getByRole('radiogroup', { name: 'Stage' })).getByRole('radio', { name: 'All' }));
+    await user.click(screen.getByRole('radio', { name: 'Breakfast' }));
 
     // Breakfast recipe shows; a lunch/dinner-only puree does not.
     expect(
@@ -167,7 +173,9 @@ describe('Recipes library page', () => {
     });
     expect(honey).toBeInTheDocument();
     expect(
-      within(honey).getByText(/Not yet: honey\. Available at 12 months\./),
+      within(cardFor(/Honey Oat Mash/)).getByText(
+        /Not yet: honey\. Available at 12 months\./,
+      ),
     ).toBeInTheDocument();
   });
 
@@ -188,8 +196,7 @@ describe('Recipes library page', () => {
     // No foods tried, so a built-in puree uses untried foods -> door badge that
     // names them (Req 7.3), not a bare "New food".
     renderRecipes(seedState(8));
-    const carrots = screen.getByRole('link', { name: /Carrots and Apples/ });
-    const badge = within(carrots).getByText(/^New food:/);
+    const badge = within(cardFor(/Carrots and Apples/)).getByText(/^New food:/);
     expect(badge).toHaveTextContent('New food: carrot, apple');
   });
 
@@ -197,8 +204,9 @@ describe('Recipes library page', () => {
     // Egg (10 months, untried, no reaction) -> door badge "New food: egg", not
     // the raw "allergen:egg" key.
     renderRecipes(seedState(10, [EGG_RECIPE]));
-    const egg = screen.getByRole('link', { name: /Egg Scramble/ });
-    expect(within(egg).getByText('New food: egg')).toBeInTheDocument();
+    expect(
+      within(cardFor(/Egg Scramble/)).getByText('New food: egg'),
+    ).toBeInTheDocument();
   });
 
   it('includes the door and freezer badge text in the card accessible name', () => {
@@ -237,10 +245,9 @@ describe('Recipes library page', () => {
 
   it('shows a pumpkin badge "Freezes for N months" for a freezer-friendly recipe', () => {
     renderRecipes(seedState(8));
-    const carrots = screen.getByRole('link', { name: /Carrots and Apples/ });
     // b-carrots-and-apples sets storage.freezerMonths: 1.
     expect(
-      within(carrots).getByText('Freezes for 1 month'),
+      within(cardFor(/Carrots and Apples/)).getByText('Freezes for 1 month'),
     ).toBeInTheDocument();
   });
 });

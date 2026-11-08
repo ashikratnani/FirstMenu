@@ -24,16 +24,16 @@
 
 .printButton {
   padding: calc(var(--space) * 0.5) var(--space);
-  border: 1px solid var(--color-accent);
+  border: 1px solid var(--fm-color-accent);
   border-radius: var(--radius);
-  background: var(--color-accent);
-  color: var(--color-on-accent);
+  background: var(--fm-color-accent);
+  color: var(--fm-color-on-accent);
   font-size: 0.95rem;
   cursor: pointer;
 }
 
 .printButton:focus-visible {
-  outline: 3px solid var(--color-focus);
+  outline: 3px solid var(--fm-color-focus);
   outline-offset: 2px;
 }
 
@@ -46,20 +46,20 @@
 .sectionHeading {
   margin: 0 0 calc(var(--space) * 0.5);
   font-size: 1.2rem;
-  color: var(--color-heading);
-  border-bottom: 1px solid var(--color-border);
+  color: var(--fm-color-heading);
+  border-bottom: 1px solid var(--fm-color-border);
   padding-bottom: calc(var(--space) * 0.25);
 }
 
 .subHeading {
   margin: var(--space) 0 calc(var(--space) * 0.25);
   font-size: 1rem;
-  color: var(--color-heading);
+  color: var(--fm-color-heading);
 }
 
 .empty {
   margin: var(--space) 0;
-  color: var(--color-muted);
+  color: var(--fm-color-muted);
 }
 
 /* Week grid: one card per day, each listing its active slots as text. */
@@ -73,8 +73,8 @@
 }
 
 .dayCard {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
+  background: var(--fm-color-surface);
+  border: 1px solid var(--fm-color-border);
   border-radius: var(--radius);
   padding: var(--space);
 }
@@ -82,12 +82,12 @@
 .dayName {
   margin: 0 0 calc(var(--space) * 0.5);
   font-size: 1rem;
-  color: var(--color-heading);
+  color: var(--fm-color-heading);
 }
 
 .dayDate {
   font-weight: 400;
-  color: var(--color-muted);
+  color: var(--fm-color-muted);
   font-size: 0.85rem;
 }
 
@@ -109,15 +109,15 @@
 .slotMeal {
   font-size: 0.8rem;
   font-weight: 600;
-  color: var(--color-muted);
+  color: var(--fm-color-muted);
 }
 
 .slotTitle {
-  color: var(--color-text);
+  color: var(--fm-color-text);
 }
 
 .slotEmpty {
-  color: var(--color-muted);
+  color: var(--fm-color-muted);
 }
 
 .slotGhost {
@@ -128,7 +128,7 @@
 
 .ghostReason {
   font-size: 0.85rem;
-  color: var(--color-text);
+  color: var(--fm-color-text);
 }
 
 /* Prep and grocery lists share a simple stacked row layout. */
@@ -147,28 +147,28 @@
   align-items: baseline;
   gap: calc(var(--space) * 0.75);
   padding: calc(var(--space) * 0.4) 0;
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--fm-color-border);
 }
 
 .itemDate {
   font-weight: 600;
-  color: var(--color-heading);
+  color: var(--fm-color-heading);
   min-width: 7em;
 }
 
 .itemTitle {
   font-weight: 600;
-  color: var(--color-heading);
+  color: var(--fm-color-heading);
 }
 
 .itemDetail {
-  color: var(--color-text);
+  color: var(--fm-color-text);
   font-size: 0.9rem;
 }
 
 .itemReminder {
   flex-basis: 100%;
-  color: var(--color-text);
+  color: var(--fm-color-text);
   font-size: 0.85rem;
 }
 
@@ -179,7 +179,7 @@
 
 .footer {
   margin-top: calc(var(--space) * 2);
-  color: var(--color-muted);
+  color: var(--fm-color-muted);
   font-size: 0.85rem;
 }
 

@@ -9,57 +9,57 @@
  * components). Computed contrast ratios are documented beside each key pair.
  *
  *   TEXT ON BACKGROUNDS (need >= 4.5:1)
- *   --color-text    #2b2330 on --color-bg      #fff8f0 = 14.39:1 (AA pass)
- *   --color-text    #2b2330 on --color-surface #ffffff = 15.15:1 (AA pass)
- *   --color-heading #4a2f5e on --color-bg      #fff8f0 = 10.72:1 (AA pass)
- *   --color-heading #4a2f5e on --color-surface #ffffff = 11.29:1 (AA pass)
- *   --color-muted   #5c5560 on --color-bg      #fff8f0 =  6.82:1 (AA pass)
- *   --color-muted   #5c5560 on --color-surface #ffffff =  7.18:1 (AA pass)
- *   --color-nav-text #3a2f44 on --color-nav-bg #efe7f7 = 10.45:1 (AA pass)
- *   --color-on-accent #ffffff on --color-accent #b4541a = 4.97:1 (AA pass)
+ *   --fm-color-text    #2b2330 on --fm-color-bg      #fff8f0 = 14.39:1 (AA pass)
+ *   --fm-color-text    #2b2330 on --fm-color-surface #ffffff = 15.15:1 (AA pass)
+ *   --fm-color-heading #4a2f5e on --fm-color-bg      #fff8f0 = 10.72:1 (AA pass)
+ *   --fm-color-heading #4a2f5e on --fm-color-surface #ffffff = 11.29:1 (AA pass)
+ *   --fm-color-muted   #5c5560 on --fm-color-bg      #fff8f0 =  6.82:1 (AA pass)
+ *   --fm-color-muted   #5c5560 on --fm-color-surface #ffffff =  7.18:1 (AA pass)
+ *   --fm-color-nav-text #3a2f44 on --fm-color-nav-bg #efe7f7 = 10.45:1 (AA pass)
+ *   --fm-color-on-accent #ffffff on --fm-color-accent #b4541a = 4.97:1 (AA pass)
  *
  *   UI COMPONENTS / LARGE TEXT (need >= 3:1)
- *   --color-accent  #b4541a on --color-bg      #fff8f0 =  4.72:1 (AA pass)
- *   --color-border  #9c8574 on --color-surface #ffffff =  3.49:1 (AA pass)
- *   --color-focus   #5a3d8c on --color-bg      #fff8f0 =  8.04:1 (AA pass)
+ *   --fm-color-accent  #b4541a on --fm-color-bg      #fff8f0 =  4.72:1 (AA pass)
+ *   --fm-color-border  #9c8574 on --fm-color-surface #ffffff =  3.49:1 (AA pass)
+ *   --fm-color-focus   #5a3d8c on --fm-color-bg      #fff8f0 =  8.04:1 (AA pass)
  */
 :root {
   /* Surfaces: light creams. */
-  --color-bg: #fff8f0;
-  --color-surface: #ffffff;
+  --fm-color-bg: #fff8f0;
+  --fm-color-surface: #ffffff;
 
   /* Foreground text. */
-  --color-text: #2b2330;
-  --color-heading: #4a2f5e; /* lavender-leaning heading ink */
-  --color-muted: #5c5560; /* secondary text, footer, notes */
+  --fm-color-text: #2b2330;
+  --fm-color-heading: #4a2f5e; /* lavender-leaning heading ink */
+  --fm-color-muted: #5c5560; /* secondary text, footer, notes */
 
   /* Accent: soft orange. Darkened enough that white text on it is AA. */
-  --color-accent: #b4541a;
-  --color-accent-soft: #f6d9c4;
-  --color-on-accent: #ffffff;
+  --fm-color-accent: #b4541a;
+  --fm-color-accent-soft: #f6d9c4;
+  --fm-color-on-accent: #ffffff;
 
   /* Lavender accents (badges, nav). */
-  --color-lavender: #e7e0f3;
-  --color-nav-bg: #efe7f7;
-  --color-nav-text: #3a2f44;
+  --fm-color-lavender: #e7e0f3;
+  --fm-color-nav-bg: #efe7f7;
+  --fm-color-nav-text: #3a2f44;
 
   /* Borders and focus ring. */
-  --color-border: #9c8574;
-  --color-focus: #5a3d8c;
+  --fm-color-border: #9c8574;
+  --fm-color-focus: #5a3d8c;
 
   /* Theme surfaces for later illustration states (task 15). Defined here so
    * components share tokens; text placed on them must still meet AA. */
-  --color-ghost-surface: #e7e0f3; /* friendly ghost card (lavender) */
-  --color-door-surface: #f6d9c4; /* mystery door (soft orange) */
-  --color-monster-surface: #d9efd6; /* friendly monster (soft green) */
-  --color-pumpkin-surface: #f7c9a0; /* pumpkin badge (warm orange) */
+  --fm-color-ghost-surface: #e7e0f3; /* friendly ghost card (lavender) */
+  --fm-color-door-surface: #f6d9c4; /* mystery door (soft orange) */
+  --fm-color-monster-surface: #d9efd6; /* friendly monster (soft green) */
+  --fm-color-pumpkin-surface: #f7c9a0; /* pumpkin badge (warm orange) */
 
   --radius: 12px;
   --space: 8px;
 
   font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  color: var(--color-text);
-  background-color: var(--color-bg);
+  color: var(--fm-color-text);
+  background-color: var(--fm-color-bg);
 }
 
 body {
@@ -87,6 +87,13 @@ body {
   /* Hide app-shell chrome: skip link, header/nav, footer, storage banner,
      first-run disclaimer and the Print button itself. */
   .print-hide {
+    display: none !important;
+  }
+
+  /* Astryx AppShell chrome (header, nav and skip link) uses stable class and
+     id hooks rather than print-hide. */
+  .astryx-app-shell-header,
+  a[href='#astryx-app-shell-main'] {
     display: none !important;
   }
 

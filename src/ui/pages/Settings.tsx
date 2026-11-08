@@ -9,8 +9,20 @@
 // derived age/stage everywhere automatically (Req 1.6). The current derived
 // age/stage is shown on this page to make that update visible, and the same
 // under-6 / 12+ notices are reused so the health wording stays in one place.
+//
+// Built on Astryx form controls (active spec Requirement 15). The Save button
+// sits in a sticky action bar so the primary action stays in reach on phones
+// (issue #36).
 
 import { useMemo, useState, type FormEvent } from 'react';
+import { Button } from '@astryxdesign/core/Button';
+import { CheckboxInput } from '@astryxdesign/core/CheckboxInput';
+import { DateInput } from '@astryxdesign/core/DateInput';
+import type { DateInputProps } from '@astryxdesign/core/DateInput';
+
+/** ISO YYYY-MM-DD string as Astryx DateInput types it. */
+type ISODateString = NonNullable<DateInputProps['value']>;
+import { TextInput } from '@astryxdesign/core/TextInput';
 import { useApp } from '../../state/AppProvider';
 import { selectAgeMonths, selectStage } from '../../state/selectors';
 import type { FoodRecord } from '../../domain/types';
@@ -105,22 +117,17 @@ export default function Settings() {
    */
   const renderItem = (item: ChecklistItem) => {
     const reaction = hasReaction(state.foods, item.key);
-    const inputId = `settings-tried-${item.key}`;
     return (
       <li key={item.key} className={styles.check}>
-        <input
-          id={inputId}
-          type="checkbox"
-          checked={reaction ? true : (checked[item.key] ?? false)}
-          disabled={reaction}
-          onChange={reaction ? undefined : () => toggle(item.key)}
+        <CheckboxInput
+          label={item.label}
+          value={reaction ? true : (checked[item.key] ?? false)}
+          isDisabled={reaction}
+          description={reaction ? 'Reaction recorded' : undefined}
+          onChange={() => {
+            if (!reaction) toggle(item.key);
+          }}
         />
-        <label htmlFor={inputId}>
-          {item.label}
-          {reaction && (
-            <span className={styles.reactionNote}> (reaction recorded)</span>
-          )}
-        </label>
       </li>
     );
   };
@@ -160,40 +167,27 @@ export default function Settings() {
       <h1>Settings</h1>
 
       <form className={styles.form} onSubmit={handleSubmit}>
-        <div className={styles.field}>
-          <label className={styles.label} htmlFor="settings-name">
-            First name (optional)
-          </label>
-          <input
-            id="settings-name"
-            className={styles.input}
-            type="text"
-            value={name}
-            onChange={(e) => {
-              setSaved(false);
-              setName(e.target.value);
-            }}
-            autoComplete="off"
-          />
-        </div>
+        <TextInput
+          label="First name"
+          isOptional
+          value={name}
+          onChange={(value) => {
+            setSaved(false);
+            setName(value);
+          }}
+          autoComplete="off"
+        />
 
-        <div className={styles.field}>
-          <label className={styles.label} htmlFor="settings-birthdate">
-            Birth date
-          </label>
-          <input
-            id="settings-birthdate"
-            className={styles.input}
-            type="date"
-            required
-            max={todayYmd()}
-            value={birthDate}
-            onChange={(e) => {
-              setSaved(false);
-              setBirthDate(e.target.value);
-            }}
-          />
-        </div>
+        <DateInput
+          label="Birth date"
+          isRequired
+          max={todayYmd() as ISODateString}
+          value={(birthDate || undefined) as ISODateString | undefined}
+          onChange={(value) => {
+            setSaved(false);
+            setBirthDate(value ?? '');
+          }}
+        />
 
         {persistedMonths !== null && (
           <p className={styles.derived}>
@@ -226,15 +220,20 @@ export default function Settings() {
           </ul>
         </fieldset>
 
-        <button type="submit" className={styles.submit} disabled={!birthDate}>
-          Save
-        </button>
-
-        {saved && (
-          <p className={styles.saved} role="status">
-            Saved.
-          </p>
-        )}
+        <div className={styles.actions}>
+          <Button
+            label="Save"
+            type="submit"
+            variant="primary"
+            size="lg"
+            isDisabled={!birthDate}
+          />
+          {saved && (
+            <p className={styles.saved} role="status">
+              Saved.
+            </p>
+          )}
+        </div>
       </form>
     </>
   );

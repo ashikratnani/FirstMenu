@@ -1,67 +1,54 @@
 /*
- * Settings form layout (Task 7.1). Edit the child profile and tried-foods
- * checklist later. Same plain single-column form as onboarding, usable at
- * 360px width (Req 14.6).
+ * Settings form layout. Astryx draws the inputs, checkboxes and button; this
+ * file arranges them in one readable column, usable at 360 px (Req 14.6).
+ * The Save action sits in a sticky bar at the bottom of the screen so the
+ * primary action is always within reach on phones (issue #36).
  */
 
 .form {
   display: flex;
   flex-direction: column;
-  gap: var(--space);
-  max-width: 32rem;
-}
-
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: calc(var(--space) * 0.25);
-}
-
-.label {
-  font-weight: 600;
-  color: var(--color-heading);
-}
-
-.input {
-  padding: calc(var(--space) * 0.5);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  background: var(--color-surface);
-  color: var(--color-text);
-  font: inherit;
+  gap: 16px;
+  max-width: 34rem;
 }
 
 .derived {
   margin: 0;
-  color: var(--color-muted);
+  color: var(--color-text-secondary);
 }
 
 .notice {
   margin: 0;
-  padding: var(--space);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  background: var(--color-surface);
-  color: var(--color-text);
+  padding: 12px 16px;
+  border: 1px solid var(--color-border-orange);
+  border-radius: var(--radius-container);
+  background: var(--color-background-orange);
+  color: var(--color-text-primary);
 }
 
 .fieldset {
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  padding: var(--space);
   margin: 0;
+  padding: 16px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-container);
+  background: var(--color-background-surface);
 }
 
 .legend {
+  padding: 0 4px;
   font-weight: 600;
-  color: var(--color-heading);
-  padding: 0 calc(var(--space) * 0.25);
 }
 
 .hint {
-  margin: 0 0 var(--space);
-  font-size: 0.85rem;
-  color: var(--color-muted);
+  margin: 0 0 8px;
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}
+
+.allergenHeading,
+.otherHeading {
+  margin: 12px 0 8px;
+  font-size: 0.95rem;
 }
 
 .checklist {
@@ -69,43 +56,28 @@
   margin: 0;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: calc(var(--space) * 0.5);
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px 12px;
 }
 
 .check {
+  min-width: 0;
+}
+
+.actions {
+  position: sticky;
+  bottom: 0;
   display: flex;
   align-items: center;
-  gap: calc(var(--space) * 0.5);
-}
-
-.allergenHeading,
-.otherHeading {
-  margin: var(--space) 0 calc(var(--space) * 0.5);
-  font-size: 0.95rem;
-  color: var(--color-heading);
-}
-
-.reactionNote {
-  margin-left: calc(var(--space) * 0.25);
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--color-muted);
+  gap: 12px;
+  margin: 0 -16px;
+  padding: 12px 16px;
+  background: var(--color-background-body);
+  border-top: 1px solid var(--color-border);
 }
 
 .saved {
   margin: 0;
-  color: var(--color-heading);
   font-weight: 600;
-}
-
-.submit {
-  align-self: flex-start;
-  padding: calc(var(--space) * 0.5) var(--space);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  background: var(--color-accent, var(--color-surface));
-  color: var(--color-text);
-  font: inherit;
-  cursor: pointer;
+  color: var(--color-text-primary);
 }
