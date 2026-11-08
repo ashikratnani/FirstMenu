@@ -4,15 +4,19 @@
 
 Deadline: Friday, December 4, 2026, 2:00 PM PT. Target submission: Thursday, December 3.
 
-Build order agreed with the maintainer: Astryx trial, then domain work and new screens, then toddler stages, then more recipes, then recipe sharing. One adjustment: the toddler schema and stage plumbing (task 1) comes before the trial, because every later task builds on the new stages and it's small. Toddler recipe content arrives with the recipe expansion (task 14). Sharing (task 15) is the first thing to cut if the schedule slips.
+Build order agreed with the maintainer: Astryx trial, then domain work and new screens, then toddler stages, then more recipes, then recipe sharing. Recipes now run alongside the other work instead of after it (see "Task 14 runs alongside the others" below). One adjustment: the toddler schema and stage plumbing (task 1) comes before the trial, because every later task builds on the new stages and it's small. Toddler recipe content arrives with the recipe expansion (task 14). Sharing (task 15) is the first thing to cut if the schedule slips.
+
+**Task 14 runs alongside the others.** Because the target is 100 recipes, task 14 starts right after task 1 merges and continues in batches through M4, interleaved with tasks 2–13 (for example one recipe batch after each other task's PR merges). This is the one exception to working through the tasks strictly in order.
 
 | Milestone | Dates | Tasks | Done when |
 | --- | --- | --- | --- |
-| M1 Foundation | Nov 9 – Nov 13 | 1 – 2 | Schema v2 and toddler stages merged; Astryx trial passed (or a decision issue opened). |
-| M2 Domain | Nov 14 – Nov 18 | 3 – 8 | Time and effort, nutrition tags, categories, parser, text mentions, matching and prompt pass tests. |
-| M3 Screens | Nov 19 – Nov 25 | 9 – 13 | Make is home; paste → preview → save works on a phone; all pages on Astryx. |
-| M4 Recipes and sharing | Nov 26 – Nov 30 | 14 – 15 | At least 40 built-ins, at least 8 per stage; sharing if time allows. Thanksgiving week, so this milestone is lighter. |
+| M1 Foundation | Nov 9 – Nov 13 | 1 – 2, 14 batch 1 | Schema v2 and toddler stages merged; Astryx trial passed (or a decision issue opened); first recipe batch merged (about 35 built-ins). |
+| M2 Domain | Nov 14 – Nov 18 | 3 – 8, 14 batches 2–3 | Time and effort, nutrition tags, categories, parser, text mentions, matching and prompt pass tests; about 75 built-ins. |
+| M3 Screens | Nov 19 – Nov 25 | 9 – 13, 14 batch 4 | Make is home; paste → preview → save works on a phone; all pages on Astryx; about 95 built-ins. |
+| M4 Recipes and sharing | Nov 26 – Nov 30 | 14 (final batch), 15 | At least 100 built-ins meeting the stage and allergen targets; sharing if time allows. Thanksgiving week, so this milestone is lighter. |
 | M5 Verify and submit | Dec 1 – Dec 3 | 16 – 17 | Real pastes and phone checks done, docs and demo updated, submitted. |
+
+Counts assume batch 1 brings the total to about 35 (10 WIC recipes plus up to 25 simple ideas) and each later batch adds about 20.
 
 Branch names use the `v2/` prefix (for example `v2/6-paste-parser`) so they don't collide with v1 branches.
 
@@ -96,14 +100,14 @@ Branch names use the `v2/` prefix (for example `v2/6-paste-parser`) so they don'
   - [ ] 13.1 Convert Foods, recipe page, typed editor, Prep, Grocery, Share, Sources and Onboarding. Keep print CSS. Apply any UI feedback received under task 2.1. Re-run `vitest-axe` on every page.
     - _Requirements: 15.1, 15.5, 15.8_
 
-- [ ] 14. More built-in recipes
-  - [ ] 14.1 Re-tag the 10 Minnesota WIC recipes for toddler stages where the texture fits.
-    - _Requirements: 13.2, 14.5_
-  - [ ] 14.2 Add simple ideas from WIC and USDA feeding guides to `data/simpleIdeas.ts`.
-    - _Requirements: 14.2, 14.4, 14.5_
-  - [ ] 14.3 Add Food Hero and ICN Child Nutrition Recipe Box recipes, following the expansion rules in the design (leave out blocked ingredients or tag for older stages; scale only to 2–6 servings).
-    - _Requirements: 14.2, 14.3, 14.5_
-  - [ ] 14.4 Update the invariant tests to the counts in Requirement 14.1 and to allergen coverage. If short of the counts or any allergen group, open `Decision needed: recipe shortfall` with the numbers. Close issue #7 if all targets are met. Update the `Recipe review` issue with the new recipes.
+- [ ] 14. More built-in recipes (starts after task 1, runs in batches alongside tasks 2–13)
+  - [ ] 14.1 Move built-in recipe data into its own build chunk and report its gzipped size. Ships in the batch 1 PR, before any recipes are added, so every batch PR can report the chunk size.
+    - _Requirements: 15.6_
+  - [ ] 14.2 Batch 1: re-tag the 10 Minnesota WIC recipes for toddler stages where the texture fits, and add simple ideas from WIC and USDA feeding guides to `data/simpleIdeas.ts` (at most 25 in total).
+    - _Requirements: 13.2, 14.2, 14.4, 14.5, 14.8_
+  - [ ] 14.3 Batches 2 onward: add ICN Child Nutrition Recipe Box and Food Hero recipes, about 20 per PR, following the expansion rules in the design. Prioritize missing allergen groups first, then stage counts. Open a `Recipe review: batch <n>` issue for each batch.
+    - _Requirements: 14.2, 14.3, 14.5, 14.8_
+  - [ ] 14.4 Ships with the final batch PR. Set the invariant tests to the final counts in Requirement 14.1 and to all nine allergen groups. If short of either, open `Decision needed: recipe shortfall` with the numbers and don't ship short without an answer. Comment on issue #7 with the final numbers.
     - _Requirements: 14.1, 14.6, 14.7_
 
 - [ ] 15. Share a recipe (first to cut)

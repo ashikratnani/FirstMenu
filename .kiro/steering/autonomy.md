@@ -9,7 +9,7 @@ The maintainer wants this project built with as little input from them as possib
 - `.kiro/specs/first-menu/`: v1, built and live. It is the baseline for anything the active spec doesn't change.
 - `.kiro/specs/what-can-i-make/`: the active spec. Where it conflicts with v1, it wins.
 
-Work through `.kiro/specs/what-can-i-make/tasks.md` in order, following `workflow.md` for branches, review and merging. Don't start it unless its tasks file says "Status: APPROVED". Remaining unticked v1 tasks are carried into the active spec's tasks 16 and 17; don't work them from the v1 file. If the schedule slips, cut task 15 (recipe sharing) first, after telling the maintainer.
+Work through `.kiro/specs/what-can-i-make/tasks.md` in order (except task 14, which runs in batches alongside the others as that file explains), following `workflow.md` for branches, review and merging. Don't start it unless its tasks file says "Status: APPROVED". Remaining unticked v1 tasks are carried into the active spec's tasks 16 and 17; don't work them from the v1 file. If the schedule slips, cut task 15 (recipe sharing) first, after telling the maintainer.
 
 ## Decide yourself
 
@@ -46,7 +46,7 @@ How to ask: open a GitHub issue titled `Decision needed: <topic>` with the conte
 Ask once, at the right time, and keep working meanwhile:
 
 - Turn on branch protection for `main` requiring the CI check to pass, if not done yet.
-- Review the built-in recipes (v1 task 4.3, `Recipe review` issue). Apply the feedback when it arrives.
+- Review the built-in recipes (v1 `Recipe review` issue and one `Recipe review: batch <n>` issue per new batch). Apply the feedback when it arrives; don't wait for it.
 - Say what to change in the UI (active spec task 2.1). Don't wait for it.
 - Provide real paste samples (active spec task 16.1). Don't wait for them.
 - Record the demo video, upload it to YouTube and submit the entry (active spec task 17.2).

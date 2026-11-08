@@ -347,14 +347,20 @@ This is a stricter-only change and bumps `RULESET_VERSION`.
 
 ## Built-in recipe expansion (Requirement 14)
 
-Target: **at least 40** built-ins (recipes plus simple ideas), **at least 8 per stage**, all nine allergen groups if the sources allow. A recipe can count toward several stages.
+Target: **at least 100** built-ins, **at most 25** of them simple ideas, **at least 15** tagged `6-8` and **at least 25** for each other stage, and all nine allergen groups. A recipe can count toward several stages.
+
+Available supply, counted on November 8, 2026: Food Hero's sitemap lists 368 recipes; the ICN recipe box has about 125 recipes for family child care homes (6 servings) plus about 58 six-serving recipes for ages 3–5. Supply is not the limit; screening, texture fit and review are.
 
 | Source | Expected use | Notes |
 | --- | --- | --- |
 | Minnesota WIC (v1) | 10 existing recipes | Re-tag for toddler stages where the texture fits (meat balls, pancakes, puffs). |
-| Simple ideas from WIC and USDA guides | 6–9 month ideas, roughly 12–20 | Utah WIC "Homemade Baby Foods" lists simple examples by age (6, 8, 10 months). Other WIC and USDA FNS Feeding Infants sheets add more. Stored in `data/simpleIdeas.ts`. |
-| Food Hero (Oregon State University Extension) | Toddler and family recipes, roughly 10–15 | Pages fetch as HTML with exact amounts. Prefer the "Kid Approved", "30 Minutes or Less" and "5 Ingredients or Less" lists. Many include salt, sugar or honey. |
-| ICN Child Nutrition Recipe Box, CACFP family child care home recipes | Toddler recipes, roughly 10 | Written for 6 servings, so scaling is usually unnecessary. Useful for fish, beans and soy. |
+| Simple ideas from WIC and USDA guides | Mostly 6–11 months, up to 25 | Utah WIC "Homemade Baby Foods" lists simple examples by age (6, 8, 10 months). Other WIC and USDA FNS Feeding Infants sheets add more. Stored in `data/simpleIdeas.ts`. With the WIC recipes, these carry the `6-8` stage. |
+| ICN Child Nutrition Recipe Box (homes, 6 servings; ages 3–5, 6 servings) | Roughly 30–40 | Usually no scaling needed. Good for fish (tilapia), tofu, beans, sunflower-seed butter and hummus. Skip the 25–50 and school-size versions when a 6-serving version exists. |
+| Food Hero (Oregon State University Extension) | Roughly 30–40 | Pages fetch as HTML with exact amounts. Prefer the "Kid Approved", "30 Minutes or Less" and "5 Ingredients or Less" lists. Many include salt, sugar or honey, so expect many to be tagged `24-36` only. |
+
+**Batches.** Recipes are added in batches of about 20, one PR each (branch `v2/14-recipes-batch-<n>`). Each PR keeps the invariant tests green for the recipes so far. Each batch opens a `Recipe review: batch <n>` issue for the primary user and doesn't wait for it. Order: batch 1 re-tags the WIC recipes and adds simple ideas (covers `6-8` early); later batches prioritize missing allergen groups, then stage counts, then variety of meal types.
+
+**Bundle size.** Built-in recipe data (`data/recipes.ts`, `data/simpleIdeas.ts`) is put in its own chunk with Vite `build.rollupOptions.output.manualChunks`, so the Astryx size budget (Requirement 15.6) excludes it. Each recipe batch PR reports that chunk's gzipped size. Rough estimate for 100 recipes: 30–50 KB gzipped.
 
 PDFs are read in the sandbox by downloading with `curl` and extracting text with `pdfjs-dist` in a scratch folder outside the repo; it is not an app dependency.
 
@@ -364,7 +370,8 @@ Rules on top of v1's "Built-in recipe sourcing":
 2. Scaling: only to make 2–6 servings, every quantity by the same factor, rounded to the nearest common kitchen measure. Record "Scaled from N servings to M".
 3. Simple ideas: one or two foods, stage from the source's age guidance, quantities left empty (shown as "as needed"), steps reworded, `kind: 'simple-idea'` on the recipe so the UI shows the "Simple idea" label.
 4. Tag a recipe for a stage only if its texture fits that stage's texture hint, or can be made to fit by a step the source itself describes (mash, chop).
-5. Stop and report if, after going through these sources, the totals are under the targets.
+5. Stop and report if, after going through these sources, the totals or allergen coverage are under the targets.
+6. Don't add near-duplicates: two recipes from different sources that have the same main ingredients and method count once; keep the one with the clearer source.
 
 `Recipe` gets an optional `kind?: 'recipe' | 'simple-idea'` (default `'recipe'`), added to the schema v2 changes.
 
@@ -378,7 +385,7 @@ Rules on top of v1's "Built-in recipe sourcing":
 4. Theme: start from the closest Astryx theme and override its CSS custom properties with the v1 palette in `ui/theme/firstmenu.css`. Set `data-astryx-theme` on `<html>`.
 5. Font: the Astryx themes name Figtree but don't load it. Self-host it through `@fontsource/figtree` (SIL Open Font License), bundled by Vite. Never use the Google Fonts or CDN setup from the Astryx docs.
 6. Convert the app shell (`Layout`), the recipe library and the Settings form.
-7. Check: tests and `vitest-axe` pass; keyboard and 360 px work on the converted pages; the size increase is within 150 KB gzipped; a new build check (`scripts/check-external.mjs`, run in CI) fails if `dist/` references any `http://` or `https://` URL for fonts, stylesheets or scripts outside the app.
+7. Check: tests and `vitest-axe` pass; keyboard and 360 px work on the converted pages; the size increase, excluding the built-in recipe chunk, is within 150 KB gzipped; a new build check (`scripts/check-external.mjs`, run in CI) fails if `dist/` references any `http://` or `https://` URL for fonts, stylesheets or scripts outside the app.
 8. Write the results (sizes, findings, screenshots) in the PR. If any check fails, stop and open `Decision needed: Astryx trial`.
 
 ### After the trial
@@ -430,6 +437,6 @@ Rules on top of v1's "Built-in recipe sourcing":
 2. **Recipe sharing** (Requirement 9): text plus a link that opens the recipe in FirstMenu. No Instagram image cards. First feature to cut if time runs short.
 3. **Results groups**: only "Ready now" and "Missing one". Recipes missing two or more are hidden.
 4. **Nutrition tags**: seven tags, including Dairy, with lists confirmed against CDC and USDA before they ship.
-5. **More recipes** (Requirement 14): Minnesota WIC, simple ideas from WIC and USDA guides, Food Hero and the ICN recipe box. Food Hero is allowed (the earlier "skip Food Hero" instruction from issue #7 no longer applies). At least 40 built-ins, at least 8 per stage.
+5. **More recipes** (Requirement 14): Minnesota WIC, simple ideas from WIC and USDA guides, Food Hero and the ICN recipe box. Food Hero is allowed (the earlier "skip Food Hero" instruction from issue #7 no longer applies). Raised on November 8 to at least 100 built-ins (at most 25 simple ideas; at least 15 for `6-8`, at least 25 for each other stage) and all nine allergen groups, added in reviewed batches starting right after task 1.
 6. **Toddlers** (Requirement 13): up to 36 months, as two stages, 12–23 and 24–36 months.
 7. **Astryx** (Requirement 15): trial first, then convert. Build order: trial, new screens and domain, toddler stages, recipes, sharing. The schema and stage plumbing for toddlers (task 1) goes first because every later task builds on the new `StageId`; toddler recipe content comes with the recipe expansion (task 14).
