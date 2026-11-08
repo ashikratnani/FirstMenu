@@ -147,7 +147,7 @@ buildVocabulary(recipes: Recipe[], pantry: string[]): Vocabulary
 | bean curd | tofu |
 | lady finger, ladyfinger | stop phrase: also a sponge biscuit |
 | lemon curd | stop phrase: a sweet spread, not yogurt |
-| porridge oats, rolled oats, quick oats, quick cooking oats, old fashioned oats | oats |
+| porridge oats, rolled oats, quick oats, quick cooking oats, old fashioned oats | oat |
 | iron fortified cereal, iron fortified infant cereal, baby cereal | infant cereal |
 | whole grain bread, whole wheat bread | bread |
 | smooth peanut butter, creamy peanut butter | peanut butter |
@@ -157,7 +157,7 @@ buildVocabulary(recipes: Recipe[], pantry: string[]): Vocabulary
 | prawn | shrimp |
 | cottage cheese (Indian English sometimes means paneer) | not mapped; shown as cottage cheese |
 
-Ambiguous names are not mapped. The list can also hold **stop phrases** that consume their words without adding a food: `lemon curd`, `ladyfinger`, `lady finger`. Because step 4 matches longest first, "bean curd" becomes tofu, "lemon curd" becomes nothing (listed as "Not recognized"), and "curd" on its own becomes yogurt. A test checks every target is a known food, no name maps to two foods, and "lemon curd" and "ladyfinger" produce no food.
+Targets are plain food keys in their stored singular form (`oat`, `pea`, `egg`). Ambiguous names are not mapped. The list can also hold **stop phrases** that consume their words without adding a food: `lemon curd`, `ladyfinger`, `lady finger`. Because step 4 matches longest first, "bean curd" becomes tofu, "lemon curd" becomes nothing (listed as "Not recognized"), and "curd" on its own becomes yogurt. A test checks every target is a known food, no name maps to two foods, and "lemon curd" and "ladyfinger" produce no food.
 
 - **Filler words** (dropped): some, any, a, an, the, bit, of, little, few, half, leftover, leftovers, fresh, frozen, cooked, raw, plus the v1 `DESCRIPTOR_WORDS`, `PREP_WORDS`, `UNIT_WORDS` and numbers. "Frozen" is dropped for matching only.
 - **Request words** (dropped): something, anything, ideas, idea, for, make, can, i, what, to, recipe, recipes, food (unless part of "finger food"), meal, baby, toddler, kid, kids.
@@ -226,7 +226,7 @@ Worked examples (required tests):
 | leftover chicken, rice and frozen peas | chicken, rice, pea | none |
 | something for breakfast | none | Breakfast |
 | finger food with chicken | chicken | Finger food |
-| quick oats and banana | oats, banana | none |
+| quick oats and banana | oat, banana | none |
 | something quick with eggs | egg | Quick |
 | mashed banana | banana | none |
 | pumpkin puree for dinner | pumpkin | Dinner |
