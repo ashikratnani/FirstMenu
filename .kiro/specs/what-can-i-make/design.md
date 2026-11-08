@@ -132,8 +132,8 @@ buildVocabulary(recipes: Recipe[], pantry: string[]): Vocabulary
 
 | Typed | Food |
 | --- | --- |
-| mince, minced beef, ground meat, hamburger meat | ground beef |
-| minced chicken | ground chicken |
+| mince, minced beef, ground meat, hamburger meat | beef |
+| minced chicken | chicken |
 | courgette | zucchini |
 | aubergine, brinjal | eggplant |
 | garbanzo, garbanzo bean, chana | chickpea |
@@ -148,7 +148,7 @@ buildVocabulary(recipes: Recipe[], pantry: string[]): Vocabulary
 | lady finger, ladyfinger | stop phrase: also a sponge biscuit |
 | lemon curd | stop phrase: a sweet spread, not yogurt |
 | porridge oats, rolled oats, quick oats, quick cooking oats, old fashioned oats | oat |
-| iron fortified cereal, iron fortified infant cereal, baby cereal | infant cereal |
+| iron fortified cereal, iron fortified infant cereal, baby cereal | cereal |
 | whole grain bread, whole wheat bread | bread |
 | smooth peanut butter, creamy peanut butter | peanut butter |
 | maize, sweetcorn | corn |
@@ -157,7 +157,7 @@ buildVocabulary(recipes: Recipe[], pantry: string[]): Vocabulary
 | prawn | shrimp |
 | cottage cheese (Indian English sometimes means paneer) | not mapped; shown as cottage cheese |
 
-Targets are plain food keys in their stored singular form (`oat`, `pea`, `egg`). Ambiguous names are not mapped. The list can also hold **stop phrases** that consume their words without adding a food: `lemon curd`, `ladyfinger`, `lady finger`. Because step 4 matches longest first, "bean curd" becomes tofu, "lemon curd" becomes nothing (listed as "Not recognized"), and "curd" on its own becomes yogurt. A test checks every target is a known food, no name maps to two foods, and "lemon curd" and "ladyfinger" produce no food.
+Targets are food keys exactly as `groceryFoodKey` stores them. Descriptor words like "ground" and "infant" are stripped when keys are made, so the targets are `beef`, `chicken` and `cereal`, not "ground beef" or "infant cereal" (checked against the built-in recipes on November 8: Meat Balls' "lean ground beef" is stored as `beef`). Ambiguous names are not mapped. The list can also hold **stop phrases** that consume their words without adding a food: `lemon curd`, `ladyfinger`, `lady finger`. Because step 3 matches longest first, "bean curd" becomes tofu, "lemon curd" is listed as "Not recognized", and "curd" on its own becomes yogurt. Tests check that every target equals `groceryFoodKey({ name: target })`, that no name maps to two foods, and that "lemon curd" and "ladyfinger" produce no food and appear under "Not recognized".
 
 - **Filler words** (dropped): some, any, a, an, the, bit, of, little, few, half, leftover, leftovers, fresh, frozen, cooked, raw, plus the v1 `DESCRIPTOR_WORDS`, `PREP_WORDS`, `UNIT_WORDS` and numbers. "Frozen" is dropped for matching only.
 - **Request words** (dropped): something, anything, ideas, idea, for, make, can, i, what, to, recipe, recipes, food (unless part of "finger food"), meal, baby, toddler, kid, kids.
@@ -206,12 +206,12 @@ Steps run in exactly this order. Phrase lists (dish-kind phrases, other names, k
 2. **Split** into segments on `,`, `;`, new lines, ` and `, ` with `, `+`, `&`.
 3. **One longest-match pass**: in each segment, walk the tokens *as typed* (nothing dropped yet) left to right. At each position, find the longest entry starting there among dish-kind phrases, known foods, other names and stop phrases, plural-aware (`tokenMatches`). On a tie in length, a food or other name wins over a phrase. Consume the match:
    - food or other name → `foods`
-   - stop phrase → nothing
+   - stop phrase → `unrecognized`, as typed, so the user sees it wasn't counted
    - dish-kind phrase → a phrase candidate (step 4)
    - no entry starts here → leave the token for step 5
 
    Longest match is what makes "quick oats", "iron fortified cereal", "whole grain bread", "smooth peanut butter", "ground meat" and "sweet potato" come out as foods rather than filters or shorter foods, as long as those names are in the other-names list. It also handles unseparated text like "chicken rice peas".
-4. **Descriptor or filter**: a form, speed, effort or food-group phrase (`form:*`, `quick`, `easy`, `tag:*`) that sits directly before or after a food in the same segment describes that food and is dropped, not turned into a filter. So "mashed banana" and "pumpkin puree" give the foods banana and pumpkin with no filter, while "something mashed for dinner", "finger food" and "iron rich" alone become filters. Meal and `freezer` phrases always become filters.
+4. **Descriptor or filter**: a form, speed, effort or food-group phrase (`form:*`, `quick`, `easy`, `tag:*`) that sits next to a food in the same segment, ignoring filler and request words in between, describes that food and is dropped, not turned into a filter. So "mashed banana", "mashed ripe banana" and "sweet potato puree" give the foods banana and sweet potato with no filter, while "something mashed for dinner", "finger food" and "iron rich" alone become filters. Meal and `freezer` phrases always become filters.
 5. **Drop** filler words, request words and numbers from the tokens left over.
 6. **Title words**: remaining tokens of at least 4 letters that match a word in any recipe title (whole word, plural-aware) → `titleWords`.
 7. **Typo matching**: Damerau–Levenshtein distance against single-word known foods and other names, never against stop phrases or dish-kind phrases. Allowed distance: 0 for words under 4 letters, 1 for 4–7 letters, 2 for 8 or more. If exactly one candidate has the smallest distance → `didYouMean`; otherwise `unrecognized`.
@@ -219,7 +219,7 @@ Steps run in exactly this order. Phrase lists (dish-kind phrases, other names, k
 
 Because filler words are dropped only at step 5, they can still be part of a phrase or a food name ("whole grain", "ground beef", "baby spinach"), but never become foods on their own.
 
-Worked examples (required tests):
+Worked examples (required tests). They use the built-in recipes as of November 8, 2026 plus the other-names list; every food in the "Foods" column is either a stored built-in key (chicken, rice, pea, oat, banana, egg, sweet potato, beef, broccoli) or an other-names target (cereal, peanut butter, tofu):
 
 | Typed | Foods | Filters |
 | --- | --- | --- |
@@ -229,11 +229,14 @@ Worked examples (required tests):
 | quick oats and banana | oat, banana | none |
 | something quick with eggs | egg | Quick |
 | mashed banana | banana | none |
-| pumpkin puree for dinner | pumpkin | Dinner |
-| iron fortified cereal | infant cereal | none |
+| mashed ripe banana | banana | none |
+| quick cooked rice | rice | none |
+| sweet potato puree for dinner | sweet potato | Dinner |
+| iron fortified cereal | cereal | none |
+| mince | beef | none |
 | iron rich lunch | none | Iron-rich, Lunch |
 | smooth peanut butter | peanut butter | none |
-| bean curd, lemon curd | tofu | none ("lemon curd" not recognized) |
+| bean curd, lemon curd | tofu | none; "lemon curd" listed under "Not recognized" |
 | brocoli | none, "Did you mean broccoli?" | none |
 
 ### Screen behavior
