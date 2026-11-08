@@ -51,6 +51,7 @@ interface Recipe {
   };
   clearedMentions?: Array<{ ruleId: string; sentence: string }>; // Requirement 7.4
   kind?: 'recipe' | 'simple-idea';  // Requirement 14.4; default 'recipe'
+  serveAs?: Array<'puree' | 'mashed' | 'finger-food' | 'pieces'>; // Requirement 16.13
 }
 
 type StageId = '6-8' | '9-12' | '12-23' | '24-36';  // Requirement 13
@@ -106,6 +107,102 @@ Suggested on-hand chips: all plain keys from required ingredients across all rec
 ### Suggested pantry list
 
 Shown as tick boxes on first use. Built from the built-in recipes' common ingredients plus a few household staples: oats, rice, infant cereal, flour, egg, butter, plain yogurt, milk, olive oil, cinnamon, frozen peas, banana. Every item is an ordinary food name and passes through `foodKeyFromName`; none is health guidance.
+
+## Type what you have (`foodSearch.ts`, Requirement 16)
+
+Free-text search without a language model. Fuzzy matching only turns her words into foods; deciding what she can make stays exact (`make.ts`), so a near match never puts a recipe in "Ready now" by itself.
+
+```ts
+interface FoodSearchResult {
+  foods: string[];                               // plain food keys, counted as on hand
+  didYouMean: Array<{ typed: string; food: string }>; // typo matches, not counted until tapped
+  filters: SearchFilter[];                       // from dish-kind phrases, see below
+  titleWords: string[];                          // words matched against recipe titles
+  unrecognized: string[];
+}
+searchHave(text: string, vocabulary: Vocabulary): FoodSearchResult
+buildVocabulary(recipes: Recipe[], pantry: string[]): Vocabulary
+```
+
+### Vocabulary
+
+- **Known foods**: every plain key (`groceryFoodKey`) from built-in and custom recipe ingredients, the suggested pantry list, and every target in the other-names list.
+- **Other names** (`data/foodNames.ts`): a fixed map from an English name to a known food key. Starter list, extended as recipes are added:
+
+| Typed | Food |
+| --- | --- |
+| mince, minced beef, ground meat, hamburger meat | ground beef |
+| minced chicken | ground chicken |
+| courgette | zucchini |
+| aubergine, brinjal | eggplant |
+| garbanzo, garbanzo bean, chana | chickpea |
+| curd, yoghurt | yogurt |
+| capsicum, pepper (when not "black pepper") | bell pepper |
+| coriander leaf, coriander leaves | cilantro |
+| rocket | arugula |
+| swede | rutabaga |
+| lady finger, ladyfinger, bhindi (common in Indian English) | okra |
+| porridge oats, rolled oats | oats |
+| maize, sweetcorn | corn |
+| spring onion, scallion | green onion |
+| beetroot | beet |
+| prawn | shrimp |
+| cottage cheese (Indian English sometimes means paneer) | not mapped; shown as cottage cheese |
+
+Ambiguous names are not mapped. A test checks every target is a known food and no name maps to two foods.
+
+- **Filler words** (dropped): some, any, a, an, the, bit, of, little, few, half, leftover, leftovers, fresh, frozen, cooked, raw, plus the v1 `DESCRIPTOR_WORDS`, `PREP_WORDS`, `UNIT_WORDS` and numbers. "Frozen" is dropped for matching only.
+- **Request words** (dropped): something, anything, ideas, idea, for, make, can, i, what, to, recipe, recipes, food (unless part of "finger food"), meal, baby, toddler, kid, kids.
+- **Dish-kind phrases** (`data/searchPhrases.ts`), matched longest first before foods, each turning into a `SearchFilter`:
+
+| Phrases | Filter | Applies to recipes where |
+| --- | --- | --- |
+| breakfast · lunch · dinner, supper · snack, snacks | `meal:<type>` | `mealTypes` includes the type |
+| finger food, finger foods, self feeding, self-feeding, baby led, blw, pick up, bites | `form:finger-food` | `serveAs` includes `finger-food` |
+| puree, purée, smooth, blended | `form:puree` | `serveAs` includes `puree` |
+| mash, mashed, mushy | `form:mashed` | `serveAs` includes `mashed` |
+| quick, fast, in a hurry, under 15 minutes | `quick` | time (stated or estimated) is 15 minutes or less |
+| easy, simple, no fuss | `easy` | effort is Easy |
+| iron, iron rich, iron-rich · protein · veggie, veggies, vegetable · fruit, fruity · whole grain | `tag:<tag>` | has that nutrition tag |
+| make ahead, make-ahead, freeze, freezer, batch, batch cook | `freezer` | `storage.freezerMonths` is set |
+
+  A test checks no phrase is also a known food or other name, so "pick up" never hides a food.
+
+### Serving form (`serveAs`)
+
+`Recipe` gets `serveAs?: Array<'puree' | 'mashed' | 'finger-food' | 'pieces'>` (part of the schema v2 changes).
+
+- **Built-in recipes**: set by hand from the source's texture and steps during the recipe batches (task 14); the v1 recipes are set in batch 1. A test checks every built-in has at least one.
+- **Custom and pasted recipes**: derived when `serveAs` is unset, first match per form, from title, texture and steps (whole words, plural-aware):
+  - `finger-food`: finger, strips, sticks, bites, puffs, pancake, muffin, fritter, ball, nugget, fries, toast, wedge
+  - `puree`: puree, purée, blend, blender, smooth
+  - `mashed`: mash, mashed, fork
+  - `pieces`: chop, chopped, dice, diced, pieces, cubes
+  - nothing matched: no form, so the recipe doesn't appear under form filters.
+- The recipe page shows "Serve as: …" with an edit button for custom recipes.
+
+### Filters and "More ideas"
+
+- All filters must match (AND). Filters apply to Ready now, Missing one, "Recipes named …" and "More ideas".
+- **More ideas** (Requirement 16.12) appears only when at least one filter is active: recipes matching every filter with 2 or more missing foods, not ghosted, sorted by number missing, then time, effort and title, at most 10, each listing what's missing. "I have this" works on each missing food.
+- With filters and no foods typed, Ready now and Missing one still use the pantry and on-hand foods.
+
+### Parsing
+
+1. Lowercase, strip accents and punctuation except separators. Split into segments on `,`, `;`, new lines, ` and `, ` with `, `+`, `&`.
+2. Within each segment, drop filler words, then match greedily left to right, longest first, against known foods and other names (multi-word first: "sweet potato" before "potato", "black bean" before "bean"). Plural-aware with the safety matcher's `tokenMatches`. This handles unseparated text like "chicken rice peas".
+3. Before food matching, dish-kind phrases are matched longest first and removed (→ `filters`), and request words are dropped. Remaining tokens that match a word in any recipe title (whole word, plural-aware, at least 4 letters) → `titleWords`; otherwise try typo matching.
+4. **Typo matching**: Damerau–Levenshtein distance against single-word known foods and other names. Allowed distance: 0 for words under 4 letters, 1 for 4–7 letters, 2 for 8 or more. If exactly one candidate has the smallest distance → `didYouMean`; otherwise `unrecognized`.
+5. Anything left → `unrecognized`.
+
+### Screen behavior
+
+- Results use `have = pantry ∪ onHand ∪ result.foods` while typing (Requirement 16.5).
+- Enter or "Add" moves `result.foods` into on-hand and clears the box. Tapping a "Did you mean" chip adds that food.
+- "Recipes named …" lists recipes whose titles contain any `titleWords`, ghosted ones shown as ghosts, sorted like the other groups.
+- Each filter shows as a removable chip ("Breakfast ✕", "Finger food ✕"). Removing the chip also removes its phrase from the box.
+- "More ideas" follows the rules above.
+- Parsing runs on every input change, debounced 150 ms.
 
 ## Time and effort (`effort.ts`)
 

@@ -242,9 +242,31 @@ Terms from the v1 glossary keep their meaning. New terms:
 7. IF the trial fails any criterion THEN work SHALL stop on the UI change and the maintainer SHALL be asked whether to fix it, accept it, or restyle with plain CSS instead.
 8. THE primary user's specific complaints about the current UI SHALL be collected and addressed. Collecting them SHALL NOT block other work.
 
+### Requirement 16: Type what you have
+
+**User Story:** As a parent, I want to type what I have the way I'd say it, like "leftover chicken, some rice and frozen peas", and see what I can make, so that I don't have to tap foods one by one or spell them exactly.
+
+#### Acceptance Criteria
+
+1. THE Make screen SHALL have one search box that accepts free English text listing foods, separated by commas, "and", "with", "+", "&" or new lines, or not separated at all ("chicken rice peas").
+2. THE app SHALL turn the text into foods in the browser, with no network request, ignoring quantities, units and filler words ("2", "cups", "some", "leftover", "a bit of", "half a").
+3. THE app SHALL recognize common other English names for the same food, including US, UK and Indian English names (for example mince for ground beef, courgette for zucchini, garbanzo for chickpea, curd for yogurt, capsicum for bell pepper), from a fixed list in source code.
+4. THE app SHALL recognize misspelled food names using the typo rules in the design. A food found only through a typo match SHALL be shown as "Did you mean …?" and SHALL NOT count as on hand until the user taps it.
+5. WHILE the user types, THE app SHALL show the recognized foods as chips and SHALL update Ready now and Missing one as if those foods were on hand.
+6. WHEN the user presses Enter or taps "Add" THEN the recognized foods SHALL be added to on-hand and the box SHALL clear. THE user SHALL be able to remove any chip.
+7. WORDS the app can't place SHALL be listed as "Not recognized". Unrecognized words SHALL NOT be counted as foods.
+8. IF the text matches words in recipe titles ("pancakes", "pudding") THEN the screen SHALL also show those recipes under "Recipes named …", with ghosted recipes shown as ghosts.
+9. THE search box SHALL understand requests for a kind of dish, from a fixed phrase list in the design, and turn each into a filter: meals ("something for breakfast", "lunch", "dinner", "snack"), forms ("finger food", "puree", "mashed"), speed and effort ("quick", "easy"), food groups ("iron-rich", "protein", "veggie") and "make ahead" (freezer-friendly). EACH active filter SHALL be shown as a chip that can be removed.
+10. THE search SHALL NOT change the safety screen. Safety checks keep using recipe ingredient names as written.
+11. Only English is supported. Other languages are out of scope.
+12. WHEN the search has at least one filter THEN, below Ready now and Missing one, THE screen SHALL show "More ideas": up to 10 more recipes matching every filter that need two or more foods the user doesn't have, fewest missing first, each naming the missing foods. This applies even when no foods are typed, so "something for breakfast" alone lists breakfast recipes.
+13. EVERY recipe SHALL have a serving form (puree, mashed, finger food, or pieces) used by the form filters: set by hand for built-in recipes, and derived from the recipe text for custom recipes using the rules in the design, editable on the recipe.
+
 ## Out of scope
 
 - Calling any AI service from the app, or any backend.
+- Semantic search with a language model or embeddings (Requirement 16 uses a fixed name list and typo rules instead).
+- Food names in languages other than English.
 - Opening Instagram links, transcribing reel audio or video, or reading text from images inside the app.
 - Nutrient amounts, calorie or portion tracking.
 - Image cards for Instagram stories (possible later, depending on Requirement 9 review).
