@@ -217,7 +217,7 @@ Steps run in exactly this order. Phrase lists (dish-kind phrases, other names, k
 7. **Typo matching**: Damerau–Levenshtein distance against single-word known foods and other names, never against stop phrases or dish-kind phrases. Allowed distance: 0 for words under 4 letters, 1 for 4–7 letters, 2 for 8 or more. If exactly one candidate has the smallest distance → `didYouMean`; otherwise `unrecognized`.
 8. Anything left → `unrecognized`.
 
-Because filler words are dropped only at step 5, they can still be part of a phrase or a food name ("whole grain", "ground beef", "baby spinach"), but never become foods on their own.
+Because filler words are dropped only at step 5, they can still be part of a phrase or a food name ("whole grain", "ground meat", "baby cereal"), but never become foods on their own.
 
 Worked examples (required tests). They use the built-in recipes as of November 8, 2026 plus the other-names list; every food in the "Foods" column is either a stored built-in key (chicken, rice, pea, oat, banana, egg, sweet potato, beef, broccoli) or an other-names target (cereal, peanut butter, tofu):
 
@@ -565,7 +565,7 @@ Rules on top of v1's "Built-in recipe sourcing":
 - `effort`: the built-in examples above, ranges, "or" alternatives, per side, hours, none found.
 - `nutrition`: term format, sources, each tag fires, `except` cases (green bean is not Iron-rich via `bean`).
 - `category`: one case per category and the fallback.
-- `foodSearch`: step order (phrases before foods before dropping fillers: "mashed", "baby led", "whole grain", "in a hurry", "under 15 minutes", "ground meat" all match), separators and unseparated text, other names and stop phrases ("bean curd" → tofu, "lemon curd" and "ladyfinger" → nothing, "curd" → yogurt), typo distances and ties, title words, unrecognized words, list checks (targets known, no double mapping, no phrase that is also a food).
+- `foodSearch`: step order (phrases before foods before dropping fillers: "mashed", "baby led", "whole grain", "in a hurry", "under 15 minutes", "ground meat" all match), separators and unseparated text, other names and stop phrases ("bean curd" → tofu, "lemon curd" and "ladyfinger" → no food, listed under "Not recognized", "curd" → yogurt), every row of the worked examples, descriptor adjacency ignoring filler words, typo distances and ties, title words, unrecognized words, list checks (every target equals `groceryFoodKey({ name: target })`, no double mapping, no phrase that is also a food).
 - `make` filters: serving-form derivation and stage defaults, AND of filters, "Iron-rich only" toggle and "iron rich" phrase are one filter, "More ideas" ordering, cap and ghost exclusion.
 - `prompt`: contains age, foods, leave-out labels for 10 and 13 months, reaction foods; never contains name or birth date.
 - `storage`: v1 → v2 migration, v1 export import, plan share link from v1 still decodes.
