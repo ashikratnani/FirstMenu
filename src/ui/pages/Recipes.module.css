@@ -74,6 +74,17 @@
   gap: 6px;
 }
 
+/* Astryx badges truncate long labels; door badges must name every untried
+   food (Req 7.3), so let them wrap instead. */
+.badges :global(.astryx-badge),
+.badges :global(.astryx-badge) * {
+  max-width: 100%;
+  height: auto;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+}
+
 .empty {
   margin: 0;
   color: var(--color-text-secondary);

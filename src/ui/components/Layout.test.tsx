@@ -37,6 +37,7 @@ function renderShell(initialPath = '/') {
           <Route element={<Layout />}>
             <Route path="/" element={<p>home content</p>} />
             <Route path="/recipes" element={<p>recipes content</p>} />
+            <Route path="/recipes/new" element={<p>editor content</p>} />
           </Route>
         </Routes>
       </MemoryRouter>
@@ -85,6 +86,13 @@ describe('Layout (app shell)', () => {
     renderShell();
     const main = screen.getByRole('main');
     expect(within(main).getByText(/home content/i)).toBeInTheDocument();
+  });
+
+  it('hides the "Add recipe" action on the recipe editor itself', () => {
+    renderShell('/recipes/new');
+    expect(
+      screen.queryByRole('link', { name: 'Add recipe' }),
+    ).not.toBeInTheDocument();
   });
 
   it('shows one primary "Add recipe" action linking to the recipe editor', () => {

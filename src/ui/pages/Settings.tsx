@@ -14,14 +14,11 @@
 // sits in a sticky action bar so the primary action stays in reach on phones
 // (issue #36).
 
-import { useMemo, useState, type FormEvent } from 'react';
+import { useMemo, useRef, useState, type FormEvent } from 'react';
 import { Button } from '@astryxdesign/core/Button';
 import { CheckboxInput } from '@astryxdesign/core/CheckboxInput';
 import { DateInput } from '@astryxdesign/core/DateInput';
 import type { DateInputProps } from '@astryxdesign/core/DateInput';
-
-/** ISO YYYY-MM-DD string as Astryx DateInput types it. */
-type ISODateString = NonNullable<DateInputProps['value']>;
 import { TextInput } from '@astryxdesign/core/TextInput';
 import { useApp } from '../../state/AppProvider';
 import { selectAgeMonths, selectStage } from '../../state/selectors';
@@ -36,6 +33,9 @@ import {
   todayYmd,
   type ChecklistItem,
 } from './childProfile';
+
+/** ISO YYYY-MM-DD string as Astryx DateInput types it. */
+type ISODateString = NonNullable<DateInputProps['value']>;
 
 /** Whether a food key is currently recorded as tried in state. */
 function isTried(
@@ -67,6 +67,11 @@ export default function Settings() {
   const [name, setName] = useState(state.child?.name ?? '');
   const [birthDate, setBirthDate] = useState(state.child?.birthDate ?? '');
   const [saved, setSaved] = useState(false);
+  // Astryx DateInput rejects an out-of-range typed date (it never calls
+  // onChange, marks the field aria-invalid and shows its own message, "Enter a
+  // date on or before <today>") but cannot stop the form from submitting, so
+  // the submit handler checks the field itself.
+  const birthDateRef = useRef<HTMLInputElement>(null);
 
   // Prefill the checklist from recorded tried foods.
   const [checked, setChecked] = useState<Record<string, boolean>>(() => {
@@ -135,6 +140,13 @@ export default function Settings() {
   function handleSubmit(event: FormEvent) {
     event.preventDefault();
     if (!birthDate) return;
+    if (birthDateRef.current?.getAttribute('aria-invalid') === 'true') {
+      // Save nothing (not the old date, not checklist changes) until the
+      // birth date is valid.
+      setSaved(false);
+      birthDateRef.current.focus();
+      return;
+    }
 
     const trimmedName = name.trim();
     dispatch({
@@ -181,6 +193,7 @@ export default function Settings() {
         <DateInput
           label="Birth date"
           isRequired
+          ref={birthDateRef}
           max={todayYmd() as ISODateString}
           value={(birthDate || undefined) as ISODateString | undefined}
           onChange={(value) => {

@@ -40,6 +40,17 @@ const NAV_ITEMS: ReadonlyArray<{ to: string; label: string; end?: boolean }> = [
   { to: '/settings', label: 'Settings' },
 ];
 
+/**
+ * Screens that have their own primary action (Save). There the shell's
+ * "Add recipe" is shown as a secondary button, so each screen has exactly one
+ * filled primary button (issue #36). On the editor itself it is hidden.
+ */
+function addRecipeVariant(pathname: string): 'primary' | 'secondary' | null {
+  if (pathname === '/recipes/new') return null;
+  if (pathname === '/settings' || pathname.endsWith('/edit')) return 'secondary';
+  return 'primary';
+}
+
 function isActive(pathname: string, to: string, end?: boolean): boolean {
   if (end) return pathname === to;
   return pathname === to || pathname.startsWith(`${to}/`);
@@ -62,13 +73,16 @@ function handleFragmentLinkClick(event: MouseEvent<HTMLDivElement>) {
 
 export default function Layout() {
   const { pathname } = useLocation();
+  const addVariant = addRecipeVariant(pathname);
 
   const topNav = (
     <TopNav
       label="Primary"
       heading={<TopNavHeading heading="FirstMenu" headingHref="/" />}
       endContent={
-        <Button label="Add recipe" variant="primary" href="/recipes/new" />
+        addVariant && (
+          <Button label="Add recipe" variant={addVariant} href="/recipes/new" />
+        )
       }
     >
       {NAV_ITEMS.map((item) => (

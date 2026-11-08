@@ -57,6 +57,10 @@
   --color-background-orange: #fde6d3;
   --color-border-orange: #f0b98f;
   --color-text-orange: #7a3410;
+  /* Pumpkin (freezer) badge: same values as the neutral theme, listed here so
+     scripts/contrast-check.mjs covers them. */
+  --color-background-yellow: #fae19e;
+  --color-text-yellow: #4b3900;
 
   background-color: var(--color-background-body);
   color: var(--color-text-primary);

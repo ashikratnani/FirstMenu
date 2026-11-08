@@ -26,6 +26,7 @@ const PAIRS = [
   ['--color-text-primary', '--color-background-purple', 4.5, 'text on ghost cards'],
   ['--color-text-orange', '--color-background-orange', 4.5, 'notice text'],
   ['--color-text-primary', '--color-background-orange', 4.5, 'text on notices'],
+  ['--color-text-yellow', '--color-background-yellow', 4.5, 'pumpkin badge text'],
 ];
 
 function luminance(hex) {

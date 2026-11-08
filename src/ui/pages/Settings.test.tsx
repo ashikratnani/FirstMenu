@@ -6,7 +6,6 @@ import Settings from './Settings';
 import {
   ALLERGEN_GROUPS,
   allergenFoodKey,
-  todayYmd,
   UNDER_6_NOTICE,
   OVER_12_NOTICE,
 } from './childProfile';
@@ -171,19 +170,27 @@ describe('Settings', () => {
     });
   });
 
-  it('rejects a future birth date, so it can never be saved', async () => {
+  it('rejects a typed future birth date and saves nothing until it is fixed', async () => {
     const user = userEvent.setup();
     renderSettings(onboardedState('2026-01-15'));
     const input = screen.getByLabelText(/birth date/i) as HTMLInputElement;
-    const tomorrow = new Date(`${todayYmd()}T12:00:00`);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const future = tomorrow.toISOString().slice(0, 10);
 
-    fireEvent.change(input, { target: { value: future } });
+    // Also change a checkbox, so we can tell whether anything was saved.
+    await user.click(screen.getByLabelText('peanut'));
+
+    await user.clear(input);
+    await user.type(input, 'January 1, 2099');
+    await user.tab();
     await user.click(screen.getByRole('button', { name: /save/i }));
 
-    // The saved birth date is never the future date.
-    expect(captured?.child?.birthDate).not.toBe(future);
+    // Nothing saved: no "Saved." message, old birth date kept, and the
+    // checklist change not recorded.
+    expect(screen.queryByText('Saved.')).not.toBeInTheDocument();
+    expect(input).toHaveAttribute('aria-invalid', 'true');
+    expect(input).toHaveAccessibleDescription(/enter a date on or before/i);
+    expect(document.activeElement).toBe(input);
+    expect(captured?.child?.birthDate).toBe('2026-01-15');
+    expect(captured?.foods[allergenFoodKey('peanut')]).toBeUndefined();
   });
 
   it('lists the nine allergen groups', () => {
