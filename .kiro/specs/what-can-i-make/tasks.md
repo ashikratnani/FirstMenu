@@ -14,9 +14,9 @@ Build order agreed with the maintainer: Astryx trial, then domain work and new s
 | M2 Domain | Nov 14 – Nov 18 | 3 – 8, 14 batches 2–3 | Time and effort, nutrition tags, categories, parser, text mentions, matching and prompt pass tests; about 75 built-ins. |
 | M3 Screens | Nov 19 – Nov 25 | 9 – 13, 14 batch 4 | Make is home; paste → preview → save works on a phone; all pages on Astryx; about 95 built-ins. |
 | M4 Recipes and sharing | Nov 26 – Nov 30 | 14 (final batch), 15 | At least 100 built-ins meeting the stage and allergen targets; sharing if time allows. Thanksgiving week, so this milestone is lighter. |
+| M5 Verify and submit | Dec 1 – Dec 3 | 16 – 17 | Real pastes and phone checks done, docs and demo updated, submitted. |
 
 Counts assume batch 1 brings the total to about 35 (10 WIC recipes plus up to 25 simple ideas) and each later batch adds about 20.
-| M5 Verify and submit | Dec 1 – Dec 3 | 16 – 17 | Real pastes and phone checks done, docs and demo updated, submitted. |
 
 Branch names use the `v2/` prefix (for example `v2/6-paste-parser`) so they don't collide with v1 branches.
 
