@@ -24,7 +24,7 @@ Branch names use the `v2/` prefix (for example `v2/6-paste-parser`) so they don'
 
 - [ ] 1. Schema v2 and toddler stages
   - [ ] 1.1 Add `Ingredient.optional`, `Recipe.statedMinutes`, `notes`, `imported`, `clearedMentions`, `kind`, `serveAs`, and `AppState.pantry`, `onHand` to `types.ts` and the zod schemas. Extend `StageId` with `12-23` and `24-36`. Set `SCHEMA_VERSION = 2` and add `MIGRATIONS[1]`.
-    - _Requirements: 10.1, 10.2, 13.2, 14.4_
+    - _Requirements: 10.1, 10.2, 13.2, 14.4, 16.13_
   - [ ] 1.2 Strip `imported.text` and `clearedMentions` from the plan share payload. Tests: v1 state migrates, a v1 export imports, a v1 plan share link decodes.
     - _Requirements: 10.2, 10.4_
   - [ ] 1.3 Update `stageFor`, `defaultSlots`, stage labels ("9–11 months" for `9-12`), the over-36 notice, and onboarding and Settings wording for 6 months to 3 years. Confirm the stage texture hints against their sources. Extend the built-in recipe invariant test to the new stages.
@@ -83,7 +83,7 @@ Branch names use the `v2/` prefix (for example `v2/6-paste-parser`) so they don'
     - _Requirements: 1.2 – 1.4_
 
 - [ ] 10. Make screen (Astryx)
-  - [ ] 10.1 Build `ui/pages/Make.tsx` at `/`: pantry summary and editor (suggested list on first use), on-hand chips and text entry, Clear, filters, Ready now, Missing one with "I have this", ghosted count with expand, empty state with the prompt helper. Add pantry editing to Settings.
+  - [ ] 10.1 Build `ui/pages/Make.tsx` at `/`: pantry summary and editor (suggested list on first use), on-hand chips and suggested-food chips, Clear (the text box itself comes in 10.3), filters, Ready now, Missing one with "I have this", ghosted count with expand, empty state with the prompt helper. Add pantry editing to Settings.
     - _Requirements: 1.1, 2.1 – 2.4, 3.1 – 3.10_
   - [ ] 10.2 Component tests: groups render, "I have this" moves a recipe to Ready now, ghosted recipes are excluded.
     - _Requirements: 3.4, 3.5_
@@ -112,7 +112,7 @@ Branch names use the `v2/` prefix (for example `v2/6-paste-parser`) so they don'
   - [ ] 14.2 Batch 1: re-tag the 10 Minnesota WIC recipes for toddler stages where the texture fits, set `serveAs` on them, and add simple ideas from WIC and USDA feeding guides to `data/simpleIdeas.ts` (at most 25 in total).
     - _Requirements: 13.2, 14.2, 14.4, 14.5, 14.8, 16.13_
   - [ ] 14.3 Batches 2 onward: add ICN Child Nutrition Recipe Box and Food Hero recipes, about 20 per PR, following the expansion rules in the design, with `serveAs` set on each. Prioritize missing allergen groups first, then stage counts. Open a `Recipe review: batch <n>` issue for each batch.
-    - _Requirements: 14.2, 14.3, 14.5, 14.8_
+    - _Requirements: 14.2, 14.3, 14.5, 14.8, 16.13_
   - [ ] 14.4 Ships with the final batch PR. Set the invariant tests to the final counts in Requirement 14.1 and to all nine allergen groups. If short of either, open `Decision needed: recipe shortfall` with the numbers and don't ship short without an answer. Comment on issue #7 with the final numbers.
     - _Requirements: 14.1, 14.6, 14.7_
 

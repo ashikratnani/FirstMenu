@@ -13,6 +13,7 @@ This change adds pure domain modules and three screens to the built v1 app, move
 | Grocery category guess | New | `domain/category.ts` |
 | Text-mention screen | New function | `domain/safety/screen.ts` |
 | Prompt helper | New | `domain/prompt.ts` |
+| Type what you have (search) | New (Requirement 16) | `domain/foodSearch.ts`, `data/foodNames.ts`, `data/searchPhrases.ts`, serving-form and filter logic in `domain/make.ts` |
 | Recipe share link | New (Requirement 9, first to cut) | `domain/recipeShare.ts` |
 | Toddler stages | Changed | `domain/types.ts`, `domain/age.ts`, `safety/rules.ts` |
 | Built-in recipes | Expanded | `data/recipes.ts`, new `data/simpleIdeas.ts` |
@@ -99,7 +100,7 @@ makeResults(recipes, have: Set<string>, ageMonths, foods, options): {
 4. Ghosted (v1 rules, reactions, or uncleared text mentions) → `ghosted`, regardless of `missing`.
 5. `missing.length === 0` → `readyNow`; `=== 1` → `missingOne`; else dropped.
 6. Stage filter (default on): keep recipes whose `stages` include the child's stage. For toddler stages, also keep recipes tagged only for younger stages, and sort them after the child's-stage recipes within each group (Requirement 13.8).
-7. "Iron-rich only" filter: keep recipes tagged Iron-rich.
+7. "Iron-rich only" filter: keep recipes tagged Iron-rich. This toggle and the `tag:iron-rich` search filter are the same filter: typing "iron rich" turns the toggle on, and turning the toggle off removes the phrase.
 8. Sort each group by `minutes` ascending (unknown last), then effort (easy, medium, more), then title.
 
 Suggested on-hand chips: all plain keys from required ingredients across all recipes, minus pantry, ordered by how many recipes use them, with the user's recent picks first.
@@ -136,12 +137,16 @@ buildVocabulary(recipes: Recipe[], pantry: string[]): Vocabulary
 | courgette | zucchini |
 | aubergine, brinjal | eggplant |
 | garbanzo, garbanzo bean, chana | chickpea |
-| curd, yoghurt | yogurt |
+| yoghurt, dahi | yogurt |
+| curd ("bean curd" and "lemon curd" are handled by longer entries, below) | yogurt |
 | capsicum, pepper (when not "black pepper") | bell pepper |
 | coriander leaf, coriander leaves | cilantro |
 | rocket | arugula |
 | swede | rutabaga |
-| lady finger, ladyfinger, bhindi (common in Indian English) | okra |
+| bhindi (common in Indian English) | okra |
+| bean curd | tofu |
+| lady finger, ladyfinger | stop phrase: also a sponge biscuit |
+| lemon curd | stop phrase: a sweet spread, not yogurt |
 | porridge oats, rolled oats | oats |
 | maize, sweetcorn | corn |
 | spring onion, scallion | green onion |
@@ -149,7 +154,7 @@ buildVocabulary(recipes: Recipe[], pantry: string[]): Vocabulary
 | prawn | shrimp |
 | cottage cheese (Indian English sometimes means paneer) | not mapped; shown as cottage cheese |
 
-Ambiguous names are not mapped. A test checks every target is a known food and no name maps to two foods.
+Ambiguous names are not mapped. The list can also hold **stop phrases** that consume their words without adding a food: `lemon curd`, `ladyfinger`, `lady finger`. Because step 4 matches longest first, "bean curd" becomes tofu, "lemon curd" becomes nothing (listed as "Not recognized"), and "curd" on its own becomes yogurt. A test checks every target is a known food, no name maps to two foods, and "lemon curd" and "ladyfinger" produce no food.
 
 - **Filler words** (dropped): some, any, a, an, the, bit, of, little, few, half, leftover, leftovers, fresh, frozen, cooked, raw, plus the v1 `DESCRIPTOR_WORDS`, `PREP_WORDS`, `UNIT_WORDS` and numbers. "Frozen" is dropped for matching only.
 - **Request words** (dropped): something, anything, ideas, idea, for, make, can, i, what, to, recipe, recipes, food (unless part of "finger food"), meal, baby, toddler, kid, kids.
@@ -178,7 +183,10 @@ Ambiguous names are not mapped. A test checks every target is a known food and n
   - `puree`: puree, purée, blend, blender, smooth
   - `mashed`: mash, mashed, fork
   - `pieces`: chop, chopped, dice, diced, pieces, cubes
-  - nothing matched: no form, so the recipe doesn't appear under form filters.
+  - nothing matched: the stage default is used, `puree` for `6-8`, `mashed` for `9-12`, `pieces` for toddler stages (the youngest stage the recipe is tagged with). The recipe page shows "Serve as: … (guessed)" so the user can correct it.
+- **Simple ideas**: set by hand like other built-ins.
+
+So every recipe always has at least one serving form (Requirement 16.13).
 - The recipe page shows "Serve as: …" with an edit button for custom recipes.
 
 ### Filters and "More ideas"
@@ -189,11 +197,18 @@ Ambiguous names are not mapped. A test checks every target is a known food and n
 
 ### Parsing
 
-1. Lowercase, strip accents and punctuation except separators. Split into segments on `,`, `;`, new lines, ` and `, ` with `, `+`, `&`.
-2. Within each segment, drop filler words, then match greedily left to right, longest first, against known foods and other names (multi-word first: "sweet potato" before "potato", "black bean" before "bean"). Plural-aware with the safety matcher's `tokenMatches`. This handles unseparated text like "chicken rice peas".
-3. Before food matching, dish-kind phrases are matched longest first and removed (→ `filters`), and request words are dropped. Remaining tokens that match a word in any recipe title (whole word, plural-aware, at least 4 letters) → `titleWords`; otherwise try typo matching.
-4. **Typo matching**: Damerau–Levenshtein distance against single-word known foods and other names. Allowed distance: 0 for words under 4 letters, 1 for 4–7 letters, 2 for 8 or more. If exactly one candidate has the smallest distance → `didYouMean`; otherwise `unrecognized`.
-5. Anything left → `unrecognized`.
+Steps run in exactly this order. Phrase lists (dish-kind phrases, other names, known foods) are stored in the same normalized form as step 1 produces, so `iron-rich` is stored as `iron rich` and `purée` as `puree`.
+
+1. **Normalize**: lowercase, strip accents, replace hyphens and apostrophes with spaces, remove other punctuation except separators. Numbers stay as tokens for now.
+2. **Split** into segments on `,`, `;`, new lines, ` and `, ` with `, `+`, `&`.
+3. **Dish-kind phrases**: in each segment, match phrases greedily, longest first, against the token sequence *as typed*, and remove them (→ `filters`). This runs before anything is dropped, so "mashed", "baby led", "whole grain", "in a hurry" and "under 15 minutes" match.
+4. **Foods and other names**: on the remaining tokens, still before dropping anything, match known foods and other names greedily, longest first and plural-aware (`tokenMatches`), and remove them (→ `foods`). Multi-word entries come first: "ground meat" before "meat", "sweet potato" before "potato", "black bean" before "bean". This handles unseparated text like "chicken rice peas".
+5. **Drop** filler words, request words and numbers from what's left.
+6. **Title words**: remaining tokens of at least 4 letters that match a word in any recipe title (whole word, plural-aware) → `titleWords`.
+7. **Typo matching**: Damerau–Levenshtein distance against single-word known foods and other names. Allowed distance: 0 for words under 4 letters, 1 for 4–7 letters, 2 for 8 or more. If exactly one candidate has the smallest distance → `didYouMean`; otherwise `unrecognized`.
+8. Anything left → `unrecognized`.
+
+Because filler words are dropped only at step 5, they can still be part of a phrase or a food name ("whole grain", "ground beef", "baby spinach"), but never become foods on their own.
 
 ### Screen behavior
 
@@ -377,8 +392,9 @@ Steps:
 
 ```
 [ Pantry: 9 foods · Edit ]
-What do you have today?   [ type a food… ] [ Clear ]
-(chips) sweet potato ✓  chicken ✓  broccoli  spinach  pear  …
+What do you have?   [ e.g. leftover chicken, rice and peas · something for breakfast ] [ Add ] [ Clear ]
+(recognized) chicken ✕  rice ✕  peas ✕   (did you mean) broccoli?   (filters) Breakfast ✕
+(suggested) sweet potato  broccoli  spinach  pear  …
 [ Iron-rich only ]  [ All stages ]
 
 Ready now (3)
@@ -519,6 +535,8 @@ Rules on top of v1's "Built-in recipe sourcing":
 - `effort`: the built-in examples above, ranges, "or" alternatives, per side, hours, none found.
 - `nutrition`: term format, sources, each tag fires, `except` cases (green bean is not Iron-rich via `bean`).
 - `category`: one case per category and the fallback.
+- `foodSearch`: step order (phrases before foods before dropping fillers: "mashed", "baby led", "whole grain", "in a hurry", "under 15 minutes", "ground meat" all match), separators and unseparated text, other names and stop phrases ("bean curd" → tofu, "lemon curd" and "ladyfinger" → nothing, "curd" → yogurt), typo distances and ties, title words, unrecognized words, list checks (targets known, no double mapping, no phrase that is also a food).
+- `make` filters: serving-form derivation and stage defaults, AND of filters, "Iron-rich only" toggle and "iron rich" phrase are one filter, "More ideas" ordering, cap and ghost exclusion.
 - `prompt`: contains age, foods, leave-out labels for 10 and 13 months, reaction foods; never contains name or birth date.
 - `storage`: v1 → v2 migration, v1 export import, plan share link from v1 still decodes.
 - Components: Make screen groups and "I have this"; paste → preview → save without typing; text mention ghosts and "Not used" clears it.
@@ -532,7 +550,7 @@ Rules on top of v1's "Built-in recipe sourcing":
 
 1. **Text mentions** (Requirement 7): block rules are checked in the steps, title and notes of pasted recipes only, with a one-tap "Not used in this recipe" for false alarms. Typed recipes stay ingredient-only.
 2. **Recipe sharing** (Requirement 9): text plus a link that opens the recipe in FirstMenu. No Instagram image cards. First feature to cut if time runs short.
-3. **Results groups**: only "Ready now" and "Missing one". Recipes missing two or more are hidden.
+3. **Results groups**: "Ready now" and "Missing one". Recipes missing two or more are hidden, except under "More ideas" when a search filter is active (Requirement 16.12, added later the same day).
 4. **Nutrition tags**: seven tags, including Dairy, with lists confirmed against CDC and USDA before they ship.
 5. **More recipes** (Requirement 14): Minnesota WIC, simple ideas from WIC and USDA guides, Food Hero and the ICN recipe box. Food Hero is allowed (the earlier "skip Food Hero" instruction from issue #7 no longer applies). Raised on November 8 to at least 100 built-ins (at most 25 simple ideas; at least 15 for `6-8`, at least 25 for each other stage) and all nine allergen groups, added in reviewed batches starting right after task 1.
 6. **Toddlers** (Requirement 13): up to 36 months, as two stages, 12–23 and 24–36 months.

@@ -68,7 +68,7 @@ Terms from the v1 glossary keep their meaning. New terms:
 
 #### Acceptance Criteria
 
-1. THE Make screen SHALL let the user pick on-hand foods by tapping suggested foods or by typing a food name.
+1. THE Make screen SHALL let the user pick on-hand foods by tapping suggested foods or by typing in the search box from Requirement 16. There is one text box, not two.
 2. THE on-hand list SHALL persist until the user clears it, and SHALL have a one-tap "Clear" action.
 3. THE app SHALL match foods by the same food keys used for first tastes and grocery merging, so that "2 cups diced sweet potatoes" counts as "sweet potato".
 4. THE Make screen SHALL show a "Ready now" group and a "Missing one" group. Each "Missing one" recipe SHALL name the missing food and offer "I have this", which adds it to on-hand.
