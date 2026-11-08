@@ -4,7 +4,12 @@ inclusion: always
 
 # Working autonomously on FirstMenu
 
-The maintainer wants this project built with as little input from them as possible. The spec in `.kiro/specs/first-menu/` is the source of truth. Work through `tasks.md` in order, following `workflow.md` for branches, review and merging.
+The maintainer wants this project built with as little input from them as possible. There are two specs:
+
+- `.kiro/specs/first-menu/`: v1, built and live. It is the baseline for anything the active spec doesn't change.
+- `.kiro/specs/what-can-i-make/`: the active spec. Where it conflicts with v1, it wins.
+
+Work through `.kiro/specs/what-can-i-make/tasks.md` in order, following `workflow.md` for branches, review and merging. Don't start it while its tasks file says "Status: DRAFT". Remaining unticked v1 tasks are carried into the active spec's tasks 12 and 13; don't work them from the v1 file.
 
 ## Decide yourself
 
@@ -24,8 +29,10 @@ Stop and ask the maintainer before any of these:
 
 - Loosening a safety rule: removing it, lowering its age limit, adding an exception word, or changing a block into a reminder or allergen rule.
 - Writing new health or safety wording that isn't already in the design or taken from a cited source.
-- Using tier 3 recipe sources, or shipping with fewer recipes or allergen groups than Requirement 2 asks for.
-- The release gate (task 17.0) failing because a rule still has no published source.
+- Using tier 3 recipe sources, or adding built-in recipes beyond the current 10 (tracked in issue #7).
+- The release-gate test failing because a safety rule still has no published source.
+- A nutrition tag term that no cited source supports. Drop it rather than keep it, and say so in the PR.
+- Adding negation handling ("no salt", "without honey") or any other way to skip a text mention without the user's tap.
 - Any change to requirements, scope or the theme decisions.
 - Anything that costs money, needs a new account or third-party service, or changes repository settings.
 - Anything `pr-reviewer` marks `NEEDS_MAINTAINER`, or a PR stuck after two review rounds.
@@ -36,10 +43,10 @@ How to ask: open a GitHub issue titled `Decision needed: <topic>` with the conte
 
 Ask once, at the right time, and keep working meanwhile:
 
-- Turn on GitHub Pages: Settings → Pages → Source: "GitHub Actions". Needed before task 17.
-- Turn on branch protection for `main` requiring the CI check to pass. Ask right after the CI workflow from task 1.2 is merged and has run once.
-- Review the built-in recipes (task 4.3). Open an issue titled `Recipe review` listing every recipe with its source link, stage tags and adaptations. Don't wait for the review. Apply the feedback when it arrives.
-- Record the demo video, upload it to YouTube and submit the entry (task 18).
+- Turn on branch protection for `main` requiring the CI check to pass, if not done yet.
+- Review the built-in recipes (v1 task 4.3, `Recipe review` issue). Apply the feedback when it arrives.
+- Provide real paste samples (active spec task 12.2). Don't wait for them.
+- Record the demo video, upload it to YouTube and submit the entry (active spec task 13.2).
 
 ## Schedule
 

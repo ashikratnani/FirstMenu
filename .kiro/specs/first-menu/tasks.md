@@ -1,5 +1,7 @@
 # Implementation Plan
 
+> **v1 baseline, closed.** Unticked tasks here (manual device pass, phone verification, submission) continue as tasks 12 and 13 in `.kiro/specs/what-can-i-make/tasks.md`. The branch-protection request (1.4) and recipe review (4.3) remain open with the maintainer.
+
 Deadline: Friday, December 4, 2026, 2:00 PM PT. Target submission: Thursday, December 3, to leave a day of buffer.
 
 | Milestone | Dates | Tasks | Done when |

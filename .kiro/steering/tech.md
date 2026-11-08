@@ -4,8 +4,15 @@ inclusion: always
 
 # Tech conventions
 
-Stack and conventions follow `.kiro/specs/first-menu/design.md`. This file is
-the short version; the design doc is the source of truth.
+Stack and conventions follow `.kiro/specs/first-menu/design.md` (v1 baseline)
+and `.kiro/specs/what-can-i-make/design.md` (active changes, wins on conflict).
+This file is the short version; the design docs are the source of truth.
+
+New domain modules from the active spec: `make.ts`, `effort.ts`,
+`nutrition.ts`, `category.ts`, `importText.ts`, `prompt.ts`, `recipeShare.ts`.
+They follow the same rules: pure TypeScript, no React, derived data not stored.
+The paste parser and prompt helper run entirely in the browser; the app never
+calls an AI service.
 
 ## Stack
 

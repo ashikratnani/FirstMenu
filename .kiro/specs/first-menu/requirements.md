@@ -1,5 +1,7 @@
 # Requirements Document
 
+> **v1 baseline.** This spec is built and live. The active spec is `.kiro/specs/what-can-i-make/`, which changes the home screen, adds paste import, nutrition tags and a ChatGPT prompt helper, and extends the safety screen for pasted recipes. Where the two conflict, the active spec wins.
+
 ## Introduction
 
 FirstMenu is a free web app for planning a week of baby meals. Parents pick recipes from a library sorted by age stage, or add their own, and get a weekly plan, a make-ahead prep list and a grocery list. Every recipe is screened against a fixed infant-safety list based on pediatric guidance. Foods that are not safe for the child's age yet appear as ghosts and cannot be planned. New foods appear as mystery doors until the parent marks them as introduced.
