@@ -41,13 +41,22 @@ const NAV_ITEMS: ReadonlyArray<{ to: string; label: string; end?: boolean }> = [
 ];
 
 /**
- * Screens that have their own primary action (Save). There the shell's
- * "Add recipe" is shown as a secondary button, so each screen has exactly one
- * filled primary button (issue #36). On the editor itself it is hidden.
+ * Each screen gets exactly one filled primary button (issue #36):
+ * - hidden on the new-recipe editor (you are already there) and on
+ *   onboarding (every route redirects there until setup is done);
+ * - secondary on screens with their own primary action (Settings and edit
+ *   Save, the Print button);
+ * - primary everywhere else.
  */
 function addRecipeVariant(pathname: string): 'primary' | 'secondary' | null {
-  if (pathname === '/recipes/new') return null;
-  if (pathname === '/settings' || pathname.endsWith('/edit')) return 'secondary';
+  if (pathname === '/recipes/new' || pathname === '/onboarding') return null;
+  if (
+    pathname === '/settings' ||
+    pathname === '/print' ||
+    pathname.endsWith('/edit')
+  ) {
+    return 'secondary';
+  }
   return 'primary';
 }
 

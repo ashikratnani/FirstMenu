@@ -38,6 +38,7 @@ function renderShell(initialPath = '/') {
             <Route path="/" element={<p>home content</p>} />
             <Route path="/recipes" element={<p>recipes content</p>} />
             <Route path="/recipes/new" element={<p>editor content</p>} />
+            <Route path="*" element={<p>other content</p>} />
           </Route>
         </Routes>
       </MemoryRouter>
@@ -93,6 +94,32 @@ describe('Layout (app shell)', () => {
     expect(
       screen.queryByRole('link', { name: 'Add recipe' }),
     ).not.toBeInTheDocument();
+  });
+
+  it('hides the "Add recipe" action during onboarding', () => {
+    renderShell('/onboarding');
+    expect(
+      screen.queryByRole('link', { name: 'Add recipe' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it.each(['/settings', '/print', '/recipes/r1/edit'])(
+    'shows "Add recipe" as a secondary button on %s, which has its own primary action',
+    (path) => {
+      renderShell(path);
+      expect(screen.getByRole('link', { name: 'Add recipe' })).toHaveAttribute(
+        'data-variant',
+        'secondary',
+      );
+    },
+  );
+
+  it('shows "Add recipe" as the primary button on the week plan', () => {
+    renderShell('/');
+    expect(screen.getByRole('link', { name: 'Add recipe' })).toHaveAttribute(
+      'data-variant',
+      'primary',
+    );
   });
 
   it('shows one primary "Add recipe" action linking to the recipe editor', () => {
