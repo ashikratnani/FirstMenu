@@ -9,6 +9,8 @@ FirstMenu v1 (spec: `.kiro/specs/first-menu/`) is built and live. It plans a wee
 3. Her recipes come from Instagram reels and ChatGPT.
 4. She cares about nutrition in what she makes.
 
+In a second review the maintainer also asked for more built-in recipes, support for toddlers (up to 3 years), and a new UI built on Meta's Astryx design system.
+
 This spec changes FirstMenu's focus to answer those. The safety screen, ghosted foods, first tastes, built-in recipes, theme, local storage and disclaimers from v1 stay. The week plan, prep list, grocery list, print view and plan share link stay as secondary features with no new work beyond what's listed here.
 
 Constraints carried over from v1: no backend, no account, no network requests other than the app's own files, React + TypeScript + Vite on GitHub Pages, MIT license. Deadline: Friday, December 4, 2026, 2:00 PM PT (submission planned Thursday, December 3).
@@ -31,6 +33,9 @@ Terms from the v1 glossary keep their meaning. New terms:
 - **Nutrition tag**: a food-group label (Iron-rich, Protein, Vegetable, Fruit, Whole grain, Dairy, Healthy fat) shown when a recipe contains a food from that group.
 - **Prompt helper**: the feature that writes a ChatGPT prompt for the user to copy.
 - **Text mention**: a block-rule food found in a pasted recipe's title, steps or notes rather than its ingredient list.
+- **Stages**: `6–8 months`, `9–11 months` (id `9-12`, kept from v1), `12–23 months` and `24–36 months`. The last two are the **toddler stages**.
+- **Simple idea**: a built-in single-food or two-food preparation taken from a public health feeding guide, with no exact amounts ("ripe banana, mashed").
+- **Astryx**: Meta's open source React design system (`@astryxdesign/core`, MIT license).
 
 ## Requirements
 
@@ -147,7 +152,7 @@ Terms from the v1 glossary keep their meaning. New terms:
 8. THE app SHALL NOT call any AI service itself.
 9. THE helper SHALL state that AI recipes can be wrong, that the app checks them against its fixed list, and to check with a pediatrician.
 
-### Requirement 9: Share a recipe (proposed, confirm in review)
+### Requirement 9: Share a recipe (approved; first to cut if time runs short)
 
 **User Story:** As a parent, I want to send a recipe to friends or other parents from my phone, so that I can pass on what worked.
 
@@ -191,6 +196,51 @@ Terms from the v1 glossary keep their meaning. New terms:
 1. THE README, `docs/kiro-usage.md` and the demo script SHALL describe the new flow: pantry, on hand, ready-now results, paste from ChatGPT, safety catch, nutrition tags.
 2. THE deployed app SHALL be checked end to end on a phone before submission, including pasting a real ChatGPT reply and a real Instagram caption.
 
+### Requirement 13: Toddler support
+
+**User Story:** As a parent of a toddler, I want the app to keep working after my child's first birthday, so that I don't have to switch apps.
+
+#### Acceptance Criteria
+
+1. THE app SHALL support children from 6 to 36 months old.
+2. THE app SHALL map ages to stages: under 9 months `6–8 months`; 9 to 11 months `9–11 months`; 12 to 23 months `12–23 months`; 24 months and over `24–36 months`.
+3. IF the child is older than 36 months THEN the app SHALL show a notice that the app is designed for 6 months to 3 years, and SHALL still apply the rules for the child's actual age. This replaces v1 Requirement 1.5.
+4. ONBOARDING, the Settings page and all age wording SHALL describe the app as being for babies and toddlers from 6 months to 3 years.
+5. EVERY stage SHALL have a texture hint used on recipe pages and in the prompt helper, taken from a cited source.
+6. THE safety screen SHALL keep applying each rule's age limit unchanged. Rules that end at 12 or 24 months stop applying at those ages.
+7. THE rule list SHALL add a prep reminder for 100% fruit juice from 12 up to 36 months: limit to 4 ounces a day. It SHALL cite the AAP source already used for juice.
+8. FOR toddler stages, THE Make screen SHALL also show recipes tagged for younger stages, after recipes tagged for the child's stage.
+9. THE default meal slots for both toddler stages SHALL be breakfast, lunch, dinner and snack.
+
+### Requirement 14: More built-in recipes
+
+**User Story:** As a parent, I want enough built-in recipes that "What can I make?" finds something before I've pasted any of my own.
+
+#### Acceptance Criteria
+
+1. THE app SHALL ship at least 40 built-in recipes and simple ideas in total, with at least 8 tagged for each of the four stages. This replaces the counts in v1 Requirement 2.1.
+2. BUILT-IN recipes MAY come from these sources, in addition to v1's: the USDA Child Nutrition Recipe Box from the Institute of Child Nutrition (CACFP family child care home recipes), university extension recipe sites (including Food Hero from Oregon State University), and public health feeding guides (WIC, USDA FNS) for simple ideas.
+3. A built-in recipe MAY differ from its source by scaling every quantity by the same factor to make 2 to 6 servings, recorded as an adaptation ("Scaled from 25 servings to 4"). This adds to the changes allowed by v1 Requirement 2.9.
+4. A simple idea MAY have no ingredient quantities and SHALL be labeled "Simple idea" in the app. This is an exception to v1 Requirement 2.8 for simple ideas only.
+5. EVERY built-in recipe and simple idea SHALL keep v1's sourcing rules: source title, publisher, URL and retrieval date recorded and shown; ingredients from the source; steps in the app's own words; storage times from the source or a cited food-safety source.
+6. THE built-in set SHOULD cover all nine allergen groups. IF it can't THEN the gap SHALL be reported to the maintainer with the groups missing.
+7. IF the sources can't reach the counts in criterion 1 THEN work SHALL stop and the shortfall SHALL be reported to the maintainer before any other source is used.
+
+### Requirement 15: UI with the Astryx design system
+
+**User Story:** As a parent, I want the app to look clean and be easy to use on my phone, so that it feels pleasant to open every day.
+
+#### Acceptance Criteria
+
+1. THE app SHALL use Astryx components for layout, navigation, forms, buttons, cards, chips, dialogs and lists, after a trial that meets every criterion in this requirement.
+2. THE app SHALL upgrade to React 19, which Astryx requires.
+3. THE app SHALL use a custom Astryx theme with the v1 palette (creams, soft oranges, lavender), meeting WCAG 2.1 AA contrast. The friendly ghosts, doors, monsters and pumpkins SHALL stay as the app's own inline SVGs.
+4. ALL fonts and styles SHALL ship with the app. THE app SHALL NOT load fonts, CSS or scripts from Google Fonts, a CDN or any other host (v1 Requirement 12.2 still applies).
+5. THE app's `vitest-axe` tests SHALL pass on every page, and every page SHALL work with a keyboard and on screens 360 px wide.
+6. THE production build's total gzipped JavaScript and CSS SHALL be no more than 150 KB larger than the v1 build. The trial SHALL record both sizes.
+7. IF the trial fails any criterion THEN work SHALL stop on the UI change and the maintainer SHALL be asked whether to fix it, accept it, or restyle with plain CSS instead.
+8. THE primary user's specific complaints about the current UI SHALL be collected and addressed. Collecting them SHALL NOT block other work.
+
 ## Out of scope
 
 - Calling any AI service from the app, or any backend.
@@ -198,4 +248,5 @@ Terms from the v1 glossary keep their meaning. New terms:
 - Nutrient amounts, calorie or portion tracking.
 - Image cards for Instagram stories (possible later, depending on Requirement 9 review).
 - New work on the week plan, prep list, grocery list, print view or plan share link.
-- More built-in recipes beyond the current 10 (tracked separately in issue #7).
+- Children older than 3 years.
+- Built-in recipes from commercial recipe blogs or sites outside Requirement 14.2.

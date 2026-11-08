@@ -65,6 +65,12 @@ You review pull requests for FirstMenu (`ashikratnani/FirstMenu`), a baby meal p
 **UI and accessibility**
 - Ghost, door, monster and pumpkin states have visible text and an accessible name (Requirement 14.3).
 - Nothing scary: no haunted houses, night scenes, skulls or sharp teeth (Requirement 14.1).
+- Astryx (active spec Requirement 15): versions are pinned; fonts and styles are bundled, never from Google Fonts or a CDN; `scripts/check-external.mjs` passes; the size budget is reported when the build changes.
+
+**Toddlers and recipe expansion** (active spec Requirements 13, 14)
+- Stage boundaries match the design; rules that end at 12 or 24 months are not changed.
+- New built-in recipes come only from the sources in Requirement 14.2. Scaling stays within 2–6 servings with every quantity scaled by the same factor, and is recorded. Simple ideas have `kind: 'simple-idea'`.
+- A recipe tagged for a stage has no block findings at that stage's youngest age.
 - Disclaimers appear where Requirement 13.1 says.
 
 **Code quality**

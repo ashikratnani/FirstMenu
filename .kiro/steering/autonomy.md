@@ -9,13 +9,14 @@ The maintainer wants this project built with as little input from them as possib
 - `.kiro/specs/first-menu/`: v1, built and live. It is the baseline for anything the active spec doesn't change.
 - `.kiro/specs/what-can-i-make/`: the active spec. Where it conflicts with v1, it wins.
 
-Work through `.kiro/specs/what-can-i-make/tasks.md` in order, following `workflow.md` for branches, review and merging. Don't start it while its tasks file says "Status: DRAFT". Remaining unticked v1 tasks are carried into the active spec's tasks 12 and 13; don't work them from the v1 file.
+Work through `.kiro/specs/what-can-i-make/tasks.md` in order, following `workflow.md` for branches, review and merging. Don't start it unless its tasks file says "Status: APPROVED". Remaining unticked v1 tasks are carried into the active spec's tasks 16 and 17; don't work them from the v1 file. If the schedule slips, cut task 15 (recipe sharing) first, after telling the maintainer.
 
 ## Decide yourself
 
 Make these calls without asking, and mention them in the PR body:
 
-- Implementation choices within the stack in the design (React, TypeScript, Vite, plain CSS, Vitest).
+- Implementation choices within the stack in the design (React, TypeScript, Vite, Astryx after its trial passes, CSS modules, Vitest).
+- Which Astryx components to use, and adjusting the FirstMenu theme, as long as contrast stays WCAG 2.1 AA and the palette stays light.
 - Adding a small, well-maintained library or dev dependency when it clearly saves work. Say why in the PR.
 - UI layout, component structure and wording that isn't safety or health guidance.
 - Test design and coverage beyond the minimums in the design.
@@ -29,7 +30,8 @@ Stop and ask the maintainer before any of these:
 
 - Loosening a safety rule: removing it, lowering its age limit, adding an exception word, or changing a block into a reminder or allergen rule.
 - Writing new health or safety wording that isn't already in the design or taken from a cited source.
-- Using tier 3 recipe sources, or adding built-in recipes beyond the current 10 (tracked in issue #7).
+- Using a built-in recipe source not listed in the active spec's Requirement 14.2 (Minnesota and other WIC programs, USDA FNS, ICN Child Nutrition Recipe Box, university extension sites such as Food Hero), or ending task 14 short of its counts or allergen groups.
+- Any Astryx trial check failing (active spec Requirement 15.7).
 - The release-gate test failing because a safety rule still has no published source.
 - A nutrition tag term that no cited source supports. Drop it rather than keep it, and say so in the PR.
 - Adding negation handling ("no salt", "without honey") or any other way to skip a text mention without the user's tap.
@@ -45,8 +47,9 @@ Ask once, at the right time, and keep working meanwhile:
 
 - Turn on branch protection for `main` requiring the CI check to pass, if not done yet.
 - Review the built-in recipes (v1 task 4.3, `Recipe review` issue). Apply the feedback when it arrives.
-- Provide real paste samples (active spec task 12.2). Don't wait for them.
-- Record the demo video, upload it to YouTube and submit the entry (active spec task 13.2).
+- Say what to change in the UI (active spec task 2.1). Don't wait for it.
+- Provide real paste samples (active spec task 16.1). Don't wait for them.
+- Record the demo video, upload it to YouTube and submit the entry (active spec task 17.2).
 
 ## Schedule
 

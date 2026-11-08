@@ -16,7 +16,12 @@ calls an AI service.
 
 ## Stack
 
-- React 18 + TypeScript, built with Vite. Strict TypeScript everywhere.
+- React + TypeScript, built with Vite. Strict TypeScript everywhere. React 18
+  until the Astryx trial (active spec task 2) upgrades it to React 19.
+- UI components: Astryx (`@astryxdesign/core`, pinned versions) once the trial
+  passes, with the FirstMenu theme in `ui/theme/`. Fonts are self-hosted
+  (`@fontsource/figtree`); never use the Astryx CDN or Google Fonts setup. The
+  trial PR updates this file with the final setup.
 - Static hosting on GitHub Pages at `https://ashikratnani.github.io/FirstMenu/`.
 - `HashRouter` for routing. GitHub Pages has no server-side rewrites, so hash
   routes always load `index.html`.
@@ -26,8 +31,9 @@ calls an AI service.
 - Validation: `zod` for all untrusted input (imported files, share links).
 - Share links: `lz-string` (`compressToEncodedURIComponent`), data in the URL
   fragment.
-- Styling: plain CSS with custom properties, CSS modules per component. No CSS
-  framework, no CSS-in-JS runtime.
+- Styling: Astryx components and theme (after the trial), plus CSS modules for
+  app-specific pieces (theme art, week grid). No other CSS framework or
+  CSS-in-JS runtime. Before the trial: plain CSS with custom properties.
 - Tests: Vitest + React Testing Library (jsdom).
 
 ## Architecture rules

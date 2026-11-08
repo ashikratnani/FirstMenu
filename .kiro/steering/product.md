@@ -16,8 +16,9 @@ Active spec: `.kiro/specs/what-can-i-make/`. v1 baseline (built):
 
 ## Who it is for
 
-- Built for a 10-month-old, designed for any parent of a baby roughly 6 to 12
-  months old.
+- Built for a 10-month-old, designed for any parent of a baby or toddler from
+  6 months to 3 years. Stages: 6–8 months, 9–11 months, 12–23 months, 2–3
+  years.
 - Primary user: the parent who decides what to cook, on her phone. She gets
   recipes from Instagram reels and ChatGPT and doesn't want to type recipes in.
 - Family sharing is not a priority. Sharing a single recipe with friends is

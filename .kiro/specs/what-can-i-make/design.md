@@ -2,7 +2,7 @@
 
 ## Overview
 
-This change adds four pure domain modules and three screens to the built v1 app, and moves the week plan off the home route. Everything new runs in the browser. Nothing new is stored that can be computed.
+This change adds pure domain modules and three screens to the built v1 app, moves the week plan off the home route, adds two toddler stages, expands the built-in recipes, and moves the UI to the Astryx design system. Everything new runs in the browser. Nothing new is stored that can be computed.
 
 | Area | New or changed | Where |
 | --- | --- | --- |
@@ -13,7 +13,10 @@ This change adds four pure domain modules and three screens to the built v1 app,
 | Grocery category guess | New | `domain/category.ts` |
 | Text-mention screen | New function | `domain/safety/screen.ts` |
 | Prompt helper | New | `domain/prompt.ts` |
-| Recipe share link | New (Requirement 9, pending review) | `domain/recipeShare.ts` |
+| Recipe share link | New (Requirement 9, first to cut) | `domain/recipeShare.ts` |
+| Toddler stages | Changed | `domain/types.ts`, `domain/age.ts`, `safety/rules.ts` |
+| Built-in recipes | Expanded | `data/recipes.ts`, new `data/simpleIdeas.ts` |
+| Design system | Astryx, after a trial | `package.json`, `ui/theme/`, all pages |
 | Schema v2 | Changed | `domain/types.ts`, `domain/storage.ts` |
 | Make screen | New, home route | `ui/pages/Make.tsx` |
 | Add recipe (paste + preview) | New | `ui/pages/AddRecipe.tsx` |
@@ -47,7 +50,10 @@ interface Recipe {
     date: string;                  // YYYY-MM-DD
   };
   clearedMentions?: Array<{ ruleId: string; sentence: string }>; // Requirement 7.4
+  kind?: 'recipe' | 'simple-idea';  // Requirement 14.4; default 'recipe'
 }
+
+type StageId = '6-8' | '9-12' | '12-23' | '24-36';  // Requirement 13
 
 interface AppState {
   schemaVersion: 2;
@@ -91,7 +97,7 @@ makeResults(recipes, have: Set<string>, ageMonths, foods, options): {
 3. `missing` = required ingredients whose plain key is not in `have`, de-duplicated.
 4. Ghosted (v1 rules, reactions, or uncleared text mentions) → `ghosted`, regardless of `missing`.
 5. `missing.length === 0` → `readyNow`; `=== 1` → `missingOne`; else dropped.
-6. Stage filter (default on): keep recipes whose `stages` include the child's stage.
+6. Stage filter (default on): keep recipes whose `stages` include the child's stage. For toddler stages, also keep recipes tagged only for younger stages, and sort them after the child's-stage recipes within each group (Requirement 13.8).
 7. "Iron-rich only" filter: keep recipes tagged Iron-rich.
 8. Sort each group by `minutes` ascending (unknown last), then effort (easy, medium, more), then title.
 
@@ -246,9 +252,9 @@ UI wording for a text mention: "The recipe text mentions **{label}**: "{sentence
 `buildPrompt({ ageMonths, have, stage, leaveOut }): string` returns:
 
 ```
-Suggest one quick and easy recipe for my {ageMonths}-month-old baby.
+Suggest one quick and easy recipe for my {ageMonths}-month-old {baby | toddler (12 months and over)}.
 Use only foods from this list (you don't need to use all of them): {have, comma-separated}.
-Texture: {6-8: "smooth or well-mashed" | 9-12: "mashed, or soft small pieces he can pick up"}.
+Texture: {the stage texture hint from the table in "Toddler stages"}.
 Leave out: {leaveOut, comma-separated}. Don't mention these foods anywhere in your reply.
 If you can, include an iron-rich food.
 Reply in exactly this format and nothing else:
@@ -261,7 +267,7 @@ Steps:
 1. <step>
 ```
 
-- "he" in the texture line becomes "they" (no pronoun is stored about the child).
+- Texture hints never use a pronoun (no pronoun is stored about the child).
 - `leaveOut` = labels of block rules with `underMonths` undefined or greater than `ageMonths`, plus `foodLabel` of each food with a `reaction` record. No name or birth date (Requirement 8.5).
 - Texture hints come from the v1 stage texture notes and CDC-solids.
 - Buttons: "Copy question" (Clipboard API, with a select-all fallback) and "Open ChatGPT" (a plain link to `https://chatgpt.com/` with `target="_blank" rel="noopener noreferrer"`). A link the user taps is not a request the app makes, so Requirement 12.2 of v1 still holds.
@@ -308,7 +314,82 @@ The v1 Home week grid, unchanged, plus a sub-navigation: Week · Prep · Grocery
 
 Time and effort, nutrition tags with the explainer, "Original text" (collapsed) for pasted recipes, cleared mentions, "Add to plan", and "Share recipe" (Requirement 9).
 
-## Recipe share (`recipeShare.ts`, Requirement 9, pending review)
+## Toddler stages (Requirement 13)
+
+```ts
+type StageId = '6-8' | '9-12' | '12-23' | '24-36';   // '9-12' kept for v1 data; labeled "9–11 months"
+stageFor(m): m < 9 ? '6-8' : m < 12 ? '9-12' : m < 24 ? '12-23' : '24-36'
+defaultSlots('12-23' | '24-36') = [breakfast, lunch, dinner, snack]
+```
+
+- Extending the `StageId` union and its zod enum needs no migration; existing data only uses the two old ids.
+- The v1 test "no block findings at the youngest age of each tagged stage" covers the new stages at 12 and 24 months.
+- Age notices: under 6 months unchanged; over 36 months: "FirstMenu is designed for 6 months to 3 years. Safety rules still use your child's actual age." The 12-month notice from v1 is removed.
+
+| Stage | Label | Texture hint | Source |
+| --- | --- | --- | --- |
+| `6-8` | 6–8 months | smooth or well-mashed | CDC-solids |
+| `9-12` | 9–11 months | mashed, or soft small pieces to pick up | CDC-solids |
+| `12-23` | 12–23 months | soft, small, bite-sized pieces | CDC-encourage |
+| `24-36` | 2–3 years | small, bite-sized pieces | CDC-encourage |
+
+Task 1 confirms the hint wording against the sources and adjusts it to match them.
+
+### Juice limit reminder (Requirement 13.7)
+
+`SafetyRule` gets an optional `fromMonths`. A rule applies while `fromMonths ≤ age < underMonths`; existing rules have no `fromMonths` and behave as before.
+
+| id | Kind | Terms | Except | From | Under | Reminder | Sources |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `juice-limit` | reminder | juice | lemon, lime | 12 mo | 36 mo | 100% juice only, no more than 4 ounces a day. | AAP-juice |
+
+This is a stricter-only change and bumps `RULESET_VERSION`.
+
+## Built-in recipe expansion (Requirement 14)
+
+Target: **at least 40** built-ins (recipes plus simple ideas), **at least 8 per stage**, all nine allergen groups if the sources allow. A recipe can count toward several stages.
+
+| Source | Expected use | Notes |
+| --- | --- | --- |
+| Minnesota WIC (v1) | 10 existing recipes | Re-tag for toddler stages where the texture fits (meat balls, pancakes, puffs). |
+| Simple ideas from WIC and USDA guides | 6–9 month ideas, roughly 12–20 | Utah WIC "Homemade Baby Foods" lists simple examples by age (6, 8, 10 months). Other WIC and USDA FNS Feeding Infants sheets add more. Stored in `data/simpleIdeas.ts`. |
+| Food Hero (Oregon State University Extension) | Toddler and family recipes, roughly 10–15 | Pages fetch as HTML with exact amounts. Prefer the "Kid Approved", "30 Minutes or Less" and "5 Ingredients or Less" lists. Many include salt, sugar or honey. |
+| ICN Child Nutrition Recipe Box, CACFP family child care home recipes | Toddler recipes, roughly 10 | Written for 6 servings, so scaling is usually unnecessary. Useful for fish, beans and soy. |
+
+PDFs are read in the sandbox by downloading with `curl` and extracting text with `pdfjs-dist` in a scratch folder outside the repo; it is not an app dependency.
+
+Rules on top of v1's "Built-in recipe sourcing":
+
+1. Salt, sugar, honey or another blocked ingredient: leave it out and record it, as in v1. If the dish depends on it, tag it only for stages where the rule no longer applies (for example sugar and salt: `24-36` only), or skip it.
+2. Scaling: only to make 2–6 servings, every quantity by the same factor, rounded to the nearest common kitchen measure. Record "Scaled from N servings to M".
+3. Simple ideas: one or two foods, stage from the source's age guidance, quantities left empty (shown as "as needed"), steps reworded, `kind: 'simple-idea'` on the recipe so the UI shows the "Simple idea" label.
+4. Tag a recipe for a stage only if its texture fits that stage's texture hint, or can be made to fit by a step the source itself describes (mash, chop).
+5. Stop and report if, after going through these sources, the totals are under the targets.
+
+`Recipe` gets an optional `kind?: 'recipe' | 'simple-idea'` (default `'recipe'`), added to the schema v2 changes.
+
+## Astryx UI (Requirement 15)
+
+### Trial (gate)
+
+1. Record the v1 build's gzipped JS and CSS sizes from `npm run build` on `main`.
+2. Upgrade to React 19 (`react`, `react-dom`, `@types/react`, `@types/react-dom`, and Testing Library if needed). All tests must pass before going further.
+3. Install `@astryxdesign/core`, one theme package, `@stylexjs/stylex` (peer dependency), and `@astryxdesign/cli` as a dev dependency. Pin exact versions; Astryx is in beta.
+4. Theme: start from the closest Astryx theme and override its CSS custom properties with the v1 palette in `ui/theme/firstmenu.css`. Set `data-astryx-theme` on `<html>`.
+5. Font: the Astryx themes name Figtree but don't load it. Self-host it through `@fontsource/figtree` (SIL Open Font License), bundled by Vite. Never use the Google Fonts or CDN setup from the Astryx docs.
+6. Convert the app shell (`Layout`), the recipe library and the Settings form.
+7. Check: tests and `vitest-axe` pass; keyboard and 360 px work on the converted pages; the size increase is within 150 KB gzipped; a new build check (`scripts/check-external.mjs`, run in CI) fails if `dist/` references any `http://` or `https://` URL for fonts, stylesheets or scripts outside the app.
+8. Write the results (sizes, findings, screenshots) in the PR. If any check fails, stop and open `Decision needed: Astryx trial`.
+
+### After the trial
+
+- New screens (Make, Add recipe, Plan sub-navigation) are built with Astryx from the start.
+- Remaining v1 pages (Foods, Recipe page, editor, Prep, Grocery, Share, Sources, Onboarding) are converted afterwards. Print keeps its own print CSS.
+- CSS modules stay for app-specific pieces (theme art, week grid). Astryx components accept `className`, so no wrappers are needed.
+- `tech.md` is updated in the trial PR to name Astryx and React 19 as the stack.
+- UI feedback: at the start of the trial, open `Decision needed: what to change in the UI` asking for the primary user's specific complaints. Apply them when they arrive, without waiting.
+
+## Recipe share (`recipeShare.ts`, Requirement 9, first to cut)
 
 - Payload `{ v: 1, recipe }` where `recipe` has `imported` reduced to `{ from: 'shared', date }` and no `clearedMentions` or `food` overrides. Encoded with lz-string into `#/r/<data>`. Validated with `recipeSchema` on decode.
 - The read-only view renders the recipe with the viewer's own safety screen and offers "Add to my recipes", which saves it as a pasted recipe with `imported.text` set to the shared text, so text-mention screening applies.
@@ -337,11 +418,18 @@ Time and effort, nutrition tags with the explainer, "Original text" (collapsed) 
 - `prompt`: contains age, foods, leave-out labels for 10 and 13 months, reaction foods; never contains name or birth date.
 - `storage`: v1 → v2 migration, v1 export import, plan share link from v1 still decodes.
 - Components: Make screen groups and "I have this"; paste → preview → save without typing; text mention ghosts and "Not used" clears it.
-- a11y: `vitest-axe` on Make and Add recipe.
+- a11y: `vitest-axe` on every page after the Astryx conversion.
+- `age`: stage boundaries at 8/9, 11/12, 23/24 months; over-36 notice.
+- `rules`: `juice-limit` fires at 12 and 35 months, not at 11 or 36; `fromMonths` respected; existing rules unchanged.
+- Built-in recipes: the v1 invariant tests extended to four stages, the counts in Requirement 14.1, `kind` set for simple ideas, scaling adaptations recorded when quantities differ from the source.
+- Build: `scripts/check-external.mjs` passes in CI.
 
-## Decisions to confirm in review
+## Decisions confirmed by the maintainer (November 8, 2026)
 
 1. **Text mentions** (Requirement 7): block rules are checked in the steps, title and notes of pasted recipes only, with a one-tap "Not used in this recipe" for false alarms. Typed recipes stay ingredient-only.
-2. **Recipe sharing** (Requirement 9): text plus a link that opens the recipe in FirstMenu. Image cards for Instagram are out of scope for now.
+2. **Recipe sharing** (Requirement 9): text plus a link that opens the recipe in FirstMenu. No Instagram image cards. First feature to cut if time runs short.
 3. **Results groups**: only "Ready now" and "Missing one". Recipes missing two or more are hidden.
 4. **Nutrition tags**: seven tags, including Dairy, with lists confirmed against CDC and USDA before they ship.
+5. **More recipes** (Requirement 14): Minnesota WIC, simple ideas from WIC and USDA guides, Food Hero and the ICN recipe box. Food Hero is allowed (the earlier "skip Food Hero" instruction from issue #7 no longer applies). At least 40 built-ins, at least 8 per stage.
+6. **Toddlers** (Requirement 13): up to 36 months, as two stages, 12–23 and 24–36 months.
+7. **Astryx** (Requirement 15): trial first, then convert. Build order: trial, new screens and domain, toddler stages, recipes, sharing.
