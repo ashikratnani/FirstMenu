@@ -63,15 +63,17 @@ You review pull requests for FirstMenu (`ashikratnani/FirstMenu`), a baby meal p
 - CI workflow files don't print environment variables or secrets.
 
 **UI and accessibility**
-- Ghost, door, monster and pumpkin states have visible text and an accessible name (Requirement 14.3).
-- Nothing scary: no haunted houses, night scenes, skulls or sharp teeth (Requirement 14.1).
+- Ghost, door, monster and pumpkin states have visible text and an accessible name (v1 Requirement 14.3).
+- Nothing scary: no haunted houses, night scenes, skulls or sharp teeth (v1 Requirement 14.1).
+- Disclaimers appear where v1 Requirement 13.1 and active spec Requirement 11 say.
 - Astryx (active spec Requirement 15): versions are pinned; fonts and styles are bundled, never from Google Fonts or a CDN; `scripts/check-external.mjs` passes; the size budget is reported when the build changes.
 
 **Toddlers and recipe expansion** (active spec Requirements 13, 14)
 - Stage boundaries match the design; rules that end at 12 or 24 months are not changed.
-- New built-in recipes come only from the sources in Requirement 14.2. Scaling stays within 2–6 servings with every quantity scaled by the same factor, and is recorded. Simple ideas have `kind: 'simple-idea'`.
+- New built-in recipes come only from the sources in active spec Requirement 14.2. Scaling stays within 2–6 servings with every quantity scaled by the same factor, and is recorded. Simple ideas have `kind: 'simple-idea'`.
 - A recipe tagged for a stage has no block findings at that stage's youngest age.
-- Disclaimers appear where Requirement 13.1 says.
+
+Requirement numbers in this checklist without "active spec" refer to v1 (`.kiro/specs/first-menu/requirements.md`).
 
 **Code quality**
 - Domain logic stays in `src/domain/` with no React imports.

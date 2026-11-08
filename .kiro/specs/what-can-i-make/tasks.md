@@ -4,7 +4,7 @@
 
 Deadline: Friday, December 4, 2026, 2:00 PM PT. Target submission: Thursday, December 3.
 
-Build order agreed with the maintainer: Astryx trial, then domain work and new screens, then toddler stages, then more recipes, then recipe sharing. Sharing (task 15) is the first thing to cut if the schedule slips.
+Build order agreed with the maintainer: Astryx trial, then domain work and new screens, then toddler stages, then more recipes, then recipe sharing. One adjustment: the toddler schema and stage plumbing (task 1) comes before the trial, because every later task builds on the new stages and it's small. Toddler recipe content arrives with the recipe expansion (task 14). Sharing (task 15) is the first thing to cut if the schedule slips.
 
 | Milestone | Dates | Tasks | Done when |
 | --- | --- | --- | --- |

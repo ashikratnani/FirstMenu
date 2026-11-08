@@ -22,7 +22,8 @@ Active spec: `.kiro/specs/what-can-i-make/`. v1 baseline (built):
 - Primary user: the parent who decides what to cook, on her phone. She gets
   recipes from Instagram reels and ChatGPT and doesn't want to type recipes in.
 - Family sharing is not a priority. Sharing a single recipe with friends is
-  proposed (active spec Requirement 9).
+  approved (active spec Requirement 9) and is the first feature to cut if time
+  runs short.
 
 ## What it does
 

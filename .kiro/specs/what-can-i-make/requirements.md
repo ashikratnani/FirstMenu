@@ -223,7 +223,7 @@ Terms from the v1 glossary keep their meaning. New terms:
 3. A built-in recipe MAY differ from its source by scaling every quantity by the same factor to make 2 to 6 servings, recorded as an adaptation ("Scaled from 25 servings to 4"). This adds to the changes allowed by v1 Requirement 2.9.
 4. A simple idea MAY have no ingredient quantities and SHALL be labeled "Simple idea" in the app. This is an exception to v1 Requirement 2.8 for simple ideas only.
 5. EVERY built-in recipe and simple idea SHALL keep v1's sourcing rules: source title, publisher, URL and retrieval date recorded and shown; ingredients from the source; steps in the app's own words; storage times from the source or a cited food-safety source.
-6. THE built-in set SHOULD cover all nine allergen groups. IF it can't THEN the gap SHALL be reported to the maintainer with the groups missing.
+6. THE built-in set SHOULD cover all nine allergen groups. IF it can't THEN the gap SHALL be reported to the maintainer with the groups missing. This replaces v1 Requirement 2.5, which v1 already relaxed in issue #7.
 7. IF the sources can't reach the counts in criterion 1 THEN work SHALL stop and the shortfall SHALL be reported to the maintainer before any other source is used.
 
 ### Requirement 15: UI with the Astryx design system
