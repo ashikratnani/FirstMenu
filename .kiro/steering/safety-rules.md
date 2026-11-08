@@ -6,7 +6,8 @@ inclusion: always
 
 The safety screen is the part of FirstMenu where a bug can hurt someone. These
 rules are not optional conventions; treat them as hard requirements. The full
-rule list and sources live in `.kiro/specs/first-menu/design.md` and, once
+rule list and sources live in `.kiro/specs/first-menu/design.md` (plus the
+pasted-recipe additions in `.kiro/specs/what-can-i-make/design.md`) and, once
 built, in `src/domain/safety/rules.ts`.
 
 ## Every rule needs a published source AND a test case
@@ -29,6 +30,13 @@ built, in `src/domain/safety/rules.ts`.
 
 - The safety screen reads ingredient names ONLY. It never reads recipe titles,
   steps or notes (Req 4.1).
+- One exception (active spec Requirement 7): for **pasted** recipes
+  (`recipe.imported` set), block rules only are also checked against the
+  title, steps and notes. A text mention ghosts the recipe until the user taps
+  "Not used in this recipe" for that exact sentence. There is no negation
+  handling; never add any without the maintainer.
+- Nutrition tags reuse the matcher but are not safety rules. Each tag term
+  list still needs a cited source (CDC, USDA, AAP or WHO) and tests.
 - Matching is case-insensitive, matches whole words and multi-word phrases, and
   treats singular and plural as the same word. Terms are written in singular,
   lowercase form; a test checks this.
