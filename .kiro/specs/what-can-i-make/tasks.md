@@ -61,12 +61,12 @@ Branch names use the `v2/` prefix (for example `v2/6-paste-parser`) so they don'
   - [x] 5.1 Implement `domain/category.ts` (`guessCategory`) with one test per category and the fallback.
     - _Requirements: 6.7_
 
-- [ ] 6. Paste parser and text-mention screen
-  - [ ] 6.1 Write paste fixtures: ChatGPT in the prompt format, ChatGPT free markdown, an Instagram caption with emoji and hashtags, a caption without headings, and a reply that mentions "no salt" in a step.
+- [x] 6. Paste parser and text-mention screen
+  - [x] 6.1 Write paste fixtures: ChatGPT in the prompt format, ChatGPT free markdown, an Instagram caption with emoji and hashtags, a caption without headings, and a reply that mentions "no salt" in a step.
     - _Requirements: 6.3_
-  - [ ] 6.2 Implement `domain/importText.ts` (`parseRecipeText`) per the design, with tests for every fixture and parsing rule.
+  - [x] 6.2 Implement `domain/importText.ts` (`parseRecipeText`) per the design, with tests for every fixture and parsing rule.
     - _Requirements: 6.2, 6.3, 6.6_
-  - [ ] 6.3 Implement `screenTextMentions` in `safety/screen.ts` and include text mentions in the ghost decision. Tests per the design.
+  - [x] 6.3 Implement `screenTextMentions` in `safety/screen.ts` and include text mentions in the ghost decision. Tests per the design.
     - _Requirements: 7.1 – 7.6_
 
 - [ ] 7. Matching
