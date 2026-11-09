@@ -320,7 +320,7 @@ The tag explainer (Requirement 5.4): "Tags show which food groups are in a recip
 6. Oil, spice names (cinnamon, cumin, nutmeg, ginger, garlic powder, paprika, oregano), baking powder, baking soda, vanilla → `pantry`.
 7. Otherwise `other`.
 
-Details (task 5.1): matching uses the safety whole-token, plural-aware helpers. The Dairy tag's exceptions apply here too: milk or butter with `peanut`, `almond`, `oat`, `soy`, `coconut` or `rice` (plant milks, nut butters) → `pantry`; other dairy terms with those words → `other`; `breast` or `formula` with a dairy term → `other`. `green bean` is produce, `vanilla bean` pantry, `jelly bean` other. A word followed by `free` ("egg-free") is ignored. `buttermilk` counts as dairy.
+Details (task 5.1): matching uses the safety whole-token, plural-aware helpers. The Dairy tag's exceptions apply here too: milk or butter with `peanut`, `almond`, `oat`, `soy`, `coconut` or `rice` (plant milks, nut butters) → `pantry`; other dairy terms with those words → `other`; `breast` or `formula` with a dairy term → `other`. `green bean` is produce, `vanilla bean` pantry, `jelly bean` other. A word followed by `free` ("egg-free") is ignored; `dairy free` names are treated as dairy alternatives (milk or butter → `pantry`, other dairy terms → `other`), and `free range eggs` stays `dairy-eggs`. Only the matched bean exception phrase is removed before testing protein terms, so `chicken and green beans` is `protein`. Extra terms: `oatmeal` (grains, one token so `oat` does not match) and `steak` (protein). `buttermilk` counts as dairy.
 
 Used for pasted recipes only. Typed recipes keep the manual select, pre-filled with the guess.
 

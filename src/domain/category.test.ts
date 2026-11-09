@@ -17,14 +17,14 @@ describe('guessCategory', () => {
 
   it('protein', () => {
     for (const n of ['ground beef', 'lamb', 'pork chops', 'chicken thighs', 'turkey', 'salmon fillet',
-      'tuna', 'shrimp', 'firm tofu', 'red lentils', 'black beans', 'chickpeas']) {
+      'tuna', 'shrimp', 'firm tofu', 'red lentils', 'black beans', 'chickpeas', 'steak']) {
       expect(guessCategory(n), n).toBe('protein');
     }
   });
 
   it('grains', () => {
     for (const n of ['brown rice', 'rolled oats', 'all-purpose flour', 'pasta', 'egg-free noodles',
-      'whole wheat bread', 'infant cereal', 'quinoa', 'barley', 'crackers']) {
+      'whole wheat bread', 'infant cereal', 'quinoa', 'barley', 'crackers', 'oatmeal']) {
       expect(guessCategory(n), n).toBe('grains');
     }
   });
@@ -97,6 +97,20 @@ describe('guessCategory', () => {
 
     it('free-from names ignore the excluded word', () => {
       expect(guessCategory('gluten free pasta')).toBe('grains');
+    });
+
+    it('bean exception only ignores the bean, not other protein', () => {
+      expect(guessCategory('chicken and green beans')).toBe('protein');
+      expect(guessCategory('green beans and ham')).toBe('protein');
+    });
+
+    it('dairy-free names are alternatives, not dairy', () => {
+      expect(guessCategory('dairy-free milk')).toBe('pantry');
+      expect(guessCategory('dairy free yogurt')).toBe('other');
+    });
+
+    it('free range is not a free-from phrase', () => {
+      expect(guessCategory('free range eggs')).toBe('dairy-eggs');
     });
 
     it('bean exceptions', () => {

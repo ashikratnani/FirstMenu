@@ -20,14 +20,14 @@ const INFANT_QUALIFIERS = ['breast', 'formula'];
 const PROTEIN_TERMS = [
   'beef', 'lamb', 'pork', 'chicken', 'turkey', 'liver', 'ham', 'bacon', 'sausage',
   'fish', 'salmon', 'tuna', 'sardine', 'cod', 'shrimp', 'crab', 'tofu',
-  'lentil', 'bean', 'chickpea',
+  'lentil', 'bean', 'chickpea', 'steak',
 ];
 // Names containing "bean" that are not protein: green bean is a vegetable
 // (produce), vanilla bean is a spice (pantry, via `vanilla`), jelly bean is candy.
 const PROTEIN_EXCEPTIONS = ['green bean', 'vanilla bean', 'jelly bean'];
 
 const GRAIN_TERMS = [
-  'rice', 'oat', 'flour', 'pasta', 'noodle', 'bread', 'cereal', 'quinoa', 'barley', 'cracker',
+  'rice', 'oat', 'flour', 'pasta', 'noodle', 'bread', 'oatmeal', 'cereal', 'quinoa', 'barley', 'cracker',
 ];
 
 // Nutrition Vegetable and Fruit terms (design.md), with their exceptions.
@@ -53,11 +53,28 @@ function hasAny(tokens: string[], terms: string[]): boolean {
 }
 
 // "egg-free noodles" is not an egg: drop each "<word> free" pair before matching.
-function withoutFreeFrom(tokens: string[]): string[] {
+// "dairy free" is reported separately: such a name is a dairy alternative, not dairy.
+function withoutFreeFrom(tokens: string[]): { tokens: string[]; dairyFree: boolean } {
   const out: string[] = [];
+  let dairyFree = false;
   for (let i = 0; i < tokens.length; i++) {
     if (tokens[i + 1] === 'free') {
+      if (tokens[i] === 'dairy') dairyFree = true;
       i++;
+      continue;
+    }
+    out.push(tokens[i]);
+  }
+  return { tokens: out, dairyFree };
+}
+
+// Remove each occurrence of the given phrases (whole-token, plural-aware).
+function withoutPhrases(tokens: string[], phrases: string[]): string[] {
+  const out: string[] = [];
+  for (let i = 0; i < tokens.length; i++) {
+    const hit = phrases.map(tokenize).find((p) => termMatchesTokens(tokens.slice(i, i + p.length), p));
+    if (hit) {
+      i += hit.length - 1;
       continue;
     }
     out.push(tokens[i]);
@@ -66,7 +83,7 @@ function withoutFreeFrom(tokens: string[]): string[] {
 }
 
 export function guessCategory(name: string): GroceryCategory {
-  const tokens = withoutFreeFrom(tokenize(name));
+  const { tokens, dairyFree } = withoutFreeFrom(tokenize(name));
   if (tokens.length === 0) return 'other';
 
   // 1. frozen
@@ -75,6 +92,8 @@ export function guessCategory(name: string): GroceryCategory {
   // 2. dairy and eggs
   if (hasAny(tokens, DAIRY_TERMS)) {
     if (hasAny(tokens, INFANT_QUALIFIERS)) return 'other';
+    // "dairy-free milk" is a plant alternative: same treatment as plant milks.
+    if (dairyFree) return hasAny(tokens, [...MILK_TERMS, 'butter']) ? 'pantry' : 'other';
     if (hasAny(tokens, PLANT_QUALIFIERS)) {
       // Plant milks and nut/seed butters are shelf-stable. Return now so the
       // grain and produce rules do not claim "oat milk" or "rice milk".
@@ -84,7 +103,8 @@ export function guessCategory(name: string): GroceryCategory {
   }
 
   // 3. protein
-  if (hasAny(tokens, PROTEIN_TERMS) && !hasAny(tokens, PROTEIN_EXCEPTIONS)) return 'protein';
+  // Only the exception phrase is ignored, so "chicken and green beans" is still protein.
+  if (hasAny(withoutPhrases(tokens, PROTEIN_EXCEPTIONS), PROTEIN_TERMS)) return 'protein';
 
   // 4. grains
   if (hasAny(tokens, GRAIN_TERMS)) return 'grains';
