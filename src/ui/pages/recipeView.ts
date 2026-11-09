@@ -7,7 +7,12 @@
 // invented here (design.md / Req 5.1).
 
 import { screenRecipe, type Finding } from '../../domain/safety/screen';
-import { foodKeyFor, foodLabel, foodStatus } from '../../domain/foods';
+import {
+  foodKeyFor,
+  foodLabel,
+  foodStatus,
+  isIgnoredFood,
+} from '../../domain/foods';
 import { selectAgeMonths } from '../../state/selectors';
 import type { AppState, MealType, Recipe, StageId } from '../../domain/types';
 
@@ -109,6 +114,9 @@ export function recipeView(
 
   for (const ingredient of recipe.ingredients) {
     for (const key of foodKeyFor(ingredient)) {
+      // Water, breast milk, formula and ice are never first-taste doors (the
+      // Foods page skips them too), so they never appear in a door badge.
+      if (isIgnoredFood(key)) continue;
       const status = foodStatus(key, state, ageMonths);
       if (status === 'door' && !seenUntried.has(key)) {
         seenUntried.add(key);

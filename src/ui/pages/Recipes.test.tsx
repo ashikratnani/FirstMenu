@@ -200,6 +200,18 @@ describe('Recipes library page', () => {
     expect(badge).toHaveTextContent('New food: carrot, apple');
   });
 
+  it('never lists water, breast milk or formula as a new food in a door badge', () => {
+    renderRecipes(seedState(8));
+    // Carrots and Apples uses water; Sweet Potato Chicken uses breastmilk.
+    expect(
+      within(cardFor(/Carrots and Apples/)).getByText(/^New food:/),
+    ).toHaveTextContent(/^New food: carrot, apple$/);
+    const chicken = within(cardFor(/Sweet Potato Chicken/)).getByText(
+      /^New food:/,
+    );
+    expect(chicken.textContent).not.toMatch(/breast ?milk|water|formula/i);
+  });
+
   it('names an allergen untried food by its group label in the door badge', () => {
     // Egg (10 months, untried, no reaction) -> door badge "New food: egg", not
     // the raw "allergen:egg" key.
