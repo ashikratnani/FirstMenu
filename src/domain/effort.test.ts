@@ -92,6 +92,15 @@ describe('recipeMinutes', () => {
     expect(recipeMinutes(make({ steps: ['Cook 30 minutes, or 12 minutes, or 20 minutes.'] }))?.minutes).toBe(20);
   });
 
+  it('does not treat an unrelated "or" as joining two durations', () => {
+    expect(recipeMinutes(make({ steps: ['Bake 20 minutes or until golden, then rest 5 minutes.'] }))?.minutes).toBe(30);
+  });
+
+  it('reads fractions of an hour', () => {
+    expect(recipeMinutes(make({ steps: ['Simmer 1/2 hour.'] }))?.minutes).toBe(35);
+    expect(recipeMinutes(make({ steps: ['Simmer 1 1/2 hours.'] }))?.minutes).toBe(95);
+  });
+
   it('adds durations that are not joined by "or"', () => {
     expect(recipeMinutes(make({ steps: ['Boil 10 minutes, then rest 5 minutes.'] }))?.minutes).toBe(20);
   });

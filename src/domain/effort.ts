@@ -10,14 +10,30 @@ export interface RecipeTime {
   kind: 'stated' | 'estimated';
 }
 
-const NUM = '(\\d+(?:\\.\\d+)?)';
+// Numbers: "1 1/2", "1/2", "2.5", "20". Never the tail of a fraction or decimal.
+const NUM = '(?<![\\d/.])(\\d+\\s+\\d+/\\d+|\\d+/\\d+|\\d+(?:\\.\\d+)?)(?![\\d/])';
 // "20-25 minutes", "2 to 3 minutes", "1 hour", "30 mins", "2 hrs".
 const DURATION = new RegExp(
   `${NUM}(?:\\s*(?:-|\u2013|\u2014|to)\\s*${NUM})?\\s*(minutes?|mins?|hours?|hrs?)\\b`,
   'gi',
 );
 const EACH_SIDE = /\b(?:per|each|the other) side\b/i;
-const OR_WORD = /\bor\b/i;
+// An "or" links two durations when it opens the last comma-separated piece
+// between them (", or microwave about ") and no sentence ends in between.
+// "Bake 20 minutes or until golden, then rest 5 minutes" is not a link.
+const CLAUSE_WORD = /\b(?:until|then|and)\b/i;
+
+function joinedByOr(between: string): boolean {
+  if (/[.;]/.test(between)) return false;
+  const piece = between.slice(between.lastIndexOf(',') + 1);
+  return /^\s*or\b/i.test(piece) && !CLAUSE_WORD.test(piece);
+}
+
+function parseNum(s: string): number {
+  const frac = s.match(/^(?:(\d+)\s+)?(\d+)\/(\d+)$/);
+  if (frac) return Number(frac[1] ?? 0) + Number(frac[2]) / Number(frac[3]);
+  return Number(s);
+}
 
 interface Found {
   start: number;
@@ -28,7 +44,7 @@ interface Found {
 function durationsIn(step: string): Found[] {
   const found: Found[] = [];
   for (const m of step.matchAll(DURATION)) {
-    const upper = Number(m[2] ?? m[1]);
+    const upper = parseNum(m[2] ?? m[1]);
     const perUnit = m[3].toLowerCase().startsWith('h') ? 60 : 1;
     let minutes = upper * perUnit;
     // The clause around the duration decides "per side" (counts twice). A
@@ -57,7 +73,7 @@ function stepMinutes(step: string): number | undefined {
   let group: number[] = [found[0].minutes];
   for (let i = 1; i < found.length; i++) {
     const between = step.slice(found[i - 1].end, found[i].start);
-    if (OR_WORD.test(between)) {
+    if (joinedByOr(between)) {
       group.push(found[i].minutes);
     } else {
       total += Math.min(...group);
