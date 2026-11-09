@@ -37,7 +37,7 @@ Stop and ask the maintainer before any of these:
 - Adding negation handling ("no salt", "without honey") or any other way to skip a text mention without the user's tap.
 - Any change to requirements, scope or the theme decisions.
 - Anything that costs money, needs a new account or third-party service, or changes repository settings.
-- Anything `pr-reviewer` marks `NEEDS_MAINTAINER`, or a PR stuck after two review rounds.
+- Anything `pr-reviewer` marks `NEEDS_MAINTAINER`, or a PR still failing after 10 review rounds (or stuck sooner, as `workflow.md` describes).
 
 How to ask: open a GitHub issue titled `Decision needed: <topic>` with the context, the options, and your recommendation, then tell the maintainer in the session. Keep working on tasks that don't depend on the answer.
 

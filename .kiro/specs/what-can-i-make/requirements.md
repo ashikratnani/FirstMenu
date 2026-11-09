@@ -262,9 +262,30 @@ Terms from the v1 glossary keep their meaning. New terms:
 12. WHEN the search has at least one filter THEN, below Ready now and Missing one, THE screen SHALL show "More ideas": up to 10 more recipes matching every filter that need two or more foods the user doesn't have, fewest missing first, each naming the missing foods. This applies even when no foods are typed, so "something for breakfast" alone lists breakfast recipes.
 13. EVERY recipe SHALL have a serving form (puree, mashed, finger food, or pieces) used by the form filters: set by hand for built-in recipes, and derived from the recipe text for custom recipes using the rules in the design, editable on the recipe.
 
+### Requirement 17: Smart suggestions
+
+**User Story:** As a parent, I want the app to guess what I'm about to do and offer it, so that I tap once instead of setting things up every time.
+
+These suggestions come from the maintainer's UI feedback (issue #36): the app should anticipate and suggest, not wait to be told. Every suggestion is worked out on the device from simple rules, with no AI service.
+
+#### Acceptance Criteria
+
+1. THE top of the Make screen SHALL show one "Try this" card: the single best Ready now recipe, chosen by the rules in the design. It SHALL have one primary button that opens the recipe, and a "Show another" action that moves to the next-best recipe.
+2. WHEN the Make screen opens THEN the app SHALL suggest a meal filter for the time of day (breakfast, lunch, snack or dinner), shown as a chip marked "Suggested" that the user can remove. It SHALL NOT be applied if the user removed it in the last 4 hours, and it SHALL change only results, never stored data.
+3. IF the on-hand foods were last changed more than 3 days ago THEN the Make screen SHALL ask "Still have these?" with the foods listed and one-tap "Yes, keep" and "Clear" actions.
+4. WHEN at least 3 days have passed since the child's last new food (the spacing from v1 Requirement 7.8 and its source) THEN the Make screen MAY show "Ready for a new food?" with one Ready now or Missing one recipe that contains exactly one untried food, naming that food. The app SHALL NOT pick allergens over other foods and SHALL NOT add new health advice.
+5. EVERY recipe page SHALL have an "I made this" action that records the date. THE Make screen SHALL show a "Make again" row of the most recently made recipes that are still not ghosted.
+6. WHEN the user has added the same food to on-hand on 3 or more different days and it is not in the pantry THEN the app SHALL offer once "You often have <food>. Add to pantry?"
+7. THE Add recipe screen SHALL have a primary "Paste" button that reads the clipboard only when tapped, and SHALL fall back to the text box when the browser doesn't allow it.
+8. A suggestion SHALL NEVER show a ghosted recipe, SHALL NEVER change stored data without a tap, and SHALL show a short "Why this?" reason (for example "Ready now · 10 min · Breakfast").
+9. EACH suggestion SHALL be dismissible with one tap, and a dismissed suggestion SHALL stay hidden for at least 24 hours, except the time-of-day meal hint, which follows criterion 2.
+10. EACH screen SHALL have at most one filled primary button. On the Make screen it is the "Try this" button when that card is shown.
+11. ALL suggestion state (made log, on-hand date, food counts, dismissals) SHALL be stored on the device in schema v2, SHALL be included in export and import, and SHALL NOT be included in share links or the ChatGPT prompt.
+
 ## Out of scope
 
 - Calling any AI service from the app, or any backend.
+- Suggestions based on how often to re-offer allergens, until a cited source gives an interval.
 - Semantic search with a language model or embeddings (Requirement 16 uses a fixed name list and typo rules instead).
 - Food names in languages other than English.
 - Opening Instagram links, transcribing reel audio or video, or reading text from images inside the app.

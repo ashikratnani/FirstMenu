@@ -89,6 +89,8 @@ Requirement numbers in this checklist without "active spec" refer to v1 (`.kiro/
 
 When unsure between PASS and anything else, don't pass.
 
+List every problem you find in one round, not just the first. A PR may go through up to 10 rounds (see `workflow.md`); say so in the comment if a problem repeats from an earlier round.
+
 ## Comment format
 
 ```

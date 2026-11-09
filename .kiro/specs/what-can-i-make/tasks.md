@@ -11,7 +11,7 @@ Build order agreed with the maintainer: Astryx trial, then domain work and new s
 | Milestone | Dates | Tasks | Done when |
 | --- | --- | --- | --- |
 | M1 Foundation | Nov 9 – Nov 13 | 1 – 2, 14 batch 1 | Schema v2 and toddler stages merged; Astryx trial passed (or a decision issue opened); first recipe batch merged (about 35 built-ins). |
-| M2 Domain | Nov 14 – Nov 18 | 3 – 8, 14 batches 2–3 | Time and effort, nutrition tags, categories, parser, text mentions, matching and prompt pass tests; about 75 built-ins. |
+| M2 Domain | Nov 14 – Nov 18 | 3 – 8, 14 batches 2–3 | Time and effort, nutrition tags, categories, parser, text mentions, matching, prompt and suggestions pass tests; about 75 built-ins. |
 | M3 Screens | Nov 19 – Nov 25 | 9 – 13, 14 batch 4 | Make is home; paste → preview → save works on a phone; all pages on Astryx; about 95 built-ins. |
 | M4 Recipes and sharing | Nov 26 – Nov 30 | 14 (final batch), 15 | At least 100 built-ins meeting the stage and allergen targets; sharing if time allows. Thanksgiving week, so this milestone is lighter. |
 | M5 Verify and submit | Dec 1 – Dec 3 | 16 – 17 | Real pastes and phone checks done, docs and demo updated, submitted. |
@@ -23,8 +23,8 @@ Branch names use the `v2/` prefix (for example `v2/6-paste-parser`) so they don'
 ## Tasks
 
 - [ ] 1. Schema v2 and toddler stages
-  - [ ] 1.1 Add `Ingredient.optional`, `Recipe.statedMinutes`, `notes`, `imported`, `clearedMentions`, `kind`, `serveAs`, and `AppState.pantry`, `onHand` to `types.ts` and the zod schemas. Extend `StageId` with `12-23` and `24-36`. Set `SCHEMA_VERSION = 2` and add `MIGRATIONS[1]`.
-    - _Requirements: 10.1, 10.2, 13.2, 14.4, 16.13_
+  - [ ] 1.1 Add `Ingredient.optional`, `Recipe.statedMinutes`, `notes`, `imported`, `clearedMentions`, `kind`, `serveAs`, and `AppState.pantry`, `onHand`, `onHandUpdated`, `madeLog`, `onHandDays`, `dismissed` to `types.ts` and the zod schemas. Extend `StageId` with `12-23` and `24-36`. Set `SCHEMA_VERSION = 2` and add `MIGRATIONS[1]`.
+    - _Requirements: 10.1, 10.2, 13.2, 14.4, 16.13, 17.11_
   - [ ] 1.2 Strip `imported.text` and `clearedMentions` from the plan share payload. Tests: v1 state migrates, a v1 export imports, a v1 plan share link decodes.
     - _Requirements: 10.2, 10.4_
   - [ ] 1.3 Update `stageFor`, `defaultSlots`, stage labels ("9–11 months" for `9-12`), the over-36 notice, and onboarding and Settings wording for 6 months to 3 years. Confirm the stage texture hints against their sources. Extend the built-in recipe invariant test to the new stages.
@@ -79,6 +79,9 @@ Branch names use the `v2/` prefix (for example `v2/6-paste-parser`) so they don'
   - [ ] 8.1 Implement `domain/prompt.ts` (`buildPrompt`) with per-stage texture hints. Tests: content, leave-out list at 10, 13 and 25 months, reaction foods, "toddler" wording at 12 months and over, no name or birth date.
     - _Requirements: 8.2 – 8.5, 13.5_
 
+  - [ ] 8.2 Implement `domain/suggest.ts` per "Smart suggestions" in the design: `pickTryThis` with scoring and reasons, time-of-day meal hint, stale on-hand check, new-food-due check using `NEW_FOOD_SPACING_DAYS`, Make again list, pantry learning. Reducer actions: record made, record on-hand day, dismiss suggestion, keep on-hand. Tests with a fixed `now`: each score rule, ghosted recipes never picked, hint boundaries (10:29 vs 10:30), 4-hour hint dismissal, 24-hour dismissals, spacing at 2 and 3 days, no food tried yet, made-log dedupe per day and cap, deleted recipe removed from the log, export/import round-trip, suggestion state absent from share payloads and the prompt.
+    - _Requirements: 17.1 – 17.6, 17.8, 17.9, 17.11_
+
 - [ ] 9. Navigation and Plan move (Astryx)
   - [ ] 9.1 Move the week grid to `/plan` with a Week · Prep · Grocery · Share · Print sub-navigation. Main nav: Make, My recipes, Add recipe, Foods, Plan, Sources, Settings. Keep old routes working.
     - _Requirements: 1.2 – 1.4_
@@ -91,6 +94,9 @@ Branch names use the `v2/` prefix (for example `v2/6-paste-parser`) so they don'
   - [ ] 10.3 Add the "What do you have?" search box to the Make screen: live chips and results while typing, "Did you mean" chips, "Not recognized" list, "Recipes named …" group, removable filter chips, "More ideas", Enter or "Add" to keep. Add "Serve as" with editing to the recipe page for custom recipes. Component tests: typing "leftover chicken, rice and peas" shows three chips and updates results; a typo needs a tap before it counts; Enter moves foods to on-hand; "something for breakfast" alone shows breakfast recipes including "More ideas"; "finger food" filters to finger-food recipes; typing "iron rich" turns on the "Iron-rich only" toggle and removing the chip turns it off; a custom recipe with a guessed form shows "(guessed)" and can be edited.
     - _Requirements: 3.9, 16.5 – 16.9, 16.12, 16.13_
 
+  - [ ] 10.4 Add the suggestions to the Make screen in the order in the design: Try this card (the screen's one primary button, with "Show another" and "Why this?"), suggested meal chip, new-food suggestion, stale on-hand prompt, pantry suggestion, Make again row; at most two banners at once; every suggestion dismissible. Make the shell's "Add recipe" secondary while the Try this card shows. Component tests: Try this opens the right recipe; dismissing hides it; removing the meal chip doesn't bring it back within 4 hours; one filled primary button.
+    - _Requirements: 17.1 – 17.6, 17.8 – 17.10_
+
 - [ ] 11. Add recipe and prompt helper (Astryx)
   - [ ] 11.1 Build `ui/pages/AddRecipe.tsx` at `/add`: source picker and link, paste box, preview with line editing and moving, "mark lines as ingredients" mode, safety results with text mentions and "Not used in this recipe", Save. Link to the typed editor. Include the Instagram and screenshot help text and the fixed-list disclaimer.
     - _Requirements: 6.1, 6.4 – 6.11, 7.3 – 7.5, 11.2_
@@ -98,10 +104,14 @@ Branch names use the `v2/` prefix (for example `v2/6-paste-parser`) so they don'
     - _Requirements: 8.1, 8.6 – 8.9_
   - [ ] 11.3 Component tests: paste → preview → save with no typing; a text mention ghosts and "Not used" clears it.
     - _Requirements: 6.4, 7.3, 7.4_
+  - [ ] 11.4 Add the primary "Paste" button to Add recipe (clipboard read only on tap, fallback message when not allowed). Component tests with a mocked clipboard: success fills and reads the recipe; rejection shows the fallback.
+    - _Requirements: 17.7, 17.10_
 
 - [ ] 12. Recipe page and library
   - [ ] 12.1 Add time, effort, nutrition tags with the explainer, "Original text", cleared mentions, "Simple idea" label and "Add to plan" to the recipe page. Show time, effort and tags in the library, plus a "From ChatGPT / Instagram" badge. Add stated time to the typed editor. Add nutrition lists and sources to the Sources page.
     - _Requirements: 1.5, 4.5, 4.6, 5.4, 6.8, 7.4, 11.3, 14.4_
+  - [ ] 12.2 Add "I made this" to the recipe page (records today once per day, confirms with a short status message).
+    - _Requirements: 17.5_
 
 - [ ] 13. Convert remaining pages to Astryx
   - [ ] 13.1 Convert Foods, recipe page, typed editor, Prep, Grocery, Share, Sources and Onboarding. Keep print CSS. Apply any UI feedback received under task 2.1. Re-run `vitest-axe` on every page.
