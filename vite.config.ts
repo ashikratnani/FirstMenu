@@ -11,5 +11,14 @@ export default defineConfig({
     // scripts/size-report.mjs reads the manifest to measure what each page
     // downloads on first open (active spec Requirement 15.6).
     manifest: true,
+    rollupOptions: {
+      output: {
+        // Built-in recipe data (src/data/recipes.ts, simpleIdeas.ts) gets its own
+        // chunk so size-report.mjs can report it apart from the page budgets.
+        manualChunks(id) {
+          if (id.includes('/src/data/')) return 'recipe-data';
+        },
+      },
+    },
   },
 });

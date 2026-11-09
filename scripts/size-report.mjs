@@ -31,7 +31,12 @@ function gz(file) {
   return gzCache.get(file);
 }
 
-const isData = (key) => key.startsWith('src/data/');
+// Recipe data is a manualChunk named 'recipe-data' (vite.config.ts), so it has
+// no 'src/data/' manifest key; match on the chunk name or file prefix too.
+const isData = (key) =>
+  key.startsWith('src/data/') ||
+  manifest[key]?.name === 'recipe-data' ||
+  /(^|\/)recipe-data-/.test(manifest[key]?.file ?? '');
 
 /** Files (JS + CSS) a chunk needs, following static imports only. */
 function closure(key, files = new Set(), data = new Set(), seen = new Set()) {
@@ -67,6 +72,8 @@ console.log('First load per page (JS + CSS, gzip):');
 for (const p of pages) {
   console.log(`  ${p.name.padEnd(14)} ${kb(p.bytes).padStart(9)}${p.data ? `  + ${kb(p.data)} recipe data` : ''}`);
 }
+const dataFiles = new Set(Object.keys(manifest).filter(isData).map((k) => manifest[k].file));
+console.log(`Recipe data chunk (gzip):       ${kb(sum(dataFiles))} (not budgeted)`);
 console.log(`All JS + CSS in the build:      ${kb(allJsCss)}`);
 console.log(`Fonts (latin woff2):            ${kb(fonts)} (not budgeted)`);
 
