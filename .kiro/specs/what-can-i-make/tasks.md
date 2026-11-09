@@ -22,14 +22,14 @@ Branch names use the `v2/` prefix (for example `v2/6-paste-parser`) so they don'
 
 ## Tasks
 
-- [x] 1. Schema v2 and toddler stages
+- [ ] 1. Schema v2 and toddler stages
   - [x] 1.1 Add `Ingredient.optional`, `Recipe.statedMinutes`, `notes`, `imported`, `clearedMentions`, `kind`, `serveAs`, and `AppState.pantry`, `onHand`, `onHandUpdated`, `madeLog`, `onHandDays`, `dismissed` to `types.ts` and the zod schemas. Extend `StageId` with `12-23` and `24-36`. Set `SCHEMA_VERSION = 2` and add `MIGRATIONS[1]`.
     - _Requirements: 10.1, 10.2, 13.2, 14.4, 16.13, 17.11_
   - [x] 1.2 Strip `imported.text` and `clearedMentions` from the plan share payload. Tests: v1 state migrates, a v1 export imports, a v1 plan share link decodes.
     - _Requirements: 10.2, 10.4_
   - [x] 1.3 Update `stageFor`, `defaultSlots`, stage labels ("9–11 months" for `9-12`), the over-36 notice, and onboarding and Settings wording for 6 months to 3 years. Extend the built-in recipe invariant test to the new stages.
     - _Requirements: 13.1 – 13.4, 13.9_
-  - [ ] 1.3b Add the stage texture hints (Req 13.5) with a cited source each, confirmed against the source page (CDC pages returned 403 from the sandbox; "Foods and Drinks to Encourage" supports "small, bite-sized pieces" for toddlers only). Add the source to `SOURCES` in `rules.ts` so the release-gate test covers it, and test the hints. Do this in the task that first uses them.
+  - [ ] 1.3b Add the stage texture hints (Req 13.5) with a cited source each, confirmed against the source page (CDC pages returned 403 from the sandbox; "Foods and Drinks to Encourage" supports "small, bite-sized pieces" for toddlers only). Add the source to `SOURCES` in `rules.ts` so the release-gate test covers it, and test the hints. Task 8.1 (the prompt helper, which uses the per-stage texture hints) consumes them first, and the recipe page display in task 12.1 also shows them. Req 13.5 stays listed in both 1.3b and 8.1 so the criterion is not lost.
     - _Requirements: 13.5_
   - [x] 1.4 Add `fromMonths` to `SafetyRule` and the `juice-limit` reminder (12 to 36 months, AAP-juice). Bump `RULESET_VERSION`. Tests per the design.
     - _Requirements: 13.6, 13.7_
