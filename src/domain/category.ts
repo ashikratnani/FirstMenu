@@ -3,15 +3,20 @@
 // phrases with plural-aware equality ("peas" matches "pea", "butternut" does not
 // match "butter", "eggplant" does not match "egg"). Pure TS, no React.
 
+import { nutritionTerms } from './nutrition';
 import { termMatchesTokens, tokenize } from './safety/normalize';
 import type { GroceryCategory } from './types';
 
 const FROZEN = ['frozen'];
 
-// Nutrition Dairy terms (design.md) plus `egg`, `butter`, and `buttermilk`
-// (one token in recipes, so it needs its own entry).
+// Shared Nutrition Dairy terms plus grocery-only dairy words: `egg`, `butter`,
+// `ricotta`, `cottage cheese` and `buttermilk` (one token in recipes, so it
+// needs its own entry). The nutrition list holds only sourced terms; a shopping
+// aisle guess needs more.
 const MILK_TERMS = ['milk', 'buttermilk'];
-const DAIRY_TERMS = ['yogurt', 'cheese', 'cottage cheese', 'ricotta', ...MILK_TERMS, 'butter', 'egg'];
+const DAIRY_TERMS = [
+  ...new Set([...nutritionTerms('dairy').terms, 'cottage cheese', 'ricotta', ...MILK_TERMS, 'butter', 'egg']),
+];
 // Same list as the Dairy tag's "Except" column: these make a name a plant
 // alternative or infant milk, not dairy.
 const PLANT_QUALIFIERS = ['peanut', 'almond', 'oat', 'soy', 'coconut', 'rice'];
@@ -30,14 +35,19 @@ const GRAIN_TERMS = [
   'rice', 'oat', 'flour', 'pasta', 'noodle', 'bread', 'oatmeal', 'cereal', 'quinoa', 'barley', 'cracker',
 ];
 
-// Nutrition Vegetable and Fruit terms (design.md), with their exceptions.
+// Shared Nutrition Vegetable and Fruit terms and exceptions, plus grocery-only
+// produce that the sourced nutrition lists leave out. "bean" and "lentil" are
+// shared too, but protein (rule 3) claims them first; green bean falls through
+// to produce, and the shared bean exceptions keep vanilla and jelly beans out.
+const vegetable = nutritionTerms('vegetable');
+const fruit = nutritionTerms('fruit');
 const PRODUCE_TERMS = [
-  'sweet potato', 'carrot', 'pea', 'broccoli', 'squash', 'spinach', 'zucchini', 'cauliflower',
-  'green bean', 'potato', 'corn', 'tomato', 'kale', 'beet', 'bell pepper',
-  'apple', 'banana', 'pear', 'peach', 'mango', 'avocado', 'blueberry', 'strawberry',
-  'raspberry', 'plum', 'papaya', 'kiwi', 'prune', 'applesauce',
+  ...vegetable.terms,
+  ...fruit.terms,
+  'squash', 'zucchini', 'cauliflower', 'potato', 'corn', 'kale', 'bell pepper',
+  'apple', 'peach', 'mango', 'blueberry', 'raspberry', 'plum', 'prune', 'applesauce',
 ];
-const PRODUCE_EXCEPTIONS = ['sweet potato puff', 'apple juice'];
+const PRODUCE_EXCEPTIONS = [...vegetable.except, ...fruit.except, 'apple juice'];
 
 const PANTRY_TERMS = [
   'oil', 'cinnamon', 'cumin', 'nutmeg', 'ginger', 'garlic powder', 'paprika', 'oregano',

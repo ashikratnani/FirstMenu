@@ -38,6 +38,9 @@ export type SourceId =
   | 'FDA-safe-food-handling'
   | 'CDC-choking'
   | 'CDC-solids'
+  | 'CDC-iron'
+  | 'CDC-encourage'
+  | 'USDA-FNS-iron'
   | 'HHS-CFOC';
 
 export interface Source {
@@ -116,6 +119,24 @@ export const SOURCES: Record<SourceId, Source> = {
   'CDC-solids': {
     title: 'CDC: When, what and how to introduce solid foods',
     url: 'https://www.cdc.gov/infant-toddler-nutrition/foods-and-drinks/when-what-and-how-to-introduce-solid-foods.html',
+  },
+  // Nutrition tag sources (task 4.1). Used by domain/nutrition.ts, not by safety
+  // rules. CDC pages were read from Internet Archive copies (CDC returns 403 to
+  // the build sandbox); the USDA PDF was read directly. See nutrition.ts.
+  'CDC-iron': {
+    title: 'CDC: Iron (Infant and Toddler Nutrition)',
+    url: 'https://www.cdc.gov/infant-toddler-nutrition/vitamins-minerals/iron.html',
+    retrieved: '2026-11-09',
+  },
+  'CDC-encourage': {
+    title: 'CDC: Foods and drinks to encourage',
+    url: 'https://www.cdc.gov/infant-toddler-nutrition/foods-and-drinks/foods-and-drinks-to-encourage.html',
+    retrieved: '2026-11-09',
+  },
+  'USDA-FNS-iron': {
+    title: 'USDA FNS: For parents, making sure your baby gets enough iron (PDF)',
+    url: 'https://www.fns.usda.gov/sites/default/files/resource-files/FI_PHa_5MakingSureEnoughIron.pdf',
+    retrieved: '2026-11-09',
   },
   'HHS-CFOC': {
     title: 'Caring for Our Children 4.5.0.10: Foods that are choking hazards',
