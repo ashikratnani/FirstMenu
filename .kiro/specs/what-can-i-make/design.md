@@ -614,8 +614,10 @@ pickTryThis(results: MakeResult[], ctx: { now: Date; mealHint?: MealType; madeLo
 Candidates are Ready now results that are not ghosted, filtered by untried foods (maintainer's option b, PR #41):
 
 1. Never a recipe with two or more untried foods.
-2. If a new food is due, recipes with one untried food are allowed.
-3. If no new food is due, recipes with one untried food are left out, unless no other candidate remains. Then the single remaining recipe may be shown, and its reason says "Has a new food: <food>".
+2. If a new food is due, a recipe with one untried food is allowed only when that food is the one the new-food banner names, so the screen never offers two different new foods at once (v1 Requirement 7.7).
+3. If no new food is due, a recipe with one untried food is allowed only when it is the **only** non-ghosted Ready now recipe. This count is taken over all Ready now results before any filtering or dismissal, so a recipe with two untried foods, or a dismissed fully tried recipe, still counts as "another recipe" and keeps the untried one out.
+4. Whenever the pick has an untried food, its reason starts "Has a new food: <food>".
+5. If no candidate is left, the Try this card is hidden, the Make page reports no primary action (`usePagePrimaryAction(false)`), and the shell's "Add recipe" is primary.
 
 Score the remaining candidates (higher is better) and sort; ties go to title order:
 

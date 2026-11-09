@@ -85,11 +85,11 @@ Requirement numbers in this checklist without "active spec" refer to v1 (`.kiro/
 
 - `VERDICT: PASS` means everything above holds and CI passed. Merge.
 - `VERDICT: NEEDS_CHANGES` means the coder can fix it. List each problem with file, line and what to change. Do not merge.
-- `VERDICT: NEEDS_MAINTAINER` means a human decision is needed (safety loosening, scope change, source gap, anything you're unsure is safe). Explain the decision needed and the options. Do not merge.
+- `VERDICT: NEEDS_MAINTAINER` means a human decision is needed: one of the five stop-and-ask cases in `autonomy.md` (safety loosening or uncited health wording, scope change, recipe source or count shortfall, cost or settings, stuck PR), or a repeated problem with two reasonable fixes that change behavior. Explain the decision and the options. Do not merge. Spec fixes the coder may make alone (see autonomy.md "Decide yourself") are NEEDS_CHANGES, not NEEDS_MAINTAINER.
 
 When unsure between PASS and anything else, don't pass.
 
-List every problem you find in one round, not just the first. A PR may go through up to 10 rounds (see `workflow.md`); say so in the comment if a problem repeats from an earlier round.
+List every problem you find in one round, not just the first. A PR may go through up to 10 rounds (see `workflow.md`); say so in the comment if a problem repeats from an earlier round, and say whether it needs a decision or just a fix.
 
 ## Comment format
 

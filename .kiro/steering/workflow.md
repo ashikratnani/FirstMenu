@@ -22,6 +22,6 @@ inclusion: always
   - `VERDICT: PASS`: it merges the PR (squash) once CI passes. Nothing else to do.
   - `VERDICT: NEEDS_CHANGES`: the coding agent fixes every listed problem on the same branch, pushes, and invokes `pr-reviewer` again.
   - `VERDICT: NEEDS_MAINTAINER`: stop work on that PR and ask the maintainer (see `autonomy.md`).
-- A PR may go through up to 10 review rounds. After the 10th NEEDS_CHANGES on the same PR, stop and ask the maintainer instead of trying again. If a round finds the same problem as an earlier round, or the problem list isn't getting shorter after 3 rounds in a row, stop and ask sooner. Ask pr-reviewer to list every problem it finds in one round.
+- A PR may go through up to 10 review rounds. After the 10th NEEDS_CHANGES on the same PR, stop and ask the maintainer instead of trying again. Stop and ask sooner only if the problem list isn't getting shorter after 3 rounds in a row, or a repeated problem needs a decision (two reasonable fixes that change behavior). A repeated problem with an obvious fix is just fixed. Ask pr-reviewer to list every problem it finds in one round.
 - If `pr-reviewer` can't be invoked, leave the PR open and tell the maintainer. Don't merge it yourself.
 - After a merge, update local `main` (`git checkout main && git pull --ff-only`) before starting the next branch.
