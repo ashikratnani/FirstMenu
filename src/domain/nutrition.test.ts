@@ -37,7 +37,7 @@ describe('rule format', () => {
       expect(rule.sources.length).toBeGreaterThan(0);
       for (const id of rule.sources) {
         expect(SOURCES[id], `${rule.tag} cites unknown ${id}`).toBeDefined();
-        expect(SOURCES[id].url).toMatch(/^https:\/\/www\.(cdc|fns\.usda)\.gov\//);
+        expect(SOURCES[id].url).toMatch(/^https:\/\/www\.(cdc\.gov|fna\.usda\.gov)\//);
       }
     }
   });

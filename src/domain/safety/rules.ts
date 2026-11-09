@@ -48,6 +48,7 @@ export interface Source {
   url: string; // primary / first cited page
   urls?: string[]; // all cited pages when a source lists more than one (design "Sources")
   retrieved?: string; // YYYY-MM-DD
+  note?: string; // e.g. the archive copy actually read
 }
 
 // Sources table (design.md "Sources"), plus the sources confirmed in task 3.2
@@ -122,20 +123,23 @@ export const SOURCES: Record<SourceId, Source> = {
   },
   // Nutrition tag sources (task 4.1). Used by domain/nutrition.ts, not by safety
   // rules. CDC pages were read from Internet Archive copies (CDC returns 403 to
-  // the build sandbox); the USDA PDF was read directly. See nutrition.ts.
+  // the build sandbox), so `retrieved` is the day the copy was read and `note`
+  // gives the copy's own date. The USDA PDF was read directly. See nutrition.ts.
   'CDC-iron': {
     title: 'CDC: Iron (Infant and Toddler Nutrition)',
     url: 'https://www.cdc.gov/infant-toddler-nutrition/vitamins-minerals/iron.html',
     retrieved: '2026-11-09',
+    note: 'Read from a web.archive.org copy dated 2024-04-01 (the live page returned 403). Re-check against the live page.',
   },
   'CDC-encourage': {
     title: 'CDC: Foods and drinks to encourage',
     url: 'https://www.cdc.gov/infant-toddler-nutrition/foods-and-drinks/foods-and-drinks-to-encourage.html',
     retrieved: '2026-11-09',
+    note: 'Read from a web.archive.org copy dated 2023-11-24 (the live page returned 403). Re-check against the live page.',
   },
   'USDA-FNS-iron': {
     title: 'USDA FNS: For parents, making sure your baby gets enough iron (PDF)',
-    url: 'https://www.fns.usda.gov/sites/default/files/resource-files/FI_PHa_5MakingSureEnoughIron.pdf',
+    url: 'https://www.fna.usda.gov/sites/default/files/resource-files/FI_PHa_5MakingSureEnoughIron.pdf',
     retrieved: '2026-11-09',
   },
   'HHS-CFOC': {

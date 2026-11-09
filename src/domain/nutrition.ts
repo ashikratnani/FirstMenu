@@ -4,15 +4,20 @@
 // stored, and use the safety screen's whole-token, plural-aware matcher.
 //
 // Task 4.1: every term below is named in at least one cited source, read on
-// 2026-11-09. A term no source names is not kept, because a wrong tag is a
+// 2026-11-09 (CDC archive copies are dated 2023-11-24 and 2024-04-01). A term no source names is not kept, because a wrong tag is a
 // wrong claim. The CDC pages were read from Internet Archive copies (CDC
-// returns HTTP 403 to the build sandbox); the USDA PDF was read directly.
+// returns HTTP 403 to the build sandbox; re-check against the live pages), and
+// the USDA PDF was read directly from its canonical fna.usda.gov URL (the old
+// fns.usda.gov URL redirects there).
 //
 //   CDC-iron (Apr 1, 2024). Heme iron: red meat "such as beef, pork, lamb,
 //     goat, or venison", "Seafood and fatty fish", "Poultry, such as chicken or
 //     turkey", "Eggs". Non-heme: "Iron-fortified infant cereals", "Tofu",
 //     "Beans and lentils", "Dark green leafy vegetables". Vitamin C produce:
 //     oranges, broccoli, cabbage, berries, papaya, tomatoes, sweet potatoes.
+//     CDC-iron lists tomato, papaya, berries, sweet potato etc. only as "vitamin
+//     C-rich fruits and vegetables"; the Fruit/Vegetable split below is our own
+//     classification, not the source's.
 //   CDC-encourage (Nov 24, 2023). Fruits: bananas, strawberries, pears,
 //     oranges, melons, avocados. Vegetables: cooked spinach, carrots, beans,
 //     peas, lentils, yams, beets. Whole grains: "whole grain breads, crackers,
@@ -32,7 +37,10 @@
 // mango, blueberry, raspberry, plum, prune, applesauce; whole grain oat,
 // oatmeal, brown rice, quinoa, barley, whole wheat; dairy ricotta. Healthy fat
 // has no supporting term in any of the three sources (avocado is a fruit
-// there), so it has no rule yet: see UNCONFIRMED_TAGS.
+// there). Also checked without success: AAP healthychildren.org Starting Solid
+// Foods, MyPlate infants/toddlers pages, WHO IYCF fact sheet, CDC solid-foods
+// page and the 2020-2025 Dietary Guidelines (no list of fat-rich foods for
+// babies). So it has no rule yet: see UNCONFIRMED_TAGS.
 
 import { matchesTerm } from './safety/normalize';
 import type { SourceId } from './safety/rules';
