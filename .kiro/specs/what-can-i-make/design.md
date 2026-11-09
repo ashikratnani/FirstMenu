@@ -611,7 +611,13 @@ interface AppState {
 pickTryThis(results: MakeResult[], ctx: { now: Date; mealHint?: MealType; madeLog; foods }): MakeResult[]
 ```
 
-Candidates are Ready now results, never ghosted, with at most one untried food (recipes that would introduce two or more new foods at once are never picked). Score each (higher is better) and sort; ties go to title order:
+Candidates are Ready now results that are not ghosted, filtered by untried foods (maintainer's option b, PR #41):
+
+1. Never a recipe with two or more untried foods.
+2. If a new food is due, recipes with one untried food are allowed.
+3. If no new food is due, recipes with one untried food are left out, unless no other candidate remains. Then the single remaining recipe may be shown, and its reason says "Has a new food: <food>".
+
+Score the remaining candidates (higher is better) and sort; ties go to title order:
 
 | Rule | Points |
 | --- | --- |
@@ -620,7 +626,6 @@ Candidates are Ready now results, never ghosted, with at most one untried food (
 | Effort Easy | +1 |
 | Has the Iron-rich tag | +1 |
 | Made in the last 2 days | −3 (variety) |
-| Contains one untried food | −2, unless the new-food suggestion is due (then 0) |
 
 "Show another" walks down the sorted list and wraps. The reason line lists the rules that scored, for example "Ready now · 10 min · Breakfast · Iron-rich".
 
@@ -688,4 +693,4 @@ On Add recipe: before a preview, "Paste" is primary and "Read recipe" is seconda
 5. **More recipes** (Requirement 14): Minnesota WIC, simple ideas from WIC and USDA guides, Food Hero and the ICN recipe box. Food Hero is allowed (the earlier "skip Food Hero" instruction from issue #7 no longer applies). Raised on November 8 to at least 100 built-ins (at most 25 simple ideas; at least 15 for `6-8`, at least 25 for each other stage) and all nine allergen groups, added in reviewed batches starting right after task 1.
 6. **Toddlers** (Requirement 13): up to 36 months, as two stages, 12–23 and 24–36 months.
 7. **Astryx** (Requirement 15): trial first, then convert. Build order: trial, new screens and domain, toddler stages, recipes, sharing. The schema and stage plumbing for toddlers (task 1) goes first because every later task builds on the new `StageId`; toddler recipe content comes with the recipe expansion (task 14).
-8. **Smart suggestions** (Requirement 17, maintainer UI feedback in issue #36, approved November 9, 2026): Try this card, time-of-day meal hint, stale on-hand prompt, new-food nudge using the existing cited spacing, Make again, pantry learning and a Paste button. All rule-based on the device, no AI service, never a ghosted recipe, never a stored change without a tap.
+8. **Smart suggestions** (Requirement 17, maintainer UI feedback in issue #36, approved November 9, 2026): Try this card, time-of-day meal hint, stale on-hand prompt, new-food nudge using the existing cited spacing, Make again, pantry learning and a Paste button. All rule-based on the device, no AI service, never a ghosted recipe, never a stored change without a tap. Try this and untried foods: option b, no untried food unless a new food is due or it's the only Ready now recipe; never two or more.
