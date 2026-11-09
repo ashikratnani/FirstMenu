@@ -14,6 +14,7 @@ This change adds pure domain modules and three screens to the built v1 app, move
 | Text-mention screen | New function | `domain/safety/screen.ts` |
 | Prompt helper | New | `domain/prompt.ts` |
 | Type what you have (search) | New (Requirement 16) | `domain/foodSearch.ts`, `data/foodNames.ts`, `data/searchPhrases.ts`, serving-form and filter logic in `domain/make.ts` |
+| Smart suggestions | New (Requirement 17) | `domain/suggest.ts`, Make screen, recipe page ("I made this"), Add recipe ("Paste") |
 | Recipe share link | New (Requirement 9, first to cut) | `domain/recipeShare.ts` |
 | Toddler stages | Changed | `domain/types.ts`, `domain/age.ts`, `safety/rules.ts` |
 | Built-in recipes | Expanded | `data/recipes.ts`, new `data/simpleIdeas.ts` |
@@ -586,6 +587,105 @@ The first trial build was +320 KB over v1 against the +150 KB budget (issue #37)
 - Built-in recipes: the v1 invariant tests extended to four stages, the counts in Requirement 14.1, `kind` set for simple ideas, scaling adaptations recorded when quantities differ from the source.
 - Build: `scripts/check-external.mjs` passes in CI.
 
+## Smart suggestions (`suggest.ts`, Requirement 17)
+
+All rules are pure functions of state, the recipe list and the current time, in `domain/suggest.ts`, with no React. Time is passed in (`now: Date`) so tests are deterministic.
+
+### Stored data (added to schema v2, task 1.1)
+
+```ts
+interface AppState {
+  // ...
+  onHandUpdated?: string;                 // YYYY-MM-DD, set whenever onHand changes
+  madeLog: Array<{ recipeId: string; date: string }>; // newest first, capped at 100
+  onHandDays: Record<string, string[]>;   // food key -> distinct YYYY-MM-DD it was added (last 10)
+  dismissed: Record<string, string>;      // suggestion id -> ISO time dismissed
+}
+```
+
+`MIGRATIONS[1]` sets `madeLog: []`, `onHandDays: {}`, `dismissed: {}`. Deleting a custom recipe removes it from `madeLog`. The plan and recipe share payloads never include these fields.
+
+### "Try this" pick
+
+```ts
+pickTryThis(results: MakeResult[], ctx: { now: Date; mealHint?: MealType; madeLog; foods }): MakeResult[]
+```
+
+Candidates are Ready now results that are not ghosted, filtered by untried foods (maintainer's option b, PR #41):
+
+1. Never a recipe with two or more untried foods.
+2. If a new food is due, a recipe with one untried food is allowed only when that food is the one the new-food banner names, so the screen never offers two different new foods at once (v1 Requirement 7.7). While the new-food banner is dismissed, Try this treats a new food as not due, so rule 3 applies.
+3. If no new food is due, a recipe with one untried food is allowed only when it is the **only** non-ghosted Ready now recipe. This count is taken over all Ready now results before any filtering or dismissal, so a recipe with two untried foods, or a dismissed fully tried recipe, still counts as "another recipe" and keeps the untried one out.
+4. Whenever the pick has an untried food, its reason starts "Has a new food: <food>".
+5. If no candidate is left, the Try this card is hidden, the Make page reports no primary action (`usePagePrimaryAction(false)`), and the shell's "Add recipe" is primary.
+
+Score the remaining candidates (higher is better) and sort; ties go to title order:
+
+| Rule | Points |
+| --- | --- |
+| Matches the time-of-day meal hint | +3 |
+| Time 15 minutes or less (stated or estimated) | +2 |
+| Effort Easy | +1 |
+| Has the Iron-rich tag | +1 |
+| Made in the last 2 days | −3 (variety) |
+
+"Show another" walks down the sorted list and wraps. The reason line lists the rules that scored, for example "Ready now · 10 min · Breakfast · Iron-rich".
+
+### Time-of-day meal hint
+
+Local time: 05:00–10:29 breakfast, 10:30–13:59 lunch, 14:00–16:59 snack, 17:00–20:59 dinner, otherwise none. The hint is a ranking signal only: it adds the +3 in the Try this score and shows as a "Suggested: Breakfast" chip. It does not filter results, so it never triggers "More ideas" (Requirement 16.12) on its own. Tapping the chip turns it into a normal `meal:<type>` search filter (Requirement 16.9). Its ✕ records `dismissed['meal-hint']`, and the chip and its score boost are skipped for 4 hours.
+
+### Stale on-hand
+
+If `onHandUpdated` is more than 3 days before today and `onHand` is not empty: a compact prompt above the results, "Still have these? chicken, rice, peas · [Yes, keep] [Clear]". "Yes, keep" sets `onHandUpdated` to today without changing the list.
+
+### New food due
+
+Uses `NEW_FOOD_SPACING_DAYS` and `NEW_FOOD_SPACING_SOURCES` from `safety/rules.ts`, so no new health rule is added. The last new food date is the newest `date` among all `foods` records, `tried` or `reaction`, so a recorded reaction also restarts the wait. Due when that date is at least `NEW_FOOD_SPACING_DAYS` days before today, or no food has been recorded yet. Pick the best-scoring Ready now or Missing one recipe with exactly one untried food, any food, allergen or not. Copy: "Ready for a new food? <Recipe> introduces <food>." with a link to that food on the Foods page. The banner itself makes no health claim. Task 12.1 adds a "New food spacing" entry to the Sources page citing `NEW_FOOD_SPACING_SOURCES` (today no rule cites it, so it isn't listed yet). Allergen doors on the Foods page keep their existing cited guidance.
+
+### Make again
+
+"I made this" on the recipe page appends `{ recipeId, date: today }` (one entry per recipe per day). The Make screen shows up to 5 distinct recipes from `madeLog`, newest first, skipping ghosted ones, as small cards with a secondary "Make again" action.
+
+### Pantry learning
+
+Each day a food is added to on-hand, append the date to `onHandDays[key]` if not already there. When a food has 3 or more dates, is not in the pantry, and `dismissed['pantry:<key>']` is unset, show once: "You often have <food>. Add to pantry? [Add] [No thanks]". "No thanks" dismisses permanently for that food.
+
+### Paste button
+
+`navigator.clipboard.readText()` inside the tap handler only. On success, fill the text box and run "Read recipe". On error or when unsupported, focus the text box and show "Paste with your keyboard or long-press". Never read the clipboard on page load.
+
+### Reasons and dismissal (Requirements 17.8, 17.9)
+
+| Suggestion | "Why this?" reason | Dismiss id | Hidden for |
+| --- | --- | --- | --- |
+| Try this | scored rules, e.g. "Ready now · 10 min · Breakfast · Iron-rich" | `try-this:<recipe id>` (moves to the next pick) | 24 hours |
+| Meal hint chip | "It's breakfast time" | `meal-hint` | 4 hours |
+| New food | "3+ days since the last new food", or "No new foods recorded yet" when there are none (spacing from `NEW_FOOD_SPACING_DAYS`) | `new-food` (the whole banner) | 24 hours |
+| Still have these? | "Last updated <n> days ago" | `stale-on-hand` | 24 hours, or until on-hand changes |
+| Pantry | "Added on <n> different days" | `pantry:<food key>` | permanently ("No thanks") |
+| Make again | "Made on <date>" | `make-again` (the whole row) | 24 hours |
+
+`isDismissed(id, now)` compares `dismissed[id]` against the hide time. Times are stored as ISO strings.
+
+### Placement and primary actions
+
+Make screen order: search box, suggested meal chip (with the search filter chips), Try this card, new-food suggestion, stale on-hand prompt, pantry suggestion, Ready now, Missing one, Make again, More ideas. At most two suggestion banners show at once (new food first, then stale on-hand, then pantry).
+
+**One primary button per screen** (Requirement 17.10). Layout's `addRecipeVariant(pathname)` from the Astryx trial can't see page state, so task 10.4 replaces it with a small context:
+
+```tsx
+// ui/components/PrimaryAction.tsx
+<PrimaryActionProvider>   // in Layout
+usePagePrimaryAction(active: boolean)  // a page calls this while it shows its own primary button
+```
+
+Layout renders "Add recipe" as `secondary` while any page reports an active primary action, and hides it on `/recipes/new`, `/add` and `/onboarding`. Settings, Print and the edit pages call `usePagePrimaryAction(true)`. The Make page calls it with `true` only while the Try this card is shown. The Layout tests from the trial check variants by pathname with placeholder pages, so task 10.4 rewrites them: placeholder pages call `usePagePrimaryAction`, and the tests check the variant follows it.
+
+All suggestion banner buttons (Yes, keep · Clear · Add · No thanks · Show another · Make again) and "I made this" on the recipe page are secondary. The recipe page has no primary button of its own, so the shell's "Add recipe" stays primary there.
+
+On Add recipe: before a preview, "Paste" is primary and "Read recipe" is secondary. During a preview, "Save recipe" is primary and "Paste" is hidden.
+
 ## Decisions confirmed by the maintainer (November 8, 2026)
 
 1. **Text mentions** (Requirement 7): block rules are checked in the steps, title and notes of pasted recipes only, with a one-tap "Not used in this recipe" for false alarms. Typed recipes stay ingredient-only.
@@ -595,3 +695,4 @@ The first trial build was +320 KB over v1 against the +150 KB budget (issue #37)
 5. **More recipes** (Requirement 14): Minnesota WIC, simple ideas from WIC and USDA guides, Food Hero and the ICN recipe box. Food Hero is allowed (the earlier "skip Food Hero" instruction from issue #7 no longer applies). Raised on November 8 to at least 100 built-ins (at most 25 simple ideas; at least 15 for `6-8`, at least 25 for each other stage) and all nine allergen groups, added in reviewed batches starting right after task 1.
 6. **Toddlers** (Requirement 13): up to 36 months, as two stages, 12–23 and 24–36 months.
 7. **Astryx** (Requirement 15): trial first, then convert. Build order: trial, new screens and domain, toddler stages, recipes, sharing. The schema and stage plumbing for toddlers (task 1) goes first because every later task builds on the new `StageId`; toddler recipe content comes with the recipe expansion (task 14).
+8. **Smart suggestions** (Requirement 17, maintainer UI feedback in issue #36, approved November 9, 2026): Try this card, time-of-day meal hint, stale on-hand prompt, new-food nudge using the existing cited spacing, Make again, pantry learning and a Paste button. All rule-based on the device, no AI service, never a ghosted recipe, never a stored change without a tap. Try this and untried foods: option b. Never two or more. One only when a new food is due and it's the food the new-food banner names, or, when no new food is due, when it's the only non-ghosted Ready now recipe.

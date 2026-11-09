@@ -40,7 +40,7 @@ You review pull requests for FirstMenu (`ashikratnani/FirstMenu`), a baby meal p
 **Spec**
 - The change does what its task and requirements say, and nothing outside them. Unrequested features or refactors are NEEDS_CHANGES.
 - Tasks the PR completes are ticked in `tasks.md`, and only those.
-- No requirement or design text was changed without a note in the PR body that the maintainer approved it.
+- No requirement or design text was changed without a note in the PR body that either the maintainer approved it, or it is a spec fix from a review finding that doesn't change approved behavior or scope (allowed by `autonomy.md` "Decide yourself"). Check that such fixes really are only fixes.
 
 **Safety screen** (`src/domain/safety/**`)
 - Matching uses ingredient names only (v1 Requirement 4.1), except the text-mention check for pasted recipes (active spec Requirement 7), which uses block rules only and has no negation handling.
@@ -50,6 +50,7 @@ You review pull requests for FirstMenu (`ashikratnani/FirstMenu`), a baby meal p
 - New or changed terms have test cases, including at least one "must not fire" case when a term could match other foods.
 - Every rule cites at least one source id, and every source id exists. Spot-check new source URLs with web fetch.
 - `RULESET_VERSION` is bumped when rules change.
+- Safety and release-gate tests are not skipped, deleted or loosened, and no rule loses a source without a replacement that has a URL. Any of these without maintainer approval is NEEDS_MAINTAINER.
 
 **Built-in recipes** (`src/data/recipes.ts`)
 - Every recipe has `source` with publisher, URL and retrieval date. Spot-check at least two new recipes against their source page: ingredients and quantities match, steps are reworded and not copied, and every difference is listed in `adaptations` and is one of the allowed kinds (Requirement 2.8, 2.9).
@@ -85,9 +86,11 @@ Requirement numbers in this checklist without "active spec" refer to v1 (`.kiro/
 
 - `VERDICT: PASS` means everything above holds and CI passed. Merge.
 - `VERDICT: NEEDS_CHANGES` means the coder can fix it. List each problem with file, line and what to change. Do not merge.
-- `VERDICT: NEEDS_MAINTAINER` means a human decision is needed (safety loosening, scope change, source gap, anything you're unsure is safe). Explain the decision needed and the options. Do not merge.
+- `VERDICT: NEEDS_MAINTAINER` means a human decision is needed: one of the five stop-and-ask cases in `autonomy.md` (safety loosening or uncited health wording, scope change, recipe source or count shortfall, cost or settings, stuck PR), or a repeated problem with two reasonable fixes that change behavior, or anything you're unsure is safe. Explain the decision and the options. Do not merge. Spec fixes the coder may make alone (see autonomy.md "Decide yourself") are NEEDS_CHANGES, not NEEDS_MAINTAINER.
 
 When unsure between PASS and anything else, don't pass.
+
+List every problem you find in one round, not just the first. A PR may go through up to 10 rounds (see `workflow.md`); say so in the comment if a problem repeats from an earlier round, and say whether it needs a decision or just a fix.
 
 ## Comment format
 
