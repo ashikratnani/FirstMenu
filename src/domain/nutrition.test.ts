@@ -32,6 +32,15 @@ describe('rule format', () => {
     }
   });
 
+  it('records the retrieval date and archive note on the CDC sources', () => {
+    expect(SOURCES['CDC-iron'].retrieved).toBe('2026-11-09');
+    expect(SOURCES['CDC-iron'].note).toContain('2024-04-01');
+    expect(SOURCES['CDC-iron'].note).toContain('web.archive.org');
+    expect(SOURCES['CDC-encourage'].retrieved).toBe('2026-11-09');
+    expect(SOURCES['CDC-encourage'].note).toContain('2023-11-24');
+    expect(SOURCES['CDC-encourage'].note).toContain('web.archive.org');
+  });
+
   it('gives every rule a CDC or USDA source that exists with a URL', () => {
     for (const rule of NUTRITION_RULES) {
       expect(rule.sources.length).toBeGreaterThan(0);
@@ -83,12 +92,19 @@ describe('each tag fires', () => {
     for (const rule of NUTRITION_RULES) expect(seen.has(rule.tag), rule.tag).toBe(true);
   });
 
-  it('every term fires on itself and its plural-aware forms', () => {
+  it('every term fires on itself', () => {
     for (const rule of NUTRITION_RULES) {
       for (const term of rule.terms) {
         expect(nutritionTags([{ name: term }]), `${rule.tag}: ${term}`).toContain(rule.tag);
       }
     }
+  });
+
+  it('fires on plural forms', () => {
+    expect(tags('cooked red peppers')).toContain('vegetable');
+    expect(tags('strawberries')).toContain('fruit');
+    expect(tags('eggs')).toContain('protein');
+    expect(tags('yogurts')).toContain('dairy');
   });
 
   it('works on built-in recipes with no extra input', () => {
@@ -107,6 +123,14 @@ describe('except and matching cases', () => {
   it('jelly bean and vanilla bean get no tags', () => {
     expect(tags('jelly beans')).toEqual([]);
     expect(tags('vanilla bean')).toEqual([]);
+  });
+  it('coffee and cocoa beans get no tags', () => {
+    expect(tags('coffee beans')).toEqual([]);
+    expect(tags('cocoa beans')).toEqual([]);
+  });
+  it('milk chocolate is not dairy, red pepper is a vegetable', () => {
+    expect(tags('milk chocolate')).not.toContain('dairy');
+    expect(tags('red pepper')).toEqual(['vegetable']);
   });
   it('plant milks and infant milks are not dairy', () => {
     for (const n of ['oat milk', 'almond milk', 'coconut milk', 'rice milk', 'soy milk', 'breast milk', 'formula milk']) {

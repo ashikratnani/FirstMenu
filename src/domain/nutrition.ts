@@ -4,8 +4,8 @@
 // stored, and use the safety screen's whole-token, plural-aware matcher.
 //
 // Task 4.1: every term below is named in at least one cited source, read on
-// 2026-11-09 (CDC archive copies are dated 2023-11-24 and 2024-04-01). A term no source names is not kept, because a wrong tag is a
-// wrong claim. The CDC pages were read from Internet Archive copies (CDC
+// 2026-11-09 (CDC archive copies are dated 2023-11-24 and 2024-04-01). A term
+// no source names is not kept, because a wrong tag is a wrong claim. The CDC pages were read from Internet Archive copies (CDC
 // returns HTTP 403 to the build sandbox; re-check against the live pages), and
 // the USDA PDF was read directly from its canonical fna.usda.gov URL (the old
 // fns.usda.gov URL redirects there).
@@ -29,11 +29,20 @@
 //     vitamin C: strawberries, tomatoes, cooked red peppers, kiwi, oranges,
 //     cooked broccoli.
 //
+// Terms that rest on the USDA PDF alone (no CDC page names them), with the PDF
+// page each was read from (PDF page 1 is printed page 76, PDF page 2 is
+// printed page 77): `fortified cereal` (iron-rich; "Fortified ready-to-eat
+// cereals", PDF page 1), `kiwi` (fruit; PDF page 2) and `red pepper`
+// (vegetable; "Cooked red peppers", PDF page 2). Vegetable and fruit also lean
+// on the USDA list for tomato, broccoli, strawberry and orange, but CDC names
+// those too.
+//
 // Dropped from the draft because none of the three sources names them: iron-
 // rich liver, salmon, tuna, sardine, chickpea, spinach (as iron), egg yolk
 // (egg already matches), infant cereal without "fortified"; protein pork,
 // salmon, cod, lentil, bean, chickpea, peanut butter, yogurt; vegetable squash,
-// zucchini, cauliflower, potato, corn, kale, bell pepper; fruit apple, peach,
+// zucchini, cauliflower, potato, corn, kale, plain bell pepper (only "red
+// peppers" is named, so only `red pepper` is kept); fruit apple, peach,
 // mango, blueberry, raspberry, plum, prune, applesauce; whole grain oat,
 // oatmeal, brown rice, quinoa, barley, whole wheat; dairy ricotta. Healthy fat
 // has no supporting term in any of the three sources (avocado is a fruit
@@ -65,7 +74,7 @@ export interface NutritionRule {
 // Bump when a tag list changes.
 export const NUTRITION_VERSION = 1;
 
-const BEAN_EXCEPTIONS = ['green bean', 'jelly bean', 'vanilla bean'];
+const BEAN_EXCEPTIONS = ['green bean', 'jelly bean', 'vanilla bean', 'coffee bean', 'cocoa bean'];
 
 export const NUTRITION_RULES: NutritionRule[] = [
   {
@@ -86,9 +95,9 @@ export const NUTRITION_RULES: NutritionRule[] = [
     tag: 'vegetable',
     terms: [
       'spinach', 'carrot', 'bean', 'pea', 'lentil', 'yam', 'beet', 'sweet potato',
-      'broccoli', 'cabbage', 'tomato',
+      'broccoli', 'cabbage', 'tomato', 'red pepper',
     ],
-    except: ['sweet potato puff', 'jelly bean', 'vanilla bean'],
+    except: ['sweet potato puff', 'jelly bean', 'vanilla bean', 'coffee bean', 'cocoa bean'],
     sources: ['CDC-encourage', 'CDC-iron', 'USDA-FNS-iron'],
   },
   {
@@ -105,7 +114,7 @@ export const NUTRITION_RULES: NutritionRule[] = [
   {
     tag: 'dairy',
     terms: ['yogurt', 'cheese', 'milk'],
-    except: ['breast', 'formula', 'peanut', 'almond', 'oat', 'coconut', 'rice', 'soy milk'],
+    except: ['breast', 'formula', 'peanut', 'almond', 'oat', 'coconut', 'rice', 'soy milk', 'milk chocolate'],
     sources: ['CDC-encourage'],
   },
 ];
