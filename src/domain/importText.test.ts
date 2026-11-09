@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest';
+import type { Recipe } from './types';
+import { screenTextMentions } from './safety/screen';
 import { MAX_PASTE_CHARS, parseRecipeText } from './importText';
 import promptFormat from './__fixtures__/paste/chatgpt-prompt-format.txt?raw';
 import freeMarkdown from './__fixtures__/paste/chatgpt-free-markdown.txt?raw';
@@ -163,6 +165,39 @@ describe('clean-up', () => {
     'Tag a mom who needs this',
   ])('drops the caption filler line "%s"', (line) => {
     const r = parseRecipeText(`Ingredients:\n- 1 egg\nSteps:\n1. Mix\n${line}`);
+    expect(r.steps.map((s) => s.text)).toEqual(['Mix']);
+    expect(r.notes).toEqual([]);
+  });
+
+  it.each([
+    ['Stir in a spoon of honey, then share with family.', 'honey'],
+    ['Add a pinch of salt, comment if you like it', 'added-salt'],
+  ])('keeps the filler-worded line "%s" and the screen ghosts it', (line, ruleId) => {
+    const r = parseRecipeText(`Ingredients:\n- 1 egg\nSteps:\n1. Mix\n2. ${line}`);
+    expect(r.steps.map((s) => s.text)).toContain(line);
+    const recipe: Recipe = {
+      id: 'p1',
+      origin: 'custom',
+      title: r.title,
+      stages: ['6-8'],
+      mealTypes: ['lunch'],
+      ingredients: [{ name: 'egg', category: 'protein' }],
+      steps: r.steps.map((s) => s.text),
+      notes: r.notes.map((n) => n.text),
+      texture: 'smooth',
+      servings: 1,
+      imported: { from: 'instagram', text: 'x', date: '2026-01-05' },
+    };
+    expect(screenTextMentions(recipe, 6).map((m) => m.ruleId)).toContain(ruleId);
+  });
+
+  it('keeps a filler-worded note that mentions a block food', () => {
+    const r = parseRecipeText('Notes:\nTag a friend, no honey for babies');
+    expect(r.notes.map((n) => n.text)).toEqual(['Tag a friend, no honey for babies']);
+  });
+
+  it('still drops pure filler with no block food', () => {
+    const r = parseRecipeText('Steps:\n1. Mix\nShare with a friend who loves banana');
     expect(r.steps.map((s) => s.text)).toEqual(['Mix']);
     expect(r.notes).toEqual([]);
   });

@@ -185,6 +185,18 @@ function inAgeWindow(rule: SafetyRule, age: number): boolean {
 }
 
 /**
+ * Does any block rule fire in `text`, whatever the child's age? The paste
+ * parser uses this to keep caption filler lines that mention a block food.
+ * Age-agnostic is the strictest reading, so it can only keep more lines.
+ */
+export function textMentionsBlockFood(text: string): boolean {
+  return splitSentences(text).some((sentence) => {
+    const tokens = tokenize(sentence);
+    return RULES.some((rule) => rule.kind === 'block' && sentenceFires(rule, tokens));
+  });
+}
+
+/**
  * Block rules found in the title, steps and notes of a pasted recipe. Returns
  * nothing for a recipe without `imported`. A rule that already has a block
  * finding from the ingredient list is skipped (that finding is the one to fix,

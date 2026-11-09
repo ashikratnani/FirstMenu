@@ -5,6 +5,7 @@
 // the ingredients, steps, notes or title, where the safety screen reads it.
 
 import { UNIT_WORDS } from './foods';
+import { textMentionsBlockFood } from './safety/screen';
 
 /** Longest paste the parser reads; the UI shows a message above this. */
 export const MAX_PASTE_CHARS = 20_000;
@@ -48,12 +49,14 @@ interface Item {
   consumed: boolean;
 }
 
-// Filler lines of Instagram captions (design step 5).
+// Filler lines of Instagram captions (design step 5). A filler line is dropped
+// only when no block rule fires on it; otherwise it is kept so the text-mention
+// screen still reads it (Requirement 7.2).
 const FILLER_RE = /\b(?:save this|follow for|link in bio|comments?|share with|tag a)\b/i;
 
 /**
  * Clean one raw line. Returns null for a dropped line (hashtags, @mentions,
- * caption filler), '' for a blank or symbol-only line (a section break).
+ * pure caption filler), '' for a blank or symbol-only line (a section break).
  */
 function cleanLine(raw: string): string | null {
   let s = raw.trim();
@@ -84,7 +87,7 @@ function cleanLine(raw: string): string | null {
   s = s.replace(/(?:\s+[#@][\p{L}\p{N}_]+)+$/u, '').trim();
 
   if (!/[\p{L}\p{N}]/u.test(s)) return '';
-  if (FILLER_RE.test(s)) return null;
+  if (FILLER_RE.test(s) && !textMentionsBlockFood(s)) return null;
   return s;
 }
 
