@@ -66,6 +66,7 @@
 // helper so the pinned numbers cannot silently drift.
 
 import type { Recipe } from '../domain/types';
+import { SIMPLE_IDEAS } from './simpleIdeas';
 
 const BABYFOOD_URL = 'https://www.health.state.mn.us/people/wic/recipes/babyfood.html';
 const INFANTFOODS_URL = 'https://www.health.state.mn.us/people/wic/recipes/infantfoods.html';
@@ -89,7 +90,7 @@ export function estimateServings(yieldOz: number): number {
 const SERVINGS_ESTIMATE_NOTE =
   'Serving count is an estimate (source gives no yield): total cooked yield \u00f7 a 2 oz infant portion.';
 
-export const BUILTIN_RECIPES: Recipe[] = [
+export const RECIPES: Recipe[] = [
   // --- Minnesota WIC "Homemade Baby Food" (babyfood.html) -------------------
   {
     // Smooth puree/mash with no added salt, sugar or honey -> fine from 6 months;
@@ -107,7 +108,9 @@ export const BUILTIN_RECIPES: Recipe[] = [
       storageSource: BABYFOOD_URL,
     },
     title: 'Carrots and Apples',
+    // Toddler tag rationale: Smooth puree or mash only, so no toddler stage.
     stages: ['6-8', '9-12'],
+    serveAs: ['puree', 'mashed'],
     mealTypes: ['lunch', 'dinner'],
     ingredients: [
       { name: 'carrots, peeled and sliced', quantity: 1, unit: 'cup', category: 'produce' },
@@ -139,7 +142,9 @@ export const BUILTIN_RECIPES: Recipe[] = [
       storageSource: BABYFOOD_URL,
     },
     title: 'Sweet Potato Chicken',
+    // Toddler tag rationale: Blended or mashed only, so no toddler stage.
     stages: ['6-8', '9-12'],
+    serveAs: ['puree', 'mashed'],
     mealTypes: ['lunch', 'dinner'],
     ingredients: [
       { name: 'small sweet potato', quantity: 1, unit: 'piece', category: 'produce' },
@@ -177,7 +182,9 @@ export const BUILTIN_RECIPES: Recipe[] = [
       storageSource: BABYFOOD_URL,
     },
     title: 'Beef, Peas and Potatoes',
-    stages: ['6-8', '9-12'],
+    // Toddler tag rationale: infantfoods.html describes small chunks of potato; WIC says grind or mash to taste, so mashed texture also fits 12-23.
+    stages: ['6-8', '9-12', '12-23'],
+    serveAs: ['puree', 'mashed'],
     mealTypes: ['lunch', 'dinner'],
     ingredients: [
       { name: 'cooked cubed beef', quantity: 1, unit: 'cup', category: 'protein' },
@@ -211,7 +218,9 @@ export const BUILTIN_RECIPES: Recipe[] = [
       storageSource: BABYFOOD_URL,
     },
     title: 'Chicken, Broccoli and Rice',
-    stages: ['6-8', '9-12'],
+    // Toddler tag rationale: infantfoods.html describes small chunks of broccoli; WIC says grind or mash to taste, so it also fits 12-23.
+    stages: ['6-8', '9-12', '12-23'],
+    serveAs: ['puree', 'mashed'],
     mealTypes: ['lunch', 'dinner'],
     ingredients: [
       { name: 'cooked cubed chicken', quantity: 1, unit: 'cup', category: 'protein' },
@@ -250,7 +259,9 @@ export const BUILTIN_RECIPES: Recipe[] = [
       storageSource: BABYFOOD_URL,
     },
     title: 'Beef, Squash and Macaroni',
-    stages: ['6-8', '9-12'],
+    // Toddler tag rationale: infantfoods.html describes small chunks of macaroni; WIC says grind or mash to taste, so it also fits 12-23.
+    stages: ['6-8', '9-12', '12-23'],
+    serveAs: ['puree', 'mashed'],
     mealTypes: ['lunch', 'dinner'],
     ingredients: [
       { name: 'cooked cubed beef', quantity: 1, unit: 'cup', category: 'protein' },
@@ -286,7 +297,9 @@ export const BUILTIN_RECIPES: Recipe[] = [
       storageSource: BABYFOOD_URL,
     },
     title: 'Cereal Pancakes',
-    stages: ['9-12'],
+    // Toddler tag rationale: Pancakes are a self-fed finger food that stays suitable for toddlers.
+    stages: ['9-12', '12-23', '24-36'],
+    serveAs: ['finger-food'],
     mealTypes: ['breakfast'],
     ingredients: [
       { name: 'flour', quantity: 1, unit: 'cup', category: 'grains' },
@@ -331,7 +344,9 @@ export const BUILTIN_RECIPES: Recipe[] = [
       storageSource: BABYFOOD_URL,
     },
     title: 'Apple Rice Pudding',
+    // Toddler tag rationale: Pureed pudding only, so no toddler stage.
     stages: ['6-8', '9-12'],
+    serveAs: ['puree'],
     mealTypes: ['breakfast', 'snack'],
     ingredients: [
       { name: 'prepared infant rice cereal', quantity: 1, unit: 'cup', category: 'grains' },
@@ -369,7 +384,9 @@ export const BUILTIN_RECIPES: Recipe[] = [
       storageSource: BABYFOOD_URL,
     },
     title: 'Meat Balls',
-    stages: ['9-12'],
+    // Toddler tag rationale: Source says cut to an appropriate size, so it stays suitable for toddlers.
+    stages: ['9-12', '12-23', '24-36'],
+    serveAs: ['finger-food', 'pieces'],
     mealTypes: ['lunch', 'dinner'],
     ingredients: [
       { name: 'lean ground beef, turkey or chicken', quantity: 1.25, unit: 'lb', category: 'protein' },
@@ -409,7 +426,9 @@ export const BUILTIN_RECIPES: Recipe[] = [
       storageSource: BABYFOOD_URL,
     },
     title: 'Spinach & Apple Puffs',
-    stages: ['9-12'],
+    // Toddler tag rationale: Small dissolvable dots, suitable for toddlers too.
+    stages: ['9-12', '12-23', '24-36'],
+    serveAs: ['finger-food'],
     mealTypes: ['snack'],
     ingredients: [
       { name: 'single-grain rice cereal', quantity: 0.5, unit: 'cup', category: 'grains' },
@@ -449,7 +468,9 @@ export const BUILTIN_RECIPES: Recipe[] = [
       storageSource: BABYFOOD_URL,
     },
     title: 'Sweet Potato Puffs',
-    stages: ['9-12'],
+    // Toddler tag rationale: Small dissolvable dots, suitable for toddlers too.
+    stages: ['9-12', '12-23', '24-36'],
+    serveAs: ['finger-food'],
     mealTypes: ['snack'],
     ingredients: [
       { name: 'single-grain rice cereal', quantity: 0.5, unit: 'cup', category: 'grains' },
@@ -473,3 +494,6 @@ export const BUILTIN_RECIPES: Recipe[] = [
     storage: { fridgeDays: 1, freezerMonths: 1 },
   },
 ];
+
+/** Everything built in: the 10 sourced recipes plus the simple ideas. */
+export const BUILTIN_RECIPES: Recipe[] = [...RECIPES, ...SIMPLE_IDEAS];
