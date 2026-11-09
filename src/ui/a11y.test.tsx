@@ -251,20 +251,19 @@ describe('Accessibility: keyboard affordances (app shell)', () => {
     renderApp('/', seededState());
 
     const skip = screen.getByRole('link', { name: /skip to content/i });
-    expect(skip).toHaveAttribute('href', '#main');
 
-    // The <main> landmark exists, has id="main" and is programmatically
-    // focusable (tabIndex=-1) so activating the skip link can move focus to it.
-    const main = document.querySelector('main#main') as HTMLElement | null;
-    expect(main).not.toBeNull();
-    expect(main).toHaveAttribute('tabindex', '-1');
+    // The main landmark exists (Astryx AppShell renders it with its own id)
+    // and the skip link targets it.
+    const main = screen.getByRole('main');
+    expect(main.id).not.toBe('');
+    expect(skip).toHaveAttribute('href', `#${main.id}`);
   });
 
   it('moves focus to <main> when the skip link is activated', () => {
     renderApp('/', seededState());
 
     const skip = screen.getByRole('link', { name: /skip to content/i });
-    const main = document.querySelector('main#main') as HTMLElement;
+    const main = screen.getByRole('main');
     expect(document.activeElement).not.toBe(main);
 
     // Activate the skip link (its onClick preventDefaults and focuses main,

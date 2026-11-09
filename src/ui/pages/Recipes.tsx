@@ -1,22 +1,28 @@
-// Recipe library (Task 9.1, Req 2.4/5.1/5.3/7.3/9.1). Lists the full recipe
-// set (built-ins + custom via selectAllRecipes) as a responsive grid of cards,
-// each linking to /recipes/:id. Two filters narrow the list:
-//   - a STAGE filter (All / 6-8 / 9-12) that DEFAULTS to the child's current
-//     stage (selectStage) when known, else All;
-//   - a MEAL-TYPE filter (All / breakfast / lunch / dinner / snack).
+// Recipe library (Task 9.1, Req 2.4/5.1/5.3/7.3/9.1), on Astryx components
+// (active spec Requirement 15). Lists the full recipe set (built-ins + custom
+// via selectAllRecipes) as a responsive grid of clickable cards, each opening
+// /recipes/:id. Two one-tap filters narrow the list:
+//   - STAGE (All / 6-8 / 9-12), defaulting to the child's current stage;
+//   - MEAL TYPE (All / breakfast / lunch / dinner / snack).
 //
-// Each card carries its state in VISIBLE text and an accessible name (Req
-// 14.3); the illustrations are decorative/aria-hidden:
-//   - a GHOST state ("Not yet: ...") when the recipe is ghosted (a block
-//     finding OR an ingredient food with a recorded reaction);
-//   - a DOOR badge ("New food: <food>") naming each untried food the recipe
-//     uses (Req 7.3);
+// Each card carries its state in VISIBLE text and in the card link's
+// accessible name (Req 14.3); the illustrations are decorative/aria-hidden:
+//   - a GHOST state ("Not yet: ...") when the recipe is ghosted;
+//   - a DOOR badge ("New food: <food>") naming each untried food (Req 7.3);
 //   - a PUMPKIN badge ("Freezes for N months") when freezer-friendly.
-// Ghosting/door/pumpkin logic lives in recipeView.ts so it stays aligned with
-// screen.ts and foods.ts (no new ghosting rule invented).
+// Ghosting/door/pumpkin logic lives in recipeView.ts.
+//
+// The page's "new recipe" action is the shell's primary "Add recipe" button,
+// so there is one clear primary action per screen (issue #36).
 
 import { useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Badge } from '@astryxdesign/core/Badge';
+import { Button } from '@astryxdesign/core/Button';
+import { ClickableCard } from '@astryxdesign/core/ClickableCard';
+import {
+  SegmentedControl,
+  SegmentedControlItem,
+} from '@astryxdesign/core/SegmentedControl';
 import { useApp } from '../../state/AppProvider';
 import { selectAllRecipes, selectStage } from '../../state/selectors';
 import type { Recipe } from '../../domain/types';
@@ -37,7 +43,7 @@ import {
 } from './recipeView';
 import styles from './Recipes.module.css';
 
-/** One recipe card: a list item linking to the recipe page, with its badges. */
+/** One recipe card: a clickable card opening the recipe page, with badges. */
 function RecipeCard({ view }: { view: RecipeView }) {
   const { recipe, isGhosted, usesUntriedFood, untriedFoodLabels, freezerMonths } =
     view;
@@ -46,38 +52,38 @@ function RecipeCard({ view }: { view: RecipeView }) {
   const freezerText =
     freezerMonths !== null ? freezerBadgeText(freezerMonths) : null;
 
-  // The card link's accessible name must carry EVERY visible state (Req 14.3):
-  // the title, the ghost reason, and the door / freezer badge text. An
-  // aria-label overrides the content, so we compose it from all of them rather
-  // than let the badge text go unspoken.
+  // The card link's accessible name must carry EVERY visible state (Req 14.3).
   const accessibleName = [recipe.title, reason, doorText, freezerText]
     .filter((part): part is string => part !== null)
     .join('. ');
 
   return (
     <li className={styles.card}>
-      <Link
-        to={`/recipes/${recipe.id}`}
-        className={`${styles.cardLink} ${isGhosted ? styles.ghost : ''}`}
-        aria-label={accessibleName}
+      <ClickableCard
+        label={accessibleName}
+        href={`/recipes/${recipe.id}`}
+        variant={isGhosted ? 'purple' : 'default'}
+        padding={3}
+        width="100%"
       >
-        <span className={styles.title}>{recipe.title}</span>
-        {reason && (
-          <span className={styles.ghostReason}>
-            <GhostArt />
-            <span>{reason}</span>
-          </span>
-        )}
-        <span className={styles.badges}>
-          {doorText && <span className={styles.badgeDoor}>{doorText}</span>}
-          {freezerText && (
-            <span className={styles.badgeFreezer}>
-              <PumpkinArt />
-              {freezerText}
+        <span className={styles.cardBody}>
+          <span className={styles.title}>{recipe.title}</span>
+          {reason && (
+            <span className={styles.ghostReason}>
+              <GhostArt />
+              <span>{reason}</span>
+            </span>
+          )}
+          {(doorText || freezerText) && (
+            <span className={styles.badges}>
+              {doorText && <Badge variant="orange" label={doorText} />}
+              {freezerText && (
+                <Badge variant="yellow" icon={<PumpkinArt />} label={freezerText} />
+              )}
             </span>
           )}
         </span>
-      </Link>
+      </ClickableCard>
     </li>
   );
 }
@@ -107,15 +113,9 @@ export default function Recipes() {
 
   return (
     <>
-      <div className={styles.header}>
-        <h1>Recipes</h1>
-        <Link to="/recipes/new" className={styles.newButton}>
-          New recipe
-        </Link>
-      </div>
+      <h1 className={styles.heading}>Recipes</h1>
       <p className={styles.intro}>
-        Browse built-in and your own recipes. Filter by stage and meal type;
-        each card opens the full recipe.
+        Built-in recipes and your own. Tap a recipe to see how to make it.
       </p>
 
       {emptiedSlots.length > 0 && (
@@ -130,51 +130,51 @@ export default function Recipes() {
               <li key={`${slot.day}-${slot.meal}`}>{emptiedSlotLabel(slot)}</li>
             ))}
           </ul>
-          <button
-            type="button"
-            className={styles.emptiedDismiss}
-            onClick={dismissEmptiedSlots}
-          >
-            Dismiss
-          </button>
+          <Button label="Dismiss" size="sm" onClick={dismissEmptiedSlots} />
         </section>
       )}
 
       <div className={styles.filters}>
         <div className={styles.filterGroup}>
-          <label htmlFor="stage-filter" className={styles.filterLabel}>
+          <span className={styles.filterLabel} aria-hidden="true">
             Stage
-          </label>
-          <select
-            id="stage-filter"
+          </span>
+          <SegmentedControl
+            label="Stage"
+            size="sm"
             value={stageFilter}
-            onChange={(e) => setStageFilter(e.target.value as StageFilter)}
+            onChange={(value) => setStageFilter(value as StageFilter)}
           >
-            <option value="all">All stages</option>
+            <SegmentedControlItem value="all" label="All" />
             {STAGES.map((stage) => (
-              <option key={stage} value={stage}>
-                {stageLabel(stage)}
-              </option>
+              <SegmentedControlItem
+                key={stage}
+                value={stage}
+                label={stageLabel(stage)}
+              />
             ))}
-          </select>
+          </SegmentedControl>
         </div>
 
         <div className={styles.filterGroup}>
-          <label htmlFor="meal-filter" className={styles.filterLabel}>
+          <span className={styles.filterLabel} aria-hidden="true">
             Meal type
-          </label>
-          <select
-            id="meal-filter"
+          </span>
+          <SegmentedControl
+            label="Meal type"
+            size="sm"
             value={mealFilter}
-            onChange={(e) => setMealFilter(e.target.value as MealFilter)}
+            onChange={(value) => setMealFilter(value as MealFilter)}
           >
-            <option value="all">All meals</option>
+            <SegmentedControlItem value="all" label="All" />
             {MEAL_TYPES.map((meal) => (
-              <option key={meal} value={meal}>
-                {mealTypeLabel(meal)}
-              </option>
+              <SegmentedControlItem
+                key={meal}
+                value={meal}
+                label={mealTypeLabel(meal)}
+              />
             ))}
-          </select>
+          </SegmentedControl>
         </div>
       </div>
 

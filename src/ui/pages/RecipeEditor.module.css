@@ -24,21 +24,21 @@
 
 .label {
   font-weight: 600;
-  color: var(--color-heading);
+  color: var(--fm-color-heading);
   font-size: 0.9rem;
 }
 
 .input {
   padding: calc(var(--space) * 0.5);
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--fm-color-border);
   border-radius: var(--radius);
-  background: var(--color-surface, #fff);
-  color: var(--color-text);
+  background: var(--fm-color-surface, #fff);
+  color: var(--fm-color-text);
   font: inherit;
 }
 
 .fieldset {
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--fm-color-border);
   border-radius: var(--radius);
   padding: var(--space);
   margin: 0;
@@ -49,7 +49,7 @@
 
 .legend {
   font-weight: 600;
-  color: var(--color-heading);
+  color: var(--fm-color-heading);
   padding: 0 calc(var(--space) * 0.25);
 }
 
@@ -83,7 +83,7 @@
   flex-wrap: wrap;
   gap: calc(var(--space) * 0.5);
   padding: calc(var(--space) * 0.5);
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--fm-color-border);
   border-radius: var(--radius);
 }
 
@@ -99,10 +99,10 @@
 .removeButton {
   align-self: flex-start;
   padding: calc(var(--space) * 0.35) var(--space);
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--fm-color-border);
   border-radius: var(--radius);
-  background: var(--color-surface, #fff);
-  color: var(--color-heading);
+  background: var(--fm-color-surface, #fff);
+  color: var(--fm-color-heading);
   font: inherit;
   cursor: pointer;
 }
@@ -115,7 +115,7 @@
 .addButton:focus-visible,
 .removeButton:hover,
 .removeButton:focus-visible {
-  border-color: var(--color-heading);
+  border-color: var(--fm-color-heading);
 }
 
 .removeButton:disabled {
@@ -131,10 +131,10 @@
 
 .submit {
   padding: calc(var(--space) * 0.5) var(--space);
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--fm-color-border);
   border-radius: var(--radius);
-  background: var(--color-accent, var(--color-surface));
-  color: var(--color-text);
+  background: var(--fm-color-accent, var(--fm-color-surface));
+  color: var(--fm-color-text);
   font: inherit;
   font-weight: 600;
   cursor: pointer;
@@ -144,7 +144,7 @@
   padding: calc(var(--space) * 0.5) var(--space);
   border: 1px solid #c05454;
   border-radius: var(--radius);
-  background: var(--color-surface, #fff);
+  background: var(--fm-color-surface, #fff);
   color: #a33a3a;
   font: inherit;
   font-weight: 600;
@@ -154,15 +154,15 @@
 .findings {
   margin-top: calc(var(--space) * 1.5);
   padding: var(--space);
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--fm-color-border);
   border-radius: var(--radius);
-  background: var(--color-surface, #fff);
+  background: var(--fm-color-surface, #fff);
   max-width: 40rem;
 }
 
 .savedNote {
   margin: 0 0 var(--space);
-  color: var(--color-heading);
+  color: var(--fm-color-heading);
   font-weight: 600;
 }
 
@@ -176,18 +176,18 @@
 
 .blockHeading {
   margin: 0 0 calc(var(--space) * 0.5);
-  color: var(--color-heading);
+  color: var(--fm-color-heading);
 }
 
 .findingHeading {
   margin: var(--space) 0 calc(var(--space) * 0.5);
-  color: var(--color-heading);
+  color: var(--fm-color-heading);
 }
 
 .findingList {
   margin: 0;
   padding-left: calc(var(--space) * 1.25);
-  color: var(--color-text);
+  color: var(--fm-color-text);
 }
 
 .findingLabel {
@@ -200,7 +200,7 @@
 
 .noFindings {
   margin: 0;
-  color: var(--color-muted);
+  color: var(--fm-color-muted);
 }
 
 .error {
@@ -212,7 +212,7 @@
 
 .countsAsHint {
   margin: calc(var(--space) * 0.25) 0 0;
-  color: var(--color-muted);
+  color: var(--fm-color-muted);
   font-size: 0.8rem;
 }
 

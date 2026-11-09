@@ -34,14 +34,15 @@ Branch names use the `v2/` prefix (for example `v2/6-paste-parser`) so they don'
   - [ ] 1.5 Add reducer actions: set pantry, add/remove/clear on-hand, clear text mention. Export `foodKeyFromName` from `foods.ts`.
     - _Requirements: 2.2, 3.2, 7.4_
 
-- [ ] 2. Astryx trial
-  - [ ] 2.1 Open `Decision needed: what to change in the UI`, asking for the primary user's specific complaints. Don't wait for the answer.
+- [x] 2. Astryx trial
+  - Ran before task 1 at the maintainer's request (November 8, 2026). Results are in PR #38. Size decision (issue #37): slimmed Astryx, native date picker, pages loaded on first open, budget +250 KB for the heaviest page.
+  - [x] 2.1 Open `Decision needed: what to change in the UI`, asking for the primary user's specific complaints. Don't wait for the answer.
     - _Requirements: 15.8_
-  - [ ] 2.2 Record v1 build sizes. Upgrade to React 19 with all tests passing.
+  - [x] 2.2 Record v1 build sizes. Upgrade to React 19 with all tests passing.
     - _Requirements: 15.2, 15.6_
-  - [ ] 2.3 Install pinned Astryx packages, add the FirstMenu theme with the v1 palette, self-host Figtree, and add `scripts/check-external.mjs` to CI.
+  - [x] 2.3 Install pinned Astryx packages, add the FirstMenu theme with the v1 palette, self-host Figtree, and add `scripts/check-external.mjs` to CI.
     - _Requirements: 15.3, 15.4_
-  - [ ] 2.4 Convert the app shell, recipe library and Settings form. Check tests, `vitest-axe`, keyboard, 360 px and the size budget, and report the results in the PR. Update `tech.md`. If any check fails, open `Decision needed: Astryx trial` and continue with tasks 3–8.
+  - [x] 2.4 Convert the app shell, recipe library and Settings form. Check tests, `vitest-axe`, keyboard, 360 px and the size budget, and report the results in the PR. Update `tech.md`. If any check fails, open `Decision needed: Astryx trial` and continue with tasks 3–8.
     - _Requirements: 15.1, 15.5 – 15.7_
 
 - [ ] 3. Time and effort

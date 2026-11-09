@@ -37,6 +37,8 @@ function renderShell(initialPath = '/') {
           <Route element={<Layout />}>
             <Route path="/" element={<p>home content</p>} />
             <Route path="/recipes" element={<p>recipes content</p>} />
+            <Route path="/recipes/new" element={<p>editor content</p>} />
+            <Route path="*" element={<p>other content</p>} />
           </Route>
         </Routes>
       </MemoryRouter>
@@ -74,14 +76,56 @@ describe('Layout (app shell)', () => {
   it('renders a skip-to-content link targeting the main region', () => {
     renderShell();
     const skip = screen.getByRole('link', { name: /skip to content/i });
-    expect(skip).toHaveAttribute('href', '#main');
+    const main = screen.getByRole('main');
+    // Astryx AppShell owns the skip link and the main landmark; the link must
+    // point at whatever id the main landmark has.
+    expect(main.id).not.toBe('');
+    expect(skip).toHaveAttribute('href', `#${main.id}`);
   });
 
   it('renders a main landmark containing the routed page', () => {
     renderShell();
     const main = screen.getByRole('main');
-    expect(main).toHaveAttribute('id', 'main');
     expect(within(main).getByText(/home content/i)).toBeInTheDocument();
+  });
+
+  it('hides the "Add recipe" action on the recipe editor itself', () => {
+    renderShell('/recipes/new');
+    expect(
+      screen.queryByRole('link', { name: 'Add recipe' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('hides the "Add recipe" action during onboarding', () => {
+    renderShell('/onboarding');
+    expect(
+      screen.queryByRole('link', { name: 'Add recipe' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it.each(['/settings', '/print', '/recipes/r1/edit'])(
+    'shows "Add recipe" as a secondary button on %s, which has its own primary action',
+    (path) => {
+      renderShell(path);
+      expect(screen.getByRole('link', { name: 'Add recipe' })).toHaveAttribute(
+        'data-variant',
+        'secondary',
+      );
+    },
+  );
+
+  it('shows "Add recipe" as the primary button on the week plan', () => {
+    renderShell('/');
+    expect(screen.getByRole('link', { name: 'Add recipe' })).toHaveAttribute(
+      'data-variant',
+      'primary',
+    );
+  });
+
+  it('shows one primary "Add recipe" action linking to the recipe editor', () => {
+    renderShell();
+    const add = screen.getByRole('link', { name: 'Add recipe' });
+    expect(add).toHaveAttribute('href', '/recipes/new');
   });
 
   it('marks the active route with aria-current', () => {

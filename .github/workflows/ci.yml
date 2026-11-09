@@ -36,3 +36,14 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      # Active spec Requirement 15.3/15.4/15.6: theme contrast, no fonts,
+      # styles or scripts from other hosts, and the bundle size budget.
+      - name: Check theme contrast
+        run: npm run check:contrast
+
+      - name: Check for external resources
+        run: npm run check:external
+
+      - name: Check bundle size
+        run: npm run check:size

@@ -14,21 +14,21 @@
 }
 
 .back a {
-  color: var(--color-accent);
+  color: var(--fm-color-accent);
 }
 
 .meta {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space);
-  color: var(--color-muted);
+  color: var(--fm-color-muted);
   margin: 0 0 var(--space);
 }
 
 /* Ghost / block panel ------------------------------------------------------ */
 .ghost {
-  background: var(--color-surface);
-  border: 2px solid var(--color-border);
+  background: var(--fm-color-surface);
+  border: 2px solid var(--fm-color-border);
   border-radius: var(--radius);
   padding: var(--space);
   margin: var(--space) 0 calc(var(--space) * 1.5);
@@ -37,7 +37,7 @@
 .ghostHeading {
   margin: 0 0 calc(var(--space) * 0.5);
   font-size: 1.1rem;
-  color: var(--color-heading);
+  color: var(--fm-color-heading);
 }
 
 .blockList {
@@ -51,11 +51,11 @@
 
 .blockLabel {
   font-weight: 600;
-  color: var(--color-heading);
+  color: var(--fm-color-heading);
 }
 
 .availableAt {
-  color: var(--color-muted);
+  color: var(--fm-color-muted);
 }
 
 .ghostReason {
@@ -81,7 +81,7 @@
   display: block;
   margin-top: calc(var(--space) * 0.2);
   font-size: 0.9rem;
-  color: var(--color-accent);
+  color: var(--fm-color-accent);
 }
 
 /* Steps -------------------------------------------------------------------- */
@@ -106,30 +106,30 @@
 }
 
 .makeAhead {
-  color: var(--color-muted);
+  color: var(--fm-color-muted);
   margin: 0 0 var(--space);
 }
 
 /* Source ------------------------------------------------------------------- */
 .source a {
-  color: var(--color-accent);
+  color: var(--fm-color-accent);
 }
 
 .source a:focus-visible {
-  outline: 3px solid var(--color-focus);
+  outline: 3px solid var(--fm-color-focus);
   outline-offset: 2px;
 }
 
 .retrieved,
 .storageSource {
-  color: var(--color-muted);
+  color: var(--fm-color-muted);
   font-size: 0.85rem;
 }
 
 .adaptationsHeading {
   font-size: 1rem;
   margin: var(--space) 0 calc(var(--space) * 0.25);
-  color: var(--color-heading);
+  color: var(--fm-color-heading);
 }
 
 .adaptations {
@@ -146,7 +146,7 @@
 }
 
 .edit {
-  color: var(--color-accent);
+  color: var(--fm-color-accent);
 }
 
 .delete {
@@ -156,6 +156,6 @@
 /* Footer disclaimer -------------------------------------------------------- */
 .footer {
   margin-top: calc(var(--space) * 2);
-  border-top: 1px solid var(--color-border);
+  border-top: 1px solid var(--fm-color-border);
   padding-top: var(--space);
 }

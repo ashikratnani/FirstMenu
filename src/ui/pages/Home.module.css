@@ -13,9 +13,9 @@
 .controls {
   margin: var(--space) 0;
   padding: var(--space);
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--fm-color-border);
   border-radius: var(--radius);
-  background: var(--color-surface);
+  background: var(--fm-color-surface);
   display: flex;
   flex-wrap: wrap;
   gap: var(--space);
@@ -26,7 +26,7 @@
   flex-basis: 100%;
   margin: 0;
   font-size: 1rem;
-  color: var(--color-heading);
+  color: var(--fm-color-heading);
 }
 
 .slotToggles {
@@ -35,14 +35,14 @@
   gap: calc(var(--space) * 0.75);
   margin: 0;
   padding: calc(var(--space) * 0.5) var(--space);
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--fm-color-border);
   border-radius: var(--radius);
 }
 
 .legend {
   font-size: 0.85rem;
   font-weight: 600;
-  color: var(--color-heading);
+  color: var(--fm-color-heading);
   padding: 0 calc(var(--space) * 0.5);
 }
 
@@ -62,7 +62,7 @@
 .controlLabel {
   font-size: 0.85rem;
   font-weight: 600;
-  color: var(--color-heading);
+  color: var(--fm-color-heading);
 }
 
 .newWeek {
@@ -73,34 +73,34 @@
 
 .newWeekButton {
   padding: calc(var(--space) * 0.5) var(--space);
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--fm-color-border);
   border-radius: var(--radius);
-  background: var(--color-surface, #fff);
-  color: var(--color-heading);
+  background: var(--fm-color-surface, #fff);
+  color: var(--fm-color-heading);
   font-weight: 600;
   cursor: pointer;
 }
 
 .newWeekButton:hover,
 .newWeekButton:focus-visible {
-  border-color: var(--color-heading);
+  border-color: var(--fm-color-heading);
 }
 
 /* Print link: opens the printable week view; styled like the new-week button. */
 .printLink {
   display: inline-block;
   padding: calc(var(--space) * 0.5) var(--space);
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--fm-color-border);
   border-radius: var(--radius);
-  background: var(--color-surface, #fff);
-  color: var(--color-heading);
+  background: var(--fm-color-surface, #fff);
+  color: var(--fm-color-heading);
   font-weight: 600;
   text-decoration: none;
 }
 
 .printLink:hover,
 .printLink:focus-visible {
-  border-color: var(--color-heading);
+  border-color: var(--fm-color-heading);
 }
 
 .spacingWarning {
@@ -113,19 +113,19 @@
 
 .spacingText {
   margin: 0 0 calc(var(--space) * 0.5);
-  color: var(--color-text);
+  color: var(--fm-color-text);
   font-weight: 600;
 }
 
 .spacingSources {
   margin: 0;
   font-size: 0.82rem;
-  color: var(--color-muted);
+  color: var(--fm-color-muted);
 }
 
 .noSlots {
   margin: var(--space) 0;
-  color: var(--color-muted);
+  color: var(--fm-color-muted);
 }
 
 .weekGrid {
@@ -138,9 +138,9 @@
 }
 
 .dayCard {
-  background: var(--color-surface);
-  color: var(--color-text);
-  border: 1px solid var(--color-border);
+  background: var(--fm-color-surface);
+  color: var(--fm-color-text);
+  border: 1px solid var(--fm-color-border);
   border-radius: var(--radius);
   padding: var(--space);
   min-height: 96px;
@@ -149,13 +149,13 @@
 .dayName {
   margin: 0 0 calc(var(--space) * 0.5);
   font-size: 1rem;
-  color: var(--color-heading);
+  color: var(--fm-color-heading);
 }
 
 .dayDate {
   font-size: 0.8rem;
   font-weight: 400;
-  color: var(--color-muted);
+  color: var(--fm-color-muted);
 }
 
 .slotList {
@@ -178,7 +178,7 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.03em;
-  color: var(--color-muted);
+  color: var(--fm-color-muted);
 }
 
 .slotEmpty,
@@ -198,7 +198,7 @@
 
 .slotTitle {
   font-weight: 600;
-  color: var(--color-heading);
+  color: var(--fm-color-heading);
   text-decoration: none;
 }
 
@@ -209,7 +209,7 @@
 
 .ghostReason {
   font-size: 0.82rem;
-  color: var(--color-text);
+  color: var(--fm-color-text);
 }
 
 .slotActions {
@@ -223,10 +223,10 @@
 .replaceButton,
 .clearButton {
   padding: calc(var(--space) * 0.25) calc(var(--space) * 0.6);
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--fm-color-border);
   border-radius: var(--radius);
-  background: var(--color-surface, #fff);
-  color: var(--color-heading);
+  background: var(--fm-color-surface, #fff);
+  color: var(--fm-color-heading);
   font-size: 0.82rem;
   font-weight: 600;
   cursor: pointer;
@@ -240,5 +240,5 @@
 .replaceButton:focus-visible,
 .clearButton:hover,
 .clearButton:focus-visible {
-  border-color: var(--color-heading);
+  border-color: var(--fm-color-heading);
 }

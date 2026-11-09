@@ -234,9 +234,9 @@ export default function Print() {
         )}
       </section>
 
-      <footer className={styles.footer}>
+      <div className={styles.footer}>
         <Disclaimer />
-      </footer>
+      </div>
     </div>
   );
 }

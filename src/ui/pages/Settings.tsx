@@ -9,8 +9,15 @@
 // derived age/stage everywhere automatically (Req 1.6). The current derived
 // age/stage is shown on this page to make that update visible, and the same
 // under-6 / 12+ notices are reused so the health wording stays in one place.
+//
+// Built on Astryx form controls (active spec Requirement 15). The Save button
+// sits in a sticky action bar so the primary action stays in reach on phones
+// (issue #36).
 
-import { useMemo, useState, type FormEvent } from 'react';
+import { useMemo, useRef, useState, type FormEvent } from 'react';
+import { Button } from '@astryxdesign/core/Button';
+import { CheckboxInput } from '@astryxdesign/core/CheckboxInput';
+import { TextInput } from '@astryxdesign/core/TextInput';
 import { useApp } from '../../state/AppProvider';
 import { selectAgeMonths, selectStage } from '../../state/selectors';
 import type { FoodRecord } from '../../domain/types';
@@ -24,6 +31,9 @@ import {
   todayYmd,
   type ChecklistItem,
 } from './childProfile';
+
+/** Shown under the birth date when it is in the future. */
+const FUTURE_DATE_ERROR = 'Birth date can’t be in the future.';
 
 /** Whether a food key is currently recorded as tried in state. */
 function isTried(
@@ -55,6 +65,11 @@ export default function Settings() {
   const [name, setName] = useState(state.child?.name ?? '');
   const [birthDate, setBirthDate] = useState(state.child?.birthDate ?? '');
   const [saved, setSaved] = useState(false);
+  // The birth date uses the browser's native date picker (decision in issue
+  // #37: Astryx DateInput is too heavy). Browsers let a future date be typed
+  // past `max`, so it is checked here too.
+  const birthDateRef = useRef<HTMLInputElement>(null);
+  const isFutureDate = birthDate !== '' && birthDate > todayYmd();
 
   // Prefill the checklist from recorded tried foods.
   const [checked, setChecked] = useState<Record<string, boolean>>(() => {
@@ -105,22 +120,17 @@ export default function Settings() {
    */
   const renderItem = (item: ChecklistItem) => {
     const reaction = hasReaction(state.foods, item.key);
-    const inputId = `settings-tried-${item.key}`;
     return (
       <li key={item.key} className={styles.check}>
-        <input
-          id={inputId}
-          type="checkbox"
-          checked={reaction ? true : (checked[item.key] ?? false)}
-          disabled={reaction}
-          onChange={reaction ? undefined : () => toggle(item.key)}
+        <CheckboxInput
+          label={item.label}
+          value={reaction ? true : (checked[item.key] ?? false)}
+          isDisabled={reaction}
+          description={reaction ? 'Reaction recorded' : undefined}
+          onChange={() => {
+            if (!reaction) toggle(item.key);
+          }}
         />
-        <label htmlFor={inputId}>
-          {item.label}
-          {reaction && (
-            <span className={styles.reactionNote}> (reaction recorded)</span>
-          )}
-        </label>
       </li>
     );
   };
@@ -128,6 +138,13 @@ export default function Settings() {
   function handleSubmit(event: FormEvent) {
     event.preventDefault();
     if (!birthDate) return;
+    if (isFutureDate) {
+      // Save nothing (not the old date, not checklist changes) until the
+      // birth date is valid.
+      setSaved(false);
+      birthDateRef.current?.focus();
+      return;
+    }
 
     const trimmedName = name.trim();
     dispatch({
@@ -160,39 +177,41 @@ export default function Settings() {
       <h1>Settings</h1>
 
       <form className={styles.form} onSubmit={handleSubmit}>
-        <div className={styles.field}>
-          <label className={styles.label} htmlFor="settings-name">
-            First name (optional)
-          </label>
-          <input
-            id="settings-name"
-            className={styles.input}
-            type="text"
-            value={name}
-            onChange={(e) => {
-              setSaved(false);
-              setName(e.target.value);
-            }}
-            autoComplete="off"
-          />
-        </div>
+        <TextInput
+          label="First name"
+          isOptional
+          value={name}
+          onChange={(value) => {
+            setSaved(false);
+            setName(value);
+          }}
+          autoComplete="off"
+        />
 
         <div className={styles.field}>
           <label className={styles.label} htmlFor="settings-birthdate">
             Birth date
           </label>
           <input
+            ref={birthDateRef}
             id="settings-birthdate"
             className={styles.input}
             type="date"
             required
             max={todayYmd()}
             value={birthDate}
+            aria-invalid={isFutureDate || undefined}
+            aria-describedby={isFutureDate ? 'settings-birthdate-error' : undefined}
             onChange={(e) => {
               setSaved(false);
               setBirthDate(e.target.value);
             }}
           />
+          {isFutureDate && (
+            <p id="settings-birthdate-error" className={styles.fieldError}>
+              {FUTURE_DATE_ERROR}
+            </p>
+          )}
         </div>
 
         {persistedMonths !== null && (
@@ -226,15 +245,20 @@ export default function Settings() {
           </ul>
         </fieldset>
 
-        <button type="submit" className={styles.submit} disabled={!birthDate}>
-          Save
-        </button>
-
-        {saved && (
-          <p className={styles.saved} role="status">
-            Saved.
-          </p>
-        )}
+        <div className={styles.actions}>
+          <Button
+            label="Save"
+            type="submit"
+            variant="primary"
+            size="lg"
+            isDisabled={!birthDate}
+          />
+          {saved && (
+            <p className={styles.saved} role="status">
+              Saved.
+            </p>
+          )}
+        </div>
       </form>
     </>
   );

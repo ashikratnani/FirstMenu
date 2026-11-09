@@ -5,8 +5,8 @@
  */
 
 .banner {
-  background: var(--color-accent);
-  color: var(--color-on-accent);
+  background: var(--fm-color-accent);
+  color: var(--fm-color-on-accent);
   padding: calc(var(--space) * 0.75) var(--space);
   border-radius: var(--radius);
   margin: var(--space) 0;

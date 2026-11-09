@@ -1,56 +1,37 @@
 /*
- * Recipe library layout (Task 9.1). A bright, light page: a header with a
- * "New recipe" action, stage + meal-type filters, then a responsive grid of
- * recipe cards usable at 360px (Req 14.6). No themed haunted imagery; the
- * ghost/door/pumpkin states are carried by the card text and accessible name.
+ * Recipe library layout. Astryx draws the cards, badges, filters and banner;
+ * this file only arranges them. Responsive grid usable at 360 px (Req 14.6).
  */
 
-.header {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space);
-}
-
-.newButton {
-  display: inline-block;
-  padding: calc(var(--space) * 0.5) var(--space);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  background: var(--color-surface, #fff);
-  color: var(--color-heading);
-  text-decoration: none;
-  font-weight: 600;
-}
-
-.newButton:hover,
-.newButton:focus-visible {
-  border-color: var(--color-heading);
+.heading {
+  margin: 0 0 4px;
 }
 
 .intro {
-  margin: 0 0 var(--space);
-  color: var(--color-text);
+  margin: 0 0 16px;
+  color: var(--color-text-secondary);
 }
 
 .filters {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space);
-  margin: 0 0 calc(var(--space) * 1.5);
+  gap: 12px 24px;
+  margin: 0 0 20px;
 }
 
 .filterGroup {
   display: flex;
   flex-direction: column;
-  gap: calc(var(--space) * 0.25);
+  gap: 6px;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .filterLabel {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 600;
-  color: var(--color-heading);
+  letter-spacing: 0.02em;
+  color: var(--color-text-secondary);
 }
 
 .grid {
@@ -58,115 +39,71 @@
   margin: 0;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: var(--space);
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 12px;
 }
 
 .card {
   display: flex;
+  min-width: 0;
 }
 
-.cardLink {
+.cardBody {
   display: flex;
   flex-direction: column;
-  gap: calc(var(--space) * 0.5);
-  width: 100%;
-  padding: var(--space);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  background: var(--color-surface, #fff);
-  color: var(--color-text);
-  text-decoration: none;
-}
-
-.cardLink:hover,
-.cardLink:focus-visible {
-  border-color: var(--color-heading);
-}
-
-.cardLink.ghost {
-  background: #f4f1fb;
-  border-color: #cdbdf0;
+  gap: 8px;
 }
 
 .title {
   font-weight: 600;
-  color: var(--color-heading);
+  font-size: 1.05rem;
+  color: var(--color-text-primary);
 }
 
 .ghostReason {
   display: flex;
   align-items: center;
-  gap: calc(var(--space) * 0.5);
-  font-size: 0.85rem;
-  color: var(--color-text);
+  gap: 6px;
+  font-size: 0.875rem;
+  color: var(--color-text-purple);
 }
 
 .badges {
   display: flex;
   flex-wrap: wrap;
-  gap: calc(var(--space) * 0.5);
+  gap: 6px;
 }
 
-.badgeDoor,
-.badgeFreezer {
-  display: inline-flex;
-  align-items: center;
-  gap: calc(var(--space) * 0.25);
-  padding: calc(var(--space) * 0.2) calc(var(--space) * 0.5);
-  border-radius: var(--radius);
-  font-size: 0.78rem;
-  font-weight: 600;
-}
-
-.badgeDoor {
-  background: #f7ecd9;
-  color: #8a6d3b;
-}
-
-.badgeFreezer {
-  background: #fdeede;
-  color: #b9601f;
+/* Astryx badges truncate long labels; door badges must name every untried
+   food (Req 7.3), so let them wrap instead. */
+.badges :global(.astryx-badge),
+.badges :global(.astryx-badge) * {
+  max-width: 100%;
+  height: auto;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
 }
 
 .empty {
   margin: 0;
-  color: var(--color-muted);
+  color: var(--color-text-secondary);
 }
 
-/* Emptied-slot notice shown after deleting a recipe used in the plan (Req
- * 3.5/5.6). Reads context emptiedSlots and lists each slot in day+meal form. */
 .emptiedNotice {
-  margin: 0 0 calc(var(--space) * 1.5);
-  padding: var(--space);
-  border: 1px solid #cdbdf0;
-  border-radius: var(--radius);
-  background: #f4f1fb;
+  margin: 0 0 16px;
+  padding: 12px 16px;
+  border: 1px solid var(--color-border-purple);
+  border-radius: var(--radius-container);
+  background: var(--color-background-purple);
 }
 
 .emptiedTitle {
-  margin: 0 0 calc(var(--space) * 0.5);
+  margin: 0 0 4px;
   font-weight: 600;
-  color: var(--color-heading);
 }
 
 .emptiedList {
-  margin: 0 0 var(--space);
-  padding-left: calc(var(--space) * 1.25);
-  color: var(--color-text);
-}
-
-.emptiedDismiss {
-  padding: calc(var(--space) * 0.35) var(--space);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  background: var(--color-surface, #fff);
-  color: var(--color-heading);
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.emptiedDismiss:hover,
-.emptiedDismiss:focus-visible {
-  border-color: var(--color-heading);
+  margin: 0 0 8px;
+  padding-left: 20px;
 }

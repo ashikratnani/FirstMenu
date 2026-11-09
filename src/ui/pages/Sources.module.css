@@ -11,8 +11,8 @@
 }
 
 .rule {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
+  background: var(--fm-color-surface);
+  border: 1px solid var(--fm-color-border);
   border-radius: var(--radius);
   padding: var(--space);
   margin-bottom: var(--space);
@@ -21,7 +21,7 @@
 .ruleLabel {
   margin: 0 0 calc(var(--space) * 0.25);
   font-size: 1rem;
-  color: var(--color-heading);
+  color: var(--fm-color-heading);
 }
 
 .ruleMessage {
@@ -31,7 +31,7 @@
 .ruleSources {
   margin: 0;
   font-size: 0.85rem;
-  color: var(--color-muted);
+  color: var(--fm-color-muted);
 }
 
 .reference {
@@ -39,15 +39,15 @@
 }
 
 .reference a {
-  color: var(--color-accent);
+  color: var(--fm-color-accent);
 }
 
 .reference a:focus-visible {
-  outline: 3px solid var(--color-focus);
+  outline: 3px solid var(--fm-color-focus);
   outline-offset: 2px;
 }
 
 .retrieved {
-  color: var(--color-muted);
+  color: var(--fm-color-muted);
   font-size: 0.85rem;
 }

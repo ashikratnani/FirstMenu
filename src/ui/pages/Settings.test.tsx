@@ -158,7 +158,8 @@ describe('Settings', () => {
     // A reaction renders as a disabled, checked control (not an editable
     // checkbox); leaving it and saving must preserve the reaction untouched.
     const peanut = screen.getByLabelText(/peanut/i) as HTMLInputElement;
-    expect(peanut).toBeDisabled();
+    // Astryx keeps disabled checkboxes focusable and marks them aria-disabled.
+    expect(peanut).toHaveAttribute('aria-disabled', 'true');
 
     await user.click(screen.getByRole('button', { name: /save/i }));
 
@@ -173,6 +174,27 @@ describe('Settings', () => {
     renderSettings(onboardedState('2026-01-15'));
     const input = screen.getByLabelText(/birth date/i) as HTMLInputElement;
     expect(input.max).toBe(todayYmd());
+  });
+
+  it('rejects a typed future birth date and saves nothing until it is fixed', async () => {
+    const user = userEvent.setup();
+    renderSettings(onboardedState('2026-01-15'));
+    const input = screen.getByLabelText(/birth date/i) as HTMLInputElement;
+
+    // Also change a checkbox, so we can tell whether anything was saved.
+    await user.click(screen.getByLabelText('peanut'));
+
+    fireEvent.change(input, { target: { value: '2099-01-01' } });
+    expect(input).toHaveAttribute('aria-invalid', 'true');
+    expect(input).toHaveAccessibleDescription(/can.t be in the future/i);
+
+    await user.click(screen.getByRole('button', { name: /save/i }));
+
+    // Nothing saved: no "Saved." message, old birth date kept, and the
+    // checklist change not recorded.
+    expect(screen.queryByText('Saved.')).not.toBeInTheDocument();
+    expect(captured?.child?.birthDate).toBe('2026-01-15');
+    expect(captured?.foods[allergenFoodKey('peanut')]).toBeUndefined();
   });
 
   it('lists the nine allergen groups', () => {
@@ -234,7 +256,8 @@ describe('Settings', () => {
     // The reaction food renders disabled (not a plain unchecked checkbox) and
     // carries a visible "reaction recorded" indication.
     const peanut = screen.getByLabelText(/peanut/i) as HTMLInputElement;
-    expect(peanut).toBeDisabled();
+    // Astryx keeps disabled checkboxes focusable and marks them aria-disabled.
+    expect(peanut).toHaveAttribute('aria-disabled', 'true');
     expect(screen.getByText(/reaction recorded/i)).toBeInTheDocument();
 
     // Saving leaves the reaction record exactly as-is (never claims a change).

@@ -530,8 +530,16 @@ Rules on top of v1's "Built-in recipe sourcing":
 4. Theme: start from the closest Astryx theme and override its CSS custom properties with the v1 palette in `ui/theme/firstmenu.css`. Set `data-astryx-theme` on `<html>`.
 5. Font: the Astryx themes name Figtree but don't load it. Self-host it through `@fontsource/figtree` (SIL Open Font License), bundled by Vite. Never use the Google Fonts or CDN setup from the Astryx docs.
 6. Convert the app shell (`Layout`), the recipe library and the Settings form.
-7. Check: tests and `vitest-axe` pass; keyboard and 360 px work on the converted pages; the size increase, excluding the built-in recipe chunk, is within 150 KB gzipped; a new build check (`scripts/check-external.mjs`, run in CI) fails if `dist/` references any `http://` or `https://` URL for fonts, stylesheets or scripts outside the app.
+7. Check: tests and `vitest-axe` pass; keyboard and 360 px work on the converted pages; the heaviest page's first load, excluding the built-in recipe chunk, is within 250 KB gzipped of v1; a new build check (`scripts/check-external.mjs`, run in CI) fails if `dist/` references any `http://` or `https://` URL for fonts, stylesheets or scripts outside the app.
 8. Write the results (sizes, findings, screenshots) in the PR. If any check fails, stop and open `Decision needed: Astryx trial`.
+
+### Trial outcome (November 8, 2026)
+
+The first trial build was +320 KB over v1 against the +150 KB budget (issue #37). The maintainer chose the slimmed option:
+
+- **Native date picker.** Astryx DateInput (about 68 KB gzipped on its own) is not used; date fields are native `<input type="date">` styled with the theme tokens. Browsers let a future date be typed past `max`, so forms also check it and block saving.
+- **Route-level code splitting.** `src/ui/pages/routes.ts` lazy-loads every page; `App.tsx` wraps the routed page in `<Suspense>` so the shell stays while a page loads. Tests use `routes.eager.ts` through a Vitest alias so component tests stay synchronous; `routes.test.ts` checks both files export the same pages.
+- **Size rule.** `scripts/size-report.mjs` reads the Vite manifest and measures each page's first load (entry closure plus the page's static-import closure, JS and CSS, gzipped). Budget: heaviest page at most +250 KB over v1. Result after slimming: heaviest page (Recipes) +224.5 KB; app shell alone 290 KB.
 
 ### After the trial
 

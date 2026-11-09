@@ -17,9 +17,9 @@
 }
 
 .firstRun {
-  background: var(--color-surface);
-  color: var(--color-text);
-  border: 1px solid var(--color-border);
+  background: var(--fm-color-surface);
+  color: var(--fm-color-text);
+  border: 1px solid var(--fm-color-border);
   border-radius: var(--radius);
   padding: var(--space);
   margin: var(--space) 0;
@@ -28,7 +28,7 @@
 .firstRunTitle {
   margin: 0 0 calc(var(--space) * 0.5);
   font-size: 1.1rem;
-  color: var(--color-heading);
+  color: var(--fm-color-heading);
 }
 
 .firstRun p {
@@ -40,14 +40,14 @@
   padding: calc(var(--space) * 0.75) var(--space);
   border: none;
   border-radius: var(--radius);
-  background: var(--color-accent);
-  color: var(--color-on-accent);
+  background: var(--fm-color-accent);
+  color: var(--fm-color-on-accent);
   font: inherit;
   font-weight: 600;
   cursor: pointer;
 }
 
 .acknowledge:focus-visible {
-  outline: 3px solid var(--color-focus);
+  outline: 3px solid var(--fm-color-focus);
   outline-offset: 2px;
 }

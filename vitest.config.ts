@@ -6,6 +6,16 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
   base: '/FirstMenu/',
   plugins: [react()],
+  resolve: {
+    // The app lazy-loads pages (src/ui/pages/routes.ts). Tests use eager
+    // versions so they can query a page right after render.
+    alias: [
+      {
+        find: /^\.\/ui\/pages\/routes$/,
+        replacement: '/src/ui/pages/routes.eager.ts',
+      },
+    ],
+  },
   test: {
     globals: true,
     environment: 'jsdom',

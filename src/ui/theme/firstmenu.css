@@ -1,0 +1,89 @@
+/*
+ * FirstMenu theme for Astryx (active spec Requirement 15.3).
+ *
+ * Starts from @astryxdesign/theme-neutral and overrides its color tokens with
+ * the FirstMenu palette: creams, soft orange and lavender. This rule is not in
+ * a cascade layer, so it wins over the theme's layered tokens. The app runs in
+ * light mode only (<Theme mode="light">), so plain colors are used instead of
+ * light-dark() pairs.
+ *
+ * Contrast (WCAG 2.1 AA, checked by scripts/contrast-check.mjs):
+ *   text-primary   #2b2330 on body #fff8f0       14.39:1
+ *   text-secondary #5c5560 on body #fff8f0        6.82:1
+ *   text-accent    #8f3f10 on body #fff8f0        6.91:1
+ *   on-accent      #ffffff on accent #b4541a      4.97:1
+ *   accent (focus, UI) #b4541a on body #fff8f0    4.72:1  (needs 3:1)
+ *   border-emphasized #9c8574 on surface #ffffff  3.49:1  (needs 3:1)
+ *
+ * Fonts: the theme names Figtree. It is self-hosted through @fontsource/figtree
+ * (imported in ThemeRoot.tsx), never loaded from Google Fonts or a CDN
+ * (Requirement 15.4).
+ */
+
+[data-astryx-theme='neutral'] {
+  /* Surfaces */
+  --color-background-body: #fff8f0;
+  --color-background-surface: #ffffff;
+  --color-background-card: #ffffff;
+  --color-background-popover: #ffffff;
+  --color-background-muted: #f8eee3;
+
+  /* Accent: soft orange */
+  --color-accent: #b4541a;
+  --color-accent-muted: #f6d9c4;
+  --color-on-accent: #ffffff;
+  --color-text-accent: #8f3f10;
+  --color-icon-accent: #b4541a;
+
+  /* Text and icons */
+  --color-text-primary: #2b2330;
+  --color-text-secondary: #5c5560;
+  --color-text-disabled: #8d8492;
+  --color-icon-primary: #2b2330;
+  --color-icon-secondary: #6e6573;
+
+  /* Borders */
+  --color-border: #eadccf;
+  --color-border-emphasized: #9c8574;
+
+  /* Hover and pressed tints use the accent so the whole app feels warm */
+  --color-overlay-hover: #b4541a14;
+  --color-overlay-pressed: #b4541a26;
+
+  /* Theme colors used by the friendly ghost, door and pumpkin states */
+  --color-background-purple: #efe7f7;
+  --color-border-purple: #cdbdf0;
+  --color-text-purple: #4a2f5e;
+  --color-background-orange: #fde6d3;
+  --color-border-orange: #f0b98f;
+  --color-text-orange: #7a3410;
+  /* Pumpkin (freezer) badge: same values as the neutral theme, listed here so
+     scripts/contrast-check.mjs covers them. */
+  --color-background-yellow: #fae19e;
+  --color-text-yellow: #4b3900;
+
+  background-color: var(--color-background-body);
+  color: var(--color-text-primary);
+  font-family: var(--font-family-body);
+  min-height: 100vh;
+}
+
+/*
+ * Astryx's full reset.css is not loaded yet, because it would restyle the v1
+ * pages that are not converted (task 13). Nav links still need the part of it
+ * that stops browser link colors, so it is added here in the lowest-priority
+ * `reset` layer, where Astryx component styles still win.
+ */
+@layer reset {
+  a.astryx-top-nav-item,
+  a.astryx-top-nav-heading {
+    color: inherit;
+    text-decoration: none;
+  }
+}
+
+/* The selected item in the phone nav drawer otherwise falls back to the
+   browser's link blue. Unlayered, so it wins over Astryx's layered rules. */
+[data-astryx-theme='neutral'] a.astryx-top-nav-item[aria-current='page'] {
+  color: var(--color-text-primary);
+}

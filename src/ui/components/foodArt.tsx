@@ -35,8 +35,8 @@ export function DoorArt() {
         width="26"
         height="33"
         rx="8"
-        fill="var(--color-accent-soft, #f6d9c4)"
-        stroke="var(--color-accent, #b4541a)"
+        fill="var(--fm-color-accent-soft, #f6d9c4)"
+        stroke="var(--fm-color-accent, #b4541a)"
         strokeWidth="1.5"
       />
       {/* Door panel (animated open) */}
@@ -47,11 +47,11 @@ export function DoorArt() {
           width="18"
           height="25"
           rx="6"
-          fill="var(--color-door-surface, #f6d9c4)"
-          stroke="var(--color-accent, #b4541a)"
+          fill="var(--fm-color-door-surface, #f6d9c4)"
+          stroke="var(--fm-color-accent, #b4541a)"
           strokeWidth="1.2"
         />
-        <circle cx="25" cy="21" r="1.8" fill="var(--color-accent, #b4541a)" />
+        <circle cx="25" cy="21" r="1.8" fill="var(--fm-color-accent, #b4541a)" />
       </g>
     </svg>
   );
@@ -90,7 +90,7 @@ export function MonsterArt({ group }: { group?: AllergenGroup } = {}) {
             strokeWidth="1.6"
             strokeLinecap="round"
           />
-          <circle cx="20" cy="4" r="2" fill="var(--color-accent, #b4541a)" />
+          <circle cx="20" cy="4" r="2" fill="var(--fm-color-accent, #b4541a)" />
         </>
       )}
       {/* Rounded friendly body */}
@@ -133,12 +133,12 @@ export function PumpkinArt() {
       <rect x="18" y="5" width="4" height="8" rx="2" fill="#6b8e4e" />
       <path d="M22 9 q6 -3 7 2 q-5 2 -7 -2 z" fill="#8ab566" />
       {/* Rounded pumpkin body */}
-      <ellipse cx="20" cy="25" rx="15" ry="12" fill="var(--color-pumpkin-surface, #f7c9a0)" />
-      <ellipse cx="20" cy="25" rx="15" ry="12" fill="none" stroke="var(--color-accent, #b4541a)" strokeWidth="1.1" opacity="0.5" />
+      <ellipse cx="20" cy="25" rx="15" ry="12" fill="var(--fm-color-pumpkin-surface, #f7c9a0)" />
+      <ellipse cx="20" cy="25" rx="15" ry="12" fill="none" stroke="var(--fm-color-accent, #b4541a)" strokeWidth="1.1" opacity="0.5" />
       {/* Soft ribs */}
-      <path d="M20 14 v22" stroke="var(--color-accent, #b4541a)" strokeWidth="1.1" opacity="0.5" />
-      <path d="M12 17 q-3 8 0 16" fill="none" stroke="var(--color-accent, #b4541a)" strokeWidth="1.1" opacity="0.5" />
-      <path d="M28 17 q3 8 0 16" fill="none" stroke="var(--color-accent, #b4541a)" strokeWidth="1.1" opacity="0.5" />
+      <path d="M20 14 v22" stroke="var(--fm-color-accent, #b4541a)" strokeWidth="1.1" opacity="0.5" />
+      <path d="M12 17 q-3 8 0 16" fill="none" stroke="var(--fm-color-accent, #b4541a)" strokeWidth="1.1" opacity="0.5" />
+      <path d="M28 17 q3 8 0 16" fill="none" stroke="var(--fm-color-accent, #b4541a)" strokeWidth="1.1" opacity="0.5" />
     </svg>
   );
 }
@@ -161,19 +161,19 @@ export function GhostArt() {
     >
       <path
         d="M9 21 a11 11 0 0 1 22 0 v12 q-2.75 3 -5.5 0 q-2.75 3 -5.5 0 q-2.75 3 -5.5 0 q-2.75 3 -5.5 0 z"
-        fill="var(--color-ghost-surface, #e7e0f3)"
-        stroke="var(--color-lavender, #e7e0f3)"
+        fill="var(--fm-color-ghost-surface, #e7e0f3)"
+        stroke="var(--fm-color-lavender, #e7e0f3)"
         strokeWidth="1"
         opacity="0.85"
       />
       {/* Round friendly eyes */}
-      <circle cx="16" cy="19" r="1.7" fill="var(--color-heading, #4a2f5e)" />
-      <circle cx="24" cy="19" r="1.7" fill="var(--color-heading, #4a2f5e)" />
+      <circle cx="16" cy="19" r="1.7" fill="var(--fm-color-heading, #4a2f5e)" />
+      <circle cx="24" cy="19" r="1.7" fill="var(--fm-color-heading, #4a2f5e)" />
       {/* Soft smile */}
       <path
         d="M16 24 q4 3 8 0"
         fill="none"
-        stroke="var(--color-heading, #4a2f5e)"
+        stroke="var(--fm-color-heading, #4a2f5e)"
         strokeWidth="1.4"
         strokeLinecap="round"
       />
@@ -198,15 +198,15 @@ export function LanternArt() {
       focusable="false"
     >
       {/* Top ring + handle */}
-      <path d="M17 6 q3 -4 6 0" fill="none" stroke="var(--color-accent, #b4541a)" strokeWidth="1.4" strokeLinecap="round" />
-      <rect x="15" y="7" width="10" height="3" rx="1.5" fill="var(--color-accent, #b4541a)" />
+      <path d="M17 6 q3 -4 6 0" fill="none" stroke="var(--fm-color-accent, #b4541a)" strokeWidth="1.4" strokeLinecap="round" />
+      <rect x="15" y="7" width="10" height="3" rx="1.5" fill="var(--fm-color-accent, #b4541a)" />
       {/* Rounded body */}
-      <rect x="13" y="10" width="14" height="22" rx="7" fill="var(--color-pumpkin-surface, #f7c9a0)" stroke="var(--color-accent, #b4541a)" strokeWidth="1.2" />
+      <rect x="13" y="10" width="14" height="22" rx="7" fill="var(--fm-color-pumpkin-surface, #f7c9a0)" stroke="var(--fm-color-accent, #b4541a)" strokeWidth="1.2" />
       {/* Warm glow */}
-      <ellipse cx="20" cy="21" rx="4.5" ry="6" fill="var(--color-accent-soft, #f6d9c4)" />
+      <ellipse cx="20" cy="21" rx="4.5" ry="6" fill="var(--fm-color-accent-soft, #f6d9c4)" />
       <circle cx="20" cy="21" r="2.4" fill="#ffd79a" />
       {/* Base */}
-      <rect x="15" y="31" width="10" height="3" rx="1.5" fill="var(--color-accent, #b4541a)" />
+      <rect x="15" y="31" width="10" height="3" rx="1.5" fill="var(--fm-color-accent, #b4541a)" />
     </svg>
   );
 }

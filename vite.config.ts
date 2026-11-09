@@ -7,4 +7,9 @@ import { defineConfig } from 'vite';
 export default defineConfig({
   base: '/FirstMenu/',
   plugins: [react()],
+  build: {
+    // scripts/size-report.mjs reads the manifest to measure what each page
+    // downloads on first open (active spec Requirement 15.6).
+    manifest: true,
+  },
 });
