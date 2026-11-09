@@ -9,7 +9,7 @@ The maintainer wants this project built with as little input from them as possib
 - `.kiro/specs/first-menu/`: v1, built and live. It is the baseline for anything the active spec doesn't change.
 - `.kiro/specs/what-can-i-make/`: the active spec. Where it conflicts with v1, it wins.
 
-Work through `.kiro/specs/what-can-i-make/tasks.md` in order (except task 14, which runs in batches alongside the others as that file explains), following `workflow.md` for branches, review and merging. Don't start it unless its tasks file says "Status: APPROVED". Remaining unticked v1 tasks are carried into the active spec's tasks 16 and 17; don't work them from the v1 file. If the schedule slips, cut task 15 (recipe sharing) first, after telling the maintainer.
+Work through `.kiro/specs/what-can-i-make/tasks.md` in order (except task 14, which runs in batches alongside the others as that file explains), following `workflow.md` for branches, review and merging. Don't start it unless its tasks file says "Status: APPROVED". Remaining unticked v1 tasks are carried into the active spec's tasks 16 and 17; don't work them from the v1 file. If the schedule slips, cut task 15 (recipe sharing) first: ask for a `Reviewer decision: scope` and tell the maintainer in the session.
 
 ## Decide yourself
 
@@ -34,9 +34,9 @@ Make these calls without asking, and mention them in the PR body:
 
 These used to stop for the maintainer. Now the coder makes the change, explains it in the PR body under a heading `Reviewer decision: <type>` with the evidence, and pr-reviewer decides using the rules in `.kiro/agents/pr-reviewer.md` ("Decisions you make"). Every such decision is logged on the `Reviewer decisions log` issue (#42) so the maintainer can audit it.
 
-- **Recipe publisher.** Any publisher that meets the source criteria in the active design ("Recipe source criteria"). Add it to `docs/recipe-sources.md` in the same PR.
-- **Safety change backed by a source.** Making the safety screen catch less (removing a rule, lowering an age limit, adding an exception word, turning a block into a reminder or allergen rule) only when a cited published source with a URL directly supports the change, with tests showing the rule still fires where it should.
-- **Scope within intent.** Changes to how a feature works that serve its user story and don't contradict a recorded maintainer decision: flows, ordering, wording that isn't health guidance, splitting or merging tasks, cutting task 15 (recipe sharing) if the schedule slips, small additions that a requirement's user story clearly implies.
+- **Publisher** (`Reviewer decision: publisher`). Any publisher that meets the source criteria in the active design ("Recipe source criteria"). Add its row to `docs/recipe-sources.md` with the verdict "Pending pr-reviewer"; after a PASS, update it to "Approved by pr-reviewer (PR #<n>)".
+- **Safety** (`Reviewer decision: safety`). Making the safety screen catch less (removing a rule, lowering an age limit, adding an exception word, turning a block into a reminder or allergen rule) only when a source from AAP, WHO, CDC, FDA/EPA or NIAID with a URL directly supports the change, with tests showing the rule still fires where it should.
+- **Scope** (`Reviewer decision: scope`). Changes to how a feature works that serve its user story and don't contradict a recorded maintainer decision: flows, ordering, wording that isn't health guidance, splitting or merging tasks. No new screens, no data the user didn't give, no network requests or accounts, and no removed requirements, except cutting task 15 (recipe sharing) when the schedule slips; tell the maintainer when that happens.
 
 ## Stop and ask
 
@@ -45,7 +45,7 @@ Stop and ask the maintainer only for these:
 1. **Cost and settings.** Anything that costs money, needs a new account or third-party service, or changes repository settings.
 2. **Stuck.** Anything pr-reviewer marks `NEEDS_MAINTAINER`, or a PR that is still failing after 10 review rounds or stuck sooner as `workflow.md` describes.
 
-pr-reviewer marks `NEEDS_MAINTAINER`, so these still reach the maintainer, for: a safety loosening with no source that directly supports it; skipping, deleting or loosening the release-gate test or any safety test; removing a rule's source without a replacement that has a URL; new health or safety wording that isn't in the design or taken from a cited source; negation handling or any other way to skip a text mention without the user's tap; new features or removed requirements beyond "scope within intent"; changes to theme decisions or deliverables; finishing task 14 short of its counts or allergen groups; and anything pr-reviewer is unsure is safe.
+pr-reviewer marks `NEEDS_MAINTAINER`, so these still reach the maintainer, for: a safety loosening with no source from AAP, WHO, CDC, FDA/EPA or NIAID that directly supports it; removing the honey, high-mercury fish, unpasteurized or no-safe-form choking rules; making a block apply to fewer ages than its source states; skipping, deleting or loosening the release-gate test or any safety test; removing a rule's source without a replacement that has a URL; new health or safety wording that isn't in the design or taken from a cited source; negation handling or any other way to skip a text mention without the user's tap; new features or removed requirements beyond "scope within intent"; changes to theme decisions or deliverables; finishing task 14 short of its counts or allergen groups; and anything pr-reviewer is unsure is safe.
 
 How to ask: open a GitHub issue titled `Decision needed: <topic>` with the context, the options, and your recommendation, then tell the maintainer in the session. Keep working on tasks that don't depend on the answer.
 
@@ -61,7 +61,7 @@ Ask once, at the right time, and keep working meanwhile:
 
 ## Schedule
 
-Milestone dates are in `tasks.md`. The deadline is Friday, December 4, 2026, 2:00 PM PT, with submission planned for Thursday, December 3. If a milestone slips by more than two days, tell the maintainer and propose specific cuts from the remaining tasks. Don't cut anything without their answer.
+Milestone dates are in `tasks.md`. The deadline is Friday, December 4, 2026, 2:00 PM PT, with submission planned for Thursday, December 3. If a milestone slips by more than two days, tell the maintainer and propose specific cuts from the remaining tasks. Task 15 may be cut with pr-reviewer's approval as above; don't cut anything else without the maintainer's answer.
 
 ## Reporting
 
