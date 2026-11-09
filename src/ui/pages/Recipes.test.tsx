@@ -200,6 +200,28 @@ describe('Recipes library page', () => {
     expect(badge).toHaveTextContent('New food: carrot, apple');
   });
 
+  it('never lists water, breast milk or formula as a new food in a door badge', () => {
+    renderRecipes(seedState(8));
+    // Carrots and Apples uses water; Sweet Potato Chicken uses breastmilk.
+    expect(
+      within(cardFor(/Carrots and Apples/)).getByText(/^New food:/),
+    ).toHaveTextContent(/^New food: carrot, apple$/);
+    const chicken = within(cardFor(/Sweet Potato Chicken/)).getByText(
+      /^New food:/,
+    );
+    expect(chicken.textContent).not.toMatch(/breast ?milk|water|formula/i);
+  });
+
+  it('still ghosts a recipe when a reaction is recorded under an ignored food', () => {
+    // The app never records this itself, but an imported backup or share
+    // link can; the badge skip must not hide it.
+    renderRecipes(
+      seedState(8, [], { water: { status: 'reaction', date: '2026-11-01' } }),
+    );
+    const carrots = screen.getByRole('link', { name: /Carrots and Apples/ });
+    expect(carrots.getAttribute('aria-label') ?? '').toMatch(/Not yet/);
+  });
+
   it('names an allergen untried food by its group label in the door badge', () => {
     // Egg (10 months, untried, no reaction) -> door badge "New food: egg", not
     // the raw "allergen:egg" key.
