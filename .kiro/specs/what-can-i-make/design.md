@@ -479,7 +479,7 @@ defaultSlots('12-23' | '24-36') = [breakfast, lunch, dinner, snack]
 | `12-23` | 12–23 months | soft, small, bite-sized pieces | CDC-encourage |
 | `24-36` | 2–3 years | small, bite-sized pieces | CDC-encourage |
 
-Task 1 confirms the hint wording against the sources and adjusts it to match them.
+Task 1.3b confirms the hint wording against the sources and adjusts it to match them.
 
 ### Juice limit reminder (Requirement 13.7)
 

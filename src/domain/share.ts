@@ -66,7 +66,8 @@ export const SHARE_WARN_LENGTH = 4000;
  *  - plan: the week plan as-is.
  *  - recipes: ONLY the recipes referenced across every meal slot of the plan,
  *    resolved against the full recipe set (built-ins + custom) so a shared
- *    custom recipe is INCLUDED; deduped, unknown ids skipped.
+ *    custom recipe is INCLUDED; deduped, unknown ids skipped. Pasted recipes
+ *    have imported.text and clearedMentions stripped.
  *  - foods: a copy of state.foods with EVERY note removed (status + date kept).
  *  - rulesetVersion: the current RULESET_VERSION; v: 1.
  *
@@ -85,9 +86,12 @@ export function buildSharePayload(state: AppState): SharePayload {
 
   // Resolve ids against the full recipe set (built-ins + custom). Preserve the
   // full set's order, keep only used ids, and naturally dedupe + skip unknowns.
-  const recipes = selectAllRecipes(state).filter((recipe) =>
-    usedIds.has(recipe.id),
-  );
+  // Strip the fields that make links long or hold the original paste (design:
+  // `imported.text` and `clearedMentions`). `imported` itself stays, with an
+  // empty text, so the viewer still treats the recipe as a pasted recipe.
+  const recipes = selectAllRecipes(state)
+    .filter((recipe) => usedIds.has(recipe.id))
+    .map(stripImportedFields);
 
   // Copy the food log, stripping every note (omit the field entirely).
   const foods: Record<string, FoodRecord> = {};
@@ -103,6 +107,13 @@ export function buildSharePayload(state: AppState): SharePayload {
     recipes,
     foods,
   };
+}
+
+/** Drop `imported.text` and `clearedMentions` from a recipe for sharing. */
+function stripImportedFields(recipe: Recipe): Recipe {
+  const { imported, ...rest } = recipe;
+  delete rest.clearedMentions;
+  return imported ? { ...rest, imported: { ...imported, text: '' } } : rest;
 }
 
 /** The result of encoding a share link. */

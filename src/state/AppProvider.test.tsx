@@ -304,6 +304,94 @@ describe('reducer actions', () => {
   });
 });
 
+describe('reducer actions: pantry, on-hand, text mentions (active spec task 1.5)', () => {
+  it('setPantry stores normalized, de-duplicated food keys', () => {
+    const next = reducer(base(), {
+      type: 'setPantry',
+      foods: ['Sweet potatoes', 'sweet potato', '  ', 'Oats'],
+    });
+    expect(next.pantry).toEqual(['sweet potato', 'oat']);
+  });
+
+  it('addOnHand stores a key, sets onHandUpdated and records the day once', () => {
+    let state = reducer(base(), { type: 'addOnHand', food: 'Bananas', today: '2026-01-15' });
+    expect(state.onHand).toEqual(['banana']);
+    expect(state.onHandUpdated).toBe('2026-01-15');
+    expect(state.onHandDays).toEqual({ banana: ['2026-01-15'] });
+    state = reducer(state, { type: 'addOnHand', food: 'banana', today: '2026-01-15' });
+    expect(state.onHand).toEqual(['banana']);
+    expect(state.onHandDays.banana).toEqual(['2026-01-15']);
+    state = reducer(state, { type: 'addOnHand', food: 'banana', today: '2026-01-16' });
+    expect(state.onHandDays.banana).toEqual(['2026-01-15', '2026-01-16']);
+  });
+
+  it('addOnHand keeps only the last 10 distinct days', () => {
+    let state = base();
+    for (let d = 1; d <= 12; d++) {
+      const today = `2026-01-${String(d).padStart(2, '0')}`;
+      state = reducer(state, { type: 'addOnHand', food: 'rice', today });
+    }
+    expect(state.onHandDays.rice).toHaveLength(10);
+    expect(state.onHandDays.rice[0]).toBe('2026-01-03');
+    expect(state.onHandDays.rice[9]).toBe('2026-01-12');
+  });
+
+  it('addOnHand ignores an empty name or a bad date', () => {
+    const start = base();
+    expect(reducer(start, { type: 'addOnHand', food: '  ', today: '2026-01-15' })).toBe(start);
+    expect(reducer(start, { type: 'addOnHand', food: 'rice', today: 'nope' })).toBe(start);
+  });
+
+  it('removeOnHand removes one food and sets onHandUpdated', () => {
+    let state = run(base(), [
+      { type: 'addOnHand', food: 'rice', today: '2026-01-10' },
+      { type: 'addOnHand', food: 'peas', today: '2026-01-10' },
+    ]);
+    state = reducer(state, { type: 'removeOnHand', food: 'Rice', today: '2026-01-15' });
+    expect(state.onHand).toEqual(['pea']);
+    expect(state.onHandUpdated).toBe('2026-01-15');
+    const same = reducer(state, { type: 'removeOnHand', food: 'kale', today: '2026-01-16' });
+    expect(same).toBe(state);
+  });
+
+  it('clearOnHand empties the list, keeps onHandDays and sets onHandUpdated', () => {
+    let state = reducer(base(), { type: 'addOnHand', food: 'rice', today: '2026-01-10' });
+    state = reducer(state, { type: 'clearOnHand', today: '2026-01-15' });
+    expect(state.onHand).toEqual([]);
+    expect(state.onHandUpdated).toBe('2026-01-15');
+    expect(state.onHandDays.rice).toEqual(['2026-01-10']);
+  });
+
+  it('clearTextMention records the cleared sentence once, on a custom recipe', () => {
+    const start: AppState = { ...base(), customRecipes: [customRecipe] };
+    const mention = { ruleId: 'honey', sentence: 'No honey.' };
+    const once = reducer(start, { type: 'clearTextMention', recipeId: 'custom-1', mention });
+    expect(once.customRecipes[0].clearedMentions).toEqual([mention]);
+    const twice = reducer(once, { type: 'clearTextMention', recipeId: 'custom-1', mention });
+    expect(twice).toBe(once);
+    const other = reducer(once, {
+      type: 'clearTextMention',
+      recipeId: 'custom-1',
+      mention: { ruleId: 'honey', sentence: 'Another sentence.' },
+    });
+    expect(other.customRecipes[0].clearedMentions).toHaveLength(2);
+    expect(reducer(start, { type: 'clearTextMention', recipeId: 'nope', mention })).toBe(start);
+  });
+
+  it('deleteCustomRecipe also removes the recipe from madeLog', () => {
+    const start: AppState = {
+      ...base(),
+      customRecipes: [customRecipe],
+      madeLog: [
+        { recipeId: 'custom-1', date: '2026-01-14' },
+        { recipeId: 'b-x', date: '2026-01-13' },
+      ],
+    };
+    const next = reducer(start, { type: 'deleteCustomRecipe', id: 'custom-1' });
+    expect(next.madeLog).toEqual([{ recipeId: 'b-x', date: '2026-01-13' }]);
+  });
+});
+
 describe('reconcilePlanRecipes (Req 3.5 load reconciliation)', () => {
   it('empties slots referencing an unknown recipe and reports them', () => {
     const start = base();

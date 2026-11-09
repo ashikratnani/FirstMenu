@@ -1,6 +1,6 @@
 // First-run onboarding (Task 7.1, Req 1.1, 1.4, 1.5, 7.2). Collects the
 // child's birth date (required) and an optional first name, shows the under-6
-// / 12+ age notices live as the date is entered, and offers a tried-foods
+// / over-36 age notices live as the date is entered, and offers a tried-foods
 // checklist with the nine allergen groups listed FIRST (Req 7.2). Completing
 // it dispatches `setChild` (which also sets onboarded:true) and one
 // `setFoodRecord` per checked food, then navigates to the week home.
@@ -75,7 +75,7 @@ export default function Onboarding() {
   return (
     <>
       <h1>Welcome to FirstMenu</h1>
-      <p>Tell us about your baby so we can show the right recipes and safety rules.</p>
+      <p>Tell us about your baby or toddler so we can show the right recipes and safety rules.</p>
 
       <form className={styles.form} onSubmit={handleSubmit}>
         <div className={styles.field}>
@@ -116,7 +116,7 @@ export default function Onboarding() {
         <fieldset className={styles.fieldset}>
           <legend className={styles.legend}>Foods already tried</legend>
           <p className={styles.hint}>
-            Check anything your baby has already tried with no reaction. You can
+            Check anything your child has already tried with no reaction. You can
             change this later in Settings.
           </p>
 

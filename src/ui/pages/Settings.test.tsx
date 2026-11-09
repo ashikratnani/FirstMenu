@@ -8,7 +8,7 @@ import {
   allergenFoodKey,
   todayYmd,
   UNDER_6_NOTICE,
-  OVER_12_NOTICE,
+  OVER_36_NOTICE,
 } from './childProfile';
 import { AppProvider, useApp } from '../../state/AppProvider';
 import { STORAGE_KEY, defaultState } from '../../domain/storage';
@@ -80,7 +80,7 @@ describe('Settings', () => {
     // Born 2026-01-15, plan start 2026-11-01 -> 9 whole months, stage 9-12.
     renderSettings(onboardedState('2026-01-15'));
     expect(screen.getByText(/current age: 9 months/i)).toBeInTheDocument();
-    expect(screen.getByText(/stage 9-12/i)).toBeInTheDocument();
+    expect(screen.getByText(/stage 9–11 months/i)).toBeInTheDocument();
   });
 
   it('updates the derived age after saving a new birth date (Req 1.6)', async () => {
@@ -205,12 +205,12 @@ describe('Settings', () => {
     expect(ALLERGEN_GROUPS).toHaveLength(9);
   });
 
-  it('shows the 12+ notice for an old enough edited birth date', () => {
+  it('shows the over-36 notice for an old enough edited birth date', () => {
     renderSettings(onboardedState('2026-01-15'));
     fireEvent.change(screen.getByLabelText(/birth date/i), {
-      target: { value: '2024-01-01' },
+      target: { value: '2022-01-01' },
     });
-    expect(screen.getByText(OVER_12_NOTICE)).toBeInTheDocument();
+    expect(screen.getByText(OVER_36_NOTICE)).toBeInTheDocument();
   });
 
   it('computes the age notice from plan.startDate, not today (Req 1.2)', () => {
@@ -238,7 +238,7 @@ describe('Settings', () => {
     expect(screen.queryByText(/current age: 11 months/i)).not.toBeInTheDocument();
     // And the notice agrees with that start-date age, NOT today's age.
     expect(screen.getByText(UNDER_6_NOTICE)).toBeInTheDocument();
-    expect(screen.queryByText(OVER_12_NOTICE)).not.toBeInTheDocument();
+    expect(screen.queryByText(OVER_36_NOTICE)).not.toBeInTheDocument();
   });
 
   it('shows a reaction food as disabled with a "reaction recorded" note and does not clear it on save', async () => {

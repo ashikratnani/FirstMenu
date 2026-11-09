@@ -9,7 +9,9 @@ import {
   blockFoodKeys,
   DESCRIPTOR_WORDS,
   foodKeyFor,
+  foodKeyFromName,
   foodStatus,
+  groceryFoodKey,
   isBlockCovered,
   isIgnoredFood,
 } from './foods';
@@ -26,13 +28,18 @@ function makeState(foods: AppState['foods'] = {}): AppState {
     days: [{}, {}, {}, {}, {}, {}, {}],
   };
   return {
-    schemaVersion: 1,
+    schemaVersion: 2,
     onboarded: true,
     customRecipes: [],
     foods,
     plan,
     groceryChecked: [],
     disclaimerAcknowledged: true,
+    pantry: [],
+    onHand: [],
+    madeLog: [],
+    onHandDays: {},
+    dismissed: {},
   };
 }
 
@@ -440,5 +447,19 @@ describe('allergen-door guidance (Req 7.7)', () => {
     expect(g.peanutNote).toBe(ALLERGEN_PEANUT_NOTE);
     expect(g.peanutNote).toMatch(/pediatrician/);
     expect(g.peanutNote).toMatch(/eczema/);
+  });
+});
+
+describe('foodKeyFromName', () => {
+  it('turns typed names into plain singular keys', () => {
+    expect(foodKeyFromName('Sweet potatoes')).toBe('sweet potato');
+    expect(foodKeyFromName('  Ripe Bananas ')).toBe('banana');
+    expect(foodKeyFromName('Blueberries')).toBe('blueberry');
+  });
+
+  it('matches the key groceryFoodKey derives for the same name', () => {
+    for (const name of ['Sweet potatoes', 'carrots, peeled', 'molasses']) {
+      expect(foodKeyFromName(name)).toBe(groceryFoodKey({ name, category: 'produce' }));
+    }
   });
 });

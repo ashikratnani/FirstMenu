@@ -44,13 +44,18 @@ const DAY_INDEXES = [0, 1, 2, 3, 4, 5, 6] as const;
  */
 function syntheticState(payload: SharePayload): AppState {
   return {
-    schemaVersion: 1,
+    schemaVersion: 2,
     onboarded: true,
     customRecipes: payload.recipes,
     foods: payload.foods,
     plan: payload.plan,
     groceryChecked: [],
     disclaimerAcknowledged: true,
+    pantry: [],
+    onHand: [],
+    madeLog: [],
+    onHandDays: {},
+    dismissed: {},
   };
 }
 

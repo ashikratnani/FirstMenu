@@ -64,7 +64,7 @@ function sampleState(): AppState {
   days[4] = { lunch: BUILTIN_RECIPE_ID, dinner: 'custom-sweet-pea-mash' };
 
   return {
-    schemaVersion: 1,
+    schemaVersion: 2,
     child: { name: CHILD_NAME, birthDate: CHILD_BIRTHDATE },
     onboarded: true,
     customRecipes: [customRecipe(), unusedCustomRecipe()],
@@ -80,6 +80,11 @@ function sampleState(): AppState {
     },
     groceryChecked: [],
     disclaimerAcknowledged: true,
+    pantry: [],
+    onHand: [],
+    madeLog: [],
+    onHandDays: {},
+    dismissed: {},
   };
 }
 
@@ -249,5 +254,72 @@ describe('length warning (Requirement 11.6)', () => {
     // The link is STILL created even when long.
     expect(url.startsWith(SHARE_BASE_URL)).toBe(true);
     expect(url.length).toBeGreaterThan(SHARE_BASE_URL.length);
+  });
+});
+
+describe('pasted-recipe fields stripped from the plan share (Req 10.2)', () => {
+  function pastedState(): AppState {
+    const state = sampleState();
+    const pasted: Recipe = {
+      ...customRecipe(),
+      imported: {
+        from: 'chatgpt',
+        text: 'ORIGINAL PASTED TEXT with a secret',
+        date: '2026-01-10',
+      },
+      clearedMentions: [{ ruleId: 'honey', sentence: 'No honey here.' }],
+      notes: ['kept note'],
+    };
+    return { ...state, customRecipes: [pasted, unusedCustomRecipe()] };
+  }
+
+  it('removes imported.text and clearedMentions, keeping the rest', () => {
+    const payload = buildSharePayload(pastedState());
+    const recipe = payload.recipes.find((r) => r.id === 'custom-sweet-pea-mash');
+    expect(recipe?.imported).toEqual({ from: 'chatgpt', text: '', date: '2026-01-10' });
+    expect(recipe?.clearedMentions).toBeUndefined();
+    expect(recipe?.notes).toEqual(['kept note']);
+  });
+
+  it('the encoded link contains neither the pasted text nor the cleared sentence and still decodes', () => {
+    const { encoded } = encodeSharePayload(pastedState());
+    const decoded = decodeShareData(encoded);
+    expect(decoded.ok).toBe(true);
+    expect(JSON.stringify(decoded.ok ? decoded.payload : {})).not.toContain('secret');
+    expect(JSON.stringify(decoded.ok ? decoded.payload : {})).not.toContain('No honey here');
+  });
+
+  it('never includes the v2 pantry and suggestion fields', () => {
+    const state = {
+      ...pastedState(),
+      pantry: ['oat'],
+      onHand: ['banana'],
+      madeLog: [{ recipeId: 'x', date: '2026-01-10' }],
+    };
+    const payload = buildSharePayload(state);
+    expect(Object.keys(payload).sort()).toEqual(
+      ['ageMonths', 'foods', 'plan', 'recipes', 'rulesetVersion', 'v'],
+    );
+  });
+});
+
+describe('a plan share link made before schema v2 still decodes (Req 10.4)', () => {
+  it('decodes a v1-era payload (v 1, ruleset 2, two-stage recipes)', () => {
+    const v1Payload = {
+      v: 1,
+      rulesetVersion: 2,
+      ageMonths: 9,
+      plan: sampleState().plan,
+      recipes: [customRecipe()],
+      foods: { carrot: { status: 'tried', date: '2026-01-10' } },
+    };
+    const link = compressToEncodedURIComponent(JSON.stringify(v1Payload));
+    const decoded = decodeShareData(link);
+    expect(decoded.ok).toBe(true);
+    if (decoded.ok) {
+      expect(decoded.payload.v).toBe(1);
+      expect(decoded.payload.recipes[0].id).toBe('custom-sweet-pea-mash');
+      expect(decoded.payload.recipes[0].imported).toBeUndefined();
+    }
   });
 });

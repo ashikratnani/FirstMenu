@@ -9,7 +9,7 @@ import type { AppState, WeekPlan } from './types';
 import { defaultStartDate } from './plan';
 
 export const STORAGE_KEY = 'firstmenu';
-export const SCHEMA_VERSION = 1 as const;
+export const SCHEMA_VERSION = 2 as const;
 export const SAVE_DEBOUNCE_MS = 300;
 
 // ---------------------------------------------------------------------------
@@ -18,7 +18,7 @@ export const SAVE_DEBOUNCE_MS = 300;
 // any data we did not produce in-memory (loaded or imported).
 // ---------------------------------------------------------------------------
 
-const stageIdSchema = z.enum(['6-8', '9-12']);
+const stageIdSchema = z.enum(['6-8', '9-12', '12-23', '24-36']);
 const mealTypeSchema = z.enum(['breakfast', 'lunch', 'dinner', 'snack']);
 const groceryCategorySchema = z.enum([
   'produce',
@@ -74,6 +74,7 @@ const ingredientSchema = z.object({
   quantity: z.number().optional(),
   unit: z.string().optional(),
   category: groceryCategorySchema,
+  optional: z.boolean().optional(),
 });
 
 export const recipeSchema = z.object({
@@ -94,6 +95,21 @@ export const recipeSchema = z.object({
     })
     .optional(),
   makeAheadNote: z.string().optional(),
+  statedMinutes: z.number().optional(),
+  notes: z.array(z.string()).optional(),
+  imported: z
+    .object({
+      from: z.enum(['chatgpt', 'instagram', 'shared', 'other']),
+      url: z.string().optional(),
+      text: z.string(),
+      date: z.string(),
+    })
+    .optional(),
+  clearedMentions: z
+    .array(z.object({ ruleId: z.string(), sentence: z.string() }))
+    .optional(),
+  kind: z.enum(['recipe', 'simple-idea']).optional(),
+  serveAs: z.array(z.enum(['puree', 'mashed', 'finger-food', 'pieces'])).optional(),
 });
 
 const childProfileSchema = z.object({
@@ -133,6 +149,12 @@ export const appStateSchema = z.object({
   plan: weekPlanSchema,
   groceryChecked: z.array(z.string()),
   disclaimerAcknowledged: z.boolean(),
+  pantry: z.array(z.string()),
+  onHand: z.array(z.string()),
+  onHandUpdated: ymdDateSchema.optional(),
+  madeLog: z.array(z.object({ recipeId: z.string(), date: ymdDateSchema })),
+  onHandDays: z.record(z.string(), z.array(ymdDateSchema)),
+  dismissed: z.record(z.string(), z.string()),
 });
 
 // zod's inferred type must be assignable to the hand-written AppState; this
@@ -194,6 +216,11 @@ export function defaultState(now: Date = new Date()): AppState {
     plan: defaultPlan(defaultStartDate(todayYmd(now))),
     groceryChecked: [],
     disclaimerAcknowledged: false,
+    pantry: [],
+    onHand: [],
+    madeLog: [],
+    onHandDays: {},
+    dismissed: {},
   };
 }
 
@@ -203,14 +230,28 @@ export function defaultState(now: Date = new Date()): AppState {
 
 /**
  * Upgrade a parsed-but-unvalidated stored object from `fromVersion` to the
- * current SCHEMA_VERSION shape, before zod validation. v1 is an identity
- * passthrough; future versions add a case per step. load() runs
+ * current SCHEMA_VERSION shape, before zod validation. load() runs
  * parse -> migrate(fromVersion) -> zod validate.
  */
 // Registry of one-step upgrades, keyed by the version they upgrade FROM. A
-// future schema bump adds an entry (e.g. `1: migrateV1toV2`) that returns the
-// object in the next version's shape. Empty today because SCHEMA_VERSION === 1.
-const MIGRATIONS: Record<number, (raw: unknown) => unknown> = {};
+// future schema bump adds an entry that returns the object in the next
+// version's shape.
+const MIGRATIONS: Record<number, (raw: unknown) => unknown> = {
+  // v1 -> v2 (Req 10.1, 10.2): add the pantry, on-hand and suggestion fields.
+  // All new recipe fields are optional, so existing recipes need no change.
+  1: (raw) => {
+    if (typeof raw !== 'object' || raw === null) return raw;
+    return {
+      ...(raw as Record<string, unknown>),
+      schemaVersion: 2,
+      pantry: [],
+      onHand: [],
+      madeLog: [],
+      onHandDays: {},
+      dismissed: {},
+    };
+  },
+};
 
 export function migrate(raw: unknown, fromVersion: number): unknown {
   let current = raw;

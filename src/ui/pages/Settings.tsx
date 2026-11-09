@@ -8,7 +8,7 @@
 // selectStage over plan.startDate), editing the birth date here updates the
 // derived age/stage everywhere automatically (Req 1.6). The current derived
 // age/stage is shown on this page to make that update visible, and the same
-// under-6 / 12+ notices are reused so the health wording stays in one place.
+// under-6 / over-36 notices are reused so the health wording stays in one place.
 //
 // Built on Astryx form controls (active spec Requirement 15). The Save button
 // sits in a sticky action bar so the primary action stays in reach on phones
@@ -21,6 +21,7 @@ import { TextInput } from '@astryxdesign/core/TextInput';
 import { useApp } from '../../state/AppProvider';
 import { selectAgeMonths, selectStage } from '../../state/selectors';
 import type { FoodRecord } from '../../domain/types';
+import { stageLabel } from './recipeView';
 import styles from './Settings.module.css';
 import {
   ALLERGEN_GROUPS,
@@ -218,7 +219,7 @@ export default function Settings() {
           <p className={styles.derived}>
             Current age: {persistedMonths}{' '}
             {persistedMonths === 1 ? 'month' : 'months'}
-            {persistedStage ? ` (stage ${persistedStage})` : ''}
+            {persistedStage ? ` (stage ${stageLabel(persistedStage)})` : ''}
           </p>
         )}
 
@@ -231,7 +232,7 @@ export default function Settings() {
         <fieldset className={styles.fieldset}>
           <legend className={styles.legend}>Foods already tried</legend>
           <p className={styles.hint}>
-            Check anything your baby has tried with no reaction.
+            Check anything your child has tried with no reaction.
           </p>
 
           <h2 className={styles.allergenHeading}>Common allergens</h2>

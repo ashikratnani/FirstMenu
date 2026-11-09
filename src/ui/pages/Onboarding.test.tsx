@@ -8,7 +8,7 @@ import {
   allergenFoodKey,
   todayYmd,
   UNDER_6_NOTICE,
-  OVER_12_NOTICE,
+  OVER_36_NOTICE,
 } from './childProfile';
 import { AppProvider, useApp } from '../../state/AppProvider';
 import { STORAGE_KEY, defaultState } from '../../domain/storage';
@@ -93,14 +93,14 @@ describe('Onboarding', () => {
     const birth = screen.getByLabelText(/birth date/i);
     fireEvent.change(birth, { target: { value: birthDateMonthsAgo(3) } });
     expect(screen.getByText(UNDER_6_NOTICE)).toBeInTheDocument();
-    expect(screen.queryByText(OVER_12_NOTICE)).not.toBeInTheDocument();
+    expect(screen.queryByText(OVER_36_NOTICE)).not.toBeInTheDocument();
   });
 
-  it('shows the 12+ notice for a birth date 12 months or more ago', () => {
+  it('shows the over-36 notice for a birth date more than 36 months ago', () => {
     renderOnboarding();
     const birth = screen.getByLabelText(/birth date/i);
-    fireEvent.change(birth, { target: { value: birthDateMonthsAgo(14) } });
-    expect(screen.getByText(OVER_12_NOTICE)).toBeInTheDocument();
+    fireEvent.change(birth, { target: { value: birthDateMonthsAgo(40) } });
+    expect(screen.getByText(OVER_36_NOTICE)).toBeInTheDocument();
     expect(screen.queryByText(UNDER_6_NOTICE)).not.toBeInTheDocument();
   });
 
@@ -135,7 +135,7 @@ describe('Onboarding', () => {
     // The notice follows the plan.startDate age (4 months, under 6), NOT the
     // 11-month age "today" would give.
     expect(screen.getByText(UNDER_6_NOTICE)).toBeInTheDocument();
-    expect(screen.queryByText(OVER_12_NOTICE)).not.toBeInTheDocument();
+    expect(screen.queryByText(OVER_36_NOTICE)).not.toBeInTheDocument();
   });
 
   it('lists the nine allergen groups first, in rule order', () => {
