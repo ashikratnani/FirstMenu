@@ -261,7 +261,7 @@ Worked examples (required tests). They use the built-in recipes as of November 8
 1. If `statedMinutes` is set, use it (`stated`).
 2. Otherwise scan each step for durations: a number or range followed by `minute(s)`, `min(s)`, `hour(s)`, `hr(s)`. Ranges ("20-25 minutes", "2 to 3 minutes") use the upper bound. Hours × 60.
 3. Within one step, durations joined by "or" are alternatives ("bake about 45 minutes, or microwave about 8 minutes"): use the smallest.
-4. Durations with "per side" or "each side" count twice.
+4. Durations with "per side", "each side" or "the other side" count twice.
 5. If at least one duration was found: `minutes = 5 + sum`, rounded up to the next 5 (`estimated`). The 5 minutes covers washing and setup.
 6. If none: undefined ("Time not given").
 

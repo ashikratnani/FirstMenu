@@ -88,6 +88,10 @@ describe('recipeMinutes', () => {
     expect(recipeMinutes(make({ steps: ['Heat 2 minutes, then cook 3 minutes per side.'] }))?.minutes).toBe(15);
   });
 
+  it('treats a parenthesised "or" as an alternative', () => {
+    expect(recipeMinutes(make({ steps: ['Cook 20 minutes (or 10 minutes in a pressure cooker).'] }))?.minutes).toBe(15);
+  });
+
   it('treats durations joined by "or" as alternatives, even three', () => {
     expect(recipeMinutes(make({ steps: ['Cook 30 minutes, or 12 minutes, or 20 minutes.'] }))?.minutes).toBe(20);
   });
@@ -146,6 +150,8 @@ describe('recipeEffort', () => {
 
   it('does not treat words like "baker" or "ovenproof" differently from the oven rule', () => {
     expect(recipeEffort(make({ steps: ['Use a bakery roll.'] }))).toBe('easy');
+    expect(recipeEffort(make({ steps: ['Ask the baker.'] }))).toBe('easy');
+    expect(recipeEffort(make({ steps: ['Use an ovenproof dish.'] }))).toBe('easy');
   });
 
   it('rates the built-in recipes', () => {

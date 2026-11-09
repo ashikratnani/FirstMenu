@@ -26,7 +26,7 @@ const CLAUSE_WORD = /\b(?:until|then|and)\b/i;
 function joinedByOr(between: string): boolean {
   if (/[.;]/.test(between)) return false;
   const piece = between.slice(between.lastIndexOf(',') + 1);
-  return /^\s*or\b/i.test(piece) && !CLAUSE_WORD.test(piece);
+  return /^\s*\(?\s*or\b/i.test(piece) && !CLAUSE_WORD.test(piece);
 }
 
 function parseNum(s: string): number {
