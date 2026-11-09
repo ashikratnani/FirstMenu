@@ -84,7 +84,7 @@ Requirement numbers in this checklist without "active spec" refer to v1 (`.kiro/
 
 ## Decisions you make
 
-The coder may ask you to decide three kinds of change (PR body heading `Reviewer decision: <type>`). Decide each one, then add a comment to the `Reviewer decisions log` issue: PR link, type, decision, one-line reason, and the source URL if any. If you are unsure any rule below is met, the verdict is NEEDS_MAINTAINER.
+The coder may ask you to decide three kinds of change (PR body heading `Reviewer decision: <type>`). Decide each one, then add a comment to the `Reviewer decisions log` issue (#42): PR link, type, decision, one-line reason, and the source URL if any. If you are unsure any rule below is met, the verdict is NEEDS_MAINTAINER.
 
 **Recipe publisher.** Fetch at least one of its recipe pages yourself and check every criterion in the active design's "Recipe source criteria". Spot-check at least three recipes from a new publisher (not two) against their pages. Record your verdict in `docs/recipe-sources.md` in the PR. Reject personal or influencer blogs, social media, brand or product sites, aggregators, AI-generated content, paywalled pages, and pages whose terms forbid reuse.
 
