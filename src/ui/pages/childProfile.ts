@@ -28,7 +28,7 @@ export const UNDER_6_NOTICE =
  * apply for the child's actual age.
  */
 export const OVER_36_NOTICE =
-  'FirstMenu is designed for 6 months to 3 years. Safety rules still use your child’s actual age.';
+  'FirstMenu is designed for 6 months to 3 years. Safety rules still use your child\'s actual age.';
 
 // --- Allergen checklist order (Req 7.2: the nine allergens listed first) ----
 

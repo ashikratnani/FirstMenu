@@ -3,7 +3,6 @@ import {
   STAGE_IDS,
   STAGE_LABELS,
   STAGE_MIN_MONTHS,
-  STAGE_TEXTURE_HINTS,
   ageInMonths,
   defaultSlots,
   stageFor,
@@ -65,21 +64,12 @@ describe('stageFor', () => {
   });
 });
 
-describe('stage labels and texture hints', () => {
+describe('stage labels', () => {
   it('labels 9-12 as "9–11 months" and the toddler stages per Req 13.2', () => {
     expect(STAGE_LABELS['6-8']).toBe('6–8 months');
     expect(STAGE_LABELS['9-12']).toBe('9–11 months');
     expect(STAGE_LABELS['12-23']).toBe('12–23 months');
     expect(STAGE_LABELS['24-36']).toBe('2–3 years');
-  });
-
-  it('gives every stage a texture hint with a CDC source URL', () => {
-    for (const stage of STAGE_IDS) {
-      expect(STAGE_TEXTURE_HINTS[stage].hint.length).toBeGreaterThan(0);
-      expect(STAGE_TEXTURE_HINTS[stage].sourceUrl).toMatch(
-        /^https:\/\/www\.cdc\.gov\//,
-      );
-    }
   });
 });
 

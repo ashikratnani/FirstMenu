@@ -21,7 +21,7 @@ describe('noticeForAgeMonths (Req 13.3)', () => {
     expect(noticeForAgeMonths(37)).toBe(OVER_36_NOTICE);
     expect(noticeForAgeMonths(60)).toBe(OVER_36_NOTICE);
     expect(OVER_36_NOTICE).toBe(
-      'FirstMenu is designed for 6 months to 3 years. Safety rules still use your child’s actual age.',
+      'FirstMenu is designed for 6 months to 3 years. Safety rules still use your child\'s actual age.',
     );
   });
 });

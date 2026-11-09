@@ -59,35 +59,6 @@ export const STAGE_LABELS: Record<StageId, string> = {
 };
 
 /**
- * Texture hint per stage (Requirement 13.5), shown on recipe pages and used by
- * the prompt helper. Sources: CDC "When, what and how to introduce solid foods"
- * (CDC-solids) for the infant stages and CDC "Foods and drinks to encourage"
- * (CDC-encourage) for the toddler stages, as listed in the design.
- */
-export const STAGE_TEXTURE_HINTS: Record<StageId, { hint: string; sourceUrl: string }> = {
-  '6-8': {
-    hint: 'smooth or well-mashed',
-    sourceUrl:
-      'https://www.cdc.gov/infant-toddler-nutrition/foods-and-drinks/when-what-and-how-to-introduce-solid-foods.html',
-  },
-  '9-12': {
-    hint: 'mashed, or soft small pieces to pick up',
-    sourceUrl:
-      'https://www.cdc.gov/infant-toddler-nutrition/foods-and-drinks/when-what-and-how-to-introduce-solid-foods.html',
-  },
-  '12-23': {
-    hint: 'soft, small, bite-sized pieces',
-    sourceUrl:
-      'https://www.cdc.gov/infant-toddler-nutrition/foods-and-drinks/foods-and-drinks-to-encourage.html',
-  },
-  '24-36': {
-    hint: 'small, bite-sized pieces',
-    sourceUrl:
-      'https://www.cdc.gov/infant-toddler-nutrition/foods-and-drinks/foods-and-drinks-to-encourage.html',
-  },
-};
-
-/**
  * Starting default meal slots for a stage (Requirements 8.2, 13.9). The user
  * can change them; these are only the defaults.
  */

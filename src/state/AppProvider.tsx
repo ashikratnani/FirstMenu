@@ -165,7 +165,8 @@ export function reducer(state: AppState, action: AppAction): AppState {
         }
         return changed ? next : day;
       });
-      // Design (suggestions): deleting a custom recipe removes it from madeLog.
+      // Deliberate (suggestions design): deleting a custom recipe removes it from
+      // madeLog. Covered by the AppProvider test "also removes the recipe from madeLog".
       const madeLog = state.madeLog.filter((e) => e.recipeId !== action.id);
       return {
         ...state,

@@ -111,8 +111,8 @@ export function buildSharePayload(state: AppState): SharePayload {
 
 /** Drop `imported.text` and `clearedMentions` from a recipe for sharing. */
 function stripImportedFields(recipe: Recipe): Recipe {
-  const { clearedMentions, imported, ...rest } = recipe;
-  void clearedMentions;
+  const { imported, ...rest } = recipe;
+  delete rest.clearedMentions;
   return imported ? { ...rest, imported: { ...imported, text: '' } } : rest;
 }
 
