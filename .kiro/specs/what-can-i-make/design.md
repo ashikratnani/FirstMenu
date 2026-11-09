@@ -634,7 +634,7 @@ If `onHandUpdated` is more than 3 days before today and `onHand` is not empty: a
 
 ### New food due
 
-Uses `NEW_FOOD_SPACING_DAYS` and `NEW_FOOD_SPACING_SOURCES` from `safety/rules.ts`, so no new health rule is added. The last new food date is the newest `date` among all `foods` records, `tried` or `reaction`, so a recorded reaction also restarts the wait. Due when that date is at least `NEW_FOOD_SPACING_DAYS` days before today, or no food has been recorded yet. Pick the best-scoring Ready now or Missing one recipe with exactly one untried food, any food, allergen or not. Copy: "Ready for a new food? <Recipe> introduces <food>." with a link to that food on the Foods page. The banner itself makes no health claim; the spacing source is listed on the Sources page, and allergen doors on the Foods page show their existing cited guidance.
+Uses `NEW_FOOD_SPACING_DAYS` and `NEW_FOOD_SPACING_SOURCES` from `safety/rules.ts`, so no new health rule is added. The last new food date is the newest `date` among all `foods` records, `tried` or `reaction`, so a recorded reaction also restarts the wait. Due when that date is at least `NEW_FOOD_SPACING_DAYS` days before today, or no food has been recorded yet. Pick the best-scoring Ready now or Missing one recipe with exactly one untried food, any food, allergen or not. Copy: "Ready for a new food? <Recipe> introduces <food>." with a link to that food on the Foods page. The banner itself makes no health claim. Task 12.1 adds a "New food spacing" entry to the Sources page citing `NEW_FOOD_SPACING_SOURCES` (today no rule cites it, so it isn't listed yet). Allergen doors on the Foods page keep their existing cited guidance.
 
 ### Make again
 
@@ -654,7 +654,7 @@ Each day a food is added to on-hand, append the date to `onHandDays[key]` if not
 | --- | --- | --- | --- |
 | Try this | scored rules, e.g. "Ready now · 10 min · Breakfast · Iron-rich" | `try-this:<recipe id>` (moves to the next pick) | 24 hours |
 | Meal hint chip | "It's breakfast time" | `meal-hint` | 4 hours |
-| New food | "3+ days since the last new food" (the spacing from `NEW_FOOD_SPACING_DAYS`) | `new-food` (the whole banner) | 24 hours |
+| New food | "3+ days since the last new food", or "No new foods recorded yet" when there are none (spacing from `NEW_FOOD_SPACING_DAYS`) | `new-food` (the whole banner) | 24 hours |
 | Still have these? | "Last updated <n> days ago" | `stale-on-hand` | 24 hours, or until on-hand changes |
 | Pantry | "Added on <n> different days" | `pantry:<food key>` | permanently ("No thanks") |
 | Make again | "Made on <date>" | `make-again` (the whole row) | 24 hours |
@@ -663,7 +663,7 @@ Each day a food is added to on-hand, append the date to `onHandDays[key]` if not
 
 ### Placement and primary actions
 
-Make screen order: search box, Try this card, new-food suggestion, stale on-hand prompt, pantry suggestion, Ready now, Missing one, Make again, More ideas. At most two suggestion banners show at once (new food first, then stale on-hand, then pantry).
+Make screen order: search box, suggested meal chip (with the search filter chips), Try this card, new-food suggestion, stale on-hand prompt, pantry suggestion, Ready now, Missing one, Make again, More ideas. At most two suggestion banners show at once (new food first, then stale on-hand, then pantry).
 
 **One primary button per screen** (Requirement 17.10). Layout's `addRecipeVariant(pathname)` from the Astryx trial can't see page state, so task 10.4 replaces it with a small context:
 
@@ -673,7 +673,9 @@ Make screen order: search box, Try this card, new-food suggestion, stale on-hand
 usePagePrimaryAction(active: boolean)  // a page calls this while it shows its own primary button
 ```
 
-Layout renders "Add recipe" as `secondary` while any page reports an active primary action, and hides it on `/recipes/new`, `/add` and `/onboarding`. Settings, Print and the edit pages call `usePagePrimaryAction(true)`. The Make page calls it with `true` only while the Try this card is shown. The existing Layout tests keep passing with the new mechanism.
+Layout renders "Add recipe" as `secondary` while any page reports an active primary action, and hides it on `/recipes/new`, `/add` and `/onboarding`. Settings, Print and the edit pages call `usePagePrimaryAction(true)`. The Make page calls it with `true` only while the Try this card is shown. The Layout tests from the trial check variants by pathname with placeholder pages, so task 10.4 rewrites them: placeholder pages call `usePagePrimaryAction`, and the tests check the variant follows it.
+
+All suggestion banner buttons (Yes, keep · Clear · Add · No thanks · Show another · Make again) and "I made this" on the recipe page are secondary. The recipe page has no primary button of its own, so the shell's "Add recipe" stays primary there.
 
 On Add recipe: before a preview, "Paste" is primary and "Read recipe" is secondary. During a preview, "Save recipe" is primary and "Paste" is hidden.
 
