@@ -114,11 +114,13 @@ export function recipeView(
 
   for (const ingredient of recipe.ingredients) {
     for (const key of foodKeyFor(ingredient)) {
+      const status = foodStatus(key, state, ageMonths);
       // Water, breast milk, formula and ice are never first-taste doors (the
       // Foods page skips them too), so they never appear in a door badge.
-      if (isIgnoredFood(key)) continue;
-      const status = foodStatus(key, state, ageMonths);
-      if (status === 'door' && !seenUntried.has(key)) {
+      // Only the badge skips them: a reaction recorded under one of these
+      // keys (possible via an imported backup or share link) must still ghost
+      // the recipe, as isRecipeGhosted() in plan.ts does.
+      if (status === 'door' && !isIgnoredFood(key) && !seenUntried.has(key)) {
         seenUntried.add(key);
         untriedLabels.push(foodLabel(key));
       }
