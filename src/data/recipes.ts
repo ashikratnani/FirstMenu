@@ -182,8 +182,8 @@ export const RECIPES: Recipe[] = [
       storageSource: BABYFOOD_URL,
     },
     title: 'Beef, Peas and Potatoes',
-    // Toddler tag rationale: infantfoods.html describes small chunks of potato; WIC says grind or mash to taste, so mashed texture also fits 12-23.
-    stages: ['6-8', '9-12', '12-23'],
+    // Toddler tag rationale: Served as puree or mash only (steps blend, grind or mash), so no toddler stage.
+    stages: ['6-8', '9-12'],
     serveAs: ['puree', 'mashed'],
     mealTypes: ['lunch', 'dinner'],
     ingredients: [
@@ -218,8 +218,8 @@ export const RECIPES: Recipe[] = [
       storageSource: BABYFOOD_URL,
     },
     title: 'Chicken, Broccoli and Rice',
-    // Toddler tag rationale: infantfoods.html describes small chunks of broccoli; WIC says grind or mash to taste, so it also fits 12-23.
-    stages: ['6-8', '9-12', '12-23'],
+    // Toddler tag rationale: Served as puree or mash only (steps blend, grind or mash), so no toddler stage.
+    stages: ['6-8', '9-12'],
     serveAs: ['puree', 'mashed'],
     mealTypes: ['lunch', 'dinner'],
     ingredients: [
@@ -259,8 +259,8 @@ export const RECIPES: Recipe[] = [
       storageSource: BABYFOOD_URL,
     },
     title: 'Beef, Squash and Macaroni',
-    // Toddler tag rationale: infantfoods.html describes small chunks of macaroni; WIC says grind or mash to taste, so it also fits 12-23.
-    stages: ['6-8', '9-12', '12-23'],
+    // Toddler tag rationale: Served as puree or mash only (steps blend, grind or mash), so no toddler stage.
+    stages: ['6-8', '9-12'],
     serveAs: ['puree', 'mashed'],
     mealTypes: ['lunch', 'dinner'],
     ingredients: [

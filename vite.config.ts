@@ -16,7 +16,7 @@ export default defineConfig({
         // Built-in recipe data (src/data/recipes.ts, simpleIdeas.ts) gets its own
         // chunk so size-report.mjs can report it apart from the page budgets.
         manualChunks(id) {
-          if (id.includes('/src/data/')) return 'recipe-data';
+          if (/\/src\/data\/(recipes|simpleIdeas)\.ts$/.test(id)) return 'recipe-data';
         },
       },
     },

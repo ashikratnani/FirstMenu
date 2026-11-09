@@ -7,7 +7,9 @@
 //  A. Utah Department of Health WIC, "Homemade Baby Foods" (Simple Examples by age:
 //     6 months pureed/mashed, 8 months ground/finely chopped, 10 months chopped or
 //     small pieces of finger foods).
-//  B. USDA Food and Nutrition Service, "Feeding Infants in the CACFP", Chapter 7.
+//  B. USDA Food and Nutrition Service, "Feeding Infants in the CACFP", Chapter 7
+//     (cited for the no-salt-added and mash adaptations; it gives no age for eggs,
+//     so no egg idea is included rather than inventing stages).
 //
 // Stage rule: the stage comes from the source's age guidance (6 and 8 month items
 // -> '6-8' and '9-12'; 10 month items -> '9-12'). '12-23' and '24-36' are added
@@ -15,13 +17,15 @@
 // tagged for toddler stages. No storage times are set (none are sourced per idea).
 // Steps are written in our own words. Dropped: nothing; every listed item was
 // found in the fetched text.
+//
+// Note on the Utah 8 month items (peaches, carrots, ground beef): the source says
+// "ground or finely chopped", but design rule 3 stages simple ideas from the
+// source's age guidance, and 8 months falls in '6-8', so they keep that stage.
 
 import type { Recipe } from '../domain/types';
 
 const UTAH_URL = 'https://wic.stage.utah.gov/wp-content/uploads/Homemade-Baby-Foods-1.pdf';
 const UTAH_PUBLISHER = 'Utah Department of Health, WIC Program';
-const USDA_URL = 'https://www.fns.usda.gov/sites/default/files/resource-files/FI_Ch7a_PrepareFoods.pdf';
-const USDA_PUBLISHER = 'USDA Food and Nutrition Service';
 const RETRIEVED = '2026-11-10';
 
 const UTAH_SIX_MONTHS = 'Source lists this under 6 months, pureed or mashed';
@@ -304,32 +308,5 @@ export const SIMPLE_IDEAS: Recipe[] = [
     texture: 'soft shreds',
     servings: 1,
     serveAs: ['finger-food'],
-  },
-
-  // --- USDA FNS, Feeding Infants in the CACFP, Chapter 7 --------------------
-  {
-    id: 'b-idea-mashed-egg',
-    origin: 'builtin',
-    kind: 'simple-idea',
-    source: {
-      title: 'Eggs (hard-boiled, mashed with a bit of liquid)',
-      publisher: USDA_PUBLISHER,
-      url: USDA_URL,
-      retrieved: RETRIEVED,
-      adaptations: [
-        'The chapter gives no month for this idea; the stages are for infants already eating solids',
-      ],
-    },
-    title: 'Mashed hard-boiled egg',
-    stages: ['6-8', '9-12'],
-    mealTypes: ['breakfast', 'snack'],
-    ingredients: [{ name: 'egg', category: 'dairy-eggs' }],
-    steps: [
-      'Cook the egg until the yolk and white are both firm, not runny.',
-      'Mash it with a bit of water, breastmilk or formula until it is the texture you want.',
-    ],
-    texture: 'soft mash',
-    servings: 1,
-    serveAs: ['mashed'],
   },
 ];

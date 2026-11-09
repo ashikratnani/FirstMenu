@@ -258,9 +258,9 @@ describe('BUILTIN_RECIPES - coverage of the Option 4 shipped batch (issue #7 def
 // Batch 1 (task 14.2): toddler tags, serveAs, simple ideas
 // ---------------------------------------------------------------------------
 const WIC_TAGS: Record<string, { stages: StageId[]; serveAs: string[] }> = {
-  'b-beef-peas-potatoes': { stages: ['6-8', '9-12', '12-23'], serveAs: ['puree', 'mashed'] },
-  'b-chicken-broccoli-rice': { stages: ['6-8', '9-12', '12-23'], serveAs: ['puree', 'mashed'] },
-  'b-beef-squash-macaroni': { stages: ['6-8', '9-12', '12-23'], serveAs: ['puree', 'mashed'] },
+  'b-beef-peas-potatoes': { stages: ['6-8', '9-12'], serveAs: ['puree', 'mashed'] },
+  'b-chicken-broccoli-rice': { stages: ['6-8', '9-12'], serveAs: ['puree', 'mashed'] },
+  'b-beef-squash-macaroni': { stages: ['6-8', '9-12'], serveAs: ['puree', 'mashed'] },
   'b-carrots-and-apples': { stages: ['6-8', '9-12'], serveAs: ['puree', 'mashed'] },
   'b-sweet-potato-chicken': { stages: ['6-8', '9-12'], serveAs: ['puree', 'mashed'] },
   'b-apple-rice-pudding': { stages: ['6-8', '9-12'], serveAs: ['puree'] },
@@ -309,11 +309,20 @@ describe('BUILTIN_RECIPES - batch 1', () => {
     }
   });
 
-  it('pureed or mashed only ideas are not tagged for toddler stages', () => {
-    for (const idea of SIMPLE_IDEAS) {
+  it('pureed or mashed only recipes and ideas are not tagged for toddler stages', () => {
+    for (const idea of BUILTIN_RECIPES) {
       const softPieces = idea.serveAs?.some((s) => s === 'pieces' || s === 'finger-food');
       const toddler = idea.stages.some((s) => s === '12-23' || s === '24-36');
       if (!softPieces) expect(toddler, idea.id).toBe(false);
+    }
+  });
+
+  // Design rule 3: simple ideas are staged from the source's age guidance. The Utah
+  // 8 month items (peaches, carrots, ground beef) say "ground or finely chopped"
+  // and are kept in '6-8' (which covers 8 months) on purpose.
+  it('keeps the Utah 8 month items in 6-8 per the source age guidance', () => {
+    for (const id of ['b-idea-chopped-peaches', 'b-idea-chopped-carrots', 'b-idea-ground-beef']) {
+      expect(SIMPLE_IDEAS.find((i) => i.id === id)?.stages, id).toContain('6-8');
     }
   });
 
