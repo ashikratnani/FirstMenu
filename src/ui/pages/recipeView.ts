@@ -7,7 +7,12 @@
 // invented here (design.md / Req 5.1).
 
 import { STAGE_IDS, STAGE_LABELS } from '../../domain/age';
-import { screenRecipe, type Finding } from '../../domain/safety/screen';
+import {
+  screenRecipe,
+  screenTextMentions,
+  type Finding,
+  type TextMention,
+} from '../../domain/safety/screen';
 import {
   foodKeyFor,
   foodLabel,
@@ -74,6 +79,8 @@ export interface RecipeView {
   isGhosted: boolean;
   /** Every block finding, in screen order (drives the ghost reason text). */
   blocks: Finding[];
+  /** Block-rule foods named in a pasted recipe's title, steps or notes (Req 7). */
+  textMentions: TextMention[];
   /** The food key (plain name) whose reaction ghosts the recipe, if any. */
   reactionFoodKey: string | null;
   /** True when any ingredient food is still an untried mystery door. */
@@ -91,6 +98,7 @@ export interface RecipeView {
  * Derive the library view model for one recipe at the child's current age.
  *
  * Ghosting (Req 5.1) stays honest and aligned with screen.ts/foods.ts:
+ *   - a text mention in a pasted recipe's title, steps or notes (Req 7.3), OR
  *   - any block finding from the screen (this already covers block-covered
  *     foods such as honey under 12 months), OR
  *   - an ingredient whose foodKeyFor key has a RECORDED reaction
@@ -108,6 +116,7 @@ export function recipeView(
   // override; when omitted behavior is unchanged (selectAgeMonths(state) ?? 0).
   const ageMonths = ageMonthsOverride ?? selectAgeMonths(state) ?? 0;
   const result = screenRecipe(recipe, ageMonths);
+  const textMentions = screenTextMentions(recipe, ageMonths);
 
   let reactionFoodKey: string | null = null;
   const untriedLabels: string[] = [];
@@ -133,7 +142,8 @@ export function recipeView(
     }
   }
 
-  const isGhosted = result.blocks.length > 0 || reactionFoodKey !== null;
+  const isGhosted =
+    result.blocks.length > 0 || textMentions.length > 0 || reactionFoodKey !== null;
   const freezer = recipe.storage?.freezerMonths;
   const freezerMonths =
     typeof freezer === 'number' && freezer > 0 ? freezer : null;
@@ -142,6 +152,7 @@ export function recipeView(
     recipe,
     isGhosted,
     blocks: result.blocks,
+    textMentions,
     reactionFoodKey,
     usesUntriedFood: untriedLabels.length > 0,
     untriedFoodLabels: untriedLabels,
@@ -158,6 +169,11 @@ function blockReason(block: Finding): string {
   return `Not yet: ${food}.`;
 }
 
+/** The design wording for a text mention (the "Not used" button lives in the UI). */
+function mentionReason(mention: TextMention): string {
+  return `The recipe text mentions ${mention.label}: "${mention.sentence}". ${mention.message}`;
+}
+
 /**
  * The visible + accessible "ghost state" reason for a ghosted recipe. Mirrors
  * the Foods page wording: EACH block becomes "Not yet: <food>. Available at N
@@ -166,8 +182,11 @@ function blockReason(block: Finding): string {
  * a bare "Not yet."
  */
 export function ghostReason(view: RecipeView): string {
-  if (view.blocks.length > 0) {
-    return view.blocks.map(blockReason).join(' ');
+  if (view.blocks.length > 0 || view.textMentions.length > 0) {
+    return [
+      ...view.blocks.map(blockReason),
+      ...view.textMentions.map(mentionReason),
+    ].join(' ');
   }
   if (view.reactionFoodKey) {
     return `Not yet: ${foodLabel(view.reactionFoodKey)}. Reaction recorded.`;

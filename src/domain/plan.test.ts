@@ -3,6 +3,7 @@ import {
   computeNextWeekPlan,
   defaultPrepDate,
   defaultStartDate,
+  isRecipeGhosted,
   newFoodSpacingWarning,
 } from './plan';
 import { reducer, type AppAction } from '../state/AppProvider';
@@ -57,6 +58,31 @@ function stateWithFoods(foods: Record<string, FoodRecord> = {}): AppState {
 // ---------------------------------------------------------------------------
 // defaultStartDate
 // ---------------------------------------------------------------------------
+
+describe('isRecipeGhosted with text mentions', () => {
+  const pasted = (over: Partial<Recipe> = {}): Recipe => ({
+    ...foodRecipe('r-pasted', 'pear'),
+    imported: { from: 'chatgpt', text: 'x', date: '2026-01-05' },
+    ...over,
+  });
+
+  it('ghosts a pasted recipe whose step names a blocked food', () => {
+    expect(isRecipeGhosted(pasted({ steps: ['Add honey.'] }), stateWithFoods(), 8)).toBe(true);
+  });
+
+  it('does not ghost a typed recipe for the same step', () => {
+    expect(isRecipeGhosted(pasted({ steps: ['Add honey.'], imported: undefined }), stateWithFoods(), 8)).toBe(false);
+  });
+
+  it('stops ghosting once the mention is cleared, and at the age limit', () => {
+    const cleared = pasted({
+      steps: ['Add honey.'],
+      clearedMentions: [{ ruleId: 'honey', sentence: 'Add honey.' }],
+    });
+    expect(isRecipeGhosted(cleared, stateWithFoods(), 8)).toBe(false);
+    expect(isRecipeGhosted(pasted({ steps: ['Add honey.'] }), stateWithFoods(), 12)).toBe(false);
+  });
+});
 
 describe('defaultStartDate', () => {
   // 2026-01-05 is a Monday; 06 Tue, 07 Wed, 08 Thu, 09 Fri, 10 Sat, 11 Sun.

@@ -126,7 +126,7 @@ const CONTAINER_PHRASES: readonly string[] = [
 ];
 
 /** Unit-like tokens dropped from derived keys (Ingredient.unit vocabulary). */
-const UNIT_WORDS: ReadonlySet<string> = new Set([
+export const UNIT_WORDS: ReadonlySet<string> = new Set([
   'g',
   'kg',
   'mg',

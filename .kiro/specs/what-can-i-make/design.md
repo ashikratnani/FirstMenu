@@ -345,7 +345,7 @@ parseRecipeText(text: string): ParsedRecipe
 2. Strip markdown: `#` headers, `**bold**`, `__bold__`, `*italic*`, inline code ticks.
 3. Strip emoji and decorative symbols, but keep `½ ¼ ¾ ⅓ ⅔`.
 4. Drop lines made only of hashtags and @mentions, and remove trailing hashtag runs from other lines.
-5. Drop common caption filler lines: lines containing "save this", "follow for", "link in bio", "comment", "share with", "tag a".
+5. Drop common caption filler lines: lines containing "save this", "follow for", "link in bio", "comment", "share with", "tag a". A filler-worded line is kept (it then lands in the steps or notes like any other line) when any block rule fires on it, checked at every age, so the text-mention screen still sees it: "Stir in a spoon of honey, then share with family." stays. Only pure filler is dropped.
 
 ### Sections
 
