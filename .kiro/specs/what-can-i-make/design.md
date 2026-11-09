@@ -512,7 +512,7 @@ Available supply, counted on November 8, 2026: Food Hero's sitemap lists 368 rec
 4. **Not:** a personal or influencer blog, social media, a brand or product marketing site, a recipe aggregator, AI-generated content, or a page whose terms forbid reuse.
 5. **In English.**
 
-Prefer publishers already in `docs/recipe-sources.md`; add new ones to fill gaps (allergen groups, stages, meal types). Each new publisher gets a row in `docs/recipe-sources.md` (publisher, type, example URL, criteria notes, pr-reviewer verdict with PR link, date) in the PR that adds its first recipe. All v1 sourcing rules still apply: ingredients copied, steps reworded, every recipe screened.
+Prefer publishers already in `docs/recipe-sources.md`; add new ones to fill gaps (allergen groups, stages, meal types). Each new publisher gets a row in `docs/recipe-sources.md` (publisher, type, example URL, criteria notes, verdict, date) in the PR that adds its first recipe, with the verdict "Pending pr-reviewer". After pr-reviewer passes and merges that PR, the next PR updates the verdict to "Approved by pr-reviewer (PR #<n>)". All v1 sourcing rules still apply: ingredients copied, steps reworded, every recipe screened.
 
 **Batches.** Recipes are added in batches of about 20, one PR each (branch `v2/14-recipes-batch-<n>`). Each PR keeps the invariant tests green for the recipes so far. Each batch opens a `Recipe review: batch <n>` issue for the primary user and doesn't wait for it. Order: batch 1 re-tags the WIC recipes and adds simple ideas (covers `6-8` early); later batches prioritize missing allergen groups, then stage counts, then variety of meal types.
 

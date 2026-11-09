@@ -1,6 +1,6 @@
 # Built-in recipe sources
 
-Publishers that built-in recipes may come from (active spec Requirement 14.2). A new publisher is added here in the PR that adds its first recipe, with pr-reviewer's verdict. Criteria: `.kiro/specs/what-can-i-make/design.md` "Recipe source criteria". Decisions are also logged on issue #42.
+Publishers that built-in recipes may come from (active spec Requirement 14.2). A new publisher is added here in the PR that adds its first recipe, with the verdict "Pending pr-reviewer". After pr-reviewer passes and merges that PR, the next PR updates the verdict to "Approved by pr-reviewer (PR #<n>)". Criteria: `.kiro/specs/what-can-i-make/design.md` "Recipe source criteria". Decisions are also logged on issue #42.
 
 | Publisher | Type | Example URL | Criteria notes | Verdict | Date |
 | --- | --- | --- | --- | --- | --- |
