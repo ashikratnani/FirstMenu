@@ -270,16 +270,16 @@ These suggestions come from the maintainer's UI feedback (issue #36): the app sh
 
 #### Acceptance Criteria
 
-1. THE top of the Make screen SHALL show one "Try this" card: the single best Ready now recipe, chosen by the rules in the design. It SHALL have one primary button that opens the recipe, and a "Show another" action that moves to the next-best recipe.
-2. WHEN the Make screen opens THEN the app SHALL suggest a meal filter for the time of day (breakfast, lunch, snack or dinner), shown as a chip marked "Suggested" that the user can remove. It SHALL NOT be applied if the user removed it in the last 4 hours, and it SHALL change only results, never stored data.
+1. THE top of the Make screen SHALL show one "Try this" card: the single best Ready now recipe with at most one untried food, chosen by the rules in the design. It SHALL have one primary button that opens the recipe, and a "Show another" action that moves to the next-best recipe.
+2. WHEN the Make screen opens THEN the app SHALL show a "Suggested: <meal>" chip for the time of day (breakfast, lunch, snack or dinner). The hint SHALL only raise matching recipes in the Try this pick; it SHALL NOT filter results or show "More ideas" unless the user taps the chip, which turns it into a normal meal filter. Dismissing the chip SHALL hide it for 4 hours. It SHALL never change stored data other than the dismissal.
 3. IF the on-hand foods were last changed more than 3 days ago THEN the Make screen SHALL ask "Still have these?" with the foods listed and one-tap "Yes, keep" and "Clear" actions.
-4. WHEN at least 3 days have passed since the child's last new food (the spacing from v1 Requirement 7.8 and its source) THEN the Make screen MAY show "Ready for a new food?" with one Ready now or Missing one recipe that contains exactly one untried food, naming that food. The app SHALL NOT pick allergens over other foods and SHALL NOT add new health advice.
+4. WHEN at least 3 days have passed since the child's last new food (the spacing from v1 Requirement 7.8 and its source) THEN the Make screen MAY show "Ready for a new food?" with one Ready now or Missing one recipe that contains exactly one untried food, naming that food. The last new food is the newest food record of any status, so a recorded reaction also restarts the wait. The app SHALL NOT pick allergens over other foods and SHALL NOT add new health advice.
 5. EVERY recipe page SHALL have an "I made this" action that records the date. THE Make screen SHALL show a "Make again" row of the most recently made recipes that are still not ghosted.
 6. WHEN the user has added the same food to on-hand on 3 or more different days and it is not in the pantry THEN the app SHALL offer once "You often have <food>. Add to pantry?"
 7. THE Add recipe screen SHALL have a primary "Paste" button that reads the clipboard only when tapped, and SHALL fall back to the text box when the browser doesn't allow it.
 8. A suggestion SHALL NEVER show a ghosted recipe, SHALL NEVER change stored data without a tap, and SHALL show a short "Why this?" reason (for example "Ready now · 10 min · Breakfast").
 9. EACH suggestion SHALL be dismissible with one tap, and a dismissed suggestion SHALL stay hidden for at least 24 hours, except the time-of-day meal hint, which follows criterion 2.
-10. EACH screen SHALL have at most one filled primary button. On the Make screen it is the "Try this" button when that card is shown.
+10. EACH screen SHALL have at most one filled primary button at a time. On the Make screen it is the "Try this" button when that card is shown. On Add recipe it is "Paste" before a preview and "Save recipe" during a preview, and the shell's "Add recipe" button is hidden there.
 11. ALL suggestion state (made log, on-hand date, food counts, dismissals) SHALL be stored on the device in schema v2, SHALL be included in export and import, and SHALL NOT be included in share links or the ChatGPT prompt.
 
 ## Out of scope

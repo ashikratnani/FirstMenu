@@ -79,7 +79,7 @@ Branch names use the `v2/` prefix (for example `v2/6-paste-parser`) so they don'
   - [ ] 8.1 Implement `domain/prompt.ts` (`buildPrompt`) with per-stage texture hints. Tests: content, leave-out list at 10, 13 and 25 months, reaction foods, "toddler" wording at 12 months and over, no name or birth date.
     - _Requirements: 8.2 – 8.5, 13.5_
 
-  - [ ] 8.2 Implement `domain/suggest.ts` per "Smart suggestions" in the design: `pickTryThis` with scoring and reasons, time-of-day meal hint, stale on-hand check, new-food-due check using `NEW_FOOD_SPACING_DAYS`, Make again list, pantry learning. Reducer actions: record made, record on-hand day, dismiss suggestion, keep on-hand. Tests with a fixed `now`: each score rule, ghosted recipes never picked, hint boundaries (10:29 vs 10:30), 4-hour hint dismissal, 24-hour dismissals, spacing at 2 and 3 days, no food tried yet, made-log dedupe per day and cap, deleted recipe removed from the log, export/import round-trip, suggestion state absent from share payloads and the prompt.
+  - [ ] 8.2 Implement `domain/suggest.ts` per "Smart suggestions" in the design: `pickTryThis` with scoring and reasons, time-of-day meal hint, stale on-hand check, new-food-due check using `NEW_FOOD_SPACING_DAYS`, Make again list, pantry learning. Reducer actions: record made, record on-hand day, dismiss suggestion, keep on-hand. Tests with a fixed `now`: each score rule, ghosted recipes never picked, hint boundaries (10:29 vs 10:30), 4-hour hint dismissal, 24-hour dismissals, spacing at 2 and 3 days, a reaction record restarts the wait, no food recorded yet, recipes with two untried foods never picked by Try this, `isDismissed` for each row of the dismissal table, made-log dedupe per day and cap, deleted recipe removed from the log, export/import round-trip, suggestion state absent from share payloads and the prompt.
     - _Requirements: 17.1 – 17.6, 17.8, 17.9, 17.11_
 
 - [ ] 9. Navigation and Plan move (Astryx)
@@ -94,7 +94,7 @@ Branch names use the `v2/` prefix (for example `v2/6-paste-parser`) so they don'
   - [ ] 10.3 Add the "What do you have?" search box to the Make screen: live chips and results while typing, "Did you mean" chips, "Not recognized" list, "Recipes named …" group, removable filter chips, "More ideas", Enter or "Add" to keep. Add "Serve as" with editing to the recipe page for custom recipes. Component tests: typing "leftover chicken, rice and peas" shows three chips and updates results; a typo needs a tap before it counts; Enter moves foods to on-hand; "something for breakfast" alone shows breakfast recipes including "More ideas"; "finger food" filters to finger-food recipes; typing "iron rich" turns on the "Iron-rich only" toggle and removing the chip turns it off; a custom recipe with a guessed form shows "(guessed)" and can be edited.
     - _Requirements: 3.9, 16.5 – 16.9, 16.12, 16.13_
 
-  - [ ] 10.4 Add the suggestions to the Make screen in the order in the design: Try this card (the screen's one primary button, with "Show another" and "Why this?"), suggested meal chip, new-food suggestion, stale on-hand prompt, pantry suggestion, Make again row; at most two banners at once; every suggestion dismissible. Make the shell's "Add recipe" secondary while the Try this card shows. Component tests: Try this opens the right recipe; dismissing hides it; removing the meal chip doesn't bring it back within 4 hours; one filled primary button.
+  - [ ] 10.4 Add the suggestions to the Make screen in the order in the design: Try this card (the screen's one primary button, with "Show another" and "Why this?"), suggested meal chip, new-food suggestion, stale on-hand prompt, pantry suggestion, Make again row; at most two banners at once; every suggestion dismissible. Replace Layout's `addRecipeVariant` with `PrimaryActionProvider` / `usePagePrimaryAction` per the design, and move Settings, Print and edit pages onto it. Component tests: Try this opens the right recipe; dismissing hides it; the meal chip doesn't filter results until tapped and doesn't come back within 4 hours after ✕; each suggestion shows its reason; exactly one filled primary button on Make, Settings, Print, edit and Add recipe; existing Layout tests still pass.
     - _Requirements: 17.1 – 17.6, 17.8 – 17.10_
 
 - [ ] 11. Add recipe and prompt helper (Astryx)
@@ -104,7 +104,7 @@ Branch names use the `v2/` prefix (for example `v2/6-paste-parser`) so they don'
     - _Requirements: 8.1, 8.6 – 8.9_
   - [ ] 11.3 Component tests: paste → preview → save with no typing; a text mention ghosts and "Not used" clears it.
     - _Requirements: 6.4, 7.3, 7.4_
-  - [ ] 11.4 Add the primary "Paste" button to Add recipe (clipboard read only on tap, fallback message when not allowed). Component tests with a mocked clipboard: success fills and reads the recipe; rejection shows the fallback.
+  - [ ] 11.4 Add the primary "Paste" button to Add recipe (clipboard read only on tap, fallback message when not allowed); "Read recipe" secondary; during a preview "Save recipe" is the only primary button and "Paste" is hidden; the shell's "Add recipe" is hidden on `/add`. Component tests with a mocked clipboard: success fills and reads the recipe; rejection shows the fallback; one filled primary button before and during a preview.
     - _Requirements: 17.7, 17.10_
 
 - [ ] 12. Recipe page and library

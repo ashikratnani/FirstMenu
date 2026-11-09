@@ -611,7 +611,7 @@ interface AppState {
 pickTryThis(results: MakeResult[], ctx: { now: Date; mealHint?: MealType; madeLog; foods }): MakeResult[]
 ```
 
-Candidates are Ready now results, never ghosted. Score each (higher is better) and sort; ties go to title order:
+Candidates are Ready now results, never ghosted, with at most one untried food (recipes that would introduce two or more new foods at once are never picked). Score each (higher is better) and sort; ties go to title order:
 
 | Rule | Points |
 | --- | --- |
@@ -620,13 +620,13 @@ Candidates are Ready now results, never ghosted. Score each (higher is better) a
 | Effort Easy | +1 |
 | Has the Iron-rich tag | +1 |
 | Made in the last 2 days | −3 (variety) |
-| Contains an untried food | −2, unless the new-food suggestion is due (then 0) |
+| Contains one untried food | −2, unless the new-food suggestion is due (then 0) |
 
 "Show another" walks down the sorted list and wraps. The reason line lists the rules that scored, for example "Ready now · 10 min · Breakfast · Iron-rich".
 
 ### Time-of-day meal hint
 
-Local time: 05:00–10:29 breakfast, 10:30–13:59 lunch, 14:00–16:59 snack, 17:00–20:59 dinner, otherwise none. Shown as a `Suggested` filter chip (same chip component as Requirement 16 filters). Removing it records `dismissed['meal-hint']`; it is not suggested again for 4 hours.
+Local time: 05:00–10:29 breakfast, 10:30–13:59 lunch, 14:00–16:59 snack, 17:00–20:59 dinner, otherwise none. The hint is a ranking signal only: it adds the +3 in the Try this score and shows as a "Suggested: Breakfast" chip. It does not filter results, so it never triggers "More ideas" (Requirement 16.12) on its own. Tapping the chip turns it into a normal `meal:<type>` search filter (Requirement 16.9). Its ✕ records `dismissed['meal-hint']`, and the chip and its score boost are skipped for 4 hours.
 
 ### Stale on-hand
 
@@ -634,7 +634,7 @@ If `onHandUpdated` is more than 3 days before today and `onHand` is not empty: a
 
 ### New food due
 
-Uses `NEW_FOOD_SPACING_DAYS` and `NEW_FOOD_SPACING_SOURCES` from `safety/rules.ts`, so no new health rule is added. The last new food date is the newest `date` among `foods` records with status `tried`. Due when that date is at least `NEW_FOOD_SPACING_DAYS` days before today, or no food has been tried yet. Pick the best-scoring Ready now or Missing one recipe with exactly one untried food, any food, allergen or not. Copy: "Ready for a new food? <Recipe> introduces <food>." with a link to that food's Foods page entry, which already carries the cited guidance. Dismissal id: `new-food:<food key>`.
+Uses `NEW_FOOD_SPACING_DAYS` and `NEW_FOOD_SPACING_SOURCES` from `safety/rules.ts`, so no new health rule is added. The last new food date is the newest `date` among all `foods` records, `tried` or `reaction`, so a recorded reaction also restarts the wait. Due when that date is at least `NEW_FOOD_SPACING_DAYS` days before today, or no food has been recorded yet. Pick the best-scoring Ready now or Missing one recipe with exactly one untried food, any food, allergen or not. Copy: "Ready for a new food? <Recipe> introduces <food>." with a link to that food on the Foods page. The banner itself makes no health claim; the spacing source is listed on the Sources page, and allergen doors on the Foods page show their existing cited guidance.
 
 ### Make again
 
@@ -648,9 +648,34 @@ Each day a food is added to on-hand, append the date to `onHandDays[key]` if not
 
 `navigator.clipboard.readText()` inside the tap handler only. On success, fill the text box and run "Read recipe". On error or when unsupported, focus the text box and show "Paste with your keyboard or long-press". Never read the clipboard on page load.
 
+### Reasons and dismissal (Requirements 17.8, 17.9)
+
+| Suggestion | "Why this?" reason | Dismiss id | Hidden for |
+| --- | --- | --- | --- |
+| Try this | scored rules, e.g. "Ready now · 10 min · Breakfast · Iron-rich" | `try-this:<recipe id>` (moves to the next pick) | 24 hours |
+| Meal hint chip | "It's breakfast time" | `meal-hint` | 4 hours |
+| New food | "3+ days since the last new food" (the spacing from `NEW_FOOD_SPACING_DAYS`) | `new-food` (the whole banner) | 24 hours |
+| Still have these? | "Last updated <n> days ago" | `stale-on-hand` | 24 hours, or until on-hand changes |
+| Pantry | "Added on <n> different days" | `pantry:<food key>` | permanently ("No thanks") |
+| Make again | "Made on <date>" | `make-again` (the whole row) | 24 hours |
+
+`isDismissed(id, now)` compares `dismissed[id]` against the hide time. Times are stored as ISO strings.
+
 ### Placement and primary actions
 
-Make screen order: search box, Try this card (primary button), new-food suggestion, stale on-hand prompt, pantry suggestion, Ready now, Missing one, Make again, More ideas. At most two suggestion banners show at once (new food first, then stale on-hand, then pantry). The shell's "Add recipe" button is secondary on the Make screen when the Try this card is shown (Requirement 17.10), and primary otherwise.
+Make screen order: search box, Try this card, new-food suggestion, stale on-hand prompt, pantry suggestion, Ready now, Missing one, Make again, More ideas. At most two suggestion banners show at once (new food first, then stale on-hand, then pantry).
+
+**One primary button per screen** (Requirement 17.10). Layout's `addRecipeVariant(pathname)` from the Astryx trial can't see page state, so task 10.4 replaces it with a small context:
+
+```tsx
+// ui/components/PrimaryAction.tsx
+<PrimaryActionProvider>   // in Layout
+usePagePrimaryAction(active: boolean)  // a page calls this while it shows its own primary button
+```
+
+Layout renders "Add recipe" as `secondary` while any page reports an active primary action, and hides it on `/recipes/new`, `/add` and `/onboarding`. Settings, Print and the edit pages call `usePagePrimaryAction(true)`. The Make page calls it with `true` only while the Try this card is shown. The existing Layout tests keep passing with the new mechanism.
+
+On Add recipe: before a preview, "Paste" is primary and "Read recipe" is secondary. During a preview, "Save recipe" is primary and "Paste" is hidden.
 
 ## Decisions confirmed by the maintainer (November 8, 2026)
 

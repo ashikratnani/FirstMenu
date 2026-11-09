@@ -49,7 +49,7 @@ Steering files in [`.kiro/steering/`](../.kiro/steering/) set standing rules tha
 Kiro never merged its own work. For each top-level task it opened one PR and then invoked the `pr-reviewer` sub-agent by name with the PR number. `pr-reviewer` posted a comment with one of three verdicts:
 
 - **`PASS`**: the reviewer merges the PR (squash) once CI is green. Nothing else to do.
-- **`NEEDS_CHANGES`**: Kiro fixes every listed problem on the same branch, pushes, and invokes `pr-reviewer` again. After two rounds without a pass, it stops and asks the maintainer instead of trying a third time.
+- **`NEEDS_CHANGES`**: Kiro fixes every listed problem on the same branch, pushes, and invokes `pr-reviewer` again. After two rounds without a pass the coder stopped and asked the maintainer. On November 9, 2026 the maintainer raised the cap to 10 rounds, stopping sooner if a problem repeats or the list stops shrinking.
 - **`NEEDS_MAINTAINER`**: Kiro stops work on that PR and escalates to the maintainer via a `Decision needed:` issue.
 
 Examples of real `pr-reviewer` verdict comments on this repo:
