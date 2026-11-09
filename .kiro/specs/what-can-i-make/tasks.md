@@ -57,8 +57,8 @@ Branch names use the `v2/` prefix (for example `v2/6-paste-parser`) so they don'
   - [ ] 4.2 Implement `domain/nutrition.ts` with `NUTRITION_VERSION`, using the safety matcher. Tests: term format, sources, each tag fires, `except` cases, optional ingredients ignored.
     - _Requirements: 5.1, 5.3, 5.5, 5.6, 10.3_
 
-- [ ] 5. Grocery category guess
-  - [ ] 5.1 Implement `domain/category.ts` (`guessCategory`) with one test per category and the fallback.
+- [x] 5. Grocery category guess
+  - [x] 5.1 Implement `domain/category.ts` (`guessCategory`) with one test per category and the fallback.
     - _Requirements: 6.7_
 
 - [ ] 6. Paste parser and text-mention screen
