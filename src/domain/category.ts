@@ -91,15 +91,30 @@ export function guessCategory(name: string): GroceryCategory {
 
   // 2. dairy and eggs
   if (hasAny(tokens, DAIRY_TERMS)) {
-    if (hasAny(tokens, INFANT_QUALIFIERS)) return 'other';
     // "dairy-free milk" is a plant alternative: same treatment as plant milks.
     if (dairyFree) return hasAny(tokens, [...MILK_TERMS, 'butter']) ? 'pantry' : 'other';
-    if (hasAny(tokens, PLANT_QUALIFIERS)) {
-      // Plant milks and nut/seed butters are shelf-stable. Return now so the
-      // grain and produce rules do not claim "oat milk" or "rice milk".
-      return hasAny(tokens, [...MILK_TERMS, 'butter']) ? 'pantry' : 'other';
+    // `egg` has no exceptions. Any other dairy term counts as dairy unless the
+    // word directly before it is a plant or infant qualifier.
+    if (has(tokens, 'egg')) return 'dairy-eggs';
+    let infant = false;
+    let plantMilkOrButter = false;
+    let plantOther = false;
+    for (const term of DAIRY_TERMS) {
+      const t = tokenize(term);
+      for (let i = 0; i < tokens.length; i++) {
+        if (!termMatchesTokens(tokens.slice(i, i + t.length), t)) continue;
+        const prev = i > 0 ? [tokens[i - 1]] : [];
+        if (hasAny(prev, INFANT_QUALIFIERS)) infant = true;
+        else if (hasAny(prev, PLANT_QUALIFIERS)) {
+          // Plant milks and nut/seed butters are shelf-stable. Return pantry so the
+          // grain and produce rules do not claim "oat milk" or "rice milk".
+          if (term === 'butter' || MILK_TERMS.includes(term)) plantMilkOrButter = true;
+          else plantOther = true;
+        } else return 'dairy-eggs';
+      }
     }
-    return 'dairy-eggs';
+    if (infant) return 'other';
+    return plantMilkOrButter && !plantOther ? 'pantry' : 'other';
   }
 
   // 3. protein

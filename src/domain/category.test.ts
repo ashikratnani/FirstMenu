@@ -90,6 +90,15 @@ describe('guessCategory', () => {
       expect(guessCategory('formula milk')).toBe('other');
     });
 
+    it('plant and infant qualifiers must directly precede the dairy term', () => {
+      expect(guessCategory('egg fried rice')).toBe('dairy-eggs');
+      expect(guessCategory('rice and cheese')).toBe('dairy-eggs');
+      expect(guessCategory('cheese oat bar')).toBe('dairy-eggs');
+      expect(guessCategory('soy marinated eggs')).toBe('dairy-eggs');
+      expect(guessCategory('butter and rice')).toBe('dairy-eggs');
+      expect(guessCategory('free range eggs')).toBe('dairy-eggs');
+    });
+
     it('plant yogurt and cheese are not dairy', () => {
       expect(guessCategory('coconut yogurt')).toBe('other');
       expect(guessCategory('oat yogurt')).toBe('other');
