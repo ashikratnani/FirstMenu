@@ -26,7 +26,7 @@ Make these calls without asking, and mention them in the PR body:
 - Fixing spec text (requirements, design, tasks) when pr-reviewer finds a contradiction, gap or missing test, as long as the fix doesn't change behavior the maintainer approved or the scope. Note it in the PR body.
 - A nutrition tag term that no cited source supports: drop it and say so in the PR.
 - A size, accessibility, contrast or external-resource check failing: fix the code. Ask only if the fix would need a requirement change, such as raising a budget.
-- A new safety rule or term with no published source with a URL: don't add it, and say so in the PR. Never weaken an existing rule to get past the release-gate test.
+- A new safety rule or term with no published source with a URL: don't add it, and say so in the PR. Never weaken an existing rule, its source or its tests to get past the release-gate test.
 - A built-in recipe batch falling short of its share of the counts: keep going with later batches. Ask only at the end of task 14 (see below).
 - A problem pr-reviewer reports again that needs no decision (for example a wording gap or a missing test): fix it and keep going.
 
@@ -34,7 +34,7 @@ Make these calls without asking, and mention them in the PR body:
 
 Stop and ask the maintainer only for these:
 
-1. **Safety.** Anything that would make the safety screen catch less: removing a rule, lowering an age limit, adding an exception word, turning a block into a reminder or allergen rule, negation handling ("no salt"), or any other way to skip a text mention without the user's tap. Also any new health or safety wording that isn't in the design or taken from a cited source.
+1. **Safety.** Anything that would make the safety screen catch less: removing a rule, lowering an age limit, adding an exception word, turning a block into a reminder or allergen rule, negation handling ("no salt"), or any other way to skip a text mention without the user's tap. Also skipping, deleting or loosening the release-gate test or any safety test, removing a rule's source without a replacement that has a URL, and any new health or safety wording that isn't in the design or taken from a cited source.
 2. **Scope.** A change to what the app does: new or removed features, changed requirements, or theme decisions. Spec fixes from the list above don't count.
 3. **Recipes.** A built-in recipe source not listed in active spec Requirement 14.2, or finishing task 14 short of its counts or allergen groups.
 4. **Cost and settings.** Anything that costs money, needs a new account or third-party service, or changes repository settings.
