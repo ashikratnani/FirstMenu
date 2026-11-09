@@ -22,7 +22,7 @@ Make these calls without asking, and mention them in the PR body:
 - Test design and coverage beyond the minimums in the design.
 - Bug fixes, including in already-merged code.
 - Making the safety screen stricter: adding terms to a rule, adding test cases, adding a source.
-- Choosing which published recipes to use, within the sourcing rules in the design.
+- Choosing which published recipes to use, within the sourcing rules and source criteria in the design.
 - Fixing spec text (requirements, design, tasks) when pr-reviewer finds a contradiction, gap or missing test, as long as the fix doesn't change behavior the maintainer approved or the scope. Note it in the PR body.
 - A nutrition tag term that no cited source supports: drop it and say so in the PR.
 - A size, accessibility, contrast or external-resource check failing: fix the code. Ask only if the fix would need a requirement change, such as raising a budget.
@@ -30,15 +30,22 @@ Make these calls without asking, and mention them in the PR body:
 - A built-in recipe batch falling short of its share of the counts: keep going with later batches. Ask only at the end of task 14 (see below).
 - A problem pr-reviewer reports again that needs no decision (for example a wording gap or a missing test): fix it and keep going.
 
+## Decide with pr-reviewer
+
+These used to stop for the maintainer. Now the coder makes the change, explains it in the PR body under a heading `Reviewer decision: <type>` with the evidence, and pr-reviewer decides using the rules in `.kiro/agents/pr-reviewer.md` ("Decisions you make"). Every such decision is logged on the `Reviewer decisions log` issue (#42) so the maintainer can audit it.
+
+- **Recipe publisher.** Any publisher that meets the source criteria in the active design ("Recipe source criteria"). Add it to `docs/recipe-sources.md` in the same PR.
+- **Safety change backed by a source.** Making the safety screen catch less (removing a rule, lowering an age limit, adding an exception word, turning a block into a reminder or allergen rule) only when a cited published source with a URL directly supports the change, with tests showing the rule still fires where it should.
+- **Scope within intent.** Changes to how a feature works that serve its user story and don't contradict a recorded maintainer decision: flows, ordering, wording that isn't health guidance, splitting or merging tasks, cutting task 15 (recipe sharing) if the schedule slips, small additions that a requirement's user story clearly implies.
+
 ## Stop and ask
 
 Stop and ask the maintainer only for these:
 
-1. **Safety.** Anything that would make the safety screen catch less: removing a rule, lowering an age limit, adding an exception word, turning a block into a reminder or allergen rule, negation handling ("no salt"), or any other way to skip a text mention without the user's tap. Also skipping, deleting or loosening the release-gate test or any safety test, removing a rule's source without a replacement that has a URL, and any new health or safety wording that isn't in the design or taken from a cited source.
-2. **Scope.** A change to what the app does: new or removed features, changed requirements, or theme decisions. Spec fixes from the list above don't count.
-3. **Recipes.** A built-in recipe source not listed in active spec Requirement 14.2, or finishing task 14 short of its counts or allergen groups.
-4. **Cost and settings.** Anything that costs money, needs a new account or third-party service, or changes repository settings.
-5. **Stuck.** Anything pr-reviewer marks `NEEDS_MAINTAINER`, or a PR that is still failing after 10 review rounds or stuck sooner as `workflow.md` describes.
+1. **Cost and settings.** Anything that costs money, needs a new account or third-party service, or changes repository settings.
+2. **Stuck.** Anything pr-reviewer marks `NEEDS_MAINTAINER`, or a PR that is still failing after 10 review rounds or stuck sooner as `workflow.md` describes.
+
+pr-reviewer marks `NEEDS_MAINTAINER`, so these still reach the maintainer, for: a safety loosening with no source that directly supports it; skipping, deleting or loosening the release-gate test or any safety test; removing a rule's source without a replacement that has a URL; new health or safety wording that isn't in the design or taken from a cited source; negation handling or any other way to skip a text mention without the user's tap; new features or removed requirements beyond "scope within intent"; changes to theme decisions or deliverables; finishing task 14 short of its counts or allergen groups; and anything pr-reviewer is unsure is safe.
 
 How to ask: open a GitHub issue titled `Decision needed: <topic>` with the context, the options, and your recommendation, then tell the maintainer in the session. Keep working on tasks that don't depend on the answer.
 

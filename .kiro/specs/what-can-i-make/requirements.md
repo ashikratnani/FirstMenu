@@ -219,12 +219,12 @@ Terms from the v1 glossary keep their meaning. New terms:
 #### Acceptance Criteria
 
 1. THE app SHALL ship at least 100 built-in recipes and simple ideas in total, of which at most 25 are simple ideas. At least 15 SHALL be tagged for `6–8 months` and at least 25 for each of the other three stages. A recipe tagged for several stages counts toward each. This replaces the counts in v1 Requirement 2.1.
-2. BUILT-IN recipes MAY come from these sources, in addition to v1's: the USDA Child Nutrition Recipe Box from the Institute of Child Nutrition (CACFP family child care home recipes), university extension recipe sites (including Food Hero from Oregon State University), and public health feeding guides (WIC, USDA FNS) for simple ideas.
+2. BUILT-IN recipes MAY come from any publisher that meets every recipe source criterion in the design (an accountable public health, government, university or extension, children's hospital, or dietitian-led nonprofit publisher; free to read; exact quantities; not a blog, social media, brand, aggregator or AI site). Minnesota and other WIC programs, USDA FNS, the ICN Child Nutrition Recipe Box and Food Hero already qualify. EACH new publisher SHALL be checked by pr-reviewer before its first recipe merges and recorded in `docs/recipe-sources.md` with the verdict. (Changed from a fixed list by the maintainer on November 9, 2026.)
 3. A built-in recipe MAY differ from its source by scaling every quantity by the same factor to make 2 to 6 servings, recorded as an adaptation ("Scaled from 25 servings to 4"). This adds to the changes allowed by v1 Requirement 2.9.
 4. A simple idea MAY have no ingredient quantities and SHALL be labeled "Simple idea" in the app. This is an exception to v1 Requirement 2.8 for simple ideas only.
 5. EVERY built-in recipe and simple idea SHALL keep v1's sourcing rules: source title, publisher, URL and retrieval date recorded and shown; ingredients from the source; steps in the app's own words; storage times from the source or a cited food-safety source.
 6. THE built-in set SHALL include, across all recipes, at least one recipe containing each of the nine allergen groups. This restores v1 Requirement 2.5, which issue #7 had relaxed.
-7. IF the sources can't reach the counts in criterion 1 or the allergen coverage in criterion 6 THEN work SHALL stop and the shortfall SHALL be reported to the maintainer before any other source is used or the set ships short.
+7. IF qualifying publishers can't reach the counts in criterion 1 or the allergen coverage in criterion 6 THEN the shortfall SHALL be reported to the maintainer before the set ships short.
 8. NEW built-in recipes SHALL be added in batches of about 20. EACH batch SHALL have a review issue listing its recipes with source links, stage tags and adaptations, for the primary user to review. Reviews SHALL NOT block later batches; feedback SHALL be applied when it arrives.
 
 ### Requirement 15: UI with the Astryx design system
@@ -293,4 +293,4 @@ These suggestions come from the maintainer's UI feedback (issue #36): the app sh
 - Image cards for Instagram stories (possible later, depending on Requirement 9 review).
 - New work on the week plan, prep list, grocery list, print view or plan share link.
 - Children older than 3 years.
-- Built-in recipes from commercial recipe blogs or sites outside Requirement 14.2.
+- Built-in recipes from publishers that fail the recipe source criteria (Requirement 14.2).
