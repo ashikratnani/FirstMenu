@@ -25,8 +25,9 @@ calls an AI service.
   `ui/theme/firstmenu.css`; `ui/theme/RouterLinkProvider.tsx` makes Astryx
   links React Router links; app-only CSS variables use the `--fm-` prefix so
   they never clash with Astryx tokens. Astryx's `reset.css` is not loaded until
-  every page is converted (task 13). Whether Astryx stays depends on the
-  `Decision needed: Astryx trial` issue (bundle size).
+  every page is converted (task 13). Do not use Astryx DateInput; use native
+  `<input type="date">` (issue #37). Pages are lazy-loaded through
+  `ui/pages/routes.ts`; add new pages there and to `routes.eager.ts`.
 - Build checks in CI: `npm run check:contrast`, `check:external`, `check:size`.
 - Look up Astryx component docs with `npm run astryx -- component <Name>`.
 - Static hosting on GitHub Pages at `https://ashikratnani.github.io/FirstMenu/`.

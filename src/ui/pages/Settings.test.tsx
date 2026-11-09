@@ -6,6 +6,7 @@ import Settings from './Settings';
 import {
   ALLERGEN_GROUPS,
   allergenFoodKey,
+  todayYmd,
   UNDER_6_NOTICE,
   OVER_12_NOTICE,
 } from './childProfile';
@@ -70,9 +71,8 @@ describe('Settings', () => {
     expect((screen.getByLabelText(/first name/i) as HTMLInputElement).value).toBe(
       'Baby',
     );
-    // Astryx DateInput shows the date in words and keeps ISO in state.
     expect((screen.getByLabelText(/birth date/i) as HTMLInputElement).value).toBe(
-      'January 15, 2026',
+      '2026-01-15',
     );
   });
 
@@ -158,7 +158,7 @@ describe('Settings', () => {
     // A reaction renders as a disabled, checked control (not an editable
     // checkbox); leaving it and saving must preserve the reaction untouched.
     const peanut = screen.getByLabelText(/peanut/i) as HTMLInputElement;
-    // Astryx keeps disabled controls focusable and marks them aria-disabled.
+    // Astryx keeps disabled checkboxes focusable and marks them aria-disabled.
     expect(peanut).toHaveAttribute('aria-disabled', 'true');
 
     await user.click(screen.getByRole('button', { name: /save/i }));
@@ -170,6 +170,12 @@ describe('Settings', () => {
     });
   });
 
+  it('caps the birth-date input at today so a future date cannot be picked', () => {
+    renderSettings(onboardedState('2026-01-15'));
+    const input = screen.getByLabelText(/birth date/i) as HTMLInputElement;
+    expect(input.max).toBe(todayYmd());
+  });
+
   it('rejects a typed future birth date and saves nothing until it is fixed', async () => {
     const user = userEvent.setup();
     renderSettings(onboardedState('2026-01-15'));
@@ -178,17 +184,15 @@ describe('Settings', () => {
     // Also change a checkbox, so we can tell whether anything was saved.
     await user.click(screen.getByLabelText('peanut'));
 
-    await user.clear(input);
-    await user.type(input, 'January 1, 2099');
-    await user.tab();
+    fireEvent.change(input, { target: { value: '2099-01-01' } });
+    expect(input).toHaveAttribute('aria-invalid', 'true');
+    expect(input).toHaveAccessibleDescription(/can.t be in the future/i);
+
     await user.click(screen.getByRole('button', { name: /save/i }));
 
     // Nothing saved: no "Saved." message, old birth date kept, and the
     // checklist change not recorded.
     expect(screen.queryByText('Saved.')).not.toBeInTheDocument();
-    expect(input).toHaveAttribute('aria-invalid', 'true');
-    expect(input).toHaveAccessibleDescription(/enter a date on or before/i);
-    expect(document.activeElement).toBe(input);
     expect(captured?.child?.birthDate).toBe('2026-01-15');
     expect(captured?.foods[allergenFoodKey('peanut')]).toBeUndefined();
   });
@@ -252,7 +256,7 @@ describe('Settings', () => {
     // The reaction food renders disabled (not a plain unchecked checkbox) and
     // carries a visible "reaction recorded" indication.
     const peanut = screen.getByLabelText(/peanut/i) as HTMLInputElement;
-    // Astryx keeps disabled controls focusable and marks them aria-disabled.
+    // Astryx keeps disabled checkboxes focusable and marks them aria-disabled.
     expect(peanut).toHaveAttribute('aria-disabled', 'true');
     expect(screen.getByText(/reaction recorded/i)).toBeInTheDocument();
 

@@ -233,12 +233,12 @@ Terms from the v1 glossary keep their meaning. New terms:
 
 #### Acceptance Criteria
 
-1. THE app SHALL use Astryx components for layout, navigation, forms, buttons, cards, chips, dialogs and lists, after a trial that meets every criterion in this requirement.
+1. THE app SHALL use Astryx components for layout, navigation, forms, buttons, cards, chips, dialogs and lists, after a trial that meets every criterion in this requirement. Date fields SHALL use the browser's native date picker instead of Astryx DateInput, to keep the app small (issue #37).
 2. THE app SHALL upgrade to React 19, which Astryx requires.
 3. THE app SHALL use a custom Astryx theme with the v1 palette (creams, soft oranges, lavender), meeting WCAG 2.1 AA contrast. The friendly ghosts, doors, monsters and pumpkins SHALL stay as the app's own inline SVGs.
 4. ALL fonts and styles SHALL ship with the app. THE app SHALL NOT load fonts, CSS or scripts from Google Fonts, a CDN or any other host (v1 Requirement 12.2 still applies).
 5. THE app's `vitest-axe` tests SHALL pass on every page, and every page SHALL work with a keyboard and on screens 360 px wide.
-6. THE production build's total gzipped JavaScript and CSS, excluding the built-in recipe data, SHALL be no more than 150 KB larger than the v1 build. The trial SHALL record both sizes. THE built-in recipe data SHALL be built as a separate file and its gzipped size reported in every PR that changes it.
+6. Pages SHALL load their code the first time they are opened. THE first load of the heaviest page (gzipped JavaScript and CSS the browser downloads to open it, excluding the built-in recipe data) SHALL be no more than 250 KB larger than the v1 build, which loaded everything at once. THE size check SHALL report every page's first load and the gzipped size of the built-in recipe data. (Raised from 150 KB by the maintainer on November 8, 2026, issue #37.)
 7. IF the trial fails any criterion THEN work SHALL stop on the UI change and the maintainer SHALL be asked whether to fix it, accept it, or restyle with plain CSS instead.
 8. THE primary user's specific complaints about the current UI SHALL be collected and addressed. Collecting them SHALL NOT block other work.
 

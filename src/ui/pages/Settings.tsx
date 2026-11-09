@@ -17,8 +17,6 @@
 import { useMemo, useRef, useState, type FormEvent } from 'react';
 import { Button } from '@astryxdesign/core/Button';
 import { CheckboxInput } from '@astryxdesign/core/CheckboxInput';
-import { DateInput } from '@astryxdesign/core/DateInput';
-import type { DateInputProps } from '@astryxdesign/core/DateInput';
 import { TextInput } from '@astryxdesign/core/TextInput';
 import { useApp } from '../../state/AppProvider';
 import { selectAgeMonths, selectStage } from '../../state/selectors';
@@ -34,8 +32,8 @@ import {
   type ChecklistItem,
 } from './childProfile';
 
-/** ISO YYYY-MM-DD string as Astryx DateInput types it. */
-type ISODateString = NonNullable<DateInputProps['value']>;
+/** Shown under the birth date when it is in the future. */
+const FUTURE_DATE_ERROR = 'Birth date can’t be in the future.';
 
 /** Whether a food key is currently recorded as tried in state. */
 function isTried(
@@ -67,11 +65,11 @@ export default function Settings() {
   const [name, setName] = useState(state.child?.name ?? '');
   const [birthDate, setBirthDate] = useState(state.child?.birthDate ?? '');
   const [saved, setSaved] = useState(false);
-  // Astryx DateInput rejects an out-of-range typed date (it never calls
-  // onChange, marks the field aria-invalid and shows its own message, "Enter a
-  // date on or before <today>") but cannot stop the form from submitting, so
-  // the submit handler checks the field itself.
+  // The birth date uses the browser's native date picker (decision in issue
+  // #37: Astryx DateInput is too heavy). Browsers let a future date be typed
+  // past `max`, so it is checked here too.
   const birthDateRef = useRef<HTMLInputElement>(null);
+  const isFutureDate = birthDate !== '' && birthDate > todayYmd();
 
   // Prefill the checklist from recorded tried foods.
   const [checked, setChecked] = useState<Record<string, boolean>>(() => {
@@ -140,11 +138,11 @@ export default function Settings() {
   function handleSubmit(event: FormEvent) {
     event.preventDefault();
     if (!birthDate) return;
-    if (birthDateRef.current?.getAttribute('aria-invalid') === 'true') {
+    if (isFutureDate) {
       // Save nothing (not the old date, not checklist changes) until the
       // birth date is valid.
       setSaved(false);
-      birthDateRef.current.focus();
+      birthDateRef.current?.focus();
       return;
     }
 
@@ -190,17 +188,31 @@ export default function Settings() {
           autoComplete="off"
         />
 
-        <DateInput
-          label="Birth date"
-          isRequired
-          ref={birthDateRef}
-          max={todayYmd() as ISODateString}
-          value={(birthDate || undefined) as ISODateString | undefined}
-          onChange={(value) => {
-            setSaved(false);
-            setBirthDate(value ?? '');
-          }}
-        />
+        <div className={styles.field}>
+          <label className={styles.label} htmlFor="settings-birthdate">
+            Birth date
+          </label>
+          <input
+            ref={birthDateRef}
+            id="settings-birthdate"
+            className={styles.input}
+            type="date"
+            required
+            max={todayYmd()}
+            value={birthDate}
+            aria-invalid={isFutureDate || undefined}
+            aria-describedby={isFutureDate ? 'settings-birthdate-error' : undefined}
+            onChange={(e) => {
+              setSaved(false);
+              setBirthDate(e.target.value);
+            }}
+          />
+          {isFutureDate && (
+            <p id="settings-birthdate-error" className={styles.fieldError}>
+              {FUTURE_DATE_ERROR}
+            </p>
+          )}
+        </div>
 
         {persistedMonths !== null && (
           <p className={styles.derived}>
