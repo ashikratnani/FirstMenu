@@ -13,8 +13,8 @@ import { tokenize } from './normalize';
 const STRICT_AGE = 0;
 
 describe('rules metadata', () => {
-  it('exports a numeric RULESET_VERSION bumped to 2 (wheat terms macaroni/penne added)', () => {
-    expect(RULESET_VERSION).toBe(2);
+  it('exports a numeric RULESET_VERSION bumped to 3 (juice-limit reminder added)', () => {
+    expect(RULESET_VERSION).toBe(3);
   });
 
   it('has a non-empty rule list', () => {
@@ -30,8 +30,10 @@ describe('rules metadata', () => {
 describe('every rule fires on at least one of its terms', () => {
   for (const rule of RULES) {
     it(`${rule.id} fires on a built-from-term ingredient`, () => {
+      // A rule with fromMonths only applies from that age (juice-limit).
+      const age = rule.fromMonths ?? STRICT_AGE;
       const firedOnSomeTerm = rule.terms.some((term) =>
-        screenIngredient(term, STRICT_AGE).some((f) => f.ruleId === rule.id),
+        screenIngredient(term, age).some((f) => f.ruleId === rule.id),
       );
       expect(firedOnSomeTerm, `${rule.id} did not fire on any of its terms`).toBe(true);
     });
@@ -103,6 +105,48 @@ describe('release gate (task 17.0): every cited source has a URL', () => {
   it('every new-food-spacing cited source resolves to a URL', () => {
     for (const sourceId of NEW_FOOD_SPACING_SOURCES) {
       expect(SOURCES[sourceId]?.url).toMatch(/^https?:\/\//);
+    }
+  });
+});
+
+describe('juice-limit reminder (active spec Requirement 13.7)', () => {
+  const fires = (name: string, months: number) =>
+    screenIngredient(name, months).some((f) => f.ruleId === 'juice-limit');
+
+  it('is a reminder from 12 up to 36 months citing AAP-juice', () => {
+    const rule = RULES.find((r) => r.id === 'juice-limit');
+    expect(rule?.kind).toBe('reminder');
+    expect(rule?.fromMonths).toBe(12);
+    expect(rule?.underMonths).toBe(36);
+    expect(rule?.sources).toEqual(['AAP-juice']);
+    expect(rule?.message).toBe('100% juice only, no more than 4 ounces a day.');
+  });
+
+  it('does not fire at 11 months and fires at 12 and 35 months', () => {
+    expect(fires('apple juice', 11)).toBe(false);
+    expect(fires('apple juice', 12)).toBe(true);
+    expect(fires('apple juice', 35)).toBe(true);
+  });
+
+  it('does not fire at 36 months', () => {
+    expect(fires('apple juice', 36)).toBe(false);
+  });
+
+  it('honors the lemon and lime exceptions', () => {
+    expect(fires('lemon juice', 18)).toBe(false);
+    expect(fires('lime juice', 18)).toBe(false);
+  });
+
+  it('never blocks: it is a reminder, and the under-12 juice block still fires at 11 months', () => {
+    const at18 = screenIngredient('apple juice', 18);
+    expect(at18.some((f) => f.kind === 'block')).toBe(false);
+    const at11 = screenIngredient('apple juice', 11);
+    expect(at11.some((f) => f.ruleId === 'juice' && f.kind === 'block')).toBe(true);
+  });
+
+  it('leaves existing rules without fromMonths', () => {
+    for (const rule of RULES) {
+      if (rule.id !== 'juice-limit') expect(rule.fromMonths).toBeUndefined();
     }
   });
 });

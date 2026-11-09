@@ -212,7 +212,7 @@ function isNumberToken(token: string): boolean {
  * phrase, then drops descriptor words, quantity/number tokens and unit tokens,
  * singularizes the remaining tokens and collapses whitespace.
  */
-function deriveKeyFromName(name: string): string {
+export function foodKeyFromName(name: string): string {
   // Drop parenthetical notes AND their contents first, on the RAW name, so a
   // size like "(4 oz)" or a note like "(optional)"/"(rice or oatmeal)" never
   // leaks tokens into the key. Done before the comma split because a
@@ -276,7 +276,7 @@ function deriveKeyFromName(name: string): string {
  *   2. Else if `ingredient.food` is set, use it as an authoritative "counts as"
  *      override (trimmed + lowercased for a stable key; not otherwise
  *      normalized so a deliberate override reads back as written).
- *   3. Else derive from `ingredient.name` (see deriveKeyFromName).
+ *   3. Else derive from `ingredient.name` (see foodKeyFromName).
  */
 export function foodKeyFor(ingredient: Ingredient): string[] {
   const name = ingredient.name;
@@ -296,7 +296,7 @@ export function foodKeyFor(ingredient: Ingredient): string[] {
   }
 
   // 3. Derive from the name.
-  return [deriveKeyFromName(name)];
+  return [foodKeyFromName(name)];
 }
 
 /**
@@ -309,14 +309,14 @@ export function foodKeyFor(ingredient: Ingredient): string[] {
  * doors (foodKeyFor is unchanged).
  *
  * The key is `ingredient.food` (trimmed + lowercased) when the user set a
- * "counts as" override, else the name-derived key ({@link deriveKeyFromName}).
+ * "counts as" override, else the name-derived key ({@link foodKeyFromName}).
  * The key is already human-readable, so foodLabel returns it unchanged.
  */
 export function groceryFoodKey(ingredient: Ingredient): string {
   if (ingredient.food !== undefined && ingredient.food.trim().length > 0) {
     return ingredient.food.trim().toLowerCase();
   }
-  return deriveKeyFromName(ingredient.name);
+  return foodKeyFromName(ingredient.name);
 }
 
 /**

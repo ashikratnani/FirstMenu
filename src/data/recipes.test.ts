@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { AllergenGroup, GroceryCategory, MealType, StageId } from '../domain/types';
+import { STAGE_IDS, STAGE_MIN_MONTHS } from '../domain/age';
 import { screenRecipe } from '../domain/safety/screen';
 import { BUILTIN_RECIPES, INFANT_PORTION_OZ, estimateServings } from './recipes';
 
@@ -22,7 +23,7 @@ import { BUILTIN_RECIPES, INFANT_PORTION_OZ, estimateServings } from './recipes'
 // recipe and are not scoped down.
 
 /** Youngest age in months for each tagged stage. */
-const YOUNGEST_AGE: Record<StageId, number> = { '6-8': 6, '9-12': 9 };
+const YOUNGEST_AGE: Record<StageId, number> = STAGE_MIN_MONTHS;
 
 const VALID_CATEGORIES: GroceryCategory[] = [
   'produce',
@@ -111,6 +112,19 @@ describe('BUILTIN_RECIPES - invariants (every shipped recipe)', () => {
         ).toEqual([]);
       }
     }
+  });
+
+  it('covers all four stages (6-8, 9-12, 12-23, 24-36) in the youngest-age table', () => {
+    expect(Object.keys(YOUNGEST_AGE).sort()).toEqual([...STAGE_IDS].sort());
+    expect(YOUNGEST_AGE['12-23']).toBe(12);
+    expect(YOUNGEST_AGE['24-36']).toBe(24);
+  });
+
+  it('the stage invariant applies at 12 and 24 months: honey blocks at 9 but not at 12', () => {
+    const honey = { ...BUILTIN_RECIPES[0], ingredients: [{ name: 'honey', category: 'pantry' as const }] };
+    expect(screenRecipe(honey, YOUNGEST_AGE['9-12']).blocks.length).toBeGreaterThan(0);
+    expect(screenRecipe(honey, YOUNGEST_AGE['12-23']).blocks).toEqual([]);
+    expect(screenRecipe(honey, YOUNGEST_AGE['24-36']).blocks).toEqual([]);
   });
 
   it('any recipe that sets storage times records a storage source', () => {

@@ -15,7 +15,7 @@ onboarding shows.
 **[0:00 – 0:20] Open on the home screen and the one-liner**
 
 > "This is FirstMenu, a free web app for planning a week of baby meals for
-> babies about 6 to 12 months old. No account, no backend. Everything stays in
+> babies and toddlers from 6 months to 3 years old. No account, no backend. Everything stays in
 > your browser. And it's not medical advice, so always check with your
 > pediatrician."
 

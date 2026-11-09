@@ -1,10 +1,10 @@
 # FirstMenu
 
-Meal Planner for Babies
+Meal Planner for Babies and Toddlers
 
 **Live app: [https://ashikratnani.github.io/FirstMenu/](https://ashikratnani.github.io/FirstMenu/)**
 
-FirstMenu is a free web app for planning a week of baby meals for babies roughly 6 to 12 months old. Pick recipes by age stage or add your own, and get a weekly plan, a make-ahead prep list and a grocery list. Every recipe is screened against a fixed infant-safety list based on pediatric guidance.
+FirstMenu is a free web app for planning a week of baby and toddler meals for children from 6 months to 3 years old. Pick recipes by age stage or add your own, and get a weekly plan, a make-ahead prep list and a grocery list. Every recipe is screened against a fixed infant-safety list based on pediatric guidance.
 
 There is no account and no backend. All data lives in your browser's `localStorage`, and the app loads only its own files (no analytics, ads, trackers or third-party fonts).
 
@@ -12,7 +12,7 @@ There is no account and no backend. All data lives in your browser's `localStora
 
 ## What it does
 
-- **Plan a week.** Build a 7-day plan across breakfast, lunch, dinner and snack slots. Eligible recipes come first; recipes that aren't safe for your baby's age are shown but can't be planned.
+- **Plan a week.** Build a 7-day plan across breakfast, lunch, dinner and snack slots. Eligible recipes come first; recipes that aren't safe for your child's age are shown but can't be planned.
 - **Recipes by stage or your own.** Browse a library filtered by age stage and meal type, or add custom recipes in the built-in editor. Every ingredient you add is screened on save.
 - **Safety screen with ghosts and doors.** Unsafe-for-age ingredients turn a recipe into a *ghost* that can't be planned, with the reason shown. Common allergens appear as *mystery doors* for first tastes, and once a food is introduced it becomes a friendly *monster*. A recorded reaction ghosts affected recipes until you clear it.
 - **Prep reminders.** Choking-risk foods carry a plain-language reminder (for example, "quarter grapes lengthwise before serving") drawn from the same rule list.

@@ -14,6 +14,7 @@ export interface SafetyRule {
   kind: RuleKind;
   terms: string[];
   except?: string[];
+  fromMonths?: number; // rule applies only once age >= fromMonths (default 0)
   underMonths?: number; // rule applies while age < underMonths
   allergenGroup?: AllergenGroup; // kind === 'allergen' only
   label: string; // short name shown in UI, e.g. "Honey"
@@ -329,6 +330,19 @@ const REMINDER_RULES: SafetyRule[] = [
     message: 'Fine in cooking. Before 12 months, breast milk or formula should be the main drink.',
     sources: ['AAP-milk'],
   },
+  {
+    // Active spec Requirement 13.7: 100% juice limit for toddlers. AAP-juice is
+    // the source already used for the under-12-month juice block.
+    id: 'juice-limit',
+    kind: 'reminder',
+    terms: ['juice'],
+    except: ['lemon', 'lime'],
+    fromMonths: 12,
+    underMonths: 36,
+    label: 'Juice',
+    message: '100% juice only, no more than 4 ounces a day.',
+    sources: ['AAP-juice'],
+  },
 ];
 
 // Allergen rules (mystery doors, never block). Transcribed verbatim from
@@ -466,4 +480,4 @@ export function allergenGuidance(group: AllergenGroup): AllergenGuidance {
  * Bumped whenever the rules change (steering/safety-rules.md). Share links
  * carry this so a viewer can tell their rules differ from the link's.
  */
-export const RULESET_VERSION = 2;
+export const RULESET_VERSION = 3;

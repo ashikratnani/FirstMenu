@@ -1,4 +1,5 @@
-export type StageId = '6-8' | '9-12';
+// '9-12' is kept for v1 data and is labeled "9–11 months" (see age.ts).
+export type StageId = '6-8' | '9-12' | '12-23' | '24-36';
 export type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snack';
 export type GroceryCategory = 'produce' | 'dairy-eggs' | 'protein' | 'grains' | 'pantry' | 'frozen' | 'other';
 
@@ -20,6 +21,7 @@ export interface Ingredient {
   quantity?: number;
   unit?: string;           // 'g', 'ml', 'tbsp', 'tsp', 'cup', 'piece', ...
   category: GroceryCategory;
+  optional?: boolean;      // "(optional)" in the source; skipped for matching and tags
 }
 
 export interface Recipe {
@@ -35,7 +37,24 @@ export interface Recipe {
   servings: number;        // servings one batch makes
   storage?: { fridgeDays?: number; freezerMonths?: number };
   makeAheadNote?: string;
+  statedMinutes?: number;  // total time written in the recipe, or set by the user
+  notes?: string[];        // pasted lines that are neither ingredients nor steps
+  imported?: ImportedInfo; // set only for pasted recipes
+  clearedMentions?: ClearedMention[]; // text mentions the user cleared (Req 7.4)
+  kind?: 'recipe' | 'simple-idea'; // Req 14.4; default 'recipe'
+  serveAs?: ServeAs[];     // Req 16.13
 }
+
+export type ServeAs = 'puree' | 'mashed' | 'finger-food' | 'pieces';
+
+export interface ImportedInfo {
+  from: 'chatgpt' | 'instagram' | 'shared' | 'other';
+  url?: string;            // user-entered, never fetched
+  text: string;            // original pasted text (Req 6.8)
+  date: string;            // YYYY-MM-DD
+}
+
+export interface ClearedMention { ruleId: string; sentence: string }
 
 export interface RecipeSource {
   title: string;           // the recipe's title at the source
@@ -62,7 +81,7 @@ export interface WeekPlan {
 }
 
 export interface AppState {
-  schemaVersion: 1;
+  schemaVersion: 2;
   child?: ChildProfile;
   onboarded: boolean;
   customRecipes: Recipe[];
@@ -70,4 +89,12 @@ export interface AppState {
   plan: WeekPlan;
   groceryChecked: string[]; // grocery line keys
   disclaimerAcknowledged: boolean;
+  pantry: string[];         // food keys
+  onHand: string[];         // food keys
+  onHandUpdated?: string;   // YYYY-MM-DD, set whenever onHand changes
+  madeLog: MadeLogEntry[];  // newest first, capped at 100
+  onHandDays: Record<string /* food key */, string[]>; // distinct YYYY-MM-DD added (last 10)
+  dismissed: Record<string /* suggestion id */, string /* ISO time */>;
 }
+
+export interface MadeLogEntry { recipeId: string; date: string }

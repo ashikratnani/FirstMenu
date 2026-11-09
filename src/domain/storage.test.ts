@@ -34,6 +34,11 @@ function validState(): AppState {
     },
     groceryChecked: ['milk'],
     disclaimerAcknowledged: true,
+    pantry: [],
+    onHand: [],
+    madeLog: [],
+    onHandDays: {},
+    dismissed: {},
   };
 }
 
@@ -81,6 +86,133 @@ describe('migrate', () => {
   it('leaves an unknown older version unchanged (so zod rejects it)', () => {
     const weird = { schemaVersion: 0 };
     expect(migrate(weird, 0)).toBe(weird);
+  });
+});
+
+/** A v1 AppState exactly as schema v1 stored it (no v2 fields). */
+function v1State(): Record<string, unknown> {
+  return {
+    schemaVersion: 1,
+    child: { name: 'Baby', birthDate: '2025-06-01' },
+    onboarded: true,
+    customRecipes: [
+      {
+        id: 'custom-1',
+        origin: 'custom',
+        title: 'My Mash',
+        stages: ['6-8', '9-12'],
+        mealTypes: ['lunch'],
+        ingredients: [{ name: 'banana', category: 'produce' }],
+        steps: ['Mash it.'],
+        texture: 'smooth',
+        servings: 2,
+      },
+    ],
+    foods: {
+      carrot: { status: 'tried', date: '2026-01-10', note: 'loved it' },
+      'allergen:egg': { status: 'reaction', date: '2026-01-11' },
+    },
+    plan: {
+      startDate: '2026-01-15',
+      prepDate: '2026-01-14',
+      activeSlots: ['breakfast', 'dinner'],
+      days: Array.from({ length: 7 }, () => ({})),
+    },
+    groceryChecked: ['milk'],
+    disclaimerAcknowledged: true,
+  };
+}
+
+describe('schema v2 migration (Req 10.1, 10.2)', () => {
+  it('SCHEMA_VERSION is 2', () => {
+    expect(SCHEMA_VERSION).toBe(2);
+  });
+
+  it('MIGRATIONS[1] adds the v2 fields and keeps every v1 field', () => {
+    const v1 = v1State();
+    const migrated = appStateSchema.parse(migrate(v1, 1));
+    expect(migrated.schemaVersion).toBe(2);
+    expect(migrated.pantry).toEqual([]);
+    expect(migrated.onHand).toEqual([]);
+    expect(migrated.madeLog).toEqual([]);
+    expect(migrated.onHandDays).toEqual({});
+    expect(migrated.dismissed).toEqual({});
+    expect(migrated.onHandUpdated).toBeUndefined();
+    expect(migrated).toMatchObject({
+      child: v1.child,
+      onboarded: true,
+      customRecipes: v1.customRecipes,
+      foods: v1.foods,
+      plan: v1.plan,
+      groceryChecked: ['milk'],
+      disclaimerAcknowledged: true,
+    });
+  });
+
+  it('does not mutate the v1 object', () => {
+    const v1 = v1State();
+    migrate(v1, 1);
+    expect(v1.schemaVersion).toBe(1);
+    expect('pantry' in v1).toBe(false);
+  });
+
+  it('loadState migrates a stored v1 state with no loss', () => {
+    const storage = makeStorage();
+    storage.setItem(STORAGE_KEY, JSON.stringify(v1State()));
+    const result = loadState(storage, FIXED_NOW);
+    expect(result.corrupt).toBe(false);
+    expect(result.state.schemaVersion).toBe(2);
+    expect(result.state.foods).toEqual(v1State().foods);
+    expect(result.state.customRecipes).toHaveLength(1);
+    expect(result.state.pantry).toEqual([]);
+  });
+
+  it('a v1 export file still imports', () => {
+    const result = importState(JSON.stringify(v1State()));
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.state.schemaVersion).toBe(2);
+      expect(result.state.groceryChecked).toEqual(['milk']);
+      expect(result.state.onHand).toEqual([]);
+    }
+  });
+
+  it('accepts the new stages and the new optional recipe fields', () => {
+    const state = validState();
+    state.customRecipes = [
+      {
+        id: 'custom-2',
+        origin: 'custom',
+        title: 'Pasted',
+        stages: ['12-23', '24-36'],
+        mealTypes: ['dinner'],
+        ingredients: [{ name: 'parsley', category: 'produce', optional: true }],
+        steps: ['Stir.'],
+        texture: 'soft pieces',
+        servings: 2,
+        statedMinutes: 15,
+        notes: ['Great for lunch boxes'],
+        imported: { from: 'chatgpt', text: 'original', date: '2026-01-15' },
+        clearedMentions: [{ ruleId: 'honey', sentence: 'No honey.' }],
+        kind: 'simple-idea',
+        serveAs: ['finger-food', 'pieces'],
+      },
+    ];
+    state.pantry = ['oat'];
+    state.onHand = ['banana'];
+    state.onHandUpdated = '2026-01-15';
+    state.madeLog = [{ recipeId: 'custom-2', date: '2026-01-15' }];
+    state.onHandDays = { banana: ['2026-01-15'] };
+    state.dismissed = { 'new-food': '2026-01-15T10:00:00.000Z' };
+    expect(appStateSchema.safeParse(state).success).toBe(true);
+  });
+
+  it('rejects an unknown stage id', () => {
+    const state = validState();
+    state.customRecipes = [
+      { ...(v1State().customRecipes as AppState['customRecipes'])[0], stages: ['37-48' as never] },
+    ];
+    expect(appStateSchema.safeParse(state).success).toBe(false);
   });
 });
 

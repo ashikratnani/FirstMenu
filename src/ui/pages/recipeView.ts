@@ -6,6 +6,7 @@
 // safety screen (screen.ts) and food status (foods.ts); no new ghosting rule is
 // invented here (design.md / Req 5.1).
 
+import { STAGE_IDS, STAGE_LABELS } from '../../domain/age';
 import { screenRecipe, type Finding } from '../../domain/safety/screen';
 import {
   foodKeyFor,
@@ -29,17 +30,17 @@ export const MEAL_TYPES: readonly MealType[] = [
   'snack',
 ];
 
-/** The two stages, in order, for the stage filter. */
-export const STAGES: readonly StageId[] = ['6-8', '9-12'];
+/** The stages, in order, for the stage filter. */
+export const STAGES: readonly StageId[] = STAGE_IDS;
 
 /** Human label for a meal type (capitalized). */
 export function mealTypeLabel(meal: MealType): string {
   return meal.charAt(0).toUpperCase() + meal.slice(1);
 }
 
-/** Human label for a stage ("6-8 months"). */
+/** Human label for a stage ("9–11 months"). */
 export function stageLabel(stage: StageId): string {
-  return `${stage} months`;
+  return STAGE_LABELS[stage];
 }
 
 /** Day labels for the 7-day plan (index 0..6), for the emptied-slot notice. */

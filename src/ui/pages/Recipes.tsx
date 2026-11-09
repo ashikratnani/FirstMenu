@@ -2,7 +2,7 @@
 // (active spec Requirement 15). Lists the full recipe set (built-ins + custom
 // via selectAllRecipes) as a responsive grid of clickable cards, each opening
 // /recipes/:id. Two one-tap filters narrow the list:
-//   - STAGE (All / 6-8 / 9-12), defaulting to the child's current stage;
+//   - STAGE (All / each age stage), defaulting to the child's current stage;
 //   - MEAL TYPE (All / breakfast / lunch / dinner / snack).
 //
 // Each card carries its state in VISIBLE text and in the card link's

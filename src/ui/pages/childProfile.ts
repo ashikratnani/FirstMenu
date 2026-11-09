@@ -2,10 +2,11 @@
 // Settings page (Settings.tsx), kept in a non-component module so both pages
 // (and their tests) import the SAME constants and derivations.
 //
-// HEALTH/SAFETY wording note: the UNDER_6_NOTICE (Req 1.4) and OVER_12_NOTICE
-// (Req 1.5) strings below are the maintainer-approved final wording, signed off
-// in GitHub issue #16. They are health wording, so change them only with
-// maintainer sign-off.
+// HEALTH/SAFETY wording note: the UNDER_6_NOTICE (Req 1.4) and OVER_36_NOTICE
+// (active spec Req 13.3, replacing v1 Req 1.5) strings below are health
+// wording. UNDER_6_NOTICE is maintainer-approved (GitHub issue #16);
+// OVER_36_NOTICE is the exact text in the active spec design. Change them only
+// with maintainer sign-off.
 
 import { ageInMonths } from '../../domain/age';
 import { RULES } from '../../domain/safety/rules';
@@ -22,12 +23,12 @@ export const UNDER_6_NOTICE =
   'Most babies start solids around 6 months. Talk to your pediatrician before starting solids.';
 
 /**
- * Req 1.5 maintainer-approved wording: shown when the entered birth date
- * implies an age of 12 months or more. The safety rules still apply for the
- * child's actual age.
+ * Active spec Req 13.3 wording (replaces the v1 12-month notice): shown when
+ * the entered birth date implies an age over 36 months. The safety rules still
+ * apply for the child's actual age.
  */
-export const OVER_12_NOTICE =
-  'FirstMenu is designed for babies 6 to 12 months old.';
+export const OVER_36_NOTICE =
+  'FirstMenu is designed for 6 months to 3 years. Safety rules still use your child’s actual age.';
 
 // --- Allergen checklist order (Req 7.2: the nine allergens listed first) ----
 
@@ -90,14 +91,14 @@ export function todayYmd(now: Date = new Date()): string {
 
 /**
  * Which age notice (if any) applies for a whole-month age. Returns null when
- * the age is in the designed 6-to-12-month range or when there is no age yet.
+ * the age is in the designed 6-to-36-month range or when there is no age yet.
  */
 export function noticeForAgeMonths(
   months: number | null,
-): typeof UNDER_6_NOTICE | typeof OVER_12_NOTICE | null {
+): typeof UNDER_6_NOTICE | typeof OVER_36_NOTICE | null {
   if (months === null) return null;
   if (months < 6) return UNDER_6_NOTICE;
-  if (months >= 12) return OVER_12_NOTICE;
+  if (months > 36) return OVER_36_NOTICE;
   return null;
 }
 

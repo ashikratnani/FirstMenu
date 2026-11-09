@@ -39,7 +39,10 @@ function anyTermMatches(name: string, terms: string[] | undefined): boolean {
 
 /** Does this rule fire for `name` at `ageMonths`? */
 function ruleFires(rule: SafetyRule, name: string, ageMonths: number): boolean {
-  // Age limit: the rule applies only while age < underMonths.
+  // Age window: the rule applies while fromMonths <= age < underMonths.
+  if (rule.fromMonths !== undefined && ageMonths < rule.fromMonths) {
+    return false;
+  }
   if (rule.underMonths !== undefined && ageMonths >= rule.underMonths) {
     return false;
   }

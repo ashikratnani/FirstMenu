@@ -93,7 +93,7 @@ describe('RecipeEditor', () => {
     const { getState } = renderApp(seedState(8), '/recipes/new');
 
     await user.type(screen.getByLabelText('Title'), 'Sweet Potato Puree');
-    await user.click(screen.getByLabelText('6-8 months'));
+    await user.click(screen.getByLabelText('6–8 months'));
     await user.click(screen.getByLabelText('Breakfast'));
     await user.type(
       screen.getByLabelText('Ingredient 1 name'),
@@ -123,7 +123,7 @@ describe('RecipeEditor', () => {
     renderApp(seedState(8), '/recipes/new');
 
     await user.type(screen.getByLabelText('Title'), 'Honey Oats');
-    await user.click(screen.getByLabelText('6-8 months'));
+    await user.click(screen.getByLabelText('6–8 months'));
     await user.click(screen.getByLabelText('Breakfast'));
     await user.type(screen.getByLabelText('Ingredient 1 name'), 'honey');
     await user.type(screen.getByLabelText('Step 1'), 'Mix.');
@@ -147,7 +147,7 @@ describe('RecipeEditor', () => {
     const { getState } = renderApp(seedState(8), '/recipes/new');
 
     await user.type(screen.getByLabelText('Title'), 'Yogurt Bowl');
-    await user.click(screen.getByLabelText('6-8 months'));
+    await user.click(screen.getByLabelText('6–8 months'));
     await user.click(screen.getByLabelText('Breakfast'));
     await user.type(
       screen.getByLabelText('Ingredient 1 name'),
@@ -243,7 +243,7 @@ describe('RecipeEditor', () => {
     const { getState } = renderApp(seedState(8), '/recipes/new');
 
     await user.type(screen.getByLabelText('Title'), 'Oat Mash');
-    await user.click(screen.getByLabelText('6-8 months'));
+    await user.click(screen.getByLabelText('6–8 months'));
     await user.click(screen.getByLabelText('Breakfast'));
     await user.type(screen.getByLabelText('Ingredient 1 name'), 'oats');
     await user.type(screen.getByLabelText('Step 1'), 'Cook the oats.');
@@ -288,7 +288,7 @@ describe('RecipeEditor', () => {
     const { getState } = renderApp(seedState(8), '/recipes/new');
 
     await user.type(screen.getByLabelText('Title'), 'Pear Mash');
-    await user.click(screen.getByLabelText('6-8 months'));
+    await user.click(screen.getByLabelText('6–8 months'));
     await user.click(screen.getByLabelText('Lunch'));
     await user.type(screen.getByLabelText('Ingredient 1 name'), 'pear');
     await user.type(screen.getByLabelText('Step 1'), 'Mash the pear.');
@@ -307,7 +307,7 @@ describe('RecipeEditor', () => {
 
     // All other required fields present, but texture left blank.
     await user.type(screen.getByLabelText('Title'), 'Pear Mash');
-    await user.click(screen.getByLabelText('6-8 months'));
+    await user.click(screen.getByLabelText('6–8 months'));
     await user.click(screen.getByLabelText('Lunch'));
     await user.type(screen.getByLabelText('Ingredient 1 name'), 'pear');
     await user.type(screen.getByLabelText('Step 1'), 'Mash the pear.');
@@ -337,7 +337,7 @@ describe('RecipeEditor', () => {
     const { getState } = renderApp(seedState(8), '/recipes/new');
 
     await user.type(screen.getByLabelText('Title'), 'Pear Mash');
-    await user.click(screen.getByLabelText('6-8 months'));
+    await user.click(screen.getByLabelText('6–8 months'));
     await user.click(screen.getByLabelText('Lunch'));
     await user.type(screen.getByLabelText('Ingredient 1 name'), 'pear');
     await user.type(screen.getByLabelText('Step 1'), 'Mash the pear.');
@@ -377,7 +377,7 @@ describe('RecipeEditor', () => {
 
     // And the hint matches what buildRecipe persists as Ingredient.food.
     await user.type(screen.getByLabelText('Title'), 'Potato Mash');
-    await user.click(screen.getByLabelText('6-8 months'));
+    await user.click(screen.getByLabelText('6–8 months'));
     await user.click(screen.getByLabelText('Lunch'));
     await user.type(screen.getByLabelText('Step 1'), 'Mash it.');
     await user.type(screen.getByLabelText('Texture'), 'smooth');
@@ -391,7 +391,7 @@ describe('RecipeEditor', () => {
     renderApp(seedState(8), '/recipes/new');
 
     await user.type(screen.getByLabelText('Title'), 'Pear Mash');
-    await user.click(screen.getByLabelText('6-8 months'));
+    await user.click(screen.getByLabelText('6–8 months'));
     await user.click(screen.getByLabelText('Lunch'));
     await user.type(screen.getByLabelText('Ingredient 1 name'), 'pear');
     await user.type(screen.getByLabelText('Step 1'), 'Mash the pear.');

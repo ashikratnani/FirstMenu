@@ -113,7 +113,7 @@ export default function Foods() {
       <h1>Foods</h1>
       <p className={styles.intro}>
         Every food your plans use, plus anything you have already tried. Open a
-        mystery door when your baby tries something new.
+        mystery door when your child tries something new.
       </p>
 
       <section className={styles.section} aria-labelledby="foods-doors">

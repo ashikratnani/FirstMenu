@@ -118,7 +118,7 @@ describe('Recipes library page', () => {
     renderRecipes(seedState(8));
     const stage = screen.getByRole('radiogroup', { name: 'Stage' });
     expect(
-      within(stage).getByRole('radio', { name: '6-8 months' }),
+      within(stage).getByRole('radio', { name: '6–8 months' }),
     ).toBeChecked();
     // A 9-12-only recipe (Cereal Pancakes) is hidden at the 6-8 default.
     expect(
@@ -142,7 +142,7 @@ describe('Recipes library page', () => {
     const user = userEvent.setup();
     renderRecipes(seedState(8));
 
-    await user.click(screen.getByRole('radio', { name: '9-12 months' }));
+    await user.click(screen.getByRole('radio', { name: '9–11 months' }));
     // Cereal Pancakes is tagged 9-12 only, so it now shows.
     expect(
       screen.getByRole('link', { name: /Cereal Pancakes/ }),

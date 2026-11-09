@@ -39,7 +39,7 @@ function sampleState(overrides: Partial<AppState> = {}): AppState {
   days[2] = { dinner: 'custom-sweet-pea-mash' };
 
   return {
-    schemaVersion: 1,
+    schemaVersion: 2,
     child: { name: 'Baby', birthDate: '2025-06-01' },
     onboarded: true,
     customRecipes: [customRecipe()],
@@ -52,6 +52,11 @@ function sampleState(overrides: Partial<AppState> = {}): AppState {
     },
     groceryChecked: [],
     disclaimerAcknowledged: true,
+    pantry: [],
+    onHand: [],
+    madeLog: [],
+    onHandDays: {},
+    dismissed: {},
     ...overrides,
   };
 }

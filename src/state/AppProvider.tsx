@@ -17,12 +17,14 @@ import {
 import type {
   AppState,
   ChildProfile,
+  ClearedMention,
   FoodRecord,
   MealType,
   Recipe,
 } from '../domain/types';
 import { BUILTIN_RECIPES } from '../data/recipes';
 import { computeNextWeekPlan } from '../domain/plan';
+import { foodKeyFromName } from '../domain/foods';
 import {
   createDebouncedSaver,
   exportState,
@@ -57,6 +59,11 @@ export type AppAction =
   | { type: 'setStartDate'; startDate: string }
   | { type: 'toggleGroceryItem'; key: string }
   | { type: 'acknowledgeDisclaimer' }
+  | { type: 'setPantry'; foods: string[] }
+  | { type: 'addOnHand'; food: string; today: string }
+  | { type: 'removeOnHand'; food: string; today: string }
+  | { type: 'clearOnHand'; today: string }
+  | { type: 'clearTextMention'; recipeId: string; mention: ClearedMention }
   | { type: 'replaceState'; state: AppState };
 
 // ---------------------------------------------------------------------------
@@ -102,6 +109,22 @@ function knownRecipeIds(customRecipes: Recipe[]): Set<string> {
   return ids;
 }
 
+/** Most recent distinct add-dates kept per food in `onHandDays`. */
+const ON_HAND_DAYS_KEPT = 10;
+
+/**
+ * Normalize typed food names to unique, non-empty plain food keys (design
+ * "Food keys for pantry and on-hand"), keeping first-seen order.
+ */
+function toFoodKeys(names: string[]): string[] {
+  const keys: string[] = [];
+  for (const name of names) {
+    const key = foodKeyFromName(name);
+    if (key.length > 0 && !keys.includes(key)) keys.push(key);
+  }
+  return keys;
+}
+
 // ---------------------------------------------------------------------------
 // Reducer (pure)
 // ---------------------------------------------------------------------------
@@ -142,9 +165,12 @@ export function reducer(state: AppState, action: AppAction): AppState {
         }
         return changed ? next : day;
       });
+      // Design (suggestions): deleting a custom recipe removes it from madeLog.
+      const madeLog = state.madeLog.filter((e) => e.recipeId !== action.id);
       return {
         ...state,
         customRecipes,
+        madeLog,
         plan: { ...state.plan, days },
       };
     }
@@ -255,6 +281,72 @@ export function reducer(state: AppState, action: AppAction): AppState {
       // Req 13.1: the first-run disclaimer has been acknowledged; record it so
       // it does not reappear. Idempotent.
       return { ...state, disclaimerAcknowledged: true };
+    }
+
+    case 'setPantry': {
+      // Req 2.2: the pantry is a set of plain food keys.
+      return { ...state, pantry: toFoodKeys(action.foods) };
+    }
+
+    case 'addOnHand': {
+      // Req 3.2: adding a food sets onHandUpdated and records the day in
+      // onHandDays (distinct dates, last 10) for pantry learning (Req 17.6).
+      // An empty key or a bad date is a no-op.
+      const key = foodKeyFromName(action.food);
+      if (key.length === 0 || !isYmdDate(action.today)) return state;
+      const days = state.onHandDays[key] ?? [];
+      const onHandDays = days.includes(action.today)
+        ? state.onHandDays
+        : {
+            ...state.onHandDays,
+            [key]: [...days, action.today].slice(-ON_HAND_DAYS_KEPT),
+          };
+      return {
+        ...state,
+        onHand: state.onHand.includes(key) ? state.onHand : [...state.onHand, key],
+        onHandUpdated: action.today,
+        onHandDays,
+      };
+    }
+
+    case 'removeOnHand': {
+      const key = foodKeyFromName(action.food);
+      if (!state.onHand.includes(key) || !isYmdDate(action.today)) return state;
+      return {
+        ...state,
+        onHand: state.onHand.filter((k) => k !== key),
+        onHandUpdated: action.today,
+      };
+    }
+
+    case 'clearOnHand': {
+      if (state.onHand.length === 0 || !isYmdDate(action.today)) return state;
+      return { ...state, onHand: [], onHandUpdated: action.today };
+    }
+
+    case 'clearTextMention': {
+      // Req 7.4: the user tapped "Not used in this recipe" for this exact
+      // sentence. Recorded on the recipe; custom recipes only (built-ins have
+      // no text mentions). No-op for unknown ids or an already-cleared mention.
+      const recipe = state.customRecipes.find((r) => r.id === action.recipeId);
+      if (!recipe) return state;
+      const cleared = recipe.clearedMentions ?? [];
+      const already = cleared.some(
+        (m) =>
+          m.ruleId === action.mention.ruleId &&
+          m.sentence === action.mention.sentence,
+      );
+      if (already) return state;
+      const updated: Recipe = {
+        ...recipe,
+        clearedMentions: [...cleared, action.mention],
+      };
+      return {
+        ...state,
+        customRecipes: state.customRecipes.map((r) =>
+          r.id === recipe.id ? updated : r,
+        ),
+      };
     }
 
     case 'replaceState': {

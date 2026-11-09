@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { ageInMonths, defaultSlots, stageFor } from './age';
+import {
+  STAGE_IDS,
+  STAGE_LABELS,
+  STAGE_MIN_MONTHS,
+  STAGE_TEXTURE_HINTS,
+  ageInMonths,
+  defaultSlots,
+  stageFor,
+} from './age';
 
 describe('ageInMonths', () => {
   it('matches the design boundary example (born 2026-01-15)', () => {
@@ -40,9 +48,48 @@ describe('stageFor', () => {
     expect(stageFor(9)).toBe('9-12');
     expect(stageFor(10)).toBe('9-12');
   });
+
+  it('maps the toddler boundaries at 11/12 and 23/24 months', () => {
+    expect(stageFor(11)).toBe('9-12');
+    expect(stageFor(12)).toBe('12-23');
+    expect(stageFor(23)).toBe('12-23');
+    expect(stageFor(24)).toBe('24-36');
+    expect(stageFor(36)).toBe('24-36');
+    expect(stageFor(50)).toBe('24-36');
+  });
+
+  it('agrees with STAGE_MIN_MONTHS for every stage', () => {
+    for (const stage of STAGE_IDS) {
+      expect(stageFor(STAGE_MIN_MONTHS[stage])).toBe(stage);
+    }
+  });
+});
+
+describe('stage labels and texture hints', () => {
+  it('labels 9-12 as "9–11 months" and the toddler stages per Req 13.2', () => {
+    expect(STAGE_LABELS['6-8']).toBe('6–8 months');
+    expect(STAGE_LABELS['9-12']).toBe('9–11 months');
+    expect(STAGE_LABELS['12-23']).toBe('12–23 months');
+    expect(STAGE_LABELS['24-36']).toBe('2–3 years');
+  });
+
+  it('gives every stage a texture hint with a CDC source URL', () => {
+    for (const stage of STAGE_IDS) {
+      expect(STAGE_TEXTURE_HINTS[stage].hint.length).toBeGreaterThan(0);
+      expect(STAGE_TEXTURE_HINTS[stage].sourceUrl).toMatch(
+        /^https:\/\/www\.cdc\.gov\//,
+      );
+    }
+  });
 });
 
 describe('defaultSlots', () => {
+  it('returns all four slots for both toddler stages', () => {
+    const four = ['breakfast', 'lunch', 'dinner', 'snack'];
+    expect(defaultSlots('12-23')).toEqual(four);
+    expect(defaultSlots('24-36')).toEqual(four);
+  });
+
   it('returns breakfast and dinner for the 6-8 stage', () => {
     expect(defaultSlots('6-8')).toEqual(['breakfast', 'dinner']);
   });
