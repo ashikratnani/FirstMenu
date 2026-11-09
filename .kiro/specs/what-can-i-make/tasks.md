@@ -47,8 +47,8 @@ Branch names use the `v2/` prefix (for example `v2/6-paste-parser`) so they don'
   - [x] 2.4 Convert the app shell, recipe library and Settings form. Check tests, `vitest-axe`, keyboard, 360 px and the size budget, and report the results in the PR. Update `tech.md`. If any check fails, open `Decision needed: Astryx trial` and continue with tasks 3–8.
     - _Requirements: 15.1, 15.5 – 15.7_
 
-- [ ] 3. Time and effort
-  - [ ] 3.1 Implement `domain/effort.ts` (`recipeMinutes`, `recipeEffort`) per the design, with tests from the built-in recipes' steps and the listed edge cases.
+- [x] 3. Time and effort
+  - [x] 3.1 Implement `domain/effort.ts` (`recipeMinutes`, `recipeEffort`) per the design, with tests from the built-in recipes' steps and the listed edge cases.
     - _Requirements: 4.1 – 4.4, 10.3_
 
 - [ ] 4. Nutrition tags
