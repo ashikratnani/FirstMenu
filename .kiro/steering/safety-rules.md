@@ -56,7 +56,18 @@ Per `.kiro/steering/autonomy.md`:
 
 - Making the screen stricter is allowed without asking: adding terms to a rule,
   adding test cases, adding a source.
-- Loosening a rule is NOT allowed without the maintainer: removing it, lowering
-  its age limit, adding an exception word, or turning a block into a reminder or
-  allergen rule. Stop and ask first.
+- Loosening a rule (removing it, lowering its age limit, adding an exception
+  word, or turning a block into a reminder or allergen rule) needs a cited
+  published source with a URL that directly supports the change. pr-reviewer
+  checks the source and decides ("Decisions you make" in pr-reviewer.md) and
+  logs it on the `Reviewer decisions log` issue (#42). The source must be from
+  AAP, WHO, CDC, FDA/EPA or NIAID. Without such a source it goes to the
+  maintainer.
+- Removing the honey, high-mercury fish, unpasteurized or no-safe-form choking
+  rules, or making a block apply to fewer ages than its source states, always
+  goes to the maintainer.
+- Never skip, delete or loosen the safety tests or the release-gate test (a
+  source-backed loosening may change only the assertion for the case it fixes), and
+  never remove a rule's source without a replacement that has a URL. These
+  always go to the maintainer.
 - Every rule change bumps `RULESET_VERSION`.

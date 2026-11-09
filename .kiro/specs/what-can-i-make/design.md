@@ -504,6 +504,16 @@ Available supply, counted on November 8, 2026: Food Hero's sitemap lists 368 rec
 | ICN Child Nutrition Recipe Box (homes, 6 servings; ages 3–5, 6 servings) | Roughly 30–40 | Usually no scaling needed. Good for fish (tilapia), tofu, beans, sunflower-seed butter and hummus. Skip the 25–50 and school-size versions when a 6-serving version exists. |
 | Food Hero (Oregon State University Extension) | Roughly 30–40 | Pages fetch as HTML with exact amounts. Prefer the "Kid Approved", "30 Minutes or Less" and "5 Ingredients or Less" lists. Many include salt, sugar or honey, so expect many to be tagged `24-36` only. |
 
+**Recipe source criteria** (Requirement 14.2). A publisher qualifies only if all hold:
+
+1. **Accountable for nutrition content:** a government or public health agency (any country), a WIC or similar nutrition program, a university or extension program, a children's hospital or pediatric health system, or a nonprofit or professional body whose recipes are written or reviewed by registered dietitians.
+2. **Free to read:** no login or paywall; fetchable as HTML or PDF.
+3. **Exact ingredients with quantities** (feeding-guide simple ideas are exempt, Requirement 14.4).
+4. **Not:** a personal or influencer blog, social media, a brand or product marketing site, a recipe aggregator, AI-generated content, or a page whose terms forbid reuse.
+5. **In English.**
+
+Prefer publishers already in `docs/recipe-sources.md`; add new ones to fill gaps (allergen groups, stages, meal types). Each new publisher gets a row in `docs/recipe-sources.md` (publisher, type, example URL, criteria notes, verdict, date) in the PR that adds its first recipe, with the verdict "Pending pr-reviewer". After pr-reviewer passes and merges that PR, the next PR updates the verdict to "Approved by pr-reviewer (PR #<n>)". All v1 sourcing rules still apply: ingredients copied, steps reworded, every recipe screened.
+
 **Batches.** Recipes are added in batches of about 20, one PR each (branch `v2/14-recipes-batch-<n>`). Each PR keeps the invariant tests green for the recipes so far. Each batch opens a `Recipe review: batch <n>` issue for the primary user and doesn't wait for it. Order: batch 1 re-tags the WIC recipes and adds simple ideas (covers `6-8` early); later batches prioritize missing allergen groups, then stage counts, then variety of meal types.
 
 **Bundle size.** Built-in recipe data (`data/recipes.ts`, `data/simpleIdeas.ts`) is put in its own chunk with Vite `build.rollupOptions.output.manualChunks`, so the Astryx size budget (Requirement 15.6) excludes it. Each recipe batch PR reports that chunk's gzipped size. Rough estimate for 100 recipes: 30–50 KB gzipped.
@@ -516,7 +526,7 @@ Rules on top of v1's "Built-in recipe sourcing":
 2. Scaling: only to make 2–6 servings, every quantity by the same factor, rounded to the nearest common kitchen measure. Record "Scaled from N servings to M".
 3. Simple ideas: one or two foods, stage from the source's age guidance, quantities left empty (shown as "as needed"), steps reworded, `kind: 'simple-idea'` on the recipe so the UI shows the "Simple idea" label.
 4. Tag a recipe for a stage only if its texture fits that stage's texture hint, or can be made to fit by a step the source itself describes (mash, chop).
-5. Stop and report if, after going through these sources, the totals or allergen coverage are under the targets.
+5. Report to the maintainer if, after the listed and other qualifying publishers, the totals or allergen coverage are under the targets.
 6. Don't add near-duplicates: two recipes from different sources that have the same main ingredients and method count once; keep the one with the clearer source.
 
 `Recipe` gets an optional `kind?: 'recipe' | 'simple-idea'` (default `'recipe'`), added to the schema v2 changes.

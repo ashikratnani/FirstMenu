@@ -122,7 +122,7 @@ Branch names use the `v2/` prefix (for example `v2/6-paste-parser`) so they don'
     - _Requirements: 15.6_
   - [ ] 14.2 Batch 1: re-tag the 10 Minnesota WIC recipes for toddler stages where the texture fits, set `serveAs` on them, and add simple ideas from WIC and USDA feeding guides to `data/simpleIdeas.ts` (at most 25 in total).
     - _Requirements: 13.2, 14.2, 14.4, 14.5, 14.8, 16.13_
-  - [ ] 14.3 Batches 2 onward: add ICN Child Nutrition Recipe Box and Food Hero recipes, about 20 per PR, following the expansion rules in the design, with `serveAs` set on each. Prioritize missing allergen groups first, then stage counts. Open a `Recipe review: batch <n>` issue for each batch.
+  - [ ] 14.3 Batches 2 onward: add ICN Child Nutrition Recipe Box and Food Hero recipes, and recipes from other publishers that meet the recipe source criteria (new publishers go through pr-reviewer and into `docs/recipe-sources.md`), about 20 per PR, following the expansion rules in the design, with `serveAs` set on each. Prioritize missing allergen groups first, then stage counts. Open a `Recipe review: batch <n>` issue for each batch.
     - _Requirements: 14.2, 14.3, 14.5, 14.8, 16.13_
   - [ ] 14.4 Ships with the final batch PR. Set the invariant tests to the final counts in Requirement 14.1 and to all nine allergen groups. If short of either, open `Decision needed: recipe shortfall` with the numbers and don't ship short without an answer. Comment on issue #7 with the final numbers.
     - _Requirements: 14.1, 14.6, 14.7_
