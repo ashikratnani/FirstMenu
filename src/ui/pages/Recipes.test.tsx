@@ -133,7 +133,9 @@ describe('Recipes library page', () => {
     await user.click(within(screen.getByRole('radiogroup', { name: 'Stage' })).getByRole('radio', { name: 'All' }));
     for (const recipe of BUILTIN_RECIPES) {
       expect(
-        screen.getByRole('link', { name: new RegExp(recipe.title) }),
+        screen.getByRole('link', {
+          name: new RegExp(recipe.title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')),
+        }),
       ).toBeInTheDocument();
     }
   });
