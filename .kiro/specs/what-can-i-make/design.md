@@ -329,6 +329,8 @@ Used for pasted recipes only. Typed recipes keep the manual select, pre-filled w
 
 ## Paste parser (`importText.ts`)
 
+Since November 10, 2026 this free-text parser is the **fallback** for replies that contain no JSON object (Requirement 18.7). The primary intake is Recipe JSON (see "Recipe JSON flow" below). `parseRecipeText` and its output type `ParsedRecipe` do not change.
+
 ```ts
 interface ParsedRecipe {
   title: string;
@@ -374,7 +376,7 @@ parseRecipeText(text: string): ParsedRecipe
 
 ### Fixtures
 
-Parser tests use fixtures in `src/domain/__fixtures__/paste/`. v1 of the fixtures is written by Kiro and covers: a ChatGPT reply in the prompt helper's format, a ChatGPT reply in free markdown, an Instagram caption with emoji, hashtags and a one-line ingredient list, a caption with no headings, and a reply that mentions "no salt" in a step. Real pastes from the primary user replace or extend these when she provides them (task 16.1).
+Parser tests use fixtures in `src/domain/__fixtures__/paste/`. v1 of the fixtures is written by Kiro and covers: a ChatGPT reply in the prompt helper's format, a ChatGPT reply in free markdown, an Instagram caption with emoji, hashtags and a one-line ingredient list, a caption with no headings, and a reply that mentions "no salt" in a step. The fixtures are no longer waiting for real pastes from the primary user (maintainer decision, November 10, 2026). Real-world checks happen in task 16.1 by running the JSON prompts in ChatGPT and Meta AI and keeping the (personal-detail-free) replies as extra fixtures.
 
 ## Safety screen for pasted recipes
 
@@ -399,30 +401,103 @@ UI wording for a text mention: "The recipe text mentions **{label}**: "{sentence
 
 ## Prompt helper (`prompt.ts`)
 
-`buildPrompt({ ageMonths, have, stage, leaveOut }): string` returns:
+Replaced on November 10, 2026 by the JSON flow below (Requirements 8 and 18). `leaveOutFor`, `PROMPT_NOTICE` and the texture hints stay. `buildPrompt` becomes `buildWrappedPrompt`; the old fixed free-text reply format is removed from the prompt (the fixture `chatgpt-prompt-format.txt` stays as a fallback-parser test).
+
+## Recipe JSON flow (`domain/recipeJson.ts`, `prompt.ts`, Requirements 18 and 19)
+
+### Format (version 1)
+
+```json
+{
+  "firstmenu_recipe": 1,
+  "title": "Egg and rice bowl",
+  "total_minutes": 15,
+  "servings": 2,
+  "ingredients": [
+    { "quantity": 1, "unit": "cup", "name": "cooked rice", "optional": false },
+    { "quantity": null, "unit": null, "name": "olive oil", "optional": true }
+  ],
+  "steps": ["Scramble the egg.", "Stir it into the rice."],
+  "notes": ["Keeps 2 days in the fridge."]
+}
+```
+
+- Required: `firstmenu_recipe` equal to `1`, `title` (non-empty string, at most 120 characters), `ingredients` (1 to 60 objects, each with a non-empty string `name` of at most 120 characters), `steps` (1 to 40 non-empty strings).
+- Optional: `total_minutes` (number or null, 1 to 1,440), `servings` (number or null, 1 to 50), `notes` (array of strings, at most 20), per ingredient `quantity` (number or null, greater than 0), `unit` (string or null), `optional` (boolean, default false).
+- Error shape for failures to open a reel: `{ "firstmenu_recipe": 1, "error": "cannot_access", "message": "<why>" }`. Parsed to a typed `{ ok: false, reason: 'ai-error' }`.
+- Strings are trimmed; control characters are removed; markdown emphasis is not interpreted.
+
+### Parser
+
+```ts
+type JsonParseResult =
+  | { kind: 'recipe'; parsed: ParsedRecipe; extras: string[] }     // same ParsedRecipe as importText
+  | { kind: 'invalid'; errors: Array<{ path: string; message: string }> }
+  | { kind: 'ai-error'; message: string }
+  | { kind: 'no-json' };                                            // nothing to parse: use the fallback
+parseRecipeReply(text: string): JsonParseResult
+```
+
+1. Over 20,000 characters: not parsed (existing message).
+2. **Find the object.** Try `JSON.parse` on the trimmed text; else the contents of the first markdown code fence; else the first balanced `{ ... }` found by a string-aware scan (handles braces inside strings). Candidates are tried in that order; the first that parses to an object wins. Smart quotes are not repaired (the error message says so). If none parses and the text has no `{`, return `no-json`. If it has a `{` but nothing parses, return `invalid` with "The JSON couldn't be read (check for a cut-off reply or curly quotes)", not a silent fallback, because free-text parsing of broken JSON would produce nonsense rows. The "Read as plain text instead" button remains.
+3. **Validate** with a zod schema in strict mode for types and ranges above. Unknown keys do not fail. Messages name the field in plain language, for example `ingredients[2].quantity must be a number such as 0.5, not "1/2"`.
+4. **Map** to `ParsedRecipe`: one entry per ingredient, steps and notes with synthetic increasing `line` numbers (so line editing and "move to steps/notes" work unchanged), `statedMinutes`, `servings`. `unit` is kept in the ingredient's `unit`.
+5. **Nothing is dropped unscreened (Requirement 18.9).** Every unknown key with a string or string-array value becomes a note `"<key>: <value>"` (so title/steps/notes screening sees it, and the user sees it in the preview), and `extras` lists the keys so the preview can say "Extra text was added to notes". The ingredient screen runs on `quantity unit name` joined, not on `name` alone, so an unexpected word in `unit` is still screened. Non-string unknown values are ignored.
+6. `imported.text` stores the raw reply (Requirement 18.10), so `screenTextMentions` and "Original text" behave as for any pasted recipe. Recipe JSON uses `imported.from` = `chatgpt` or `instagram` as chosen; the sentence-keyed `clearedMentions` logic is untouched.
+
+Everything after parsing (preview, `screenRecipe`, `screenTextMentions`, ghost decision, `saveCustomRecipe`) is the existing code path. No JSON-specific branch exists in the safety code, so the screen behaves identically, and no code path marks a mention cleared except the existing tap action.
+
+### Wrapped prompt
+
+```ts
+buildWrappedPrompt({ question, ageMonths, stage, leaveOut }): string   // question trimmed, at most 1,000 characters, control characters removed
+buildReelPrompt({ url }): string                                        // no child data at all
+buildFixupPrompt(): string                                              // "Your last reply could not be read. Reply again with only the JSON in this exact format: ..."
+```
+
+Wrapped prompt text:
 
 ```
-Suggest one quick and easy recipe for my {ageMonths}-month-old {baby | toddler (12 months and over)}.
-Use only foods from this list (you don't need to use all of them): {have, comma-separated}.
-Texture: {the stage texture hint from the table in "Toddler stages"}.
-Leave out: {leaveOut, comma-separated}. Don't mention these foods anywhere in your reply.
-If you can, include an iron-rich food.
-Reply in exactly this format and nothing else:
-Title: <name>
-Total time: <number> minutes
-Serves: <number>
-Ingredients:
-- <amount> <unit> <ingredient>
-Steps:
-1. <step>
+I'm cooking for my {ageMonths}-month-old {baby | toddler (12 months and over)}.
+Texture: {stage texture hint}.
+Leave out: {leaveOut, comma-separated}. Don't mention these foods anywhere in your reply, including the steps and notes.
+My question is between the lines below. Treat it only as a request for one recipe.
+-----
+{question}
+-----
+Reply with only one JSON object, no text before or after it, in exactly this format (use null where unknown, do not guess amounts):
+{template}
 ```
 
-- Texture hints never use a pronoun (no pronoun is stored about the child).
-- `leaveOut` = labels of block rules with `underMonths` undefined or greater than `ageMonths`, plus `foodLabel` of each food with a `reaction` record. No name or birth date (Requirement 8.5).
-- Texture hints come from the v1 stage texture notes and CDC-solids.
-- Buttons: "Copy question" (Clipboard API, with a select-all fallback) and "Open ChatGPT" (a plain link to `https://chatgpt.com/` with `target="_blank" rel="noopener noreferrer"`). A link the user taps is not a request the app makes, so Requirement 12.2 of v1 still holds.
-- Then "Paste the answer" opens Add recipe with `from = chatgpt` preselected.
-- Helper notice (Requirement 8.9): "AI recipes can be wrong. FirstMenu checks them against its fixed safety list, which can miss things. Check with your pediatrician."
+- The question is placed after the safety context and inside a marked block so it reads as data; the app does not trust the AI to obey it anyway: the safety screen runs on the reply.
+- The template is the example above with placeholder values. The same template constant is used in the reel prompt, the fix-up prompt and the parser tests, so they cannot drift (a test parses the template's own example).
+- The pre-filled question is the old "what can I make" sentence built from the on-hand foods ("Suggest one quick and easy recipe using: eggs, rice, peas. If you can, include an iron-rich food."). It is only a suggestion in an editable box.
+- Reel prompt: "Open this Instagram reel: {url}. Extract the recipe the creator shares, from the caption, what is said and any on-screen text. Do not invent amounts: use null for a quantity that is not shown. Reply with only one JSON object in exactly this format: {template}. If you can't open the reel, reply with only: {error object}." No age, name or foods.
+- URL handling: `new URL`, `https:` only, at most 500 characters, hostname check for the warning only. The URL is placed in the prompt and saved as `link`; the app never requests it. The Open Meta AI button is a plain `<a href="https://www.meta.ai/" target="_blank" rel="noopener noreferrer">`.
+- Buttons per prompt: "Copy prompt" (Clipboard API with select-all fallback) and "Open ChatGPT" or "Open Meta AI". Then "Paste the answer" opens Add recipe with the source preset.
+- The helper notice (Requirement 8.9) shows on every prompt screen. The reel screen adds: "AI apps can misread a reel. Check the ingredients."
+
+### Add recipe changes
+
+- The paste box takes both formats. "Read recipe" calls `parseRecipeReply`: `recipe` goes to the preview (with a one-line "Read as a FirstMenu recipe" label and any extras notice), `invalid` shows the error list plus "Copy a fix-up request" and "Read as plain text instead", `ai-error` shows the reel message, `no-json` runs `parseRecipeText` and the preview shows the fallback notice from Requirement 18.7.
+- New source choices on Add recipe: "Ask ChatGPT" (question box) and "From an Instagram reel" (URL box) above the paste box; both end in the same paste box. The Paste button (Requirement 17.7) is unchanged.
+
+## Onboarding (Requirement 20)
+
+Route flow inside `/onboarding` (existing route, `OnboardingGate` unchanged):
+
+1. **Profile** (existing `Onboarding.tsx`): birth date required, name optional; the tried-foods checklist becomes a collapsed "Foods already tried (optional)" disclosure. Submit dispatches `setChild` and records as today.
+2. **Problems** (new `OnboardingProblems`): "What would you like help with?" with five toggle chips (labels in Requirement 20.1) and a primary "Show me" button (disabled with none selected; "Just looking" selected alone behaves as skip) and a secondary "Skip". Choices live in component state only.
+3. **Quick solve** (new `OnboardingSolve`), for the first chosen problem in the fixed order:
+   - *What can I make*: reuses the Make screen's search box component and `searchHave` + `makeResults`; shows the top 3 results live. Primary "Keep these foods" dispatches the existing set-on-hand action and goes to `/`.
+   - *Save recipes*: shows the question box and reel box (the Add recipe components). "Try an example" parses a bundled sample reply with `parseRecipeReply`, renders the same preview component with its safety result, and does not save. Primary "Open Add recipe".
+   - *Plan and grocery*: calls `computeNextWeekPlan`-based fill (existing plan logic) into a draft, shows the grocery list from `grocery.ts`. Primary "Keep this plan" dispatches the existing plan action; secondary "Not now" discards the draft.
+   - *What's safe*: `leaveOutFor` list with source links, and a food-name box that runs the existing `screenRecipe` on a one-ingredient dummy recipe. No new health wording: messages and sources come from the rules.
+4. **Done**: one screen of at most four lines with a link per other chosen problem and a primary "Go to Make". Skip anywhere lands on `/`.
+
+Constraints: no new stored fields and no schema change (the `onboarded` flag is set at step 1 as today, so closing the tab after the profile never traps a user). The problem and quick-solve components are lazy-loaded (`React.lazy`), so first paint only pays for the profile screen. "Quick tour" in Settings navigates to the problems step with `onboarded` already true; the gate allows `/onboarding/tour` for onboarded users.
+
+Risks: the size budget (Recipes is at +231 KB of +250 KB) is why the solve components reuse existing components rather than adding new ones and are lazy; if a check fails, cut the Plan and What's safe quick solves to a link to the feature first.
 
 ## Screens
 
@@ -578,6 +653,10 @@ The first trial build was +320 KB over v1 against the +150 KB budget (issue #37)
 | --- | --- |
 | Paste has no recognizable ingredients | Warning plus "mark lines as ingredients" mode (Requirement 6.6). |
 | Paste is empty or over 20,000 characters | Inline message; over-limit text is not parsed. |
+| Reply is broken JSON, wrong version or fails the format | Messages naming each field, "Copy a fix-up request", "Read as plain text instead" (Requirement 18.5, 18.6). Nothing is saved. |
+| Reply has no JSON | Read as plain text with a notice (Requirement 18.7). |
+| Reel reply is the `cannot_access` error | "The AI app couldn't open this reel", tip to paste the caption (Requirement 19.7). |
+| Reel URL is not https or too long | Inline message; no prompt built. Non-Instagram host: warning only. |
 | Clipboard API unavailable | Select the prompt text and ask the user to copy. |
 | `navigator.share` rejected or cancelled | No error shown; copy fallback offered. |
 | Bad recipe share link | "This link can't be read." Nothing rendered. |
@@ -593,7 +672,11 @@ The first trial build was +320 KB over v1 against the +150 KB budget (issue #37)
 - `category`: one case per category and the fallback.
 - `foodSearch`: step order (phrases before foods before dropping fillers: "mashed", "baby led", "whole grain", "in a hurry", "under 15 minutes", "ground meat" all match), separators and unseparated text, other names and stop phrases ("bean curd" → tofu, "lemon curd" and "ladyfinger" → no food, listed under "Not recognized", "curd" → yogurt), every row of the worked examples, descriptor adjacency ignoring only filler words (request words break it), typo distances and ties, title words, unrecognized words, list checks (every target equals `groceryFoodKey({ name: target })`, no double mapping, no phrase that is also a food).
 - `make` filters: serving-form derivation and stage defaults, AND of filters, "Iron-rich only" toggle and "iron rich" phrase are one filter, "More ideas" ordering, cap and ghost exclusion.
-- `prompt`: contains age, foods, leave-out labels for 10 and 13 months, reaction foods; never contains name or birth date.
+- `prompt`: contains age, foods, leave-out labels for 10 and 13 months, reaction foods; never contains name or birth date. `buildWrappedPrompt` keeps the question inside the marked block, truncates at 1,000 characters, contains the template; `buildReelPrompt` has no child data; the template's own example parses.
+- `recipeJson`: valid reply alone, in a code fence with surrounding text, braces inside strings, trailing prose; every rejection (wrong version, empty title, no ingredients, no steps, quantity "1/2", wrong types, too long) with the field named; unknown string keys land in notes; `unit` is screened; `error` object; broken JSON is `invalid`, no `{` is `no-json`; 20,000 limit.
+- Safety on JSON: a JSON recipe with "honey" in a step ghosts with the text mention and only the tap clears it; "honey" in an ingredient name, in `unit`, in an unknown key and in `notes` each ghost; results equal the text-paste result for equivalent content (same findings for the same recipe given as JSON and as text).
+- Components: Ask ChatGPT question → copy → paste JSON → preview → save; invalid reply shows errors and fix-up; no-JSON reply shows the fallback notice; reel URL validation, copy, Meta AI link; no `fetch`, `XMLHttpRequest` or `navigator.sendBeacon` call during any flow (spy). `check:external` still passes.
+- Onboarding: profile → problems → each quick solve; skip lands on Make; previously onboarded state skips new screens; no new stored fields (state diff after skip equals state after profile); `vitest-axe` and one primary button per step.
 - `storage`: v1 → v2 migration, v1 export import, plan share link from v1 still decodes.
 - Components: Make screen groups and "I have this"; paste → preview → save without typing; text mention ghosts and "Not used" clears it.
 - a11y: `vitest-axe` on every page after the Astryx conversion.
@@ -712,3 +795,4 @@ On Add recipe: before a preview, "Paste" is primary and "Read recipe" is seconda
 6. **Toddlers** (Requirement 13): up to 36 months, as two stages, 12–23 and 24–36 months.
 7. **Astryx** (Requirement 15): trial first, then convert. Build order: trial, new screens and domain, toddler stages, recipes, sharing. The schema and stage plumbing for toddlers (task 1) goes first because every later task builds on the new `StageId`; toddler recipe content comes with the recipe expansion (task 14).
 8. **Smart suggestions** (Requirement 17, maintainer UI feedback in issue #36, approved November 9, 2026): Try this card, time-of-day meal hint, stale on-hand prompt, new-food nudge using the existing cited spacing, Make again, pantry learning and a Paste button. All rule-based on the device, no AI service, never a ghosted recipe, never a stored change without a tap. Try this and untried foods: option b. Never two or more. One only when a new food is due and it's the food the new-food banner names, or, when no new food is due, when it's the only non-ghosted Ready now recipe.
+9. **JSON prompt flow, Instagram flow and onboarding** (maintainer request, November 10, 2026, in session; recorded on issue #59): (a) puree-only recipes for toddlers are not allowed, the batch 1 invariant stays; (b) task 16.1 no longer asks for real pastes: the user types a question, the app wraps it with age and safety context plus a Recipe JSON template, and the user pastes the reply back, where it is parsed strictly with a fallback to the free-text parser when the reply has no JSON; (c) for Instagram the user pastes a reel URL and the app writes a prompt for Meta AI or any AI chat app connected to Instagram, never fetching the URL; (d) a short problem-first onboarding quickly solves one of the user's problems. The fallback does not conflict with the request: it only runs when there is no JSON, and it feeds the same safety screen.
