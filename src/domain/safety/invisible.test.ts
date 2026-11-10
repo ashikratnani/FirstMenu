@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { Recipe } from '../types';
-import { normalize, matchesTerm, tokenize } from './normalize';
+import { normalize, matchesTerm, termMatchesTokens, tokenize } from './normalize';
+import { RULES, type SafetyRule } from './rules';
 import { screenIngredient, screenRecipe, screenTextMentions, textMentionsBlockFood } from './screen';
 
 const AGE = 6;
@@ -193,3 +194,99 @@ describe('control, private-use and combining-mark characters (extra cases)', () 
     expect(performance.now() - start).toBeLessThan(5000);
   });
 });
+
+describe('screen is never weaker than the previous ruleset (ruleset 4 reading)', () => {
+  it.each([
+    'ho\u0301ney\u20DDcake',
+    'ho\u0301ney\u0001cake',
+    'ho\u200Bney\u20DDcake',
+    'ho\u200Bney\u0001cake',
+  ])('mixed hiding and separating characters still fire honey: %j', (text) => {
+    expect(screenIngredient(text, AGE).map((f) => f.ruleId)).toContain('honey');
+    expect(textMentionsBlockFood(text)).toBe(true);
+  });
+
+  it.each([
+    ['juice l\u20DDemon', 'fruit-juice'],
+    ['sugar s\u20DDnap', 'added-sugar'],
+    ['popcorn x\u20DDanthan', 'popcorn'],
+    ['cherry t\u20DDomato', 'whole-cherry-tomato'],
+    ['p\u20DDeanut butter', 'allergen-dairy'],
+    ['milk b\u20DDreast', 'allergen-dairy'],
+    ['wheat a\u20DDlmond', 'allergen-wheat'],
+    ['wheat a\u0001lmond', 'allergen-wheat'],
+    ['wheat a\uE000lmond', 'allergen-wheat'],
+  ])('a hidden character inside an exception word does not suppress: %j', (text) => {
+    expect(screenIngredient(text, AGE).length).toBeGreaterThan(0);
+  });
+
+  it('exceptions still suppress when nothing is hidden', () => {
+    const ids = (t: string) => screenIngredient(t, AGE).map((f) => f.ruleId);
+    expect(ids('juice lemon')).toEqual(ids('lemon'));
+    expect(ids('lemon\u200B juice')).toEqual(ids('lemon juice'));
+    expect(ids('juice lemon')).not.toContain('fruit-juice');
+    expect(ids('lemon\u200B juice')).not.toContain('fruit-juice');
+  });
+
+  // Reference copy of the previous screen (ruleset 4): old hidden set only,
+  // exception suppresses if any reading has it.
+  const OLD = /[\p{Default_Ignorable_Code_Point}\p{Cf}\u2800]/gu;
+  const oldTokens = (text: string, rep: string): string[] => {
+    const n = text
+      .replace(OLD, rep)
+      .normalize('NFKD')
+      .replace(OLD, '')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, ' ')
+      .trim();
+    return n ? n.split(' ') : [];
+  };
+  const oldVariants = (text: string) => [oldTokens(text, ''), oldTokens(text, ' ')];
+  const oldMatch = (text: string, term: string) => {
+    const tt = oldTokens(term, '');
+    return oldVariants(text).some((v) => termMatchesTokens(v, tt));
+  };
+  const oldFires = (rule: SafetyRule, text: string) =>
+    !(rule.except ?? []).some((e) => oldMatch(text, e)) &&
+    (rule.terms ?? []).some((t) => oldMatch(text, t));
+
+  it('never loses a finding that the previous ruleset produced', () => {
+    const chars = ['\u20DD', '\u0001', '\uE000', '\u200B', '\u0301'];
+    const losses: string[] = [];
+    let checked = 0;
+    const withChar = (w: string, c: string, i: number) => w.slice(0, i) + c + w.slice(i);
+    for (const rule of RULES) {
+      const terms = rule.terms ?? [];
+      const excepts = rule.except ?? [];
+      const words = [...terms, ...excepts];
+      const texts: string[] = [];
+      for (const w of words) {
+        for (const c of chars) {
+          // one position per word keeps the run fast; vary it across chars
+          for (const i of [1, Math.max(1, Math.floor(w.length / 2)), w.length - 1]) {
+            if (i < 0 || i > w.length) continue;
+            texts.push(withChar(w, c, i));
+            const partner = excepts.length && terms.includes(w) ? excepts[0] : terms[0];
+            if (partner !== undefined) {
+              texts.push(`${withChar(w, c, i)} ${partner}`, `${partner} ${withChar(w, c, i)}`);
+              texts.push(`${w} ${withChar(partner, c, 1)}`, `${withChar(partner, c, 1)} ${w}`);
+            }
+          }
+        }
+      }
+      for (const text of texts) {
+        checked++;
+        if (oldFires(rule, text) && !ruleFiresNow(rule, text)) {
+          losses.push(`${rule.id}: ${JSON.stringify(text)}`);
+        }
+      }
+    }
+    expect(checked).toBeGreaterThan(1000);
+    expect(losses.slice(0, 10)).toEqual([]);
+  });
+});
+
+function ruleFiresNow(rule: SafetyRule, text: string): boolean {
+  return screenIngredient(text, rule.fromMonths ?? 0).some((f) => f.ruleId === rule.id);
+}

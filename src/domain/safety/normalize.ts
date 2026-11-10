@@ -54,18 +54,47 @@ export function normalize(name: string): string {
 const NORMALIZE_CACHE_LIMIT = 20000;
 const normalizeCache = new Map<string, string>();
 
+// The previous (ruleset 4) reading: only the old hidden set is dropped, the
+// combining range U+0300-U+036F is stripped, and every other character becomes
+// a space. Kept as extra readings so the screen never fires less than before.
+const LEGACY_INVISIBLE = /[\p{Default_Ignorable_Code_Point}\p{Cf}\u2800]/gu;
+
+function legacyTokens(text: string, replacement: string): string[] {
+  const n = text
+    .replace(LEGACY_INVISIBLE, replacement)
+    .normalize('NFKD')
+    .replace(LEGACY_INVISIBLE, '')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+  return n.length === 0 ? [] : n.split(/\s+/);
+}
+
 /**
- * Token lists for the safety screen. An invisible character can hide a word
+ * Token lists for the safety screen. A hidden character can hide a word
  * ("ho\u3164ney") or stand in for a space ("honey\u200Bcake"), and the screen
- * cannot tell which, so it checks both readings: invisibles removed (the first
- * list) and invisibles read as spaces (a second list, only when they differ).
- * Checking both keeps the screen strictly stricter than before.
+ * cannot tell which, so it checks several readings: hidden characters removed,
+ * hidden characters read as spaces, and the two readings the previous ruleset
+ * used (only the old hidden set removed or spaced, everything else a space).
+ * A text fires when any one reading fires, so the union can only fire more
+ * than the previous ruleset did. Duplicate readings are dropped.
  */
 export function screenTokenVariants(text: string): string[][] {
   const stripped = tokenize(text);
   if (!hasInvisible(text)) return [stripped];
-  const spaced = tokenize(dropInvisible(text, ' '));
-  return spaced.join(' ') === stripped.join(' ') ? [stripped] : [stripped, spaced];
+  const variants = [stripped];
+  const seen = new Set([stripped.join(' ')]);
+  const add = (tokens: string[]) => {
+    const key = tokens.join(' ');
+    if (seen.has(key)) return;
+    seen.add(key);
+    variants.push(tokens);
+  };
+  add(tokenize(dropInvisible(text, ' ')));
+  add(legacyTokens(text, ''));
+  add(legacyTokens(text, ' '));
+  return variants;
 }
 
 /** Normalize then split into non-empty tokens. */
