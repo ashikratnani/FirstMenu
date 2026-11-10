@@ -80,3 +80,27 @@ describe('matchesTerm', () => {
     expect(matchesTerm('grapefruit', 'grape')).toBe(false);
   });
 });
+
+describe('normalize and token caches', () => {
+  it('tokenize returns a fresh array each call, so mutating it cannot corrupt the cache', () => {
+    const a = tokenize('Cow\'s Milk');
+    a.push('junk');
+    a[0] = 'changed';
+    const b = tokenize('Cow\'s Milk');
+    expect(b).toEqual(['cow', 's', 'milk']);
+    expect(b).not.toBe(a);
+    expect(matchesTerm("Cow's Milk", 'cow s milk')).toBe(true);
+  });
+
+  it('gives the same answers before and after the 20,000-entry cache clear', () => {
+    const before = [normalize('Honeydew Melon'), matchesTerm('Honey', 'honey'), matchesTerm('honeydew', 'honey')];
+    for (let i = 0; i < 20500; i++) {
+      normalize(`filler ${i}`);
+      matchesTerm(`filler ${i}`, 'honey');
+    }
+    const after = [normalize('Honeydew Melon'), matchesTerm('Honey', 'honey'), matchesTerm('honeydew', 'honey')];
+    expect(after).toEqual(before);
+    expect(after).toEqual(['honeydew melon', true, false]);
+    expect(tokenize('Cow\'s Milk')).toEqual(['cow', 's', 'milk']);
+  });
+});

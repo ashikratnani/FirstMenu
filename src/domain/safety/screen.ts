@@ -2,7 +2,7 @@
 // findings (design.md "Screen API"). Pure TS, no React.
 
 import type { Recipe } from '../types';
-import { matchesTerm, termMatchesTokens, tokenize } from './normalize';
+import { matchesTerm, screenTokenVariants, termMatchesTokens, tokenize } from './normalize';
 import { RULES, type RuleKind, type SafetyRule } from './rules';
 
 export interface Finding {
@@ -155,7 +155,12 @@ export function splitSentences(text: string): string[] {
  * apple juice" through, so exceptions are local here: stricter than ingredient
  * names, never looser.
  */
-function sentenceFires(rule: SafetyRule, sentenceTokens: string[]): boolean {
+function sentenceFires(rule: SafetyRule, sentence: string): boolean {
+  // Invisible characters can hide a word or stand in for a space; check both.
+  return screenTokenVariants(sentence).some((tokens) => tokensFire(rule, tokens));
+}
+
+function tokensFire(rule: SafetyRule, sentenceTokens: string[]): boolean {
   const exceptions = (rule.except ?? []).map((e) => tokenize(e));
   for (const term of rule.terms ?? []) {
     const termTokens = tokenize(term);
@@ -191,8 +196,7 @@ function inAgeWindow(rule: SafetyRule, age: number): boolean {
  */
 export function textMentionsBlockFood(text: string): boolean {
   return splitSentences(text).some((sentence) => {
-    const tokens = tokenize(sentence);
-    return RULES.some((rule) => rule.kind === 'block' && sentenceFires(rule, tokens));
+    return RULES.some((rule) => rule.kind === 'block' && sentenceFires(rule, sentence));
   });
 }
 
@@ -222,7 +226,7 @@ export function screenTextMentions(recipe: Recipe, ageMonths: number): TextMenti
     if (blockedByIngredient.has(rule.id)) continue;
     for (const source of sources) {
       for (const sentence of splitSentences(source.text)) {
-        if (!sentenceFires(rule, tokenize(sentence))) continue;
+        if (!sentenceFires(rule, sentence)) continue;
         if (cleared.some((c) => c.ruleId === rule.id && c.sentence === sentence)) continue;
         mentions.push({
           ruleId: rule.id,

@@ -171,20 +171,51 @@ export function isRecipeGhosted(
   state: AppState,
   ageMonths: number,
 ): boolean {
-  if (screenRecipe(recipe, ageMonths).blocks.length > 0) return true;
-  // Pasted recipes: a block-rule food named in the title, steps or notes.
-  if (screenTextMentions(recipe, ageMonths).length > 0) return true;
-  for (const ingredient of recipe.ingredients) {
-    for (const key of foodKeyFor(ingredient)) {
-      if (
-        foodStatus(key, state, ageMonths) === 'ghost' &&
-        state.foods[key]?.status === 'reaction'
-      ) {
-        return true;
-      }
-    }
+  const facts = ghostFacts(recipe);
+  if (blockedAt(recipe, facts, ageMonths)) return true;
+  // A recorded reaction ghosts the recipe. foodStatus() is 'ghost' for every
+  // reaction, so checking the record is the same test as before.
+  for (const key of facts.foodKeys) {
+    if (state.foods[key]?.status === 'reaction') return true;
   }
   return false;
+}
+
+// Per-recipe facts that depend only on the recipe object and the age, never on
+// the child's food records (active spec Requirement 14.9, speed with 500
+// recipes). Built-in recipes are module constants and an edited custom recipe
+// is a new object, so nothing here needs invalidating; the WeakMap lets deleted
+// recipes be collected. The safety screen itself is unchanged: this only keeps
+// its answer for a recipe and age instead of asking again on every keystroke.
+interface GhostFacts {
+  /** Food keys of every ingredient (foodKeyFor), in order. */
+  foodKeys: string[];
+  /** Does the recipe have a block, or a block-rule food in its text, at an age? */
+  blocked: Map<number, boolean>;
+}
+
+const ghostFactsCache = new WeakMap<Recipe, GhostFacts>();
+
+function ghostFacts(recipe: Recipe): GhostFacts {
+  const cached = ghostFactsCache.get(recipe);
+  if (cached !== undefined) return cached;
+  const facts: GhostFacts = {
+    foodKeys: recipe.ingredients.flatMap((ingredient) => foodKeyFor(ingredient)),
+    blocked: new Map(),
+  };
+  ghostFactsCache.set(recipe, facts);
+  return facts;
+}
+
+function blockedAt(recipe: Recipe, facts: GhostFacts, ageMonths: number): boolean {
+  const cached = facts.blocked.get(ageMonths);
+  if (cached !== undefined) return cached;
+  // Pasted recipes: a block-rule food named in the title, steps or notes.
+  const blocked =
+    screenRecipe(recipe, ageMonths).blocks.length > 0 ||
+    screenTextMentions(recipe, ageMonths).length > 0;
+  facts.blocked.set(ageMonths, blocked);
+  return blocked;
 }
 
 /**

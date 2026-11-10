@@ -35,6 +35,18 @@ export const MEAL_TYPES: readonly MealType[] = [
   'snack',
 ];
 
+/**
+ * How many recipe cards the library shows at a time (Requirement 14.9: long
+ * lists are shown in pages instead of 500 cards at once). "Show more" adds
+ * another page.
+ */
+export const RECIPES_PAGE_SIZE = 50;
+
+/** The status line under the list, such as "Showing 50 of 142 recipes". */
+export function pageStatusText(shown: number, total: number): string {
+  return `Showing ${shown} of ${total} ${total === 1 ? 'recipe' : 'recipes'}`;
+}
+
 /** The stages, in order, for the stage filter. */
 export const STAGES: readonly StageId[] = STAGE_IDS;
 

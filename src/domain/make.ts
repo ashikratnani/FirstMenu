@@ -186,15 +186,48 @@ function compareResults(a: MakeResult, b: MakeResult): number {
   return a.recipe.title.localeCompare(b.recipe.title);
 }
 
-function buildResult(recipe: Recipe, have: Set<string>, youngerStage: boolean): MakeResult {
+/**
+ * Values that depend only on the recipe, not on the pantry, the child or the
+ * filters (design "Bundle size and speed with 500 recipes").
+ */
+export interface Derived {
+  requiredKeys: string[];
+  minutes?: number;
+  minutesKind?: 'stated' | 'estimated';
+  effort: Effort;
+  tags: NutritionTag[];
+}
+
+// Keyed by the recipe object. Built-in recipes are module constants, and an
+// edited custom recipe is a new object, so nothing here ever needs to be
+// invalidated. A WeakMap lets deleted recipes be collected.
+const derivedCache = new WeakMap<Recipe, Derived>();
+
+/** The recipe's derived values, computed once per recipe object. */
+export function recipeDerived(recipe: Recipe): Derived {
+  const cached = derivedCache.get(recipe);
+  if (cached !== undefined) return cached;
   const time = recipeMinutes(recipe);
-  return {
-    recipe,
-    missing: requiredKeys(recipe).filter((key) => !have.has(key)),
+  const derived: Derived = {
+    requiredKeys: requiredKeys(recipe),
     minutes: time?.minutes,
     minutesKind: time?.kind,
     effort: recipeEffort(recipe),
     tags: recipeNutritionTags(recipe),
+  };
+  derivedCache.set(recipe, derived);
+  return derived;
+}
+
+function buildResult(recipe: Recipe, have: Set<string>, youngerStage: boolean): MakeResult {
+  const derived = recipeDerived(recipe);
+  return {
+    recipe,
+    missing: derived.requiredKeys.filter((key) => !have.has(key)),
+    minutes: derived.minutes,
+    minutesKind: derived.minutesKind,
+    effort: derived.effort,
+    tags: derived.tags,
     youngerStage,
   };
 }
@@ -289,7 +322,7 @@ export function suggestedChips(
   const inPantry = new Set(pantry);
   const counts = new Map<string, number>();
   for (const recipe of recipes) {
-    for (const key of requiredKeys(recipe)) {
+    for (const key of recipeDerived(recipe).requiredKeys) {
       if (inPantry.has(key)) continue;
       counts.set(key, (counts.get(key) ?? 0) + 1);
     }
