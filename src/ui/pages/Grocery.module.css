@@ -37,36 +37,6 @@
   gap: calc(var(--space) * 0.3);
 }
 
-.lineLabel {
-  display: flex;
-  align-items: flex-start;
-  gap: calc(var(--space) * 0.5);
-  cursor: pointer;
-}
-
-.checkbox {
-  margin-top: 0.2em;
-  width: 1.1em;
-  height: 1.1em;
-  flex: 0 0 auto;
-}
-
-.lineText {
-  display: flex;
-  flex-direction: column;
-  gap: calc(var(--space) * 0.15);
-}
-
-.lineName {
-  font-weight: 600;
-  color: var(--fm-color-heading);
-}
-
-.lineAmount {
-  font-size: 0.9rem;
-  color: var(--fm-color-text);
-}
-
 .reminderList {
   padding: 0 0 0 calc(1.1em + var(--space) * 0.5);
   margin: 0;

@@ -107,6 +107,31 @@ interface FormErrors {
   ingredients?: string;
   steps?: string;
   texture?: string;
+  servings?: string;
+  statedMinutes?: string;
+  fridgeDays?: string;
+  freezerMonths?: string;
+  /** Quantity messages keyed by ingredient row index. */
+  quantities?: Record<number, string>;
+}
+
+/**
+ * Check a numeric text field. Blank is allowed (the field is optional or has a
+ * default). Otherwise the text must be a finite number that is positive (or
+ * non-negative when `allowZero`), and a whole number when `integer`. Mirrors
+ * the v1 type="number" min/step constraints. Returns a message or undefined.
+ */
+function numberError(
+  raw: string,
+  opts: { integer: boolean; allowZero: boolean },
+  message: string,
+): string | undefined {
+  if (raw.trim() === '') return undefined;
+  const n = Number(raw);
+  if (!Number.isFinite(n)) return message;
+  if (opts.integer && !Number.isInteger(n)) return message;
+  if (opts.allowZero ? n < 0 : n <= 0) return message;
+  return undefined;
 }
 
 /**
@@ -122,6 +147,10 @@ function validateForm(form: {
   ingredients: IngredientForm[];
   steps: string[];
   texture: string;
+  servings: string;
+  statedMinutes: string;
+  fridgeDays: string;
+  freezerMonths: string;
 }): FormErrors {
   const errors: FormErrors = {};
   if (form.title.trim() === '') {
@@ -142,6 +171,40 @@ function validateForm(form: {
   if (form.texture.trim() === '') {
     errors.texture = 'Add a texture note.';
   }
+  const servings = numberError(
+    form.servings,
+    { integer: true, allowZero: false },
+    'Servings must be a whole number of 1 or more.',
+  );
+  if (servings) errors.servings = servings;
+  const minutes = numberError(
+    form.statedMinutes,
+    { integer: true, allowZero: false },
+    'Minutes must be a whole number of 1 or more.',
+  );
+  if (minutes) errors.statedMinutes = minutes;
+  const fridge = numberError(
+    form.fridgeDays,
+    { integer: true, allowZero: true },
+    'Fridge days must be a whole number, 0 or more.',
+  );
+  if (fridge) errors.fridgeDays = fridge;
+  const freezer = numberError(
+    form.freezerMonths,
+    { integer: true, allowZero: true },
+    'Freezer months must be a whole number, 0 or more.',
+  );
+  if (freezer) errors.freezerMonths = freezer;
+  const quantities: Record<number, string> = {};
+  form.ingredients.forEach((row, index) => {
+    const q = numberError(
+      row.quantity,
+      { integer: false, allowZero: false },
+      'Quantity must be a number greater than 0.',
+    );
+    if (q) quantities[index] = q;
+  });
+  if (Object.keys(quantities).length > 0) errors.quantities = quantities;
   return errors;
 }
 
@@ -373,6 +436,10 @@ export default function RecipeEditor() {
       ingredients,
       steps,
       texture,
+      servings,
+      statedMinutes,
+      fridgeDays,
+      freezerMonths,
     });
     setErrors(validation);
     if (Object.keys(validation).length > 0) {
@@ -525,7 +592,24 @@ export default function RecipeEditor() {
                       value={row.quantity}
                       onChange={(value) => updateIngredient(index, { quantity: value })}
                       inputMode="decimal"
+                      status={
+                        errors.quantities?.[index] ? { type: 'error' } : undefined
+                      }
+                      aria-describedby={
+                        errors.quantities?.[index]
+                          ? `${rowId}-quantity-error`
+                          : undefined
+                      }
                     />
+                    {errors.quantities?.[index] && (
+                      <p
+                        id={`${rowId}-quantity-error`}
+                        className={styles.error}
+                        role="alert"
+                      >
+                        {errors.quantities[index]}
+                      </p>
+                    )}
                   </div>
 
                   <div className={styles.field}>
@@ -649,7 +733,14 @@ export default function RecipeEditor() {
             value={servings}
             onChange={(value) => setServings(value)}
             inputMode="decimal"
+            status={errors.servings ? { type: 'error' } : undefined}
+            aria-describedby={errors.servings ? 'recipe-servings-error' : undefined}
           />
+          {errors.servings && (
+            <p id="recipe-servings-error" className={styles.error} role="alert">
+              {errors.servings}
+            </p>
+          )}
         </div>
 
         <div className={styles.field}>
@@ -658,7 +749,14 @@ export default function RecipeEditor() {
             value={statedMinutes}
             onChange={(value) => setStatedMinutes(value)}
             inputMode="decimal"
+            status={errors.statedMinutes ? { type: 'error' } : undefined}
+            aria-describedby={errors.statedMinutes ? 'recipe-minutes-error' : undefined}
           />
+          {errors.statedMinutes && (
+            <p id="recipe-minutes-error" className={styles.error} role="alert">
+              {errors.statedMinutes}
+            </p>
+          )}
         </div>
 
         <fieldset className={styles.fieldset}>
@@ -669,7 +767,14 @@ export default function RecipeEditor() {
               value={fridgeDays}
               onChange={(value) => setFridgeDays(value)}
               inputMode="decimal"
+              status={errors.fridgeDays ? { type: 'error' } : undefined}
+              aria-describedby={errors.fridgeDays ? 'recipe-fridge-error' : undefined}
             />
+            {errors.fridgeDays && (
+              <p id="recipe-fridge-error" className={styles.error} role="alert">
+                {errors.fridgeDays}
+              </p>
+            )}
           </div>
           <div className={styles.field}>
             <TextInput
@@ -677,7 +782,14 @@ export default function RecipeEditor() {
               value={freezerMonths}
               onChange={(value) => setFreezerMonths(value)}
               inputMode="decimal"
+              status={errors.freezerMonths ? { type: 'error' } : undefined}
+              aria-describedby={errors.freezerMonths ? 'recipe-freezer-error' : undefined}
             />
+            {errors.freezerMonths && (
+              <p id="recipe-freezer-error" className={styles.error} role="alert">
+                {errors.freezerMonths}
+              </p>
+            )}
           </div>
         </fieldset>
 

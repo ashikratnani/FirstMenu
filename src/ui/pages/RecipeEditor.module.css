@@ -95,60 +95,10 @@
   flex: 1 1 100%;
 }
 
-.addButton,
-.removeButton {
-  align-self: flex-start;
-  padding: calc(var(--space) * 0.35) var(--space);
-  border: 1px solid var(--fm-color-border);
-  border-radius: var(--radius);
-  background: var(--fm-color-surface, #fff);
-  color: var(--fm-color-heading);
-  font: inherit;
-  cursor: pointer;
-}
-
-.removeButton {
-  align-self: flex-end;
-}
-
-.addButton:hover,
-.addButton:focus-visible,
-.removeButton:hover,
-.removeButton:focus-visible {
-  border-color: var(--fm-color-heading);
-}
-
-.removeButton:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
 .actions {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space);
-}
-
-.submit {
-  padding: calc(var(--space) * 0.5) var(--space);
-  border: 1px solid var(--fm-color-border);
-  border-radius: var(--radius);
-  background: var(--fm-color-accent, var(--fm-color-surface));
-  color: var(--fm-color-text);
-  font: inherit;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.delete {
-  padding: calc(var(--space) * 0.5) var(--space);
-  border: 1px solid #c05454;
-  border-radius: var(--radius);
-  background: var(--fm-color-surface, #fff);
-  color: #a33a3a;
-  font: inherit;
-  font-weight: 600;
-  cursor: pointer;
 }
 
 .findings {
