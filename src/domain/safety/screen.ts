@@ -2,7 +2,7 @@
 // findings (design.md "Screen API"). Pure TS, no React.
 
 import type { Recipe } from '../types';
-import { matchesTerm, screenTokenVariants, termMatchesTokens, tokenize } from './normalize';
+import { screenTokenVariants, termMatchesTokens, tokenize } from './normalize';
 import { RULES, type RuleKind, type SafetyRule } from './rules';
 
 export interface Finding {
@@ -31,12 +31,6 @@ function safeAge(ageMonths: number): number {
   return ageMonths;
 }
 
-/** Does any of `terms` match the ingredient name? */
-function anyTermMatches(name: string, terms: string[] | undefined): boolean {
-  if (!terms) return false;
-  return terms.some((term) => matchesTerm(name, term));
-}
-
 /** Does this rule fire for `name` at `ageMonths`? */
 function ruleFires(rule: SafetyRule, name: string, ageMonths: number): boolean {
   // Age window: the rule applies while fromMonths <= age < underMonths.
@@ -46,11 +40,13 @@ function ruleFires(rule: SafetyRule, name: string, ageMonths: number): boolean {
   if (rule.underMonths !== undefined && ageMonths >= rule.underMonths) {
     return false;
   }
-  // Exceptions suppress the rule.
-  if (anyTermMatches(name, rule.except)) {
-    return false;
-  }
-  return anyTermMatches(name, rule.terms);
+  // Read the term and the exceptions in the SAME reading of the name: the rule
+  // fires when any one reading has a term match and no exception match.
+  return screenTokenVariants(name).some((tokens) => {
+    const hits = (terms: string[] | undefined) =>
+      (terms ?? []).some((t) => termMatchesTokens(tokens, tokenize(t)));
+    return hits(rule.terms) && !hits(rule.except);
+  });
 }
 
 /**
