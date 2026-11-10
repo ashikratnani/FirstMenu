@@ -105,7 +105,8 @@ function hiddenUnitNotes(parsed: ParsedRecipe, extras: readonly string[]): Set<n
 export function draftFromParsed(parsed: ParsedRecipe, jsonExtras?: readonly string[]): Draft {
   let nextId = 1;
   const hiddenNotes = jsonExtras ? hiddenUnitNotes(parsed, jsonExtras) : new Set<number>();
-  const lines = (texts: string[]): DraftLine[] => texts.map((text) => ({ id: nextId++, text }));
+  const lines = (texts: string[]): DraftLine[] =>
+    texts.map((text) => ({ id: nextId++, text }));
   const draft: Draft = {
     title: parsed.title,
     ingredients: lines(parsed.ingredients.map(ingredientText)),

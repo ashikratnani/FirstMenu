@@ -175,6 +175,7 @@ export default function AddRecipe() {
     { kind: 'invalid'; errors: JsonIssue[] } | { kind: 'ai-error'; message: string } | null
   >(null);
   const [notices, setNotices] = useState({ extras: false, outside: false });
+  const [readAsJson, setReadAsJson] = useState(false);
   const [showReply, setShowReply] = useState(false);
   const [copyMessage, setCopyMessage] = useState('');
   const [draft, setDraft] = useState<Draft | null>(null);
@@ -206,6 +207,7 @@ export default function AddRecipe() {
     setMarked(new Set());
     setProblem(null);
     setShowReply(false);
+    setReadAsJson(false);
     setNotices({ extras: false, outside: false });
     const result = parseRecipeReply(source);
     if (result.kind === 'recipe') {
@@ -213,6 +215,7 @@ export default function AddRecipe() {
         extras: result.extras.length > 0,
         outside: result.outsideNotable,
       });
+      setReadAsJson(true);
       setDraft(draftFromParsed(result.parsed, result.extras));
     } else if (result.kind === 'no-json') {
       readAsPlainText(source, true);
@@ -226,6 +229,7 @@ export default function AddRecipe() {
     const parsed = parseRecipeText(source);
     if (withNotice) parsed.warnings = [PLAIN_TEXT_NOTICE, ...parsed.warnings];
     setProblem(null);
+    setReadAsJson(false);
     setDraft(draftFromParsed(parsed));
   }
 
@@ -314,8 +318,8 @@ export default function AddRecipe() {
     <div className={styles.page}>
       <h1 className={styles.heading}>Add recipe</h1>
       <p className={styles.intro}>
-        Paste ChatGPT's answer or an Instagram caption. FirstMenu reads it on your device and checks
-        it before you save.
+        Paste a recipe from ChatGPT or an Instagram caption. FirstMenu reads it
+        on your device and checks it before you save.
       </p>
 
       {draft === null && (
@@ -422,6 +426,11 @@ export default function AddRecipe() {
             {recipeNutritionTags(recipe).map((tag) => ` · ${tagLabel(tag)}`)}
           </p>
 
+          {readAsJson && (
+            <p className={styles.help} role="status">
+              Read as a FirstMenu recipe
+            </p>
+          )}
           {notices.extras && (
             <p className={styles.warning} role="status">
               Extra text was added to the notes. Check it below.

@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { spyOnNetwork } from '../../test/networkSpy';
 import AskChatGpt from './AskChatGpt';
 import { buildWrappedPrompt, PROMPT_NOTICE } from '../../domain/prompt';
 
@@ -16,13 +17,13 @@ function setup(have = ['rice', 'peas']) {
     value: { writeText, readText: vi.fn() },
     configurable: true,
   });
-  const fetchSpy = vi.spyOn(globalThis, 'fetch');
+  const network = spyOnNetwork();
   render(
     <MemoryRouter>
       <AskChatGpt ageMonths={10} stage="9-12" have={have} leaveOut={['Honey']} />
     </MemoryRouter>,
   );
-  return { user, writeText, fetchSpy };
+  return { user, writeText, network };
 }
 
 describe('AskChatGpt question box (Req 18.1 to 18.3, 18.12)', () => {
@@ -40,7 +41,7 @@ describe('AskChatGpt question box (Req 18.1 to 18.3, 18.12)', () => {
   });
 
   it('copies the wrapped prompt built from the edited question, with no network call', async () => {
-    const { user, writeText, fetchSpy } = setup();
+    const { user, writeText, network } = setup();
     await user.click(screen.getByRole('button', { name: 'Ask ChatGPT' }));
     const box = screen.getByRole('textbox', { name: 'Your question for ChatGPT' });
     await user.clear(box);
@@ -59,7 +60,7 @@ describe('AskChatGpt question box (Req 18.1 to 18.3, 18.12)', () => {
       'href',
       '/add?from=chatgpt',
     );
-    expect(fetchSpy).not.toHaveBeenCalled();
+    network.expectNoNetwork();
   });
 
   it('shows the full text to copy by hand when the clipboard fails', async () => {

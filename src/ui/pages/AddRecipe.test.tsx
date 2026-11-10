@@ -2,6 +2,7 @@ import { cleanup, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { spyOnNetwork } from '../../test/networkSpy';
 import AddRecipe, { INSTAGRAM_HELP, PASTE_FALLBACK, PLAIN_TEXT_NOTICE } from './AddRecipe';
 import validJson from '../../domain/__fixtures__/json/valid.json?raw';
 import fencedJson from '../../domain/__fixtures__/json/fenced-with-prose.txt?raw';
@@ -134,7 +135,7 @@ describe('Add recipe: paste, preview, save (Req 6.1, 6.4, 6.7, 6.8)', () => {
 
   it('records the source and link, and never fetches the link', async () => {
     const user = userEvent.setup();
-    const fetchSpy = vi.spyOn(globalThis, 'fetch');
+    const network = spyOnNetwork();
     const { getState } = renderAdd();
     await user.click(screen.getByRole('radio', { name: 'Instagram' }));
     expect(screen.getByRole('radio', { name: 'Instagram' })).toBeChecked();
@@ -146,7 +147,7 @@ describe('Add recipe: paste, preview, save (Req 6.1, 6.4, 6.7, 6.8)', () => {
       from: 'instagram',
       url: 'https://example.com/reel',
     });
-    expect(fetchSpy).not.toHaveBeenCalled();
+    network.expectNoNetwork();
   });
 
   it('rejects a link that is not a web address', async () => {
@@ -353,6 +354,7 @@ describe('Add recipe: Paste button (Req 17.7)', () => {
 describe('Add recipe: prompt helper (Req 8.1, 8.6 to 8.9)', () => {
   it('copies the question, then "Paste the answer" selects ChatGPT and moves to the paste box', async () => {
     const user = userEvent.setup();
+    const network = spyOnNetwork();
     renderAdd();
     const writeText = vi.fn().mockResolvedValue(undefined);
     Object.defineProperty(navigator, 'clipboard', {
@@ -371,6 +373,7 @@ describe('Add recipe: prompt helper (Req 8.1, 8.6 to 8.9)', () => {
     await user.click(screen.getByRole('button', { name: 'Paste the answer' }));
     expect(screen.getByRole('radio', { name: 'ChatGPT' })).toBeChecked();
     expect(screen.getByRole('textbox', { name: 'Recipe text' })).toHaveFocus();
+    network.expectNoNetwork();
   });
 });
 
@@ -389,19 +392,20 @@ function jsonWith(fields: Record<string, unknown>): string {
 describe('Add recipe: Recipe JSON intake (Req 18.3 to 18.12, 6.1)', () => {
   it('previews a JSON reply, keeps the raw reply as original text and saves', async () => {
     const user = userEvent.setup();
-    const fetchSpy = vi.spyOn(globalThis, 'fetch');
+    const network = spyOnNetwork();
     const { getState } = renderAdd('/add?from=chatgpt');
     await pasteAndRead(user, validJson);
     const preview = screen.getByRole('region', { name: 'Preview' });
     expect(within(preview).getByRole('textbox', { name: 'Title' })).toHaveValue('Egg and rice bowl');
     expect(within(preview).getByText('1 cup cooked rice')).toBeInTheDocument();
+    expect(screen.getByText('Read as a FirstMenu recipe')).toBeInTheDocument();
     expect(screen.queryByText(PLAIN_TEXT_NOTICE)).not.toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Save recipe' }));
     const recipe = getState().customRecipes[0];
     expect(recipe.imported).toMatchObject({ from: 'chatgpt', text: validJson });
     expect(recipe.statedMinutes).toBe(15);
     expect(recipe.servings).toBe(2);
-    expect(fetchSpy).not.toHaveBeenCalled();
+    network.expectNoNetwork();
   });
 
   it('reads a fenced reply, hides plain unit notes and says long outside text was ignored', async () => {
@@ -582,6 +586,7 @@ describe('Add recipe: Recipe JSON intake (Req 18.3 to 18.12, 6.1)', () => {
 
   it('shows field-level errors, a fix-up request and a plain-text escape for an invalid reply', async () => {
     const user = userEvent.setup();
+    const network = spyOnNetwork();
     renderAdd();
     const writeText = vi.fn().mockResolvedValue(undefined);
     Object.defineProperty(navigator, 'clipboard', {
@@ -598,6 +603,8 @@ describe('Add recipe: Recipe JSON intake (Req 18.3 to 18.12, 6.1)', () => {
 
     await user.click(screen.getByRole('button', { name: 'Read as plain text instead' }));
     expect(screen.getByRole('region', { name: 'Preview' })).toBeInTheDocument();
+    expect(screen.queryByText('Read as a FirstMenu recipe')).not.toBeInTheDocument();
+    network.expectNoNetwork();
   });
 
   it('explains a cut-off reply instead of reading it as plain text', async () => {

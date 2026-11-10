@@ -31,13 +31,7 @@ export const PASTE_ANSWER_PATH = '/add?from=chatgpt';
 
 export const CHATGPT_URL = 'https://chatgpt.com/';
 
-export default function AskChatGpt({
-  ageMonths,
-  stage,
-  have,
-  leaveOut,
-  onPasteAnswer,
-}: AskChatGptProps) {
+export default function AskChatGpt({ ageMonths, stage, have, leaveOut, onPasteAnswer }: AskChatGptProps) {
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState('');
   const [asked, setAsked] = useState(false);
