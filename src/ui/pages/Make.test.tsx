@@ -334,9 +334,10 @@ describe('Make screen empty state (Req 3.10)', () => {
     expect(screen.getByRole('heading', { name: 'Nothing fits yet' })).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Ask ChatGPT' }));
     const question = screen.getByRole('textbox', { name: 'Your question for ChatGPT' }) as HTMLTextAreaElement;
-    expect(question.value).toMatch(/10-month-old baby/);
-    // The question never carries the child's name (Req 8.5).
-    expect(question.value).not.toMatch(/Baby\b.*Baby/);
+    // Pre-filled from the foods on hand and editable (Req 18.1).
+    expect(question.value).toMatch(/^Suggest one quick and easy recipe using: /);
+    expect(question).not.toHaveAttribute('readonly');
+    expect(question).toHaveAttribute('maxlength', '1000');
     expect(screen.getByRole('link', { name: 'Open ChatGPT' })).toHaveAttribute('target', '_blank');
   });
 

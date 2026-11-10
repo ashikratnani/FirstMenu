@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
   buildFixupPrompt,
-  buildPrompt,
   buildReelPrompt,
   buildWrappedPrompt,
   leaveOutFor,
@@ -13,28 +12,16 @@ import { stageFor } from './age';
 import { defaultState } from './storage';
 import type { AppState } from './types';
 
-function promptFor(ageMonths: number, state: AppState, have = ['chicken', 'rice', 'peas']): string {
-  return buildPrompt({
+function promptFor(ageMonths: number, state: AppState, question = 'Something with chicken, rice, peas'): string {
+  return buildWrappedPrompt({
+    question,
     ageMonths,
-    have,
     stage: stageFor(ageMonths),
     leaveOut: leaveOutFor(ageMonths, state.foods),
   });
 }
 
 const state = defaultState(new Date(2026, 0, 15));
-
-describe('buildPrompt (kept for the current UI until task 11.6)', () => {
-  it('wraps the old sentence as the question and has no free-text reply format', () => {
-    const text = promptFor(10, state);
-    expect(text).toContain(
-      'Suggest one quick and easy recipe using: chicken, rice, peas. If you can, include an iron-rich food.',
-    );
-    expect(text).not.toContain('Reply in exactly this format and nothing else');
-    expect(text).not.toContain('Title: <name>');
-    expect(text).toContain(RECIPE_JSON_TEMPLATE);
-  });
-});
 
 describe('buildWrappedPrompt content (Requirements 8.2 - 8.4, 18.2)', () => {
   const wrapped = (months: number, question = 'Something with eggs', leaveOut = leaveOutFor(months, {})) =>
@@ -157,9 +144,9 @@ describe('leave-out list', () => {
     const list = leaveOutFor(13, foods);
     expect(list).toContain('egg');
     expect(list).not.toContain('pear');
-    const text = buildPrompt({
+    const text = buildWrappedPrompt({
+      question: 'Something with rice',
       ageMonths: 13,
-      have: ['rice'],
       stage: '12-23',
       leaveOut: list,
     });

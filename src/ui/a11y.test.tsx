@@ -376,6 +376,36 @@ describe('Accessibility: axe on every main page (color-contrast disabled)', () =
     });
   });
 
+  describe('Add recipe JSON states', () => {
+    async function expectNoViolations(container: HTMLElement) {
+      const results = await axe(container, AXE_OPTIONS);
+      expect(results).toHaveNoViolations();
+    }
+
+    async function readReply(reply: string) {
+      const user = userEvent.setup();
+      const { container } = renderApp('/add', seededState({}));
+      await user.click(await screen.findByRole('textbox', { name: 'Recipe text' }));
+      await user.paste(reply);
+      await user.click(screen.getByRole('button', { name: 'Read recipe' }));
+      return container;
+    }
+
+    it('the invalid-reply state has no violations', async () => {
+      const container = await readReply('{"firstmenu_recipe": 1, "title": "", "ingredients": []}');
+      expect(await screen.findByRole('button', { name: 'Copy a fix-up request' })).toBeInTheDocument();
+      await expectNoViolations(container);
+    });
+
+    it('the JSON preview with notices has no violations', async () => {
+      const container = await readReply(
+        '{"firstmenu_recipe":1,"title":"Oat mash","ingredients":[{"name":"oats","unit":"cup","extra":"x"}],"steps":["Cook."]}\nAlso {"other": true}',
+      );
+      expect(await screen.findByText(/Extra text was added/)).toBeInTheDocument();
+      await expectNoViolations(container);
+    });
+  });
+
   it('Onboarding (not onboarded) has no axe violations', async () => {
     // Render with onboarded:false so the onboarding form shows instead of the
     // gate redirecting. The gate exempts /onboarding, so the form renders.
