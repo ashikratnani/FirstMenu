@@ -365,6 +365,12 @@ describe('built-in recipes derive clean food keys (Item 3)', () => {
       'spice',
       'spinach',
       'baking powder',
+      // Simple ideas (batch 1) add these; mozzarella, bread and egg dedup into
+      // the allergen keys above.
+      'peach',
+      'green bean',
+      'cauliflower',
+      'bean',
     ]);
   });
 

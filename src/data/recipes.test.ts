@@ -2,7 +2,8 @@ import { describe, expect, it } from 'vitest';
 import type { AllergenGroup, GroceryCategory, MealType, StageId } from '../domain/types';
 import { STAGE_IDS, STAGE_MIN_MONTHS } from '../domain/age';
 import { screenRecipe } from '../domain/safety/screen';
-import { BUILTIN_RECIPES, INFANT_PORTION_OZ, estimateServings } from './recipes';
+import { BUILTIN_RECIPES, INFANT_PORTION_OZ, RECIPES, estimateServings } from './recipes';
+import { SIMPLE_IDEAS } from './simpleIdeas';
 
 // ---------------------------------------------------------------------------
 // COVERAGE SCOPE: OPTION 4 REDUCED FIRST BATCH (maintainer decision, issue #7)
@@ -185,12 +186,12 @@ describe('BUILTIN_RECIPES - servings (Option A deterministic estimate, issue #9)
 
   it('every recipe has a pinned servings expectation', () => {
     const expected = new Set(Object.keys(SERVINGS_BY_ID));
-    const actual = new Set(BUILTIN_RECIPES.map((r) => r.id));
+    const actual = new Set(RECIPES.map((r) => r.id));
     expect(actual).toEqual(expected);
   });
 
   it('each recipe servings matches the rule (or the source yield) and cannot drift', () => {
-    for (const recipe of BUILTIN_RECIPES) {
+    for (const recipe of RECIPES) {
       const expectation = SERVINGS_BY_ID[recipe.id];
       expect(expectation, `${recipe.id} must have a servings expectation`).toBeDefined();
       if (!expectation) continue;
@@ -217,10 +218,11 @@ describe('BUILTIN_RECIPES - servings (Option A deterministic estimate, issue #9)
 });
 
 describe('BUILTIN_RECIPES - coverage of the Option 4 shipped batch (issue #7 defers the rest)', () => {
-  it('matches the shipped recipe count', () => {
-    // Guards the current batch transcribed from the two Minnesota WIC pages.
-    // When issue #7 adds more sourced recipes, raise this count then.
-    expect(BUILTIN_RECIPES.length).toBe(10);
+  it('ships the 10 sourced recipes plus 1 to 25 simple ideas', () => {
+    expect(RECIPES.length).toBe(10);
+    expect(SIMPLE_IDEAS.length).toBeGreaterThanOrEqual(1);
+    expect(SIMPLE_IDEAS.length).toBeLessThanOrEqual(25);
+    expect(BUILTIN_RECIPES.length).toBe(RECIPES.length + SIMPLE_IDEAS.length);
   });
 
   it('represents both stages (6-8 and 9-12)', () => {
@@ -249,5 +251,95 @@ describe('BUILTIN_RECIPES - coverage of the Option 4 shipped batch (issue #7 def
     for (const group of EXPECTED_ALLERGEN_GROUPS) {
       expect(covered.has(group), `shipped batch should cover allergen group "${group}"`).toBe(true);
     }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Batch 1 (task 14.2): toddler tags, serveAs, simple ideas
+// ---------------------------------------------------------------------------
+const WIC_TAGS: Record<string, { stages: StageId[]; serveAs: string[] }> = {
+  'b-beef-peas-potatoes': { stages: ['6-8', '9-12'], serveAs: ['puree', 'mashed'] },
+  'b-chicken-broccoli-rice': { stages: ['6-8', '9-12'], serveAs: ['puree', 'mashed'] },
+  'b-beef-squash-macaroni': { stages: ['6-8', '9-12'], serveAs: ['puree', 'mashed'] },
+  'b-carrots-and-apples': { stages: ['6-8', '9-12'], serveAs: ['puree', 'mashed'] },
+  'b-sweet-potato-chicken': { stages: ['6-8', '9-12'], serveAs: ['puree', 'mashed'] },
+  'b-apple-rice-pudding': { stages: ['6-8', '9-12'], serveAs: ['puree'] },
+  'b-cereal-pancakes': { stages: ['9-12', '12-23', '24-36'], serveAs: ['finger-food'] },
+  'b-meat-balls': { stages: ['9-12', '12-23', '24-36'], serveAs: ['finger-food', 'pieces'] },
+  'b-spinach-apple-puffs': { stages: ['9-12', '12-23', '24-36'], serveAs: ['finger-food'] },
+  'b-sweet-potato-puffs': { stages: ['9-12', '12-23', '24-36'], serveAs: ['finger-food'] },
+};
+
+describe('BUILTIN_RECIPES - batch 1', () => {
+  it('every built-in has at least one serveAs', () => {
+    for (const recipe of BUILTIN_RECIPES) {
+      expect(recipe.serveAs?.length ?? 0, `${recipe.id} serveAs`).toBeGreaterThan(0);
+    }
+  });
+
+  it('the 10 WIC recipes have the decided stages and serveAs', () => {
+    expect(Object.keys(WIC_TAGS).sort()).toEqual(RECIPES.map((r) => r.id).sort());
+    for (const recipe of RECIPES) {
+      expect(recipe.stages, `${recipe.id} stages`).toEqual(WIC_TAGS[recipe.id].stages);
+      expect(recipe.serveAs, `${recipe.id} serveAs`).toEqual(WIC_TAGS[recipe.id].serveAs);
+    }
+  });
+
+  it('simple ideas are simple-idea kind, built-in, have no quantities and 1 to 2 foods', () => {
+    for (const idea of SIMPLE_IDEAS) {
+      expect(idea.kind, idea.id).toBe('simple-idea');
+      expect(idea.id.startsWith('b-idea-'), idea.id).toBe(true);
+      expect(idea.ingredients.length, idea.id).toBeGreaterThanOrEqual(1);
+      expect(idea.ingredients.length, idea.id).toBeLessThanOrEqual(2);
+      expect(idea.steps.length, idea.id).toBeLessThanOrEqual(3);
+      expect(idea.servings, idea.id).toBe(1);
+      for (const ing of idea.ingredients) {
+        expect(ing.quantity, `${idea.id} ${ing.name}`).toBeUndefined();
+      }
+    }
+  });
+
+  it('full recipes keep quantities and are not simple ideas', () => {
+    for (const recipe of RECIPES) {
+      expect(recipe.kind).not.toBe('simple-idea');
+      expect(
+        recipe.ingredients.some((i) => i.quantity !== undefined),
+        `${recipe.id} has quantities`,
+      ).toBe(true);
+    }
+  });
+
+  it('pureed or mashed only recipes and ideas are not tagged for toddler stages', () => {
+    for (const idea of BUILTIN_RECIPES) {
+      const softPieces = idea.serveAs?.some((s) => s === 'pieces' || s === 'finger-food');
+      const toddler = idea.stages.some((s) => s === '12-23' || s === '24-36');
+      if (!softPieces) expect(toddler, idea.id).toBe(false);
+    }
+  });
+
+  // Maintainer decision on issue #46 (option b): the Utah 8 month items say "ground or
+  // finely chopped", so they are tagged 9-12 and later only, never 6-8.
+  it('tags the Utah 8 month items 9-12 and later only, not 6-8', () => {
+    for (const id of [
+      'b-idea-chopped-peaches',
+      'b-idea-chopped-carrots',
+      'b-idea-mashed-rice',
+      'b-idea-ground-beef',
+    ]) {
+      const idea = SIMPLE_IDEAS.find((i) => i.id === id);
+      expect(idea, id).toBeDefined();
+      expect(idea?.stages, id).toContain('9-12');
+      expect(idea?.stages, id).not.toContain('6-8');
+    }
+  });
+
+  it('has enough recipes in the 6-8 stage and covers dairy, egg and wheat at 12 months', () => {
+    const count = (stage: StageId) => BUILTIN_RECIPES.filter((r) => r.stages.includes(stage)).length;
+    expect(count('6-8')).toBeGreaterThanOrEqual(10);
+    expect(count('9-12')).toBeGreaterThanOrEqual(10);
+    expect(count('12-23')).toBeGreaterThanOrEqual(8);
+    expect(count('24-36')).toBeGreaterThanOrEqual(7);
+    const covered = coveredAllergenGroups();
+    for (const group of ['dairy', 'egg', 'wheat'] as AllergenGroup[]) expect(covered.has(group)).toBe(true);
   });
 });

@@ -120,9 +120,9 @@ Branch names use the `v2/` prefix (for example `v2/6-paste-parser`) so they don'
     - _Requirements: 15.1, 15.5, 15.8_
 
 - [ ] 14. More built-in recipes (starts after task 1, runs in batches alongside tasks 2–13)
-  - [ ] 14.1 Move built-in recipe data into its own build chunk and report its gzipped size. Ships in the batch 1 PR, before any recipes are added, so every batch PR can report the chunk size.
+  - [x] 14.1 Move built-in recipe data into its own build chunk and report its gzipped size. Ships in the batch 1 PR, before any recipes are added, so every batch PR can report the chunk size.
     - _Requirements: 15.6_
-  - [ ] 14.2 Batch 1: re-tag the 10 Minnesota WIC recipes for toddler stages where the texture fits, set `serveAs` on them, and add simple ideas from WIC and USDA feeding guides to `data/simpleIdeas.ts` (at most 25 in total).
+  - [x] 14.2 Batch 1: re-tag the 10 Minnesota WIC recipes for toddler stages where the texture fits, set `serveAs` on them, and add simple ideas from WIC and USDA feeding guides to `data/simpleIdeas.ts` (at most 25 in total).
     - _Requirements: 13.2, 14.2, 14.4, 14.5, 14.8, 16.13_
   - [ ] 14.3 Batches 2 onward: add ICN Child Nutrition Recipe Box and Food Hero recipes, and recipes from other publishers that meet the recipe source criteria (new publishers go through pr-reviewer and into `docs/recipe-sources.md`), about 20 per PR, following the expansion rules in the design, with `serveAs` set on each. Prioritize missing allergen groups first, then stage counts. Open a `Recipe review: batch <n>` issue for each batch.
     - _Requirements: 14.2, 14.3, 14.5, 14.8, 16.13_
