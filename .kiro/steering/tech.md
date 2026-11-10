@@ -27,7 +27,8 @@ calls an AI service.
   they never clash with Astryx tokens. Astryx's `reset.css` stays off as a
   separate decision (it was not turned on when task 13 converted the pages).
   After task 13 these stay native on purpose: `<select>` (recipe page "Add to
-  plan", editor ingredient category) and `<input type="date">` (issue #37). The
+  plan", editor ingredient category) and `<input type="date">` (issue #37; also the Prep page prep-day input,
+  which is the only native control left in `Prep.tsx`). The
   recipe editor's number fields are Astryx `TextInput` with
   `inputMode="decimal"`; `validateForm` in `RecipeEditor.tsx` checks them
   (servings and minutes whole numbers above 0, quantity above 0, fridge days
