@@ -27,6 +27,14 @@ function makeStorage(): Storage {
 // Render the shell with a trivial routed child so <Outlet/> has something to
 // show. Uses an in-memory Storage so AppProvider does not touch real
 // localStorage (matching the component-test pattern in App.test.tsx).
+/** The shell's "Add recipe" button. The main nav also has an "Add recipe"
+ * item with the same destination, so pick the one that is a Button. */
+function addRecipeButton(): HTMLElement | undefined {
+  return screen
+    .queryAllByRole('link', { name: 'Add recipe' })
+    .find((a) => a.hasAttribute('data-variant'));
+}
+
 function renderShell(initialPath = '/') {
   const storage = makeStorage();
 
@@ -36,6 +44,8 @@ function renderShell(initialPath = '/') {
         <Routes>
           <Route element={<Layout />}>
             <Route path="/" element={<p>home content</p>} />
+            <Route path="/plan" element={<p>plan content</p>} />
+            <Route path="/prep" element={<p>prep content</p>} />
             <Route path="/recipes" element={<p>recipes content</p>} />
             <Route path="/recipes/new" element={<p>editor content</p>} />
             <Route path="*" element={<p>other content</p>} />
@@ -58,19 +68,37 @@ describe('Layout (app shell)', () => {
     renderShell();
     const nav = screen.getByRole('navigation', { name: /primary/i });
     const expected: Array<[RegExp, string]> = [
-      [/week/i, '/'],
-      [/recipes/i, '/recipes'],
-      [/foods/i, '/foods'],
-      [/prep/i, '/prep'],
-      [/grocery/i, '/grocery'],
-      [/share/i, '/share'],
-      [/sources/i, '/sources'],
-      [/settings/i, '/settings'],
+      [/^make$/i, '/'],
+      [/^my recipes$/i, '/recipes'],
+      [/^add recipe$/i, '/add'],
+      [/^foods$/i, '/foods'],
+      [/^plan$/i, '/plan'],
+      [/^sources$/i, '/sources'],
+      [/^settings$/i, '/settings'],
     ];
     for (const [name, href] of expected) {
-      const link = within(nav).getByRole('link', { name });
-      expect(link).toHaveAttribute('href', href);
+      const links = within(nav).getAllByRole('link', { name });
+      expect(links[0]).toHaveAttribute('href', href);
     }
+  });
+
+  it('lists the main navigation in the required order (Req 1.2)', () => {
+    renderShell();
+    const nav = screen.getByRole('navigation', { name: /primary/i });
+    const labels = within(nav)
+      .getAllByRole('link')
+      .map((a) => a.textContent?.trim())
+      // The shell's own "FirstMenu" heading link is not a nav item.
+      .filter((t) => t !== 'FirstMenu');
+    expect(labels.slice(0, 7)).toEqual([
+      'Make',
+      'My recipes',
+      'Add recipe',
+      'Foods',
+      'Plan',
+      'Sources',
+      'Settings',
+    ]);
   });
 
   it('renders a skip-to-content link targeting the main region', () => {
@@ -91,48 +119,63 @@ describe('Layout (app shell)', () => {
 
   it('hides the "Add recipe" action on the recipe editor itself', () => {
     renderShell('/recipes/new');
-    expect(
-      screen.queryByRole('link', { name: 'Add recipe' }),
-    ).not.toBeInTheDocument();
+    expect(addRecipeButton()).toBeUndefined();
   });
 
   it('hides the "Add recipe" action during onboarding', () => {
     renderShell('/onboarding');
-    expect(
-      screen.queryByRole('link', { name: 'Add recipe' }),
-    ).not.toBeInTheDocument();
+    expect(addRecipeButton()).toBeUndefined();
   });
 
   it.each(['/settings', '/print', '/recipes/r1/edit'])(
     'shows "Add recipe" as a secondary button on %s, which has its own primary action',
     (path) => {
       renderShell(path);
-      expect(screen.getByRole('link', { name: 'Add recipe' })).toHaveAttribute(
-        'data-variant',
-        'secondary',
-      );
+      expect(addRecipeButton()).toHaveAttribute('data-variant', 'secondary');
     },
   );
 
   it('shows "Add recipe" as the primary button on the week plan', () => {
-    renderShell('/');
-    expect(screen.getByRole('link', { name: 'Add recipe' })).toHaveAttribute(
-      'data-variant',
-      'primary',
-    );
+    renderShell('/plan');
+    expect(addRecipeButton()).toHaveAttribute('data-variant', 'primary');
   });
 
-  it('shows one primary "Add recipe" action linking to the recipe editor', () => {
+  it('shows one primary "Add recipe" action linking to the Add recipe page', () => {
     renderShell();
-    const add = screen.getByRole('link', { name: 'Add recipe' });
-    expect(add).toHaveAttribute('href', '/recipes/new');
+    expect(addRecipeButton()).toHaveAttribute('href', '/add');
   });
 
   it('marks the active route with aria-current', () => {
     renderShell('/recipes');
     const nav = screen.getByRole('navigation', { name: /primary/i });
-    const recipesLink = within(nav).getByRole('link', { name: /recipes/i });
+    const recipesLink = within(nav).getByRole('link', { name: 'My recipes' });
     expect(recipesLink).toHaveAttribute('aria-current', 'page');
+  });
+
+  it('marks Plan as current on every Plan route, and shows its sub-nav', () => {
+    for (const path of ['/plan', '/prep', '/grocery', '/share', '/print']) {
+      const { unmount } = renderShell(path);
+      const nav = screen.getByRole('navigation', { name: /primary/i });
+      expect(within(nav).getByRole('link', { name: 'Plan' })).toHaveAttribute(
+        'aria-current',
+        'page',
+      );
+      expect(
+        screen.getByRole('navigation', { name: 'Plan' }),
+      ).toBeInTheDocument();
+      unmount();
+    }
+  });
+
+  it('marks Add recipe (not My recipes) as current on the typed editor', () => {
+    renderShell('/recipes/new');
+    const nav = screen.getByRole('navigation', { name: /primary/i });
+    expect(
+      within(nav).getByRole('link', { name: 'My recipes' }),
+    ).not.toHaveAttribute('aria-current');
+    expect(
+      within(nav).getAllByRole('link', { name: 'Add recipe' })[0],
+    ).toHaveAttribute('aria-current', 'page');
   });
 
   // Regression test for the HashRouter skip-link bug: a plain href="#main"

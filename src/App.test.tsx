@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, expect, it } from 'vitest';
 import App from './App';
@@ -50,12 +50,76 @@ function renderApp(initialPath = '/') {
 }
 
 describe('App', () => {
-  it('renders the home page heading', () => {
+  it('renders the Make screen at / (the week plan moved to /plan)', () => {
     renderApp();
-    // Home renders the week grid under the heading "This week"; the shared
-    // header's "FirstMenu" h1 is a different heading, so target Home's own.
+    expect(
+      screen.getByRole('heading', { name: /what can i make/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('heading', { name: /this week/i }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('renders the week grid at /plan with the Plan sub-navigation', () => {
+    renderApp('/plan');
     expect(
       screen.getByRole('heading', { name: /this week/i }),
+    ).toBeInTheDocument();
+    const sub = screen.getByRole('navigation', { name: 'Plan' });
+    const expected = [
+      ['Week', '/plan'],
+      ['Prep', '/prep'],
+      ['Grocery', '/grocery'],
+      ['Share', '/share'],
+      ['Print', '/print'],
+    ];
+    const links = within(sub).getAllByRole('link');
+    expect(links).toHaveLength(expected.length);
+    expected.forEach(([name, href], i) => {
+      expect(links[i]).toHaveAccessibleName(name);
+      expect(links[i]).toHaveAttribute('href', href);
+    });
+    // Astryx Tab marks the current link with aria-current="true".
+    expect(within(sub).getByRole('link', { name: 'Week' })).toHaveAttribute(
+      'aria-current',
+      'true',
+    );
+  });
+
+  // Requirement 1.4: old links keep working, and each shows the sub-nav with
+  // its own item current.
+  it.each([
+    ['/prep', 'Prep', /^prep$/i],
+    ['/grocery', 'Grocery', /^grocery$/i],
+    ['/share', 'Share', /^share$/i],
+    ['/print', 'Print', /^print your week$/i],
+  ])('keeps %s working under the Plan sub-navigation', (path, label, h1) => {
+    renderApp(path);
+    expect(screen.getByRole('heading', { level: 1, name: h1 })).toBeInTheDocument();
+    const sub = screen.getByRole('navigation', { name: 'Plan' });
+    expect(within(sub).getByRole('link', { name: label })).toHaveAttribute(
+      'aria-current',
+      'true',
+    );
+    // The main nav marks Plan as current too.
+    const main = screen.getByRole('navigation', { name: 'Primary' });
+    expect(within(main).getByRole('link', { name: 'Plan' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
+  });
+
+  it('does not show the Plan sub-navigation on other pages', () => {
+    renderApp('/recipes');
+    expect(
+      screen.queryByRole('navigation', { name: 'Plan' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('opens the typed editor from /add until the Add recipe page exists', () => {
+    renderApp('/add');
+    expect(
+      screen.getByRole('heading', { name: /^new recipe$/i }),
     ).toBeInTheDocument();
   });
 
@@ -86,7 +150,7 @@ describe('App', () => {
   });
 
   it('renders normal routes once onboarded', () => {
-    renderApp();
+    renderApp('/plan');
     expect(
       screen.getByRole('heading', { name: /this week/i }),
     ).toBeInTheDocument();

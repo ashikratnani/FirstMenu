@@ -2,7 +2,7 @@ import { fireEvent, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, expect, it, beforeEach } from 'vitest';
-import Home from './Home';
+import Plan from './Plan';
 import { AppProvider, useApp } from '../../state/AppProvider';
 import { STORAGE_KEY, defaultState } from '../../domain/storage';
 import type { AppState, MealType, Recipe } from '../../domain/types';
@@ -108,9 +108,9 @@ function seedState(
 function renderHome(seed?: AppState) {
   return render(
     <AppProvider storage={makeStorage(seed)}>
-      <MemoryRouter initialEntries={['/']}>
+      <MemoryRouter initialEntries={['/plan']}>
         <StateProbe />
-        <Home />
+        <Plan />
       </MemoryRouter>
     </AppProvider>,
   );
@@ -123,7 +123,7 @@ function daysWith(recipeId: string): AppState['plan']['days'] {
   return days;
 }
 
-describe('Home week view', () => {
+describe('Plan week view', () => {
   beforeEach(() => {
     captured = null;
   });
@@ -207,7 +207,7 @@ describe('Home week view', () => {
 
   it('recording a reaction ghosts an already-planned slot on re-render (derived, not cached)', async () => {
     const user = userEvent.setup();
-    // Render Home plus a tiny control that dispatches the reaction, proving the
+    // Render Plan plus a tiny control that dispatches the reaction, proving the
     // slot re-derives its ghost state from recipeView after a reaction.
     function ReactionButton() {
       const { dispatch } = useApp();
@@ -232,9 +232,9 @@ describe('Home week view', () => {
           seedState(10, [EGG_RECIPE], ['breakfast'], daysWith('custom-egg')),
         )}
       >
-        <MemoryRouter initialEntries={['/']}>
+        <MemoryRouter initialEntries={['/plan']}>
           <ReactionButton />
-          <Home />
+          <Plan />
         </MemoryRouter>
       </AppProvider>,
     );

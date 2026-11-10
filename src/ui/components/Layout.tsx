@@ -26,18 +26,36 @@ import {
 import RouterLinkProvider from '../theme/RouterLinkProvider';
 import styles from './Layout.module.css';
 import Disclaimer, { FirstRunDisclaimer } from './Disclaimer';
+import PlanNav from './PlanNav';
+import { isPlanPath } from './planNav';
 import StorageBanner from './StorageBanner';
 
-/** Primary navigation entries. Task 9 regroups these under Make and Plan. */
-const NAV_ITEMS: ReadonlyArray<{ to: string; label: string; end?: boolean }> = [
-  { to: '/', label: 'Week', end: true },
-  { to: '/recipes', label: 'Recipes' },
-  { to: '/foods', label: 'Foods' },
-  { to: '/prep', label: 'Prep' },
-  { to: '/grocery', label: 'Grocery' },
-  { to: '/share', label: 'Share' },
-  { to: '/sources', label: 'Sources' },
-  { to: '/settings', label: 'Settings' },
+/**
+ * Primary navigation entries (Requirement 1.2), in order. `match` lists the
+ * paths that mark an item as current: the Plan item also covers the prep,
+ * grocery, share and print routes, and Add recipe covers the typed editor.
+ */
+const NAV_ITEMS: ReadonlyArray<{
+  to: string;
+  label: string;
+  match: (pathname: string) => boolean;
+}> = [
+  { to: '/', label: 'Make', match: (p) => p === '/' },
+  {
+    to: '/recipes',
+    label: 'My recipes',
+    match: (p) =>
+      (p === '/recipes' || p.startsWith('/recipes/')) && p !== '/recipes/new',
+  },
+  {
+    to: '/add',
+    label: 'Add recipe',
+    match: (p) => p === '/add' || p === '/recipes/new',
+  },
+  { to: '/foods', label: 'Foods', match: (p) => p === '/foods' },
+  { to: '/plan', label: 'Plan', match: isPlanPath },
+  { to: '/sources', label: 'Sources', match: (p) => p === '/sources' },
+  { to: '/settings', label: 'Settings', match: (p) => p === '/settings' },
 ];
 
 /**
@@ -49,7 +67,13 @@ const NAV_ITEMS: ReadonlyArray<{ to: string; label: string; end?: boolean }> = [
  * - primary everywhere else.
  */
 function addRecipeVariant(pathname: string): 'primary' | 'secondary' | null {
-  if (pathname === '/recipes/new' || pathname === '/onboarding') return null;
+  if (
+    pathname === '/recipes/new' ||
+    pathname === '/add' ||
+    pathname === '/onboarding'
+  ) {
+    return null;
+  }
   if (
     pathname === '/settings' ||
     pathname === '/print' ||
@@ -58,11 +82,6 @@ function addRecipeVariant(pathname: string): 'primary' | 'secondary' | null {
     return 'secondary';
   }
   return 'primary';
-}
-
-function isActive(pathname: string, to: string, end?: boolean): boolean {
-  if (end) return pathname === to;
-  return pathname === to || pathname.startsWith(`${to}/`);
 }
 
 /** Intercept fragment links (the AppShell skip link) so HashRouter never sees them. */
@@ -90,7 +109,7 @@ export default function Layout() {
       heading={<TopNavHeading heading="FirstMenu" headingHref="/" />}
       endContent={
         addVariant && (
-          <Button label="Add recipe" variant={addVariant} href="/recipes/new" />
+          <Button label="Add recipe" variant={addVariant} href="/add" />
         )
       }
     >
@@ -99,7 +118,7 @@ export default function Layout() {
           key={item.to}
           label={item.label}
           href={item.to}
-          isSelected={isActive(pathname, item.to, item.end)}
+          isSelected={item.match(pathname)}
         />
       ))}
     </TopNav>
@@ -114,6 +133,7 @@ export default function Layout() {
                 (Req 13.1) show above the routed page on every route. */}
             <StorageBanner />
             <FirstRunDisclaimer />
+            {isPlanPath(pathname) && <PlanNav pathname={pathname} />}
             <Outlet />
           </div>
         </AppShell>
