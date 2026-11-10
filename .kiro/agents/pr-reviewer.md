@@ -71,7 +71,7 @@ You review pull requests for FirstMenu (`ashikratnani/FirstMenu`), a baby meal p
 
 **Toddlers and recipe expansion** (active spec Requirements 13, 14)
 - Stage boundaries match the design; rules that end at 12 or 24 months are not changed.
-- Recipe batch PRs: about 20 recipes, a `Recipe review: batch <n>` issue linked, the recipe chunk's gzipped size reported, simple ideas still at most 25, no near-duplicates of existing recipes.
+- Recipe batch PRs: about 50 recipes (40 to 60), the stage by effort count table pasted, a `Recipe review: batch <n>` issue linked, the recipe chunk's gzipped size reported, simple ideas still at most 40, no near-duplicates of existing recipes.
 - New built-in recipes come only from publishers listed in `docs/recipe-sources.md` with an "Approved" verdict (by the maintainer or by you), or a new publisher you approve in this PR under "Decisions you make". Scaling stays within 2–6 servings with every quantity scaled by the same factor, and is recorded. Simple ideas have `kind: 'simple-idea'`.
 - A recipe tagged for a stage has no block findings at that stage's youngest age.
 

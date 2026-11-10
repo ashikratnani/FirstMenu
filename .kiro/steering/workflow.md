@@ -7,7 +7,7 @@ inclusion: always
 ## Branches and PRs
 
 - One branch and one PR per top-level task in the active spec's `tasks.md` (`.kiro/specs/what-can-i-make/tasks.md`). Branch name: `v2/<number>-<short-name>`, such as `v2/6-paste-parser`. (v1 used `task/<number>-...`; don't reuse those names.)
-- Exception: active spec task 14 (built-in recipes) is split into one PR per batch of about 20 recipes, branch `v2/14-recipes-batch-<n>`, and runs alongside the other tasks.
+- Exception: active spec task 14 (built-in recipes) is split into one PR per batch of about 50 recipes, branch `v2/14-recipes-batch-<n>`, and runs alongside the other tasks.
 - Small follow-up fixes can be a separate PR named `fix/<short-name>`.
 - The PR body lists the task ids completed, the requirement ids covered, what was tested, and anything the maintainer should know.
 - Tick the completed task checkboxes in `tasks.md` in the same PR.
