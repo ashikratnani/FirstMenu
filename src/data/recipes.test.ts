@@ -877,7 +877,7 @@ const BATCH_4_EXPECTED: Record<string, Batch3Expectation> = {
   'b-icn-gochujang-tofu': { publisher: ICN, stages: ['24-36'], serveAs: ['pieces'], allergens: ['sesame', 'soy'], servings: 6 },
   'b-fh-sweet-potato-and-orange-muffins': { publisher: FH, stages: ['12-23', '24-36'], serveAs: ['finger-food'], allergens: ['egg', 'wheat'], servings: 12, estimateNote: 'Serving count is an estimate (source gives no servings): 12 muffins, 1 muffin per serving.' },
   'b-fh-easy-manicotti': { publisher: FH, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: ['dairy', 'egg', 'wheat'], servings: 14, estimateNote: 'Serving count is an estimate (source gives no servings): 14 filled shells, 1 shell per serving.' },
-  'b-icn-mediterranean-tuna-salad': { publisher: ICN, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: ['fish', 'wheat'], servings: 6 },
+  'b-icn-mediterranean-tuna-salad': { publisher: ICN, stages: ['24-36'], serveAs: ['pieces'], allergens: ['fish', 'wheat'], servings: 6 },
   'b-fh-jack-o-lantern-pumpkin-pancakes': { publisher: FH, stages: ['9-12', '12-23', '24-36'], serveAs: ['finger-food'], allergens: ['dairy', 'egg', 'wheat'], servings: 8, estimateNote: 'Serving count is an estimate (source gives no servings): 16 4-inch pancakes, 2 pancakes per serving.' },
   'b-fh-sauteed-peppers': { publisher: FH, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: [], servings: 8, estimateNote: ESTIMATE_HALF_CUP },
   'b-fh-garlic-bok-choy': { publisher: FH, stages: ['24-36'], serveAs: ['pieces'], allergens: [], servings: 4, estimateNote: ESTIMATE_HALF_CUP },
@@ -1075,7 +1075,7 @@ describe('BUILTIN_RECIPES - batch 4', () => {
     const cellCount = (stage: StageId, effort: Effort) =>
       BATCH_4_RECIPES.filter((r) => r.stages.includes(stage) && recipeEffort(r) === effort).length;
     expect(cellCount('12-23', 'easy')).toBeGreaterThanOrEqual(2);
-    expect(cellCount('12-23', 'medium')).toBeGreaterThanOrEqual(14);
+    expect(cellCount('12-23', 'medium')).toBeGreaterThanOrEqual(13);
     expect(cellCount('6-8', 'easy')).toBeGreaterThanOrEqual(3);
     expect(cellCount('6-8', 'medium')).toBeGreaterThanOrEqual(2);
     const groupCount = (group: string) =>

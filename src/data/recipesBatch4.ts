@@ -936,7 +936,7 @@ export const BATCH_4_RECIPES: Recipe[] = [
     steps: [
       'Wash your hands. In a medium bowl, blend the strawberries and peanut butter with a hand or stand mixer until smooth, then let it sit for 10 to 15 minutes to settle.',
       'Put 1/2 cup of the strawberry and peanut butter mixture in a 6 fl oz cup or bowl and top it with 1/4 cup mini graham crackers (or 14 g crushed graham crackers).',
-      'Serve right away or keep cold at 40°F or lower.',
+      'Serve right away or keep cold at 40°F or lower. The source warns that nut butters can be a choking risk for children under 4, so serve it in a thin layer.',
     ],
     texture: 'smooth berry peanut butter dip with crisp crackers',
     servings: 6,
@@ -1565,7 +1565,7 @@ export const BATCH_4_RECIPES: Recipe[] = [
     servings: 14,
   },
   {
-    // Tuna, carrot, cucumber and peas in Italian dressing, served in whole-wheat pita pockets.
+    // Tuna, carrot, cucumber and peas in Italian dressing, served in whole-wheat pita pockets. 24-36 only because the fat-free Italian dressing is salty.
     id: 'b-icn-mediterranean-tuna-salad',
     origin: 'builtin',
     source: {
@@ -1576,7 +1576,7 @@ export const BATCH_4_RECIPES: Recipe[] = [
       adaptations: [],
     },
     title: 'Mediterranean Tuna Salad',
-    stages: ['12-23', '24-36'],
+    stages: ['24-36'],
     serveAs: ['pieces'],
     mealTypes: ['lunch'],
     ingredients: [
