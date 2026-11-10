@@ -20,7 +20,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 // vitest-axe's /matchers subpath re-exports `toHaveNoViolations` through an
 // aliased chunk .d.ts, which TS (under `isolatedModules` + bundler resolution)
@@ -188,6 +188,9 @@ function renderApp(path: string, seed: AppState) {
     </AppProvider>,
   );
 }
+
+// The heavier Astryx pages sit near the 5s default under load.
+vi.setConfig({ testTimeout: 20000 });
 
 describe('Accessibility: axe on every main page (color-contrast disabled)', () => {
   // Each entry is [label, path, heading]; all render through the shell with the
