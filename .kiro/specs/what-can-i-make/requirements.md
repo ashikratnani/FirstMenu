@@ -218,14 +218,24 @@ Terms from the v1 glossary keep their meaning. New terms:
 
 #### Acceptance Criteria
 
-1. THE app SHALL ship at least 100 built-in recipes and simple ideas in total, of which at most 25 are simple ideas. At least 15 SHALL be tagged for `6–8 months` and at least 25 for each of the other three stages. A recipe tagged for several stages counts toward each. This replaces the counts in v1 Requirement 2.1.
+1. THE app SHALL ship **500 built-in recipes and simple ideas as the goal and no fewer than 300 as the hard minimum**, of which at most 40 are simple ideas. A recipe tagged for several stages counts toward each of them. Each stage SHALL meet the goal and hard-minimum counts below, split by effort (Easy, Medium, More, as computed by `recipeEffort` in `domain/effort.ts`, Requirement 10.3). This replaces the counts in v1 Requirement 2.1.
+
+   | Stage | Goal (Easy / Medium / More) | Goal total | Hard minimum (Easy / Medium / More) | Minimum total |
+   | --- | --- | --- | --- | --- |
+   | `6–8 months` | 30 / 12 / 3 | 45 | 20 / 8 / 2 | 30 |
+   | `9–12 months` | 50 / 45 / 25 | 120 | 30 / 25 / 15 | 70 |
+   | `12–23 months` | 80 / 80 / 60 | 220 | 45 / 45 / 30 | 120 |
+   | `24–36 months` | 130 / 130 / 120 | 380 | 70 / 70 / 60 | 200 |
+
+   The older the stage, the more recipes it gets. Within a stage the split aims to be even, but it is not required to be: the youngest stages lean toward Easy because few recipes suit them, and that is accepted. The goal totals add up to 765 stage tags over 500 recipes (about 1.5 stages per recipe). The invariant tests SHALL fail below the hard minimum and SHALL report the goal as a count table without failing.
 2. BUILT-IN recipes MAY come from any publisher that meets every recipe source criterion in the design (an accountable public health, government, university or extension, children's hospital, or dietitian-led nonprofit publisher; free to read; exact quantities; not a blog, social media, brand, aggregator or AI site). Minnesota and other WIC programs, USDA FNS, the ICN Child Nutrition Recipe Box and Food Hero already qualify. EACH new publisher SHALL be checked by pr-reviewer before its first recipe merges and recorded in `docs/recipe-sources.md` with the verdict. (Changed from a fixed list by the maintainer on November 9, 2026.)
 3. A built-in recipe MAY differ from its source by scaling every quantity by the same factor to make 2 to 6 servings, recorded as an adaptation ("Scaled from 25 servings to 4"). This adds to the changes allowed by v1 Requirement 2.9.
 4. A simple idea MAY have no ingredient quantities and SHALL be labeled "Simple idea" in the app. This is an exception to v1 Requirement 2.8 for simple ideas only.
 5. EVERY built-in recipe and simple idea SHALL keep v1's sourcing rules: source title, publisher, URL and retrieval date recorded and shown; ingredients from the source; steps in the app's own words; storage times from the source or a cited food-safety source.
-6. THE built-in set SHALL include, across all recipes, at least one recipe containing each of the nine allergen groups. This restores v1 Requirement 2.5, which issue #7 had relaxed.
-7. IF qualifying publishers can't reach the counts in criterion 1 or the allergen coverage in criterion 6 THEN the shortfall SHALL be reported to the maintainer before the set ships short.
-8. NEW built-in recipes SHALL be added in batches of about 20. EACH batch SHALL have a review issue listing its recipes with source links, stage tags and adaptations, for the primary user to review. Reviews SHALL NOT block later batches; feedback SHALL be applied when it arrives.
+6. THE built-in set SHALL include recipes containing each of the nine allergen groups, in at least these numbers (hard minimum / goal): dairy, egg, wheat and soy 30 / 60 each; peanut, tree nuts and fish 8 / 15 each; sesame 4 / 8; shellfish 3 / 6. This restores v1 Requirement 2.5, which issue #7 had relaxed, and scales it to the larger set. Counts come from the real safety screen, as in the v1 tests.
+7. IF qualifying publishers can't reach the hard minimums in criterion 1 or the allergen minimums in criterion 6 THEN the shortfall SHALL be reported to the maintainer before the set ships short. Falling short of a goal but meeting every hard minimum needs no report beyond the final numbers on issue #7, because the maintainer set the 500 goal on November 11, 2026 and approves the hard minimums by merging this spec change.
+8. NEW built-in recipes SHALL be added in batches of about 50 (40 to 60). EACH batch SHALL have a review issue listing its recipes with source links, stage tags and adaptations, for the primary user to review. Reviews SHALL NOT block later batches; feedback SHALL be applied when it arrives. No batch SHALL merge after November 30, 2026.
+9. WITH 500 built-in recipes THE app SHALL stay fast on a mid-range phone: opening Make, searching and changing a filter SHALL each finish rendering within 100 ms of the interaction for the full built-in set plus 50 custom recipes (measured by a Vitest timing test on `makeResults`, with generous CI margins), and the built-in data SHALL stay within the recipe data budget in the design.
 
 ### Requirement 15: UI with the Astryx design system
 

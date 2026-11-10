@@ -6,17 +6,19 @@ Deadline: Friday, December 4, 2026, 2:00 PM PT. Target submission: Thursday, Dec
 
 Build order agreed with the maintainer: Astryx trial, then domain work and new screens, then toddler stages, then more recipes, then recipe sharing. Recipes now run alongside the other work instead of after it (see "Task 14 runs alongside the others" below). One adjustment: the toddler schema and stage plumbing (task 1) comes before the trial, because every later task builds on the new stages and it's small. Toddler recipe content arrives with the recipe expansion (task 14). Sharing (task 15) is the first thing to cut if the schedule slips.
 
-**Task 14 runs alongside the others.** Because the target is 100 recipes, task 14 starts right after task 1 merges and continues in batches through M4, interleaved with tasks 2–13 (for example one recipe batch after each other task's PR merges). This is the one exception to working through the tasks strictly in order.
+**Task 14 runs alongside the others.** Because the goal is 500 recipes (hard minimum 300; raised from 100 by the maintainer on November 11), task 14 starts right after task 1 merges and continues in batches through M4, interleaved with tasks 2–13 (for example one recipe batch after each other task's PR merges). This is the one exception to working through the tasks strictly in order.
 
 | Milestone | Dates | Tasks | Done when |
 | --- | --- | --- | --- |
-| M1 Foundation | Nov 9 – Nov 13 | 1 – 2, 14 batch 1 | Schema v2 and toddler stages merged; Astryx trial passed (or a decision issue opened); first recipe batch merged (about 35 built-ins). |
-| M2 Domain | Nov 14 – Nov 18 | 3 – 8, 14 batches 2–3 | Time and effort, nutrition tags, categories, parser, text mentions, matching, prompt and suggestions pass tests; about 75 built-ins. |
-| M3 Screens | Nov 19 – Nov 25 | 9 – 13, 14 batch 4 | Make is home; paste → preview → save works on a phone; all pages on Astryx; about 95 built-ins. |
-| M4 Recipes and sharing | Nov 26 – Nov 30 | 14 (final batch), 15 | At least 100 built-ins meeting the stage and allergen targets; sharing if time allows. Thanksgiving week, so this milestone is lighter. |
-| M5 Verify and submit | Dec 1 – Dec 3 | 16 – 17 | Real pastes and phone checks done, docs and demo updated, submitted. |
+| M1 Foundation | Nov 9 – Nov 13 | 1 – 2, 14 batches 1–3 | Schema v2 and toddler stages merged; Astryx trial passed (or a decision issue opened); batches 1–2 merged (43 built-ins), batch 3 merged (about 95). |
+| M2 Domain | Nov 14 – Nov 18 | 3 – 8, 14 batches 4–6 | Time and effort, nutrition tags, categories, parser, text mentions, matching, prompt and suggestions pass tests; about 250 built-ins. |
+| M3 Screens | Nov 19 – Nov 25 | 9 – 13, 14 batches 7–9 | Make is home; paste → preview → save works on a phone; all pages on Astryx; about 400 built-ins (hard minimum 300 passed by Nov 25). |
+| M4 Recipes and sharing | Nov 26 – Nov 30 | 14 batches 10–11 (final), 15 | Goal of 500 built-ins, at least the hard minimum of 300 and its stage, effort and allergen counts; recipe freeze on Nov 30; sharing if time allows. Thanksgiving week (Nov 26), so lighter. |
+| M5 Verify and submit | Dec 1 – Dec 3 | 16 – 17 | Real pastes and phone checks done, docs and demo updated, submitted. No new recipes. |
 
-Counts assume batch 1 brings the total to about 35 (10 WIC recipes plus up to 25 simple ideas) and each later batch adds about 20.
+Counts assume batches 1 and 2 are merged (43 built-ins on November 11) and each later batch adds about 50. Checkpoints (cumulative built-ins, merged): batch 3 about 95 (Nov 13), batch 4 about 145 (Nov 15), batch 5 about 195 (Nov 17), batch 6 about 245 (Nov 19), batch 7 about 295 (Nov 21), batch 8 about 345 (Nov 23), batch 9 about 395 (Nov 25), batch 10 about 445 (Nov 28), batch 11 about 500 (Nov 30). If the total at a checkpoint is more than 15% behind, say so in the session and in the batch PR, and follow the cut order in "If recipes fall behind" below.
+
+**If recipes fall behind** (proposed order, approved by merging this PR): (1) keep going; run two batch PRs at once; (2) cut task 15 (recipe sharing), as `autonomy.md` already allows; (3) lower the goal but never the hard minimum: stop batching at the best count by Nov 30 and report the numbers on issue #7; (4) if the total is under 300 on Nov 25, open `Decision needed: recipe shortfall` with the stage by effort table and a recommendation. Never lower sourcing, safety screening or review rules to reach a count.
 
 Branch names use the `v2/` prefix (for example `v2/6-paste-parser`) so they don't collide with v1 branches.
 
@@ -124,11 +126,11 @@ Branch names use the `v2/` prefix (for example `v2/6-paste-parser`) so they don'
 - [ ] 14. More built-in recipes (starts after task 1, runs in batches alongside tasks 2–13)
   - [x] 14.1 Move built-in recipe data into its own build chunk and report its gzipped size. Ships in the batch 1 PR, before any recipes are added, so every batch PR can report the chunk size.
     - _Requirements: 15.6_
-  - [x] 14.2 Batch 1: re-tag the 10 Minnesota WIC recipes for toddler stages where the texture fits, set `serveAs` on them, and add simple ideas from WIC and USDA feeding guides to `data/simpleIdeas.ts` (at most 25 in total).
+  - [x] 14.2 Batch 1: re-tag the 10 Minnesota WIC recipes for toddler stages where the texture fits, set `serveAs` on them, and add simple ideas from WIC and USDA feeding guides to `data/simpleIdeas.ts` (at most 25 in total at the time; the cap is now 40, Requirement 14.1).
     - _Requirements: 13.2, 14.2, 14.4, 14.5, 14.8, 16.13_
-  - [ ] 14.3 Batches 2 onward: add ICN Child Nutrition Recipe Box and Food Hero recipes, and recipes from other publishers that meet the recipe source criteria (new publishers go through pr-reviewer and into `docs/recipe-sources.md`), about 20 per PR, following the expansion rules in the design, with `serveAs` set on each. Prioritize missing allergen groups first, then stage counts. Open a `Recipe review: batch <n>` issue for each batch.
-    - _Requirements: 14.2, 14.3, 14.5, 14.8, 16.13_
-  - [ ] 14.4 Ships with the final batch PR. Set the invariant tests to the final counts in Requirement 14.1 and to all nine allergen groups. If short of either, open `Decision needed: recipe shortfall` with the numbers and don't ship short without an answer. Comment on issue #7 with the final numbers.
+  - [ ] 14.3 Batches 3 to 11, about 50 recipes per PR (branch `v2/14-recipes-batch-<n>`, data in `src/data/recipesBatch<n>.ts`): add Food Hero and ICN Child Nutrition Recipe Box recipes and recipes from other publishers that meet the recipe source criteria (new publishers go through pr-reviewer and into `docs/recipe-sources.md`), following the expansion rules in the design, with `serveAs` set on each. Fill the biggest gaps in the stage by effort table first (scarce cells in `6-8` and `9-12`, then missing allergen minimums, then `12-23`, then `24-36`). Batch 3 also adds the `recipes.test.ts` count table with `HARD_MINIMUM`, `GOAL` and `CHECKPOINT`, the recipe-data size warning and failure in `scripts/size-report.mjs`, and the `makeResults` derived-value cache with its timing test (design "Bundle size and speed with 500 recipes"). Each batch PR body pastes the count table, the recipe-data gzipped size and the duplicate check. Open a `Recipe review: batch <n>` issue for each batch. Batch 6 checks first-load speed and decides on lazy-loading the data chunk.
+    - _Requirements: 14.2, 14.3, 14.5, 14.8, 14.9, 16.13_
+  - [ ] 14.4 Ships with the final batch PR. Set `CHECKPOINT = HARD_MINIMUM` in the invariant tests (Requirement 14.1 and 14.6 tables: total, simple ideas, each stage, each stage by effort, each allergen group). If short of any hard minimum, open `Decision needed: recipe shortfall` with the numbers and don't ship short without an answer. Comment on issue #7 with the final numbers.
     - _Requirements: 14.1, 14.6, 14.7_
 
 - [ ] 15. Share a recipe (first to cut)
