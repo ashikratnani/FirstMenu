@@ -3,8 +3,8 @@
 // tests use a fixed clock. Nothing here writes state: the reducer actions
 // (markMade, recordOnHandDay, dismissSuggestion, keepOnHand) do that after a tap.
 //
-// Not here yet: the "Iron-rich" tag comes from nutrition.ts (open PR), so
-// scoring takes an optional `ironRich` predicate instead of importing it.
+// Scoring takes an optional `ironRich` predicate instead of importing
+// nutrition.ts; the caller (task 10.4) passes one, e.g. from MakeResult.tags.
 
 import type { MakeResult } from './make';
 import { foodKeyFor, foodLabel, isIgnoredFood } from './foods';
