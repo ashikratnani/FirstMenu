@@ -2,7 +2,13 @@
 
 **Status: APPROVED** by the maintainer on November 8, 2026.
 
-**Change note, November 10, 2026:** the maintainer requested, in session, (1) a JSON prompt flow for ChatGPT and an Instagram reel prompt flow in place of unstructured pastes (new tasks 11.5 to 11.7, Requirements 18 and 19, task 16.1 reworked), (2) a short problem-first onboarding (new task 18, Requirement 20), and (3) confirmed that puree-only recipes for toddlers are not allowed (batch 1 invariant kept). These are approved scope changes, not Decide-yourself spec fixes. Order: 11.5 to 11.7 come next (11.1 to 11.4 are done), before 12; task 18 comes after 13 because it builds on the Astryx Onboarding page. Tasks already ticked are unchanged, except the parent checkbox of task 11, which is unticked again until 11.5 to 11.7 land.
+**Change note, November 10, 2026:** the maintainer sent three replies in session, quoted verbatim:
+
+1. "should puree-only recipes be allowed for toddlers? No"
+2. "Instead of taking in unschematized pastes, let's give user a prompt which includes JSON format output template. The user will input the prompt they would send to ChatGPT, and the app will generate a prompt with output template that you can parse. The task for the user will be to run the prompt and paste the output into the app, and the app will parse the output and add it to their recipes. For Instagram, we will need the user to access Meta AI or any AI chat app that can connect to user's Insta account. The user will have to paste the reel url in our app, the app generates a prompt instructing the AI chat app to parse the recipe and output a parseable JSON."
+3. "I like the new UI. It's clean and it's proactive like I asked. It's still a bit daunting to a new user. There should be some onboarding process to help user understand what the app can do and how to use it. We shouldn't spend too much time of onboarding because we do want the user to be delighted on first impression. We should have them say what problems they have and we should quickly help solve one of them so they know this app can do something for them."
+
+Resulting scope: (1) a JSON prompt flow for ChatGPT and an Instagram reel prompt flow in place of unstructured pastes (new tasks 11.5 to 11.7, Requirements 18 and 19, task 16.1 reworked), (2) a short problem-first onboarding (new task 18, Requirement 20), and (3) puree-only recipes for toddlers are not allowed (batch 1 invariant kept). These are approved scope changes, not Decide-yourself spec fixes. Order: 11.5 to 11.7 come next (11.1 to 11.4 are done), before 12; task 18 comes after 13 because it builds on the Astryx Onboarding page, and is part of M3. Tasks already ticked are unchanged, except the parent checkbox of task 11, which is unticked again until 11.5 to 11.7 land.
 
 Deadline: Friday, December 4, 2026, 2:00 PM PT. Target submission: Thursday, December 3.
 
@@ -129,14 +135,6 @@ Branch names use the `v2/` prefix (for example `v2/6-paste-parser`) so they don'
   - [ ] 13.1 Convert Foods, recipe page, typed editor, Prep, Grocery, Share, Sources and Onboarding. Keep print CSS. Apply any UI feedback received under task 2.1 (the November 10 feedback, that the UI is clean but daunting to new users, is handled by task 18). Re-run `vitest-axe` on every page.
     - _Requirements: 15.1, 15.5, 15.8_
 
-- [ ] 18. Problem-first onboarding (added November 10, 2026; after task 13, before M4 ends)
-  - [ ] 18.1 Slim the profile step and add the problems screen: collapse the tried-foods checklist into "Foods already tried (optional)" in `src/ui/pages/Onboarding.tsx`; add the problems screen (five chips, "Show me", "Skip") and the done screen. Lazy-load the new components. Tests: skip lands on Make; previously onboarded users never see the screens; no stored field added.
-    - _Requirements: 20.1, 20.2, 20.5, 20.6, 20.7, 20.8_
-  - [ ] 18.2 Quick solves: What can I make (reuse the Make search box), Save recipes (question and reel boxes, "Try an example" with a bundled sample reply, no save), Plan and grocery (draft week, grocery list, keep or discard), What's safe (leave-out list with sources, food-name check using `screenRecipe`). Tests per solve, a11y, one primary button per step, 360 px, size report.
-    - _Requirements: 20.3, 20.4, 20.8_
-  - [ ] 18.3 Add "Quick tour" to Settings and the `/onboarding/tour` route for onboarded users. Test it.
-    - _Requirements: 20.9_
-
 - [ ] 14. More built-in recipes (starts after task 1, runs in batches alongside tasks 2–13)
   - [x] 14.1 Move built-in recipe data into its own build chunk and report its gzipped size. Ships in the batch 1 PR, before any recipes are added, so every batch PR can report the chunk size.
     - _Requirements: 15.6_
@@ -164,3 +162,11 @@ Branch names use the `v2/` prefix (for example `v2/6-paste-parser`) so they don'
     - _Requirements: 12.1_
   - [ ] 17.2 Carried over from v1 task 18.4: the maintainer records the video, uploads it to YouTube, and submits by Thursday, December 3.
     - _Requirements: 12.1_
+
+- [ ] 18. Problem-first onboarding (added November 10, 2026; after task 13, part of M3)
+  - [ ] 18.1 Slim the profile step and add the problems screen: collapse the tried-foods checklist into "Foods already tried (optional)" in `src/ui/pages/Onboarding.tsx`; add the problems screen (five chips, "Show me", "Skip") and the done screen. Lazy-load the new components. Tests: skip lands on Make; previously onboarded users never see the screens; no stored field added.
+    - _Requirements: 20.1, 20.2, 20.5, 20.6, 20.7, 20.8_
+  - [ ] 18.2 Quick solves: What can I make (reuse the Make search box), Save recipes (question and reel boxes, "Try an example" with a bundled sample reply, no save), Plan and grocery (draft week, grocery list, keep or discard), What's safe (leave-out list with sources, food-name check using `screenRecipe`). Tests per solve, a11y, one primary button per step, 360 px, size report.
+    - _Requirements: 20.3, 20.4, 20.8, 20.9_
+  - [ ] 18.3 Add "Quick tour" to Settings and the new `/onboarding/tour` route (problems step onward; `OnboardingGate` unchanged). Test it, including that a not-yet-onboarded user is redirected to `/onboarding`.
+    - _Requirements: 20.7, 20.10_

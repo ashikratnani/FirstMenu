@@ -56,7 +56,7 @@ Ask once, at the right time, and keep working meanwhile:
 - Turn on branch protection for `main` requiring the CI check to pass, if not done yet.
 - Review the built-in recipes (v1 `Recipe review` issue and one `Recipe review: batch <n>` issue per new batch). Apply the feedback when it arrives; don't wait for it.
 - Say what to change in the UI (active spec task 2.1). Don't wait for it.
-- Run the JSON prompt flows in ChatGPT and Meta AI if no one else can (active spec task 16.1; the maintainer no longer needs to supply real pastes). Don't wait for it.
+- Run the JSON prompt flows in ChatGPT and Meta AI (active spec task 16.1), because they need accounts. Anything that needs an account or costs money goes to the maintainer under "Stop and ask"; don't work around it and don't wait for it. The maintainer no longer needs to supply real pastes.
 - Record the demo video, upload it to YouTube and submit the entry (active spec task 17.2).
 
 ## Schedule

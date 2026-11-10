@@ -150,7 +150,7 @@ Terms from the v1 glossary keep their meaning. New terms:
 #### Acceptance Criteria
 
 1. THE Make screen and the Add recipe screen SHALL offer "Ask ChatGPT", which opens the question box of Requirement 18.
-2. THE app SHALL build a prompt containing: the child's age in months, the on-hand and pantry foods, a texture hint for the stage, the foods to leave out, a request for something quick and easy (iron-rich if possible), and the Recipe JSON reply format from the design, wrapped around the user's question (Requirement 18).
+2. THE app SHALL build a prompt containing: the child's age in months, a texture hint for the stage, the foods to leave out, and the Recipe JSON reply format from the design, wrapped around the user's question (Requirement 18). The on-hand foods and the request for something quick and easy (iron-rich if possible) are not added by the prompt builder: they appear only in the editable pre-filled question of Requirement 18.1, so the user sees and controls them.
 3. THE foods to leave out SHALL be the labels of the block rules that apply at the child's age, plus foods with a recorded reaction.
 4. THE prompt SHALL ask ChatGPT not to mention the left-out foods anywhere in its reply.
 5. THE app SHALL NOT include the child's name or birth date in the prompt.
@@ -298,12 +298,12 @@ These suggestions come from the maintainer's UI feedback (issue #36): the app sh
 1. THE "Ask ChatGPT" screen SHALL have a text box for the user's question, pre-filled with a suggestion based on what the user has on hand (editable), and a limit of 1,000 characters.
 2. THE app SHALL build the wrapped prompt: the child's age in months and stage texture hint, the foods to leave out (Requirement 8.3), the instruction not to mention those foods, the user's question inside a clearly marked block, and the Recipe JSON output template with the instruction to reply with only the JSON. The prompt SHALL NOT contain the child's name or birth date.
 3. THE user SHALL be able to copy the wrapped prompt and open ChatGPT in a new tab, then paste the reply into Add recipe (with the source preset to ChatGPT).
-4. THE app SHALL parse a pasted reply as Recipe JSON when it contains a JSON object: it SHALL accept the object alone or inside a markdown code fence with text around it, and SHALL ignore text outside the object.
+4. THE app SHALL parse a pasted reply as Recipe JSON when it contains a JSON object: it SHALL accept the object alone or inside a markdown code fence with text around it, and SHALL ignore text outside the object as recipe content: that text is not shown as steps or notes and is not saved in the recipe, and is kept only in the original text (Requirement 18.10). THE preview SHALL say when a long outside text (over 200 characters) or a second JSON object was ignored.
 5. THE Recipe JSON parser SHALL be strict: a wrong version, a missing or empty title, no ingredients, no steps, an ingredient with no name, a quantity that is not a number, or a wrong type SHALL be rejected with a plain-language message that names the field. A rejected reply SHALL NOT be saved.
 6. WHEN the reply is rejected THEN the app SHALL offer a "Copy a fix-up request" prompt that asks the AI chat app to resend the recipe in the exact format, and SHALL offer "Read as plain text instead".
 7. IF the reply contains no JSON object THEN the app SHALL read it with the free-text parser, say "This isn't in the expected format, so it was read as plain text. Check each line.", and continue with the same preview.
 8. THE parsed recipe SHALL go through exactly the same preview, line editing, safety screen (ingredient screen plus text-mention screen on title, steps and notes, Requirement 7), time, effort and nutrition tags as a text paste. THE app SHALL NOT offer any way to skip or clear a text mention except the user's tap on "Not used in this recipe".
-9. ANY text in the reply that the format does not define (extra fields, an ingredient's unit, notes) SHALL be screened as recipe text and SHALL NOT be dropped silently.
+9. EVERY string inside the reply's JSON object, at any depth, that the format does not define (extra fields, nested values, ingredient-level extra fields, an ingredient's unit) SHALL be added to the recipe's notes and screened as recipe text, so nothing inside the object is dropped unscreened. IF the reply has more such text than the limits in the design THEN the app SHALL reject it as invalid rather than truncate it. An ingredient's `unit` SHALL be screened through the text-mention screen, not the ingredient-name match (v1 Requirement 4.1 is not widened). Text outside the object is covered by 18.4.
 10. THE raw reply SHALL be kept as the recipe's original text (Requirement 6.8).
 11. A reply of more than 20,000 characters SHALL NOT be parsed.
 12. THE app SHALL NOT call any AI service. The question and the reply stay on the device.
@@ -335,13 +335,14 @@ These suggestions come from the maintainer's UI feedback (issue #36): the app sh
    1. What can I make: the user types what they have; live results show the Ready now and Missing one recipes; "Keep these foods" stores them as on-hand and opens Make.
    2. Save recipes: the user sees the question box for ChatGPT and the reel box side by side with "Try an example", which parses a bundled sample reply and shows the preview with its safety result without saving; "Open Add recipe" goes on.
    3. Plan and grocery: one tap fills the week using the existing plan logic and shows the grocery list, with "Keep this plan" and "Not now".
-   4. What's safe: shows the foods to leave out at the child's age with their sources, and a box to check any food by name using the safety screen.
+   4. What's safe: shows the foods to leave out at the child's age with their sources, and a box to check any food by name using the safety screen. WHEN the check finds no rule for the food THEN the app SHALL NOT show "safe", "OK" or a green state; it SHALL show "FirstMenu's list has no rule for {food} at this age." followed by the fixed-list limit sentence (`SCREEN_LIMITS`) and the not-medical-advice line (`NOT_MEDICAL_ADVICE`), the same constants the other screens use.
 4. THE quick solve SHALL be skippable at every step. WHEN a user chose more than one problem THEN the end screen SHALL link to the other chosen features in one line each.
 5. THE onboarding after the profile SHALL be at most three screens, shall not require typing except in the quick solve, and SHALL NOT hold back the Make screen: finishing or skipping lands on Make.
 6. THE tried-foods checklist (v1 Requirement 7.2) SHALL be offered as an optional collapsed section on the profile screen ("Foods already tried") instead of an open list, so the first screen is short. Nothing it records changes.
-7. USERS who already finished onboarding SHALL NOT see the new screens. THE onboarding SHALL add no stored fields (it uses the existing `onboarded` flag) and make no network request.
+7. USERS who already finished onboarding SHALL NOT be shown the new screens automatically; they see them only when they open "Quick tour" (20.10), which opens the problems step at `/onboarding/tour`. THE onboarding SHALL add no stored fields (it uses the existing `onboarded` flag) and make no network request.
 8. THE onboarding SHALL meet Requirement 15 (Astryx, WCAG 2.1 AA, keyboard, 360 px, one filled primary button per screen) and SHALL be loaded with the Make screen's chunk or lazily, within the size budget of Requirement 15.6.
-9. THE onboarding SHALL be re-openable from Settings as "Quick tour".
+9. EVERY quick-solve screen that shows safety results (What's safe, and the Save recipes example preview) SHALL show the disclaimers of Requirement 11 (`NOT_MEDICAL_ADVICE` and `SCREEN_LIMITS`) next to the results, not only in the page footer.
+10. THE onboarding SHALL be re-openable from Settings as "Quick tour".
 
 ## Out of scope
 
