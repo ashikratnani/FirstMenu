@@ -137,7 +137,7 @@ export const SOURCES: Record<SourceId, Source> = {
     title: 'CDC: Foods and drinks to encourage',
     url: 'https://www.cdc.gov/infant-toddler-nutrition/foods-and-drinks/foods-and-drinks-to-encourage.html',
     retrieved: '2026-11-09',
-    note: 'Read from a web.archive.org copy dated 2023-11-24 (the live page returned 403). Re-check against the live page. The archive copy read for the texture hints was captured 2025-01-26 and carries the page date November 24, 2023.',
+    note: 'Read from a web.archive.org copy dated 2023-11-24 (the live page returned 403). Re-check against the live page. Two copies were read: the nutrition tags (nutrition.ts) used the 2023-11-24 copy; the stage texture hints (STAGE_TEXTURE_HINTS) used the copy captured 2025-01-26, which carries the page date November 24, 2023. `retrieved` is the day of the earlier nutrition read.',
   },
   'USDA-FNS-iron': {
     title: 'USDA FNS: For parents, making sure your baby gets enough iron (PDF)',
@@ -156,8 +156,11 @@ export const SOURCES: Record<SourceId, Source> = {
  * decision on issue #54). `quote` is the supporting text from the page, and
  * `archiveNote` says which copy it was read from. Hints never use a pronoun.
  * Gaps: the CDC pages give no age-specific texture wording for 2 to 3 years
- * and do not use the phrase "small, bite-sized pieces"; the 24-36 hint uses
- * the page's general "bite-sized" wording for children eating family foods.
+ * and do not use the phrase "small, bite-sized pieces". The 12-23 and 24-36
+ * hints both rest on one sentence from the "Starting solid foods" section of
+ * the encourage page (match foods to the child's eating skills; soft and
+ * mashed or bite-sized at first). That sentence is general, not an age-specific
+ * rule for 2 to 3 years. Every content word of a hint appears in its quote.
  */
 export interface StageTextureHint {
   hint: string;
@@ -180,21 +183,20 @@ export const STAGE_TEXTURE_HINTS: Record<'6-8' | '9-12' | '12-23' | '24-36', Sta
     archiveNote: SOLIDS_ARCHIVE,
   },
   '9-12': {
-    hint: 'mashed, with thicker and lumpier foods as eating develops; soft food cut into small pieces',
+    hint: 'thicker and more lumpy foods; soft food cut into small pieces',
     quote:
       "You can introduce thicker and more lumpy foods as your baby's ability to eat develops. ... Cut soft food into small pieces or thin slices.",
     sources: ['CDC-solids'],
     archiveNote: SOLIDS_ARCHIVE,
   },
   '12-23': {
-    hint: 'soft, small, bite-sized pieces',
-    quote:
-      'At first, foods may need to be soft and mashed or bite-sized. ... Proteins: soft, small pieces of beef, lamb, chicken, fish, turkey, eggs, or tofu.',
+    hint: 'soft and mashed, or bite-sized',
+    quote: 'At first, foods may need to be soft and mashed or bite-sized.',
     sources: ['CDC-encourage'],
     archiveNote: ENCOURAGE_ARCHIVE,
   },
   '24-36': {
-    hint: 'bite-sized pieces',
+    hint: 'foods that match eating skills, soft and mashed or bite-sized at first',
     quote:
       "It is important to provide foods that match your child's eating skills. At first, foods may need to be soft and mashed or bite-sized.",
     sources: ['CDC-encourage'],

@@ -185,10 +185,17 @@ describe('stage texture hints (Req 13.5)', () => {
     expect(STAGE_TEXTURE_HINTS['24-36'].sources).toEqual(['CDC-encourage']);
   });
 
-  it('every quote is a phrase the archived page was read to contain', () => {
+  it('each hint is tied to its quote: key phrases are in the quote and every content word of the hint appears in it', () => {
     expect(STAGE_TEXTURE_HINTS['6-8'].quote).toContain('mashed, pureed, or strained foods that are very smooth');
     expect(STAGE_TEXTURE_HINTS['9-12'].quote).toContain('thicker and more lumpy foods');
     expect(STAGE_TEXTURE_HINTS['12-23'].quote).toContain('soft and mashed or bite-sized');
-    expect(STAGE_TEXTURE_HINTS['24-36'].quote).toContain('bite-sized');
+    expect(STAGE_TEXTURE_HINTS['24-36'].quote).toContain('soft and mashed or bite-sized');
+    for (const stage of stages) {
+      const { hint, quote } = STAGE_TEXTURE_HINTS[stage];
+      const quoteWords = new Set(quote.toLowerCase().match(/[a-z]+(?:-[a-z]+)*/g));
+      for (const word of hint.toLowerCase().match(/[a-z]+(?:-[a-z]+)*/g) ?? []) {
+        expect(quoteWords.has(word), `${stage}: "${word}" is in the quote`).toBe(true);
+      }
+    }
   });
 });

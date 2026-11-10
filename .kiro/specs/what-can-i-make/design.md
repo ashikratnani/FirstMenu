@@ -479,12 +479,12 @@ defaultSlots('12-23' | '24-36') = [breakfast, lunch, dinner, snack]
 
 | Stage | Label | Texture hint | Source |
 | --- | --- | --- | --- |
-| `6-8` | 6–8 months | smooth or well-mashed | CDC-solids |
-| `9-12` | 9–11 months | mashed, or soft small pieces to pick up | CDC-solids |
-| `12-23` | 12–23 months | soft, small, bite-sized pieces | CDC-encourage |
-| `24-36` | 2–3 years | small, bite-sized pieces | CDC-encourage |
+| `6-8` | 6–8 months | mashed, pureed or strained, very smooth | CDC-solids |
+| `9-12` | 9–11 months | thicker and more lumpy foods; soft food cut into small pieces | CDC-solids |
+| `12-23` | 12–23 months | soft and mashed, or bite-sized | CDC-encourage |
+| `24-36` | 2–3 years | foods that match eating skills, soft and mashed or bite-sized at first | CDC-encourage |
 
-Task 1.3b confirmed the hint wording against Wayback copies of the CDC pages (`STAGE_TEXTURE_HINTS` in `rules.ts` holds each hint, its quote and sources). The CDC pages do not use the phrase "small, bite-sized pieces" and give no age-specific wording for 2 to 3 years, so the toddler hints use "bite-sized" wording the pages do support.
+Task 1.3b confirmed the hint wording against Wayback copies of the CDC pages (`STAGE_TEXTURE_HINTS` in `rules.ts` holds each hint, its quote and sources). The CDC pages do not use the phrase "small, bite-sized pieces" and give no age-specific wording for 2 to 3 years, so the toddler hints use one general sentence from the "Starting solid foods" section of the encourage page (match foods to the child's eating skills; soft and mashed or bite-sized at first). It is not an age-specific rule for 2 to 3 years, and a test checks that every content word of each hint appears in its quote.
 
 ### Juice limit reminder (Requirement 13.7)
 
