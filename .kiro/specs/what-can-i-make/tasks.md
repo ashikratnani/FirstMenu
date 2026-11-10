@@ -70,12 +70,12 @@ Branch names use the `v2/` prefix (for example `v2/6-paste-parser`) so they don'
     - _Requirements: 7.1 – 7.6_
 
 - [ ] 7. Matching
-  - [x] 7.1 Implement `domain/make.ts` (`makeResults`, suggested chips) per the design, including younger-stage recipes for toddlers. Tests.
+  - [ ] 7.1 Implement `domain/make.ts` (`makeResults`, suggested chips) per the design, including younger-stage recipes for toddlers. Tests. Note: the `tags` field on `MakeResult` (Req 3.8) and the Iron-rich filter (Req 3.9) land with 7.3 once `nutrition.ts` is merged; tick 7.1 in the 7.3 PR.
     - _Requirements: 3.3 – 3.9, 13.8_
   - [x] 7.2 Implement `data/foodNames.ts`, `data/searchPhrases.ts` and `domain/foodSearch.ts` (`buildVocabulary`, `searchHave`) per "Type what you have" in the design. Tests: every row of the worked-examples table in the design; separators and unseparated text; filler and request words; quantities; the single longest-match pass with ties going to foods ("sweet potato" vs "potato", "quick oats" vs "quick"); descriptor vs filter (step 4); other names and stop phrases ("bean curd" → tofu, "lemon curd" and "ladyfinger" → no food, listed under "Not recognized", "curd" → yogurt); typo distances and ties, and no typo match against stop phrases or dish-kind phrases; each dish-kind phrase ("something for breakfast", "finger food", "quick", "iron rich", "make ahead"); title words; unrecognized words; list checks (every target equals `groceryFoodKey({ name: target })`, no name mapped to two foods, no phrase that is also a food, plural-aware); descriptor adjacency ignoring only filler words ("mashed ripe banana", "quick cooked rice", "quick mashed banana"), with a request word keeping the phrase a filter ("eggs something quick"); stop phrases listed under "Not recognized".
     - _Requirements: 16.1 – 16.4, 16.7 – 16.11_
   - [ ] 7.3 Add `serveAs` derivation for custom recipes and the filter logic, including "More ideas", to `make.ts`. Tests: derivation keywords, stage defaults when nothing matches, AND of filters, the "Iron-rich only" toggle and the "iron rich" phrase as one filter, "More ideas" ordering, cap and ghost exclusion, "More ideas" with only the toggle on, filters with no foods typed.
-    - _Requirements: 16.9, 16.12, 16.13_
+    - _Requirements: 3.8, 3.9, 16.9, 16.12, 16.13_
 
 - [ ] 8. Prompt helper logic
   - [ ] 8.1 Implement `domain/prompt.ts` (`buildPrompt`) with per-stage texture hints. Tests: content, leave-out list at 10, 13 and 25 months, reaction foods, "toddler" wording at 12 months and over, no name or birth date.

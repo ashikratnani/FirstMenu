@@ -6,9 +6,9 @@
 // having yogurt does not cover butter. Fuzzy text search lives in
 // foodSearch.ts and only turns words into foods.
 //
-// Not here yet (task 7.3, after nutrition.ts exists): nutrition tags on each
-// result, serving-form derivation, search filters, the "Iron-rich only" toggle
-// and "More ideas".
+// Not here yet (task 7.3, after nutrition.ts exists): the `tags` field on
+// MakeResult (Req 3.8), serving-form derivation, search filters, the
+// "Iron-rich only" filter (Req 3.9) and "More ideas".
 
 import { STAGE_IDS, stageFor } from './age';
 import { isOptional, recipeEffort, recipeMinutes, type Effort } from './effort';

@@ -53,7 +53,7 @@ export interface Vocabulary {
 /** Words dropped at step 5 and ignored for adjacency at step 4 (design.md). */
 const BASIC_FILLER = [
   'some', 'any', 'a', 'an', 'the', 'bit', 'of', 'little', 'few', 'half',
-  'leftover', 'leftovers', 'fresh', 'frozen', 'cooked', 'raw', 's',
+  'leftover', 'leftovers', 'fresh', 'frozen', 'cooked', 'raw',
 ];
 const FILLER_WORDS: ReadonlySet<string> = new Set([
   ...BASIC_FILLER,
