@@ -620,7 +620,8 @@ interface AppState {
 ### "Try this" pick
 
 ```ts
-pickTryThis(results: MakeResult[], ctx: { now: Date; mealHint?: MealType; madeLog; foods }): MakeResult[]
+pickTryThis(results: MakeResult[], ctx: { now: Date; mealHint?: MealType; madeLog; foods; newFoodKey?: string; dismissed?; ironRich? }): TryThisPick[]
+// TryThisPick = { result: MakeResult; score: number; newFood?: string (the one untried food); reason: string }
 ```
 
 Candidates are Ready now results that are not ghosted, filtered by untried foods (maintainer's option b, PR #41):
@@ -639,7 +640,7 @@ Score the remaining candidates (higher is better) and sort; ties go to title ord
 | Time 15 minutes or less (stated or estimated) | +2 |
 | Effort Easy | +1 |
 | Has the Iron-rich tag | +1 |
-| Made in the last 2 days | −3 (variety) |
+| Made today, yesterday or the day before (age 0 to 2 days) | −3 (variety) |
 
 "Show another" walks down the sorted list and wraps. The reason line lists the rules that scored, for example "Ready now · 10 min · Breakfast · Iron-rich".
 
