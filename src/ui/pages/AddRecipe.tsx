@@ -12,6 +12,8 @@
 import { useMemo, useRef, useState, type FormEvent } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@astryxdesign/core/Button';
+import { CheckboxInput } from '@astryxdesign/core/CheckboxInput';
+import { RadioList, RadioListItem } from '@astryxdesign/core/RadioList';
 import { TextArea } from '@astryxdesign/core/TextArea';
 import { TextInput } from '@astryxdesign/core/TextInput';
 import { foodLabel } from '../../domain/foods';
@@ -94,26 +96,22 @@ function LineRow({ list, line, onEdit, onRemove, onMove }: LineRowProps) {
     return (
       <li className={styles.line}>
         <form className={styles.editForm} onSubmit={finish}>
-          <input
-            className={styles.editInput}
-            aria-label={`Edit ${kind}`}
+          <TextInput
+            label={`Edit ${kind}`}
+            isLabelHidden
             value={value}
-            onChange={(event) => setValue(event.target.value)}
-            autoFocus
+            onChange={setValue}
+            hasAutoFocus
           />
-          <button type="submit" className={styles.lineButton}>
-            Done
-          </button>
-          <button
-            type="button"
-            className={styles.lineButton}
+          <Button label="Done" type="submit" size="sm" />
+          <Button
+            label="Cancel"
+            size="sm"
             onClick={() => {
               setValue(line.text);
               setEditing(false);
             }}
-          >
-            Cancel
-          </button>
+          />
         </form>
       </li>
     );
@@ -123,36 +121,29 @@ function LineRow({ list, line, onEdit, onRemove, onMove }: LineRowProps) {
     <li className={styles.line}>
       <span className={styles.lineText}>{line.text}</span>
       <span className={styles.lineActions}>
-        <button
-          type="button"
-          className={styles.lineButton}
-          aria-label={`Edit ${kind}: ${line.text}`}
+        <Button
+          label={`Edit ${kind}: ${line.text}`}
+          size="sm"
           onClick={() => {
             setValue(line.text);
             setEditing(true);
           }}
         >
           Edit
-        </button>
+        </Button>
         {MOVE_TARGETS[list].map((to) => (
-          <button
+          <Button
             key={to}
-            type="button"
-            className={styles.lineButton}
-            aria-label={`Move ${kind} to ${to}: ${line.text}`}
+            label={`Move ${kind} to ${to}: ${line.text}`}
+            size="sm"
             onClick={() => onMove(to)}
           >
             To {to}
-          </button>
+          </Button>
         ))}
-        <button
-          type="button"
-          className={styles.lineButton}
-          aria-label={`Delete ${kind}: ${line.text}`}
-          onClick={onRemove}
-        >
+        <Button label={`Delete ${kind}: ${line.text}`} size="sm" onClick={onRemove}>
           Delete
-        </button>
+        </Button>
       </span>
     </li>
   );
@@ -278,20 +269,16 @@ export default function AddRecipe() {
       {draft === null && (
         <>
           <section className={styles.section} aria-label="Where it came from">
-            <fieldset className={styles.sourcePicker}>
-              <legend className={styles.legend}>Where did it come from?</legend>
+            <RadioList
+              label="Where did it come from?"
+              orientation="horizontal"
+              value={source}
+              onChange={(value) => setSource(value as typeof source)}
+            >
               {SOURCES.map((s) => (
-                <label key={s.value} className={styles.sourceOption}>
-                  <input
-                    type="radio"
-                    name="recipe-source"
-                    checked={source === s.value}
-                    onChange={() => setSource(s.value)}
-                  />
-                  <span>{s.label}</span>
-                </label>
+                <RadioListItem key={s.value} value={s.value} label={s.label} />
               ))}
-            </fieldset>
+            </RadioList>
             <TextInput
               label="Link (optional)"
               description="FirstMenu keeps this link with the recipe and never opens it."
@@ -390,10 +377,9 @@ export default function AddRecipe() {
                   <strong>Not safe yet:</strong> {mention.label} is mentioned in
                   the {mention.where === 'title' ? 'title' : mention.where}:{' '}
                   <q>{mention.sentence}</q> {mention.message}{' '}
-                  <button
-                    type="button"
-                    className={styles.lineButton}
-                    aria-label={`Not used in this recipe: ${mention.sentence}`}
+                  <Button
+                    label={`Not used in this recipe: ${mention.sentence}`}
+                    size="sm"
                     onClick={() =>
                       setCleared((current) => [
                         ...current,
@@ -402,7 +388,7 @@ export default function AddRecipe() {
                     }
                   >
                     Not used in this recipe
-                  </button>
+                  </Button>
                 </li>
               ))}
               {screen.reminders.map((finding, index) => (
@@ -448,21 +434,18 @@ export default function AddRecipe() {
               <ul className={styles.lines}>
                 {[...draft.steps, ...draft.notes].map((line) => (
                   <li key={line.id} className={styles.line}>
-                    <label className={styles.markLabel}>
-                      <input
-                        type="checkbox"
-                        checked={marked.has(line.id)}
-                        onChange={(event) =>
-                          setMarked((current) => {
-                            const next = new Set(current);
-                            if (event.target.checked) next.add(line.id);
-                            else next.delete(line.id);
-                            return next;
-                          })
-                        }
-                      />
-                      <span>{line.text}</span>
-                    </label>
+                    <CheckboxInput
+                      label={line.text}
+                      value={marked.has(line.id)}
+                      onChange={(checked) =>
+                        setMarked((current) => {
+                          const next = new Set(current);
+                          if (checked) next.add(line.id);
+                          else next.delete(line.id);
+                          return next;
+                        })
+                      }
+                    />
                   </li>
                 ))}
               </ul>

@@ -133,8 +133,8 @@ Branch names use the `v2/` prefix (for example `v2/6-paste-parser`) so they don'
   - [x] 12.2 Add a secondary "I made this" button to the recipe page (records today once per day, confirms with a short status message). Component test: one filled primary button on the recipe page.
     - _Requirements: 17.5, 17.10_
 
-- [ ] 13. Convert remaining pages to Astryx
-  - [ ] 13.1 Convert Foods, recipe page, typed editor, Prep, Grocery, Share, Sources and Onboarding. Keep print CSS. Apply any UI feedback received under task 2.1 (the November 10 feedback, that the UI is clean but daunting to new users, is handled by task 18). Re-run `vitest-axe` on every page.
+- [x] 13. Convert remaining pages to Astryx
+  - [x] 13.1 Convert Foods, recipe page, typed editor, Prep, Grocery, Share, Sources and Onboarding. Keep print CSS. Apply any UI feedback received under task 2.1 (the November 10 feedback, that the UI is clean but daunting to new users, is handled by task 18). Re-run `vitest-axe` on every page.
     - _Requirements: 15.1, 15.5, 15.8_
 
 - [ ] 14. More built-in recipes (starts after task 1, runs in batches alongside tasks 2–13)

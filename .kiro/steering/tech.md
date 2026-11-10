@@ -25,7 +25,7 @@ calls an AI service.
   `ui/theme/firstmenu.css`; `ui/theme/RouterLinkProvider.tsx` makes Astryx
   links React Router links; app-only CSS variables use the `--fm-` prefix so
   they never clash with Astryx tokens. Astryx's `reset.css` is not loaded until
-  every page is converted (task 13). Do not use Astryx DateInput; use native
+  every page is converted (task 13). After task 13 these stay native on purpose: `<select>` (recipe page "Add to plan", editor ingredient category), `<input type="date">` (issue #37), and the recipe editor's number fields are Astryx `TextInput` with `inputMode="decimal"` (values are still validated in `buildRecipe`). Do not use Astryx DateInput; use native
   `<input type="date">` (issue #37). Pages are lazy-loaded through
   `ui/pages/routes.ts`; add new pages there and to `routes.eager.ts`.
 - Build checks in CI: `npm run check:contrast`, `check:external`, `check:size`.

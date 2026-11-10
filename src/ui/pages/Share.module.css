@@ -29,45 +29,14 @@
   margin-bottom: calc(var(--space) * 0.75);
 }
 
-.copyButton {
-  padding: calc(var(--space) * 0.5) var(--space);
-  border: 1px solid var(--fm-color-border);
-  border-radius: var(--radius);
-  background: var(--fm-color-surface, #fff);
-  color: var(--fm-color-heading);
-  font-weight: 600;
-  cursor: pointer;
-}
 
-.copyButton:hover,
-.copyButton:focus-visible {
-  border-color: var(--fm-color-heading);
-}
 
 .copied {
   font-weight: 600;
   color: var(--fm-color-heading);
 }
 
-.fieldLabel {
-  display: block;
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--fm-color-heading);
-  margin-bottom: calc(var(--space) * 0.25);
-}
 
-.urlField {
-  width: 100%;
-  box-sizing: border-box;
-  padding: calc(var(--space) * 0.5);
-  border: 1px solid var(--fm-color-border);
-  border-radius: var(--radius);
-  font-family: monospace;
-  font-size: 0.85rem;
-  color: var(--fm-color-text);
-  background: var(--fm-color-surface);
-}
 
 .warning {
   margin: var(--space) 0;

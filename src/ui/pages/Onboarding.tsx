@@ -10,8 +10,12 @@
 
 import { useMemo, useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Button } from '@astryxdesign/core/Button';
+import { CheckboxInput } from '@astryxdesign/core/CheckboxInput';
+import { TextInput } from '@astryxdesign/core/TextInput';
 import { useApp } from '../../state/AppProvider';
 import type { FoodRecord } from '../../domain/types';
+import { usePagePrimaryAction } from '../components/primaryActionContext';
 import styles from './Onboarding.module.css';
 import {
   ALLERGEN_GROUPS,
@@ -26,6 +30,7 @@ import {
 export default function Onboarding() {
   const { state, dispatch } = useApp();
   const navigate = useNavigate();
+  usePagePrimaryAction(true);
 
   const [name, setName] = useState('');
   const [birthDate, setBirthDate] = useState('');
@@ -78,19 +83,13 @@ export default function Onboarding() {
       <p>Tell us about your baby or toddler so we can show the right recipes and safety rules.</p>
 
       <form className={styles.form} onSubmit={handleSubmit}>
-        <div className={styles.field}>
-          <label className={styles.label} htmlFor="onboarding-name">
-            First name (optional)
-          </label>
-          <input
-            id="onboarding-name"
-            className={styles.input}
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            autoComplete="off"
-          />
-        </div>
+        <TextInput
+          label="First name"
+          isOptional
+          value={name}
+          onChange={(value) => setName(value)}
+          autoComplete="off"
+        />
 
         <div className={styles.field}>
           <label className={styles.label} htmlFor="onboarding-birthdate">
@@ -124,13 +123,11 @@ export default function Onboarding() {
           <ul className={styles.checklist}>
             {allergenItems.map((item) => (
               <li key={item.key} className={styles.check}>
-                <input
-                  id={`tried-${item.key}`}
-                  type="checkbox"
-                  checked={checked[item.key] ?? false}
+                <CheckboxInput
+                  label={item.label}
+                  value={checked[item.key] ?? false}
                   onChange={() => toggle(item.key)}
                 />
-                <label htmlFor={`tried-${item.key}`}>{item.label}</label>
               </li>
             ))}
           </ul>
@@ -139,21 +136,19 @@ export default function Onboarding() {
           <ul className={styles.checklist}>
             {OTHER_FIRST_FOODS.map((item) => (
               <li key={item.key} className={styles.check}>
-                <input
-                  id={`tried-${item.key}`}
-                  type="checkbox"
-                  checked={checked[item.key] ?? false}
+                <CheckboxInput
+                  label={item.label}
+                  value={checked[item.key] ?? false}
                   onChange={() => toggle(item.key)}
                 />
-                <label htmlFor={`tried-${item.key}`}>{item.label}</label>
               </li>
             ))}
           </ul>
         </fieldset>
 
-        <button type="submit" className={styles.submit} disabled={!birthDate}>
-          Start planning
-        </button>
+        <div className={styles.actions}>
+          <Button label="Start planning" type="submit" variant="primary" size="lg" isDisabled={!birthDate} />
+        </div>
       </form>
     </>
   );

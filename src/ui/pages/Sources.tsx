@@ -6,6 +6,7 @@
 // Nothing here is hardcoded: the rule list and the source list are derived
 // from RULES/SOURCES so adding or changing a rule updates this page.
 
+import { Link } from '@astryxdesign/core/Link';
 import {
   NEW_FOOD_SPACING_DAYS,
   NEW_FOOD_SPACING_SOURCES,
@@ -74,9 +75,9 @@ function SourceLinks({ ids }: { ids: SourceId[] }) {
           {sourceUrls(SOURCES[id]).map((url, j) => (
             <span key={url}>
               {j > 0 ? ' ' : ''}
-              <a href={url} target="_blank" rel="noopener noreferrer">
+              <Link href={url} target="_blank" rel="noopener noreferrer">
                 {SOURCES[id].title}
-              </a>
+              </Link>
             </span>
           ))}
         </span>
@@ -114,9 +115,9 @@ export default function Sources() {
                     {urls.map((url, j) => (
                       <span key={url}>
                         {j > 0 ? ' ' : ''}
-                        <a href={url} target="_blank" rel="noopener noreferrer">
+                        <Link href={url} target="_blank" rel="noopener noreferrer">
                           {source.title}
-                        </a>
+                        </Link>
                       </span>
                     ))}
                   </span>
@@ -178,9 +179,9 @@ export default function Sources() {
               {urls.map((url, i) => (
                 <span key={url}>
                   {i > 0 ? ' ' : ''}
-                  <a href={url} target="_blank" rel="noopener noreferrer">
+                  <Link href={url} target="_blank" rel="noopener noreferrer">
                     {source.title}
-                  </a>
+                  </Link>
                 </span>
               ))}
               {source.retrieved ? (
@@ -195,9 +196,9 @@ export default function Sources() {
       <ul className={styles.referenceList}>
         {recipeSourceList.map((source) => (
           <li key={source.url} className={styles.reference}>
-            <a href={source.url} target="_blank" rel="noopener noreferrer">
+            <Link href={source.url} target="_blank" rel="noopener noreferrer">
               {source.title}
-            </a>
+            </Link>
             <span className={styles.retrieved}>
               {' '}
               — {source.publisher} (retrieved {source.retrieved})
