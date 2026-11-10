@@ -4,20 +4,63 @@
 // with plural-aware token equality, which avoids the common false positives
 // ("honeydew melon" must not match "honey", "eggplant" must not match "egg").
 
+// Invisible code points that must not hide a food word from the screen:
+// every default-ignorable code point (Hangul fillers U+115F/U+1160/U+3164/
+// U+FFA0, variation selectors, soft hyphen, zero-width and bidi controls, tag
+// characters, ...), every format character, and the Braille blank U+2800.
+const INVISIBLE = /[\p{Default_Ignorable_Code_Point}\p{Cf}\u2800]/gu;
+const HAS_INVISIBLE = /[\p{Default_Ignorable_Code_Point}\p{Cf}\u2800]/u;
+
+/** Does `text` contain any invisible code point that normalize() strips? */
+export function hasInvisible(text: string): boolean {
+  return HAS_INVISIBLE.test(text);
+}
+
+/** Replace every invisible code point with `replacement`. */
+function dropInvisible(text: string, replacement: string): string {
+  return text.replace(INVISIBLE, replacement);
+}
+
 /**
- * Lowercase, strip accents (NFKD + drop combining marks), replace every
- * non [a-z0-9] character with a space, then collapse and trim spaces.
+ * Lowercase, strip invisible characters (so "ho\u3164ney" reads "honey"), strip
+ * accents (NFKD + drop combining marks), replace every non [a-z0-9] character
+ * with a space, then collapse and trim spaces.
  *
  * e.g. "Cow's Milk" -> "cow s milk".
  */
 export function normalize(name: string): string {
-  return name
-    .normalize('NFKD')
+  const cached = normalizeCache.get(name);
+  if (cached !== undefined) return cached;
+  const result = dropInvisible(dropInvisible(name, '').normalize('NFKD'), '')
     .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, ' ')
     .trim()
     .replace(/\s+/g, ' ');
+  // Speed only (active spec Requirement 14.9): the screen normalizes the same
+  // ingredient name once per rule term, so strings repeat many times. The
+  // function is pure, so the cache cannot change a result. It is cleared when
+  // it grows past the limit so it cannot grow without bound.
+  if (normalizeCache.size >= NORMALIZE_CACHE_LIMIT) normalizeCache.clear();
+  normalizeCache.set(name, result);
+  return result;
+}
+
+const NORMALIZE_CACHE_LIMIT = 20000;
+const normalizeCache = new Map<string, string>();
+
+/**
+ * Token lists for the safety screen. An invisible character can hide a word
+ * ("ho\u3164ney") or stand in for a space ("honey\u200Bcake"), and the screen
+ * cannot tell which, so it checks both readings: invisibles removed (the first
+ * list) and invisibles read as spaces (a second list, only when they differ).
+ * Checking both keeps the screen strictly stricter than before.
+ */
+export function screenTokenVariants(text: string): string[][] {
+  const stripped = tokenize(text);
+  if (!hasInvisible(text)) return [stripped];
+  const spaced = tokenize(dropInvisible(text, ' '));
+  return spaced.join(' ') === stripped.join(' ') ? [stripped] : [stripped, spaced];
 }
 
 /** Normalize then split into non-empty tokens. */
@@ -67,5 +110,27 @@ export function termMatchesTokens(
 
 /** Convenience: does `term` match anywhere in the ingredient `name`? */
 export function matchesTerm(name: string, term: string): boolean {
-  return termMatchesTokens(tokenize(name), tokenize(term));
+  const termTokens = cachedTokens(term);
+  return cachedVariants(name).some((tokens) => termMatchesTokens(tokens, termTokens));
+}
+
+// Speed only (active spec Requirement 14.9): the screen calls matchesTerm for
+// every rule term against the same ingredient name, so the same strings are
+// tokenized again and again. These arrays are read-only and never leave this
+// module (tokenize() above still returns a fresh array to its callers). The
+// cache is cleared when it passes the limit so it cannot grow without bound.
+const TOKEN_CACHE_LIMIT = 20000;
+const tokenCache = new Map<string, string[][]>();
+
+function cachedVariants(text: string): string[][] {
+  const cached = tokenCache.get(text);
+  if (cached !== undefined) return cached;
+  const variants = screenTokenVariants(text);
+  if (tokenCache.size >= TOKEN_CACHE_LIMIT) tokenCache.clear();
+  tokenCache.set(text, variants);
+  return variants;
+}
+
+function cachedTokens(text: string): string[] {
+  return cachedVariants(text)[0];
 }

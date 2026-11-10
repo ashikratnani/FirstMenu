@@ -67,6 +67,7 @@
 
 import type { Recipe } from '../domain/types';
 import { BATCH_2_RECIPES } from './recipesBatch2';
+import { BATCH_3_RECIPES } from './recipesBatch3';
 import { SIMPLE_IDEAS } from './simpleIdeas';
 
 const BABYFOOD_URL = 'https://www.health.state.mn.us/people/wic/recipes/babyfood.html';
@@ -498,6 +499,12 @@ export const RECIPES: Recipe[] = [
 
 /**
  * Everything built in: the 10 sourced WIC recipes, the simple ideas and the
- * batch 2 recipes (Food Hero, ICN, NHLBI; see recipesBatch2.ts).
+ * batch 2 and batch 3 recipes (Food Hero, ICN, NHLBI and others; see
+ * recipesBatch2.ts and recipesBatch3.ts).
  */
-export const BUILTIN_RECIPES: Recipe[] = [...RECIPES, ...SIMPLE_IDEAS, ...BATCH_2_RECIPES];
+export const BUILTIN_RECIPES: Recipe[] = [
+  ...RECIPES,
+  ...SIMPLE_IDEAS,
+  ...BATCH_2_RECIPES,
+  ...BATCH_3_RECIPES,
+];

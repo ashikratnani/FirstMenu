@@ -3,9 +3,12 @@
 //
 // Pages are code-split, so what matters is the FIRST LOAD of each page: the
 // app entry plus the page's own chunk and everything it imports, JS and CSS,
-// gzipped. Built-in recipe data (src/data/*) is reported but not budgeted.
+// gzipped. Built-in recipe data (src/data/*) is reported apart from the page
+// budget.
 // The budget: the heaviest page's first load may be at most 250 KB larger
 // than the v1 build, which loaded everything at once.
+// The recipe data chunk has its own budget (size-budget.mjs): a warning at
+// 160 KB gzipped and a failure at 200 KB (active spec Requirement 14.9).
 //
 // Reads dist/.vite/manifest.json (vite.config.ts sets build.manifest).
 // Usage: node scripts/size-report.mjs [distDir]   (default: dist)
@@ -13,6 +16,7 @@
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { gzipSync } from 'node:zlib';
+import { recipeDataStatus } from './size-budget.mjs';
 
 // v1 build on main (commit 17bc237), gzip level 9: 120,625 B JS + 5,501 B CSS.
 const V1_BASELINE_BYTES = 126_126;
@@ -73,7 +77,9 @@ for (const p of pages) {
   console.log(`  ${p.name.padEnd(14)} ${kb(p.bytes).padStart(9)}${p.data ? `  + ${kb(p.data)} recipe data` : ''}`);
 }
 const dataFiles = new Set(Object.keys(manifest).filter(isData).map((k) => manifest[k].file));
-console.log(`Recipe data chunk (gzip):       ${kb(sum(dataFiles))} (not budgeted)`);
+const dataBytes = sum(dataFiles);
+const dataStatus = recipeDataStatus(dataBytes);
+console.log(`Recipe data chunk (gzip):       ${kb(dataBytes)} (warn 160 KB, fail 200 KB; separate from the page budget)`);
 console.log(`All JS + CSS in the build:      ${kb(allJsCss)}`);
 console.log(`Fonts (latin woff2):            ${kb(fonts)} (not budgeted)`);
 
@@ -81,8 +87,20 @@ const heaviest = pages[0];
 const growth = heaviest.bytes - V1_BASELINE_BYTES;
 console.log(`Heaviest page vs v1:            ${heaviest.name} ${kb(heaviest.bytes)} vs ${kb(V1_BASELINE_BYTES)} (${growth >= 0 ? '+' : ''}${kb(growth)})`);
 console.log(`Budget:                         +${kb(BUDGET_BYTES)}`);
+let failed = false;
 if (growth > BUDGET_BYTES) {
   console.error(`Over budget by ${kb(growth - BUDGET_BYTES)}.`);
-  process.exit(1);
+  failed = true;
+} else {
+  console.log('Within budget.');
 }
-console.log('Within budget.');
+if (dataStatus.level === 'fail') {
+  console.error(dataStatus.message);
+  failed = true;
+} else if (dataStatus.level === 'warn') {
+  // ::warning:: shows as an annotation in GitHub Actions and is plain text elsewhere.
+  console.warn(`::warning::${dataStatus.message}`);
+} else {
+  console.log(dataStatus.message);
+}
+if (failed) process.exit(1);
