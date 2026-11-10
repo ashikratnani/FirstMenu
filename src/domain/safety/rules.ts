@@ -561,4 +561,4 @@ export function allergenGuidance(group: AllergenGroup): AllergenGuidance {
  * Bumped whenever the rules change (steering/safety-rules.md). Share links
  * carry this so a viewer can tell their rules differ from the link's.
  */
-export const RULESET_VERSION = 4;
+export const RULESET_VERSION = 5;

@@ -24,6 +24,24 @@ const INVISIBLES: Array<[string, string]> = [
   ['U+FEFF BOM', '\uFEFF'],
   ['U+200E left-to-right mark', '\u200E'],
   ['U+E0041 tag character', '\u{E0041}'],
+  ['U+0000 NUL', '\u0000'],
+  ['U+0001 control', '\u0001'],
+  ['U+0085 next line', '\u0085'],
+  ['U+007F delete', '\u007F'],
+  ['U+009F control', '\u009F'],
+  ['U+E000 private use', '\uE000'],
+  ['U+F8FF private use', '\uF8FF'],
+  ['U+10FFFD plane 16 private use', '\u{10FFFD}'],
+  ['U+0378 unassigned', '\u0378'],
+  ['U+FFFF noncharacter', '\uFFFF'],
+  ['U+D800 lone high surrogate', '\uD800'],
+  ['U+DC00 lone low surrogate', '\uDC00'],
+  ['U+FFFC object replacement', '\uFFFC'],
+  ['U+20DD combining enclosing circle', '\u20DD'],
+  ['U+20D2 combining long vertical line', '\u20D2'],
+  ['U+1AB0 combining doubled circumflex', '\u1AB0'],
+  ['U+FE20 combining ligature left half', '\uFE20'],
+  ['U+0301 combining acute', '\u0301'],
 ];
 
 // [word with a gap, rule id]
@@ -126,5 +144,52 @@ describe('invisible characters do not cause false positives (must not fire)', ()
     expect(normalize('ho\uFE0Fney  badger')).toBe('honey badger');
     expect(tokenize('a\u200Bb c')).toEqual(['ab', 'c']);
     expect(matchesTerm('ho\u2800ney', 'honey')).toBe(true);
+  });
+});
+
+describe('control, private-use and combining-mark characters (extra cases)', () => {
+  it('tab, CR and LF stay whitespace', () => {
+    expect(normalize('honey\tcake')).toBe('honey cake');
+    expect(normalize('honey\r\ncake')).toBe('honey cake');
+    expect(tokenize('a\nb')).toEqual(['a', 'b']);
+  });
+
+  it('the reviewer probes', () => {
+    for (const ch of ['\u0001', '\u0000', '\u0085', '\uE000', '\uD800', '\uFFFC', '\u20DD', '\u20D2', '\u1AB0', '\uFE20']) {
+      expect(textMentionsBlockFood(`ho${ch}ney`)).toBe(true);
+      expect(matchesTerm(`ho${ch}ney`, 'honey')).toBe(true);
+    }
+  });
+
+  it('mixed runs still fire', () => {
+    expect(textMentionsBlockFood('ho\u0001\uE000\u20DD\uD800\u3164ney')).toBe(true);
+    expect(screenIngredient('pea\u0000\u20DDnut', AGE).map((f) => f.ruleId)).toContain('allergen-peanut');
+  });
+
+  it('must not fire on other foods, accents, other scripts or emoji', () => {
+    expect(screenIngredient('ho\u0001neydew melon', AGE).map((f) => f.ruleId)).not.toContain('honey');
+    expect(screenIngredient('ho\u20DDneydew melon', AGE).map((f) => f.ruleId)).not.toContain('honey');
+    expect(screenIngredient('eggplant', AGE).map((f) => f.ruleId)).not.toContain('allergen-egg');
+    expect(screenIngredient('egg\u20DDplant', AGE).map((f) => f.ruleId)).toContain('allergen-egg'); // spaced reading, stricter by design
+    expect(textMentionsBlockFood('Mash the banana \u0001 and \uE000 \u20DD enjoy')).toBe(false);
+    expect(textMentionsBlockFood('\u{1F34C} \u{1F600} \u{1F1FA}\u{1F1F8}')).toBe(false);
+  });
+
+  it('accents (precomposed and decomposed) and non-Latin scripts keep matching as before', () => {
+    expect(normalize('Cr\u00E8me Br\u00FBl\u00E9e')).toBe('creme brulee');
+    expect(normalize('Cre\u0300me')).toBe('creme');
+    expect(normalize('jalapen\u0303o')).toBe('jalapeno');
+    expect(normalize('\u0928\u092E\u0938\u094D\u0924\u0947')).toBe('');
+    expect(normalize('\u4E2D\u6587 honey')).toBe('honey');
+    expect(textMentionsBlockFood('Une cr\u00E8me d\u00E9licieuse.')).toBe(false);
+    expect(screenIngredient('hone\u0300y', AGE).map((f) => f.ruleId)).toContain('honey');
+  });
+
+  it('screening many strings with hidden characters stays fast', () => {
+    const start = performance.now();
+    for (let i = 0; i < 2000; i++) {
+      screenIngredient(`${i} ho\u0001ney \u20DD pea\uE000nut gra\uD800pes`, AGE);
+    }
+    expect(performance.now() - start).toBeLessThan(5000);
   });
 });

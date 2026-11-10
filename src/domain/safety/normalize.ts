@@ -4,12 +4,18 @@
 // with plural-aware token equality, which avoids the common false positives
 // ("honeydew melon" must not match "honey", "eggplant" must not match "egg").
 
-// Invisible code points that must not hide a food word from the screen:
-// every default-ignorable code point (Hangul fillers U+115F/U+1160/U+3164/
-// U+FFA0, variation selectors, soft hyphen, zero-width and bidi controls, tag
-// characters, ...), every format character, and the Braille blank U+2800.
-const INVISIBLE = /[\p{Default_Ignorable_Code_Point}\p{Cf}\u2800]/gu;
-const HAS_INVISIBLE = /[\p{Default_Ignorable_Code_Point}\p{Cf}\u2800]/u;
+// Code points that must not hide a food word from the screen:
+// - every default-ignorable code point (Hangul fillers U+115F/U+1160/U+3164/
+//   U+FFA0, variation selectors, soft hyphen, zero-width and bidi controls, tag
+//   characters, ...), every format character, and the Braille blank U+2800;
+// - control characters (\p{Cc}) except tab, CR and LF, which stay whitespace;
+// - private-use, unassigned and lone-surrogate code points, plus the object
+//   replacement character U+FFFC;
+// - combining marks (\p{Mn}\p{Me}), e.g. U+20DD, U+20D2, U+1AB0, U+FE20.
+const HIDDEN_CLASS =
+  '[\\p{Default_Ignorable_Code_Point}\\p{Cf}\\u2800\\p{Cc}\\p{Co}\\p{Cn}\\p{Cs}\\uFFFC\\p{Mn}\\p{Me}]';
+const INVISIBLE = new RegExp(`(?![\\t\\r\\n])${HIDDEN_CLASS}`, 'gu');
+const HAS_INVISIBLE = new RegExp(`(?![\\t\\r\\n])${HIDDEN_CLASS}`, 'u');
 
 /** Does `text` contain any invisible code point that normalize() strips? */
 export function hasInvisible(text: string): boolean {
@@ -22,7 +28,7 @@ function dropInvisible(text: string, replacement: string): string {
 }
 
 /**
- * Lowercase, strip invisible characters (so "ho\u3164ney" reads "honey"), strip
+ * Lowercase, strip invisible characters and combining marks (so "ho\u3164ney" reads "honey"), strip
  * accents (NFKD + drop combining marks), replace every non [a-z0-9] character
  * with a space, then collapse and trim spaces.
  *
@@ -32,7 +38,6 @@ export function normalize(name: string): string {
   const cached = normalizeCache.get(name);
   if (cached !== undefined) return cached;
   const result = dropInvisible(dropInvisible(name, '').normalize('NFKD'), '')
-    .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, ' ')
     .trim()
