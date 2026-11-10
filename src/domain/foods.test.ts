@@ -491,6 +491,8 @@ describe('built-in recipes derive clean food keys (Item 3)', () => {
       'gochujang',
       'manicotti',
       'pumpkin pie spice',
+      'bok choy',
+      'sugar snap pea',
     ]);
   });
 

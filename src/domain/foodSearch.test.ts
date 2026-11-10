@@ -476,9 +476,9 @@ describe('title words', () => {
   });
 
   it('does not match part of a word', () => {
-    // "pan" is part of the built-in titles "Pancakes", never a whole title word.
-    expect(search('pan').titleWords).toEqual([]);
-    expect(search('pan').unrecognized).toEqual(['pan']);
+    // "ancake" (4 or more letters) is part of the built-in title "Pancakes", never a whole title word.
+    expect(search('ancake').titleWords).toEqual([]);
+    expect(search('ancake').unrecognized).toEqual(['ancake']);
   });
 
   it('is checked before typo matching', () => {

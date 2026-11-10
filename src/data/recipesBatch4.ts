@@ -16,7 +16,11 @@
 //    out and recorded in source.adaptations. When the dish depends on the
 //    ingredient (soy sauce or teriyaki sauce, brown sugar in a sauce, honey that
 //    binds a bar) the recipe is tagged 24-36 only and keeps it; recipes.test.ts
-//    lists those exceptions.
+//    lists those exceptions. A recipe tagged 24-36 only keeps every source
+//    ingredient (the screen blocks salt, sugar and honey only under 24 months).
+//  - Recipes with nut pieces (slivered, sliced or chopped nuts, even optional
+//    ones) are tagged 24-36 only: the screen's whole-nuts reminder applies below
+//    that and no source page describes grinding the nuts.
 //  - Servings are the source's own count when it states one. Otherwise they are
 //    an estimate (yield divided by a stated portion), disclosed in
 //    source.adaptations and pinned in recipes.test.ts.
@@ -116,7 +120,7 @@ export const BATCH_4_RECIPES: Recipe[] = [
     servings: 8,
   },
   {
-    // Fish fillets baked over spinach with tomato and green onion. Salt left out.
+    // Fish fillets baked over spinach with tomato and green onion. Salt left out. The Creole or Cajun blend is a seasoning blend that may contain salt, so it is tagged from 12 months.
     id: 'b-fh-fish-and-spinach-bake',
     origin: 'builtin',
     source: {
@@ -127,7 +131,7 @@ export const BATCH_4_RECIPES: Recipe[] = [
       adaptations: ['Left out 1/4 teaspoon salt'],
     },
     title: 'Fish and Spinach Bake',
-    stages: ['9-12', '12-23', '24-36'],
+    stages: ['12-23', '24-36'],
     serveAs: ['pieces'],
     mealTypes: ['lunch', 'dinner'],
     ingredients: [
@@ -178,36 +182,6 @@ export const BATCH_4_RECIPES: Recipe[] = [
       'Add the spinach and stir constantly until it is completely wilted, about 2 to 3 minutes, and the dish reaches 140°F for at least 15 seconds. Serve 1/3 cup right away or keep warm at 140°F or higher.',
     ],
     texture: 'crumbled tempeh with soft cauliflower and spinach',
-    servings: 6,
-  },
-  {
-    // Tofu marinated in soy sauce, vinegar and oil, then baked. Soy sauce is the marinade, so 24-36 only. Honey or brown sugar left out of the soy-honey marinade.
-    id: 'b-fh-baked-tofu',
-    origin: 'builtin',
-    source: {
-      title: 'Baked Tofu',
-      publisher: FH_PUBLISHER,
-      url: 'https://foodhero.org/recipes/baked-tofu',
-      retrieved: RETRIEVED,
-      adaptations: [ESTIMATE_HALF_CUP, 'Uses the soy-honey marinade only; the page also gives a soy-lime marinade', 'Left out 1 Tablespoon honey or brown sugar'],
-    },
-    title: 'Baked Tofu',
-    stages: ['24-36'],
-    serveAs: ['finger-food', 'pieces'],
-    mealTypes: ['lunch', 'dinner'],
-    ingredients: [
-      { name: 'firm or extra-firm tofu, fresh or frozen and thawed', food: 'tofu', quantity: 16, unit: 'oz', category: 'protein' },
-      { name: 'low-sodium soy sauce (marinade)', food: 'soy sauce', quantity: 2, unit: 'tbsp', category: 'pantry' },
-      { name: 'vinegar, cider, rice or balsamic (marinade)', food: 'vinegar', quantity: 2, unit: 'tbsp', category: 'pantry' },
-      { name: 'vegetable oil, try sesame oil (marinade)', food: 'vegetable oil', quantity: 1, unit: 'tbsp', category: 'pantry' },
-    ],
-    steps: [
-      'Wash your hands. Press the water out of the tofu with a clean towel and cut it into triangles, cubes, slices or sticks.',
-      'Mix the marinade ingredients in a bowl, add the tofu and marinate for at least 30 minutes. Heat the oven to 350°F.',
-      'Drain the tofu and set the pieces on a baking sheet (foil makes clean-up easy).',
-      'Bake for about 30 minutes, turning the pieces once, until the tofu is firm and lightly browned. Refrigerate leftovers within 2 hours.',
-    ],
-    texture: 'firm baked tofu pieces',
     servings: 6,
   },
   {
@@ -268,7 +242,7 @@ export const BATCH_4_RECIPES: Recipe[] = [
     ],
     steps: [
       'Wash your hands and rinse the cabbage. Heat the oil in a skillet over medium-high heat (350°F in an electric skillet).',
-      'Add the chicken strips and stir-fry, turning constantly, until done. Wash your hands after touching raw chicken.',
+      'Add the chicken strips and stir-fry, turning constantly, until done.',
       'Add the cabbage and stir until it is crisp-tender, about 2 minutes.',
       'In a small bowl, mix the cornstarch, ginger and garlic, then stir in the water and soy sauce until smooth. Stir the sauce into the chicken and cabbage.',
       'Cook about 1 minute, until the sauce thickens and coats the chicken. Refrigerate leftovers within 2 hours.',
@@ -277,7 +251,7 @@ export const BATCH_4_RECIPES: Recipe[] = [
     servings: 12,
   },
   {
-    // Greens and carrots cooked until wilted and finished with vinegar and soy sauce, so 24-36 only. Salt left out.
+    // Greens and carrots cooked until wilted and finished with vinegar and soy sauce, so 24-36 only.
     id: 'b-fh-greens-and-carrots',
     origin: 'builtin',
     source: {
@@ -285,7 +259,7 @@ export const BATCH_4_RECIPES: Recipe[] = [
       publisher: FH_PUBLISHER,
       url: 'https://foodhero.org/recipes/greens-carrots',
       retrieved: RETRIEVED,
-      adaptations: [ESTIMATE_HALF_CUP, 'Left out 1/4 teaspoon salt'],
+      adaptations: [ESTIMATE_HALF_CUP],
     },
     title: 'Greens with Carrots',
     stages: ['24-36'],
@@ -296,6 +270,7 @@ export const BATCH_4_RECIPES: Recipe[] = [
       { name: 'vegetable oil', food: 'vegetable oil', quantity: 2, unit: 'tsp', category: 'pantry' },
       { name: 'large carrots, peeled and cut in thin strips or coarsely shredded', food: 'carrot', quantity: 2, unit: 'piece', category: 'produce' },
       { name: 'garlic, minced (or 1/4 teaspoon garlic powder)', food: 'garlic', quantity: 1, unit: 'clove', category: 'produce' },
+      { name: 'salt', food: 'salt', quantity: 0.25, unit: 'tsp', category: 'pantry' },
       { name: 'black pepper', food: 'black pepper', quantity: 0.25, unit: 'tsp', category: 'pantry' },
       { name: 'ground coriander', food: 'coriander', quantity: 1, unit: 'tsp', category: 'pantry', optional: true },
       { name: 'cayenne pepper', food: 'cayenne', quantity: 1, unit: 'pinch', category: 'pantry', optional: true },
@@ -305,7 +280,7 @@ export const BATCH_4_RECIPES: Recipe[] = [
     steps: [
       'Wash your hands and rinse the fresh vegetables. Cut the leaves from large stems and slice the stems crosswise if you want to use them. Chop or slice the leaves into thin strips.',
       'Heat the oil in a large skillet over medium-high heat (350°F in an electric skillet). Cook the carrots and stems for 2 minutes, then add the garlic and cook for 1 minute.',
-      'Add the greens, pepper, and the coriander and cayenne if you like. Stir often until the greens turn bright green and begin to wilt, then remove from the heat.',
+      'Add the greens, salt, pepper, and the coriander and cayenne if you like. Stir often until the greens turn bright green and begin to wilt, then remove from the heat.',
       'Sprinkle the vinegar and soy sauce over the top, toss gently and serve. Refrigerate leftovers within 2 hours.',
     ],
     texture: 'soft cooked greens and carrot strips',
@@ -517,49 +492,11 @@ export const BATCH_4_RECIPES: Recipe[] = [
     ],
     steps: [
       'Wash your hands and rinse the vegetables. Heat the oven to 350°F and lightly grease a 9 x 13 inch baking dish.',
-      'Mix the beef, rice, milk, egg, onion, carrot and pepper. Use a spoon to form 24 meatballs and set them in the baking dish. Wash your hands after touching raw beef and egg.',
+      'Mix the beef, rice, milk, egg, onion, carrot and pepper. Use a spoon to form 24 meatballs and set them in the baking dish.',
       'In a separate bowl, mix the soup and milk well and pour the sauce over the meatballs.',
       'Cover the pan tightly with foil and bake for 1 hour. Refrigerate leftovers within 2 hours.',
     ],
     texture: 'soft baked meatballs in sauce',
-    servings: 8,
-  },
-  {
-    // Egg and parmesan batter with shredded vegetables, cooked on a griddle. Salt left out; tomato and sour cream are optional in the source.
-    id: 'b-fh-garden-vegetable-cakes',
-    origin: 'builtin',
-    source: {
-      title: 'Garden Vegetable Cakes',
-      publisher: FH_PUBLISHER,
-      url: 'https://foodhero.org/recipes/garden-vegetable-cakes',
-      retrieved: RETRIEVED,
-      adaptations: ['Serving count is an estimate (source gives no servings): 8 cakes, 1 cake per serving.', 'Left out 1/4 teaspoon salt'],
-    },
-    title: 'Garden Vegetable Cakes',
-    stages: ['9-12', '12-23', '24-36'],
-    serveAs: ['finger-food'],
-    mealTypes: ['breakfast', 'lunch', 'snack'],
-    ingredients: [
-      { name: 'grated parmesan cheese', food: 'parmesan', quantity: 0.25, unit: 'cup', category: 'dairy-eggs' },
-      { name: 'all purpose flour', food: 'flour', quantity: 0.33, unit: 'cup', category: 'grains' },
-      { name: 'baking powder', food: 'baking powder', quantity: 0.5, unit: 'tsp', category: 'pantry' },
-      { name: 'dill weed', food: 'dill', quantity: 0.25, unit: 'tsp', category: 'pantry' },
-      { name: 'black pepper', food: 'black pepper', quantity: 0.25, unit: 'tsp', category: 'pantry' },
-      { name: 'eggs (or 1 cup egg substitute)', food: 'egg', quantity: 4, unit: 'piece', category: 'dairy-eggs' },
-      { name: 'minced green onion with tops', food: 'green onion', quantity: 2, unit: 'tbsp', category: 'produce' },
-      { name: 'lemon juice', food: 'lemon juice', quantity: 2, unit: 'tsp', category: 'produce' },
-      { name: 'garlic (or 1/4 teaspoon garlic powder)', food: 'garlic', quantity: 1, unit: 'clove', category: 'produce' },
-      { name: 'shredded vegetables: unpeeled zucchini (drained and pressed), potato, carrots, bell pepper, celery, sweet potato or yam', food: 'vegetable', quantity: 1.5, unit: 'cup', category: 'produce' },
-      { name: 'tomato slices', food: 'tomato', quantity: 8, unit: 'slice', category: 'produce', optional: true },
-      { name: 'lowfat sour cream', food: 'sour cream', category: 'dairy-eggs', optional: true },
-    ],
-    steps: [
-      'Wash your hands and rinse the fresh vegetables. In a medium bowl, stir together the cheese, flour, baking powder, dill and pepper.',
-      'Beat in the eggs, green onions, lemon juice and garlic until well blended, then stir in all the shredded vegetables.',
-      'Heat a skillet or griddle over medium-high heat (350°F in an electric skillet) and lightly spray or oil it. For each cake, pour 1/3 cup of batter onto the hot surface and cook on both sides until golden brown.',
-      'Top with low-fat sour cream and tomato slices if you like and serve warm. Refrigerate leftovers within 2 hours.',
-    ],
-    texture: 'soft vegetable and egg cakes',
     servings: 8,
   },
   {
@@ -673,7 +610,7 @@ export const BATCH_4_RECIPES: Recipe[] = [
     servings: 16,
   },
   {
-    // Asparagus sauteed with slivered almonds until fork-tender. Salt and sugar left out.
+    // Asparagus sauteed with slivered almonds until fork-tender. The slivered almonds are nut pieces, so 24-36 only.
     id: 'b-fh-ginger-almond-asparagus',
     origin: 'builtin',
     source: {
@@ -681,17 +618,19 @@ export const BATCH_4_RECIPES: Recipe[] = [
       publisher: FH_PUBLISHER,
       url: 'https://foodhero.org/recipes/ginger-almond-asparagus',
       retrieved: RETRIEVED,
-      adaptations: [ESTIMATE_HALF_CUP, 'Left out 1/4 teaspoon salt', 'Left out 1/4 teaspoon sugar'],
+      adaptations: [ESTIMATE_HALF_CUP],
     },
     title: 'Ginger Almond Asparagus',
-    stages: ['12-23', '24-36'],
+    stages: ['24-36'],
     serveAs: ['pieces'],
     mealTypes: ['dinner'],
     ingredients: [
       { name: 'asparagus, rinsed and trimmed (2 1/2 cups sliced)', food: 'asparagus', quantity: 0.75, unit: 'lb', category: 'produce' },
       { name: 'vegetable oil', food: 'vegetable oil', quantity: 1, unit: 'tsp', category: 'pantry' },
       { name: 'slivered almonds', food: 'almond', quantity: 3, unit: 'tbsp', category: 'pantry' },
+      { name: 'salt', food: 'salt', quantity: 0.25, unit: 'tsp', category: 'pantry' },
       { name: 'black pepper', food: 'black pepper', quantity: 1, unit: 'pinch', category: 'pantry' },
+      { name: 'sugar', food: 'sugar', quantity: 0.25, unit: 'tsp', category: 'pantry' },
       { name: 'ground ginger', food: 'ginger', quantity: 0.125, unit: 'tsp', category: 'pantry' },
     ],
     steps: [
@@ -703,7 +642,7 @@ export const BATCH_4_RECIPES: Recipe[] = [
     servings: 4,
   },
   {
-    // Green beans in a mustard and orange sauce with onion and almonds. Brown sugar left out.
+    // Green beans in a mustard and orange sauce with onion and almonds. The almonds are nut pieces, so 24-36 only.
     id: 'b-fh-green-beans-onions-and-almonds',
     origin: 'builtin',
     source: {
@@ -711,23 +650,24 @@ export const BATCH_4_RECIPES: Recipe[] = [
       publisher: FH_PUBLISHER,
       url: 'https://foodhero.org/recipes/green-beans-onions-and-almonds',
       retrieved: RETRIEVED,
-      adaptations: [ESTIMATE_HALF_CUP, 'Left out 2 Tablespoons packed brown sugar'],
+      adaptations: [ESTIMATE_HALF_CUP],
     },
     title: 'Green Beans with Onions and Almonds',
-    stages: ['12-23', '24-36'],
+    stages: ['24-36'],
     serveAs: ['pieces'],
     mealTypes: ['dinner'],
     ingredients: [
       { name: 'margarine or butter', food: 'butter', quantity: 1, unit: 'tbsp', category: 'dairy-eggs' },
       { name: 'small onion (1/2 cup chopped or sliced)', food: 'onion', quantity: 1, unit: 'piece', category: 'produce' },
       { name: 'chopped, sliced or slivered almonds', food: 'almond', quantity: 0.25, unit: 'cup', category: 'pantry' },
+      { name: 'packed brown sugar', food: 'brown sugar', quantity: 2, unit: 'tbsp', category: 'pantry' },
       { name: 'orange juice (juice from 1/4 orange)', food: 'orange juice', quantity: 2, unit: 'tbsp', category: 'produce' },
       { name: 'prepared mustard', food: 'mustard', quantity: 1, unit: 'tbsp', category: 'pantry' },
       { name: 'green beans, fresh cooked, frozen, or canned, drained and rinsed', food: 'green bean', quantity: 4, unit: 'cup', category: 'produce' },
     ],
     steps: [
       'Wash your hands and rinse the fresh vegetables. Melt the margarine or butter in a medium skillet over medium heat, then add the onion and almonds and cook until the onions are tender.',
-      'In a small bowl, mix the orange juice and mustard and stir them into the onion mixture.',
+      'In a small bowl, mix the brown sugar, orange juice and mustard and stir them into the onion mixture.',
       'Cook 2 to 3 minutes, until the sauce begins to thicken. Stir in the green beans and cook for 3 to 5 minutes, until heated through. Refrigerate leftovers within 2 hours.',
     ],
     texture: 'soft green beans and onion with almonds',
@@ -767,7 +707,7 @@ export const BATCH_4_RECIPES: Recipe[] = [
     servings: 10,
   },
   {
-    // Apples, celery and raisins with toasted walnuts in a yogurt dressing. Sugar left out.
+    // Apples, celery and raisins with toasted walnuts in a yogurt dressing.
     id: 'b-fh-waldorf-salad',
     origin: 'builtin',
     source: {
@@ -775,7 +715,7 @@ export const BATCH_4_RECIPES: Recipe[] = [
       publisher: FH_PUBLISHER,
       url: 'https://foodhero.org/recipes/waldorf-salad',
       retrieved: RETRIEVED,
-      adaptations: [ESTIMATE_HALF_CUP, 'Left out 1/2 teaspoon sugar'],
+      adaptations: [ESTIMATE_HALF_CUP],
     },
     title: 'Waldorf Salad',
     stages: ['24-36'],
@@ -787,18 +727,19 @@ export const BATCH_4_RECIPES: Recipe[] = [
       { name: 'diced celery', food: 'celery', quantity: 1, unit: 'cup', category: 'produce' },
       { name: 'raisins', food: 'raisin', quantity: 0.5, unit: 'cup', category: 'produce' },
       { name: 'low-fat plain yogurt', food: 'yogurt', quantity: 0.25, unit: 'cup', category: 'dairy-eggs' },
+      { name: 'sugar', food: 'sugar', quantity: 0.5, unit: 'tsp', category: 'pantry' },
       { name: 'lemon juice', food: 'lemon juice', quantity: 1, unit: 'tsp', category: 'produce' },
     ],
     steps: [
       'Wash your hands and rinse the fresh fruit and celery. Heat the oven to 350°F, spread the walnuts on a baking sheet and bake for 12 to 15 minutes, stirring now and then, until evenly toasted.',
       'In a large bowl, combine the apples, celery, nuts and raisins.',
-      'In a small bowl, stir the yogurt and lemon juice together, pour over the apple mixture and toss lightly. Refrigerate leftovers within 2 hours.',
+      'In a small bowl, stir the yogurt, sugar and lemon juice together, pour over the apple mixture and toss lightly. Refrigerate leftovers within 2 hours.',
     ],
     texture: 'crunchy diced apple and celery salad with walnuts',
     servings: 8,
   },
   {
-    // An egg batter baked over cherries in a hot skillet. Sugar left out; the sliced almonds are optional in the source.
+    // An egg batter baked over cherries in a hot skillet. The optional sliced almonds are nut pieces, so 24-36 only.
     id: 'b-fh-cherry-puff-pancake',
     origin: 'builtin',
     source: {
@@ -806,10 +747,10 @@ export const BATCH_4_RECIPES: Recipe[] = [
       publisher: FH_PUBLISHER,
       url: 'https://foodhero.org/recipes/cherry-puff-pancake',
       retrieved: RETRIEVED,
-      adaptations: ['Serving count is an estimate (source gives no servings): 4 pieces, 1 piece per serving.', 'Left out 1 Tablespoon sugar'],
+      adaptations: ['Serving count is an estimate (source gives no servings): 4 pieces, 1 piece per serving.'],
     },
     title: 'Cherry Puff Pancake',
-    stages: ['12-23', '24-36'],
+    stages: ['24-36'],
     serveAs: ['pieces'],
     mealTypes: ['breakfast'],
     ingredients: [
@@ -817,6 +758,7 @@ export const BATCH_4_RECIPES: Recipe[] = [
       { name: 'nonfat or 1% milk', food: 'milk', quantity: 0.5, unit: 'cup', category: 'dairy-eggs' },
       { name: 'vanilla', food: 'vanilla', quantity: 1, unit: 'tsp', category: 'pantry' },
       { name: 'all-purpose flour', food: 'flour', quantity: 0.5, unit: 'cup', category: 'grains' },
+      { name: 'sugar', food: 'sugar', quantity: 1, unit: 'tbsp', category: 'pantry' },
       { name: 'cinnamon', food: 'cinnamon', quantity: 1, unit: 'dash', category: 'pantry' },
       { name: 'margarine or butter', food: 'butter', quantity: 2, unit: 'tbsp', category: 'dairy-eggs' },
       { name: 'halved, pitted sweet cherries, fresh or frozen, thawed and drained', food: 'cherry', quantity: 2, unit: 'cup', category: 'produce' },
@@ -824,7 +766,7 @@ export const BATCH_4_RECIPES: Recipe[] = [
     ],
     steps: [
       'Wash your hands and rinse fresh cherries. Heat the oven to 450°F.',
-      'Beat the eggs, milk and vanilla in a medium bowl or blender until well blended. Mix the flour and cinnamon, add them to the liquid and mix until there are no lumps.',
+      'Beat the eggs, milk and vanilla in a medium bowl or blender until well blended. Mix the flour, sugar and cinnamon, add them to the liquid and mix until there are no lumps.',
       'Put the margarine or butter in a 10- or 11-inch oven-proof skillet or a 2 1/2- to 3-quart baking dish and heat it in the oven until melted and bubbly. Take it out and quickly spread the cherries across the bottom.',
       'Pour the batter over the cherries and sprinkle with the almond slices if you like. Bake for 15 to 20 minutes, until the edges are browned and the middle puffs are golden.',
       'Cool slightly and cut into 4 pieces. The center puffs flatten as it cools. Refrigerate leftovers within 2 hours.',
@@ -833,7 +775,7 @@ export const BATCH_4_RECIPES: Recipe[] = [
     servings: 4,
   },
   {
-    // Carrot, raisin and oat muffins; the walnuts are optional in the source. Sugar and salt left out.
+    // Carrot, raisin and oat muffins; the walnuts are optional in the source and are nut pieces, so 24-36 only.
     id: 'b-fh-morning-muffins',
     origin: 'builtin',
     source: {
@@ -841,15 +783,16 @@ export const BATCH_4_RECIPES: Recipe[] = [
       publisher: FH_PUBLISHER,
       url: 'https://foodhero.org/recipes/morning-muffins',
       retrieved: RETRIEVED,
-      adaptations: ['Serving count is an estimate (source gives no servings): 12 muffins, 1 muffin per serving.', 'Left out 1/3 cup sugar', 'Left out 1/2 teaspoon salt'],
+      adaptations: ['Serving count is an estimate (source gives no servings): 12 muffins, 1 muffin per serving.'],
     },
     title: 'Morning Muffins',
-    stages: ['12-23', '24-36'],
+    stages: ['24-36'],
     serveAs: ['finger-food'],
     mealTypes: ['breakfast', 'snack'],
     ingredients: [
       { name: 'egg', food: 'egg', quantity: 1, unit: 'piece', category: 'dairy-eggs' },
       { name: 'nonfat or 1% milk', food: 'milk', quantity: 1, unit: 'cup', category: 'dairy-eggs' },
+      { name: 'sugar', food: 'sugar', quantity: 0.33, unit: 'cup', category: 'pantry' },
       { name: 'vegetable oil', food: 'vegetable oil', quantity: 2, unit: 'tbsp', category: 'pantry' },
       { name: 'grated carrot (about 1 medium carrot)', food: 'carrot', quantity: 0.5, unit: 'cup', category: 'produce' },
       { name: 'raisins', food: 'raisin', quantity: 0.5, unit: 'cup', category: 'produce' },
@@ -860,18 +803,19 @@ export const BATCH_4_RECIPES: Recipe[] = [
       { name: 'cinnamon', food: 'cinnamon', quantity: 1.5, unit: 'tsp', category: 'pantry' },
       { name: 'baking powder', food: 'baking powder', quantity: 1, unit: 'tsp', category: 'pantry' },
       { name: 'baking soda', food: 'baking soda', quantity: 0.5, unit: 'tsp', category: 'pantry' },
+      { name: 'salt', food: 'salt', quantity: 0.5, unit: 'tsp', category: 'pantry' },
     ],
     steps: [
       'Wash your hands and heat the oven to 400°F. Lightly grease 12 muffin cups.',
-      'In a large bowl, mix the egg, milk, oil, carrots, raisins, walnuts (if using) and vanilla.',
-      'In a separate bowl, mix the flour, oats, cinnamon, baking powder and baking soda. Add the wet ingredients to the dry ingredients and stir gently until the flour is just moistened.',
+      'In a large bowl, mix the egg, milk, sugar, oil, carrots, raisins, walnuts (if using) and vanilla.',
+      'In a separate bowl, mix the flour, oats, cinnamon, baking powder, baking soda and salt. Add the wet ingredients to the dry ingredients and stir gently until the flour is just moistened.',
       'Fill the muffin cups about 3/4 full and bake for 15 minutes, until the edges start to brown. Cool slightly, take the muffins out of the pan and cool completely, then store in an airtight container at room temperature.',
     ],
     texture: 'soft muffins with carrot and raisins',
     servings: 12,
   },
   {
-    // Rolled oats baked with eggs, milk and berries; the walnuts are optional in the source. Brown sugar and salt left out.
+    // Rolled oats baked with eggs, milk and berries; the walnuts are optional in the source and are nut pieces, so 24-36 only.
     id: 'b-fh-baked-berry-oatmeal',
     origin: 'builtin',
     source: {
@@ -879,17 +823,19 @@ export const BATCH_4_RECIPES: Recipe[] = [
       publisher: FH_PUBLISHER,
       url: 'https://foodhero.org/recipes/baked-berry-oatmeal',
       retrieved: RETRIEVED,
-      adaptations: [ESTIMATE_HALF_CUP, 'Left out 1/2 cup packed brown sugar', 'Left out 1/4 teaspoon salt'],
+      adaptations: [ESTIMATE_HALF_CUP],
     },
     title: 'Baked Berry Oatmeal',
-    stages: ['9-12', '12-23', '24-36'],
+    stages: ['24-36'],
     serveAs: ['mashed', 'pieces'],
     mealTypes: ['breakfast'],
     ingredients: [
       { name: 'old fashioned rolled oats', food: 'oat', quantity: 2, unit: 'cup', category: 'grains' },
       { name: 'baking powder', food: 'baking powder', quantity: 1, unit: 'tsp', category: 'pantry' },
       { name: 'cinnamon', food: 'cinnamon', quantity: 1, unit: 'tsp', category: 'pantry' },
+      { name: 'salt', food: 'salt', quantity: 0.25, unit: 'tsp', category: 'pantry' },
       { name: 'eggs', food: 'egg', quantity: 2, unit: 'piece', category: 'dairy-eggs' },
+      { name: 'packed brown sugar', food: 'brown sugar', quantity: 0.5, unit: 'cup', category: 'pantry' },
       { name: 'vanilla', food: 'vanilla', quantity: 1.5, unit: 'tsp', category: 'pantry' },
       { name: '1% or nonfat milk', food: 'milk', quantity: 2, unit: 'cup', category: 'dairy-eggs' },
       { name: 'margarine or butter, melted', food: 'butter', quantity: 4, unit: 'tsp', category: 'dairy-eggs' },
@@ -898,8 +844,8 @@ export const BATCH_4_RECIPES: Recipe[] = [
     ],
     steps: [
       'Wash your hands and rinse fresh berries. Heat the oven to 375°F.',
-      'In a medium bowl, mix the oats, baking powder and cinnamon.',
-      'In a separate bowl, beat the eggs until blended, then stir in the vanilla, milk and melted butter. Pour the wet ingredients into the dry ingredients and stir until well combined.',
+      'In a medium bowl, mix the oats, baking powder, cinnamon and salt.',
+      'In a separate bowl, beat the eggs until blended, then stir in the brown sugar, vanilla, milk and melted butter. Pour the wet ingredients into the dry ingredients and stir until well combined.',
       'Stir in the berries lightly to spread them evenly, pour into a 2-quart baking dish and sprinkle with chopped nuts if you like.',
       'Bake for 20 to 30 minutes, until the top is golden brown. Refrigerate leftovers within 2 hours.',
     ],
@@ -1174,35 +1120,6 @@ export const BATCH_4_RECIPES: Recipe[] = [
     ],
     texture: 'soft roasted zucchini sticks',
     servings: 6,
-  },
-  {
-    // Sweet potato cubes roasted with Italian seasoning until tender. Salt and sugar left out.
-    id: 'b-fh-savory-sweet-potatoes',
-    origin: 'builtin',
-    source: {
-      title: 'Savory Sweet Potatoes',
-      publisher: FH_PUBLISHER,
-      url: 'https://foodhero.org/recipes/savory-sweet-potatoes',
-      retrieved: RETRIEVED,
-      adaptations: [ESTIMATE_HALF_CUP, 'Left out 1 teaspoon salt', 'Left out 1/2 teaspoon sugar'],
-    },
-    title: 'Savory Sweet Potatoes',
-    stages: ['9-12', '12-23', '24-36'],
-    serveAs: ['finger-food'],
-    mealTypes: ['lunch', 'dinner'],
-    ingredients: [
-      { name: 'sweet potatoes, peeled and diced (2 medium)', food: 'sweet potato', quantity: 3.5, unit: 'cup', category: 'produce' },
-      { name: 'vegetable oil', food: 'vegetable oil', quantity: 1, unit: 'tbsp', category: 'pantry' },
-      { name: 'Italian seasoning', food: 'italian seasoning', quantity: 2, unit: 'tsp', category: 'pantry' },
-      { name: 'black pepper', food: 'black pepper', quantity: 0.25, unit: 'tsp', category: 'pantry' },
-    ],
-    steps: [
-      'Wash your hands and heat the oven to 400°F. Line a baking sheet with foil for quick clean-up.',
-      'In a large bowl, mix the sweet potato cubes with the other ingredients so each piece is coated, then set the cubes in a single layer on the baking sheet.',
-      'Bake until tender and golden, about 20 minutes, stirring or turning the cubes after 10 minutes. Refrigerate leftovers within 2 hours.',
-    ],
-    texture: 'soft roasted sweet potato cubes',
-    servings: 5,
   },
   {
     // Potato pieces roasted and topped with parmesan. Salt left out.
@@ -1534,7 +1451,7 @@ export const BATCH_4_RECIPES: Recipe[] = [
     servings: 6,
   },
   {
-    // Tofu baked until golden and tossed in a gochujang, soy sauce and brown sugar sauce. The sauce is the dish, so it keeps its soy sauce and brown sugar and is 24-36 only. Salt left out.
+    // Tofu baked until golden and tossed in a gochujang, soy sauce and brown sugar sauce. The sauce is the dish, so it keeps its soy sauce and brown sugar and is 24-36 only.
     id: 'b-icn-gochujang-tofu',
     origin: 'builtin',
     source: {
@@ -1542,7 +1459,7 @@ export const BATCH_4_RECIPES: Recipe[] = [
       publisher: ICN_PUBLISHER,
       url: 'https://theicn.org/cnrb/recipes-for-homes/gochujang-tofu-usda-recipe-for-family-child-care-homes/',
       retrieved: RETRIEVED,
-      adaptations: ['Left out 1/8 tsp salt'],
+      adaptations: [],
     },
     title: 'Gochujang Tofu',
     stages: ['24-36'],
@@ -1551,6 +1468,7 @@ export const BATCH_4_RECIPES: Recipe[] = [
     ingredients: [
       { name: 'firm tofu, drained (2 blocks, 1 lb 12 oz)', food: 'tofu', quantity: 28, unit: 'oz', category: 'protein' },
       { name: 'olive oil', food: 'olive oil', quantity: 1, unit: 'tbsp', category: 'pantry' },
+      { name: 'salt', food: 'salt', quantity: 0.125, unit: 'tsp', category: 'pantry' },
       { name: 'cornstarch (2 Tbsp 1 tsp)', food: 'cornstarch', quantity: 7, unit: 'tsp', category: 'pantry' },
       { name: 'ketchup', food: 'ketchup', quantity: 3, unit: 'tbsp', category: 'pantry' },
       { name: 'apple cider vinegar', food: 'vinegar', quantity: 3, unit: 'tbsp', category: 'pantry' },
@@ -1565,7 +1483,7 @@ export const BATCH_4_RECIPES: Recipe[] = [
     ],
     steps: [
       'The night before, drain the tofu, dice it and set it on a large plate lined with a paper towel. Cover it with another paper towel and leave it overnight to absorb extra water. Wash your hands and heat the oven to 425°F (400°F convection).',
-      'Put the tofu in a medium mixing bowl, drizzle with the olive oil and toss gently with a rubber spatula. Sprinkle the cornstarch evenly over the tofu and toss gently to coat.',
+      'Put the tofu in a medium mixing bowl, drizzle with the olive oil, sprinkle with the salt and toss gently with a rubber spatula. Sprinkle the cornstarch evenly over the tofu and toss gently to coat.',
       'Spread the tofu on a baking sheet lined with parchment paper and sprayed with pan release spray. Bake for 20 minutes or more, until lightly golden brown, and for 10 minutes longer if it has not browned or crisped. Move the crispy tofu to a large mixing bowl (135°F or higher).',
       'For the sauce, mix the ketchup, vinegar, gochujang paste, brown sugar, garlic, soy sauce and sesame oil in a medium bowl, then stir in the water. Move it to a medium-large saucepan, cook over medium-high heat until it bubbles, then reduce the heat to low and simmer for 1 minute, stirring often, until the sugar dissolves and the sauce begins to thicken. Add a little water if it is too thick, or simmer 2 minutes longer if it is too thin.',
       'Pour the sauce over the tofu and toss gently to coat. Garnish with the green onions and sesame seeds and serve 1/2 cup firmly packed, keeping it hot at 135°F or higher.',
@@ -1711,5 +1629,92 @@ export const BATCH_4_RECIPES: Recipe[] = [
     ],
     texture: 'soft pumpkin pancakes',
     servings: 8,
+  },
+  {
+    // Bell pepper strips and onion sauteed until tender. Salt left out.
+    id: 'b-fh-sauteed-peppers',
+    origin: 'builtin',
+    source: {
+      title: 'Sautéed Peppers',
+      publisher: FH_PUBLISHER,
+      url: 'https://foodhero.org/recipes/saut%C3%A9ed-peppers',
+      retrieved: RETRIEVED,
+      adaptations: [ESTIMATE_HALF_CUP, 'Left out 1/4 teaspoon salt'],
+    },
+    title: 'Sautéed Peppers',
+    stages: ['12-23', '24-36'],
+    serveAs: ['pieces'],
+    mealTypes: ['lunch', 'dinner'],
+    ingredients: [
+      { name: 'bell peppers, cut into long strips (green, red or yellow, try a mix)', food: 'bell pepper', quantity: 2, unit: 'piece', category: 'produce' },
+      { name: 'medium onion, sliced or chopped', food: 'onion', quantity: 1, unit: 'piece', category: 'produce' },
+      { name: 'vegetable oil', food: 'vegetable oil', quantity: 1, unit: 'tbsp', category: 'pantry' },
+      { name: 'black pepper', food: 'black pepper', quantity: 0.25, unit: 'tsp', category: 'pantry' },
+    ],
+    steps: [
+      'Wash your hands and rinse the fresh vegetables. Heat the oil in a large skillet over medium heat, add the peppers and onion and sprinkle with the black pepper.',
+      'Stir a few times while cooking for about 8 to 10 minutes, until the onion is clear and the peppers are tender. Refrigerate leftovers within 2 hours.',
+    ],
+    texture: 'tender sauteed pepper strips and onion',
+    servings: 8,
+  },
+  {
+    // Bok choy wilted with garlic. Salt is added to the bok choy, so 24-36 only.
+    id: 'b-fh-garlic-bok-choy',
+    origin: 'builtin',
+    source: {
+      title: 'Garlic Bok Choy',
+      publisher: FH_PUBLISHER,
+      url: 'https://foodhero.org/recipes/garlic-bok-choy',
+      retrieved: RETRIEVED,
+      adaptations: ['Serving count is an estimate (source gives no servings): total yield divided by a 1/2 cup portion.'],
+    },
+    title: 'Garlic Bok Choy',
+    stages: ['24-36'],
+    serveAs: ['pieces'],
+    mealTypes: ['lunch', 'dinner'],
+    ingredients: [
+      { name: 'bok choy', food: 'bok choy', quantity: 1, unit: 'lb', category: 'produce' },
+      { name: 'garlic, minced (4 to 6 cloves, or 1 to 1 1/2 teaspoons garlic powder)', food: 'garlic', quantity: 4, unit: 'clove', category: 'produce' },
+      { name: 'vegetable oil', food: 'vegetable oil', quantity: 2, unit: 'tsp', category: 'pantry' },
+      { name: 'salt', food: 'salt', quantity: 0.5, unit: 'tsp', category: 'pantry' },
+    ],
+    steps: [
+      'Wash your hands and rinse the bok choy. Cut it crosswise into easy-to-eat pieces.',
+      'In a medium skillet over medium-high heat, saute the garlic in the oil until fragrant. If you use garlic powder, add it with the salt in the next step.',
+      'Add the bok choy and stir quickly, then add the salt. Stir until the greens are wilted and the stem pieces are tender-crisp. Serve hot. Refrigerate leftovers within 2 hours.',
+    ],
+    texture: 'wilted bok choy with tender-crisp stems',
+    servings: 4,
+  },
+  {
+    // Sugar snap peas tossed with oil, soy sauce and salt, then roasted. Soy sauce and salt are kept, so 24-36 only.
+    id: 'b-fh-roasted-sugar-snap-peas',
+    origin: 'builtin',
+    source: {
+      title: 'Roasted Sugar Snap Peas',
+      publisher: FH_PUBLISHER,
+      url: 'https://foodhero.org/recipes/roasted-sugar-snap-peas',
+      retrieved: RETRIEVED,
+      adaptations: [ESTIMATE_HALF_CUP],
+    },
+    title: 'Roasted Sugar Snap Peas',
+    stages: ['24-36'],
+    serveAs: ['finger-food'],
+    mealTypes: ['snack', 'dinner'],
+    ingredients: [
+      { name: 'sugar snap peas', food: 'sugar snap pea', quantity: 1, unit: 'lb', category: 'produce' },
+      { name: 'vegetable oil', food: 'vegetable oil', quantity: 2, unit: 'tsp', category: 'pantry' },
+      { name: 'low-sodium soy sauce', food: 'soy sauce', quantity: 1, unit: 'tsp', category: 'pantry' },
+      { name: 'salt', food: 'salt', quantity: 0.5, unit: 'tsp', category: 'pantry' },
+      { name: 'black pepper', food: 'black pepper', quantity: 0.25, unit: 'tsp', category: 'pantry' },
+    ],
+    steps: [
+      'Wash your hands and rinse the fresh vegetables. Heat the oven to 400°F and lightly grease a large baking pan.',
+      'Put the sugar snap peas in a large bowl, sprinkle with the oil, soy sauce, salt and black pepper and toss to coat.',
+      'Spread the peas on the baking sheet and bake for 8 to 10 minutes, stirring a couple of times. Refrigerate leftovers within 2 hours.',
+    ],
+    texture: 'roasted sugar snap pea pods',
+    servings: 6,
   },
 ];
