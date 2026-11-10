@@ -125,10 +125,10 @@ Branch names use the `v2/` prefix (for example `v2/6-paste-parser`) so they don'
   - [ ] 11.7 Instagram reel prompt flow. Reel URL box with validation, `buildReelPrompt`, copy, Open Meta AI, error-object handling, source preset to Instagram, URL saved only as `link`; reword the Instagram help text. Component tests: URL validation, no child data in the prompt, no fetch.
     - _Requirements: 19.1 – 19.8, 6.9, 6.10_
 
-- [ ] 12. Recipe page and library
-  - [ ] 12.1 Add time, effort, nutrition tags with the explainer, "Original text", cleared mentions, "Simple idea" label and "Add to plan" to the recipe page. Show time, effort and tags in the library, plus a "From ChatGPT / Instagram" badge. Add stated time to the typed editor. Add nutrition lists and sources to the Sources page, plus a "New food spacing" entry citing `NEW_FOOD_SPACING_SOURCES`, with a Sources page test that the entry lists every spacing source with its URL.
-    - _Requirements: 1.5, 4.5, 4.6, 5.4, 6.8, 7.4, 11.3, 14.4, 17.4_
-  - [ ] 12.2 Add a secondary "I made this" button to the recipe page (records today once per day, confirms with a short status message). Component test: one filled primary button on the recipe page.
+- [x] 12. Recipe page and library
+  - [x] 12.1 Add time, effort, nutrition tags with the explainer, "Original text", cleared mentions, "Simple idea" label and "Add to plan" to the recipe page. Show time, effort and tags in the library, plus a "From ChatGPT / Instagram" badge. Add stated time to the typed editor. Add nutrition lists and sources to the Sources page, plus a "New food spacing" entry citing `NEW_FOOD_SPACING_SOURCES`, with a Sources page test that the entry lists every spacing source with its URL.
+    - _Requirements: 1.5, 4.5, 4.6, 5.4, 6.8, 7.4, 11.2, 11.3, 14.4, 17.4_
+  - [x] 12.2 Add a secondary "I made this" button to the recipe page (records today once per day, confirms with a short status message). Component test: one filled primary button on the recipe page.
     - _Requirements: 17.5, 17.10_
 
 - [ ] 13. Convert remaining pages to Astryx

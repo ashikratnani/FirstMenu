@@ -38,7 +38,7 @@ import {
   type DraftLine,
   type LineList,
 } from './addRecipeDraft';
-import { effortLabel, tagLabel, timeLabel } from './makeView';
+import { FIXED_LIST_NOTE, effortLabel, tagLabel, timeLabel } from './makeView';
 import styles from './AddRecipe.module.css';
 
 type Source = ImportedInfo['from'];
@@ -53,9 +53,6 @@ export const PASTE_FALLBACK = 'Paste with your keyboard or long-press';
 
 export const INSTAGRAM_HELP =
   "Instagram reels can't be opened here. Copy the caption instead. On a phone, you can also copy text from a screenshot by pressing and holding on it.";
-
-export const FIXED_LIST_NOTE =
-  "FirstMenu's safety check uses a fixed list of foods. It can miss foods, amounts and preparations, so check every recipe yourself and ask your pediatrician if you are unsure.";
 
 const LIST_LABELS: Record<LineList, string> = {
   ingredients: 'ingredient',
