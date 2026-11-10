@@ -2,31 +2,35 @@
 // public-health feeding guides rather than full recipes (spec Requirement 14.4).
 // Pure data, no React. Ingredients carry no quantity.
 //
-// Sources (both fetched 2026-11-10; publishers already approved in
+// Sources (both fetched 2026-11-09; publishers already approved in
 // docs/recipe-sources.md):
-//  A. Utah Department of Health WIC, "Homemade Baby Foods" (Simple Examples by age:
-//     6 months pureed/mashed, 8 months ground/finely chopped, 10 months chopped or
-//     small pieces of finger foods).
+//  A. Utah Department of Health WIC, "Homemade Baby Foods" (Original 8/11), page 2,
+//     "Simple Examples" table. Its three columns are headed 6 months
+//     (pureed/mashed), 8 months (ground/finely chopped) and 10 months
+//     (chopped/small pieces of finger foods). The headings and the table are not in
+//     the PDF's text layer (the text extractor only finds some of the items), so
+//     each of the 14 items was checked by rendering page 2 to an image and reading it.
+//     Left column (6 months): bananas, sweet potatoes, oats, chicken. Middle column
+//     (8 months): peaches, carrots, rice, beef. Right column (10 months): green
+//     beans, cauliflower or broccoli, whole wheat bread, beans, mozzarella.
 //  B. USDA Food and Nutrition Service, "Feeding Infants in the CACFP", Chapter 7
-//     (cited for the no-salt-added and mash adaptations; it gives no age for eggs,
-//     so no egg idea is included rather than inventing stages).
+//     (cited for two adaptations only: p. 99 "canned vegetables without added salt",
+//     p. 100 cook beans "until soft enough to puree or mash easily". It gives no age
+//     for eggs, so no egg idea is included rather than inventing stages).
 //
-// Stage rule: the stage comes from the source's age guidance (6 and 8 month items
-// -> '6-8' and '9-12'; 10 month items -> '9-12'). '12-23' and '24-36' are added
-// only where the idea is soft small pieces. Pureed or mashed only ideas are not
-// tagged for toddler stages. No storage times are set (none are sourced per idea).
-// Steps are written in our own words. Dropped: nothing; every listed item was
-// found in the fetched text.
-//
-// Note on the Utah 8 month items (peaches, carrots, ground beef): the source says
-// "ground or finely chopped", but design rule 3 stages simple ideas from the
-// source's age guidance, and 8 months falls in '6-8', so they keep that stage.
+// Stage rule: 6 month items (pureed/mashed) -> '6-8' and '9-12'. 8 month items
+// (ground/finely chopped) and 10 month items -> '9-12' and later only, never '6-8'
+// (maintainer decision on issue #46, option b). '12-23' and '24-36' are added only
+// where the idea is soft small pieces. Pureed or mashed only ideas are not tagged
+// for toddler stages. No storage times are set (none are sourced per idea).
+// Steps are written in our own words. Dropped: nothing; every item was found on
+// page 2 of the Utah PDF.
 
 import type { Recipe } from '../domain/types';
 
 const UTAH_URL = 'https://wic.stage.utah.gov/wp-content/uploads/Homemade-Baby-Foods-1.pdf';
 const UTAH_PUBLISHER = 'Utah Department of Health, WIC Program';
-const RETRIEVED = '2026-11-10';
+const RETRIEVED = '2026-11-09';
 
 const UTAH_SIX_MONTHS = 'Source lists this under 6 months, pureed or mashed';
 const UTAH_EIGHT_MONTHS = 'Source lists this under 8 months, ground or finely chopped';
@@ -115,7 +119,7 @@ export const SIMPLE_IDEAS: Recipe[] = [
     serveAs: ['puree'],
   },
 
-  // --- Utah WIC, 8 months: ground/finely chopped ----------------------------
+  // --- Utah WIC, 8 months: ground/finely chopped (stages 9-12 and later) ----
   {
     id: 'b-idea-chopped-peaches',
     origin: 'builtin',
@@ -128,8 +132,9 @@ export const SIMPLE_IDEAS: Recipe[] = [
       adaptations: [UTAH_EIGHT_MONTHS],
     },
     title: 'Finely chopped peaches',
-    // Soft fruit in small pieces stays suitable for toddlers.
-    stages: ['6-8', '9-12', '12-23', '24-36'],
+    // 8 month item: 9-12 and later only (issue #46). Soft fruit in small pieces
+    // stays suitable for toddlers.
+    stages: ['9-12', '12-23', '24-36'],
     mealTypes: ['breakfast', 'snack'],
     ingredients: [{ name: 'fresh peach', category: 'produce' }],
     steps: ['Peel a ripe peach and remove the pit.', 'Chop the fruit into very small pieces.'],
@@ -149,8 +154,9 @@ export const SIMPLE_IDEAS: Recipe[] = [
       adaptations: [UTAH_EIGHT_MONTHS],
     },
     title: 'Finely chopped cooked carrots',
-    // Cooked soft carrot pieces stay suitable for toddlers.
-    stages: ['6-8', '9-12', '12-23', '24-36'],
+    // 8 month item: 9-12 and later only (issue #46). Cooked soft carrot pieces stay
+    // suitable for toddlers.
+    stages: ['9-12', '12-23', '24-36'],
     mealTypes: ['lunch', 'dinner'],
     ingredients: [{ name: 'carrots', category: 'produce' }],
     steps: ['Peel the carrots and cook them in a little water until tender.', 'Chop them into very small pieces.'],
@@ -170,7 +176,8 @@ export const SIMPLE_IDEAS: Recipe[] = [
       adaptations: [UTAH_EIGHT_MONTHS],
     },
     title: 'Mashed rice',
-    stages: ['6-8', '9-12'],
+    // 8 month item: 9-12 only (issue #46); mashed only, so no toddler stages.
+    stages: ['9-12'],
     mealTypes: ['lunch', 'dinner'],
     ingredients: [{ name: 'rice', category: 'grains' }],
     steps: ['Cook the rice until it is very soft.', 'Mash it with a fork.'],
@@ -190,7 +197,8 @@ export const SIMPLE_IDEAS: Recipe[] = [
       adaptations: [UTAH_EIGHT_MONTHS],
     },
     title: 'Ground beef',
-    stages: ['6-8', '9-12'],
+    // 8 month item: 9-12 only (issue #46).
+    stages: ['9-12'],
     mealTypes: ['lunch', 'dinner'],
     ingredients: [{ name: 'beef', category: 'protein' }],
     steps: ['Cook the beef all the way through.', 'Grind it fine with a food grinder or processor.'],
@@ -211,7 +219,7 @@ export const SIMPLE_IDEAS: Recipe[] = [
       retrieved: RETRIEVED,
       adaptations: [
         UTAH_TEN_MONTHS,
-        'Choose no-salt-added canned vegetables (USDA Food and Nutrition Service, Feeding Infants in the CACFP, Chapter 7)',
+        'Choose canned vegetables without added salt (USDA Food and Nutrition Service, Feeding Infants in the CACFP, Chapter 7, p. 99)',
       ],
     },
     title: 'Green beans as finger food',
@@ -274,7 +282,7 @@ export const SIMPLE_IDEAS: Recipe[] = [
       retrieved: RETRIEVED,
       adaptations: [
         UTAH_TEN_MONTHS,
-        'Mash the beans, following USDA Food and Nutrition Service, Feeding Infants in the CACFP, Chapter 7: cook until soft enough to puree or mash',
+        'Mash the beans, following USDA Food and Nutrition Service, Feeding Infants in the CACFP, Chapter 7, p. 100: cook until soft enough to puree or mash easily',
       ],
     },
     title: 'Mashed beans',

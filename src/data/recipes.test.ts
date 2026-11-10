@@ -317,12 +317,19 @@ describe('BUILTIN_RECIPES - batch 1', () => {
     }
   });
 
-  // Design rule 3: simple ideas are staged from the source's age guidance. The Utah
-  // 8 month items (peaches, carrots, ground beef) say "ground or finely chopped"
-  // and are kept in '6-8' (which covers 8 months) on purpose.
-  it('keeps the Utah 8 month items in 6-8 per the source age guidance', () => {
-    for (const id of ['b-idea-chopped-peaches', 'b-idea-chopped-carrots', 'b-idea-ground-beef']) {
-      expect(SIMPLE_IDEAS.find((i) => i.id === id)?.stages, id).toContain('6-8');
+  // Maintainer decision on issue #46 (option b): the Utah 8 month items say "ground or
+  // finely chopped", so they are tagged 9-12 and later only, never 6-8.
+  it('tags the Utah 8 month items 9-12 and later only, not 6-8', () => {
+    for (const id of [
+      'b-idea-chopped-peaches',
+      'b-idea-chopped-carrots',
+      'b-idea-mashed-rice',
+      'b-idea-ground-beef',
+    ]) {
+      const idea = SIMPLE_IDEAS.find((i) => i.id === id);
+      expect(idea, id).toBeDefined();
+      expect(idea?.stages, id).toContain('9-12');
+      expect(idea?.stages, id).not.toContain('6-8');
     }
   });
 
