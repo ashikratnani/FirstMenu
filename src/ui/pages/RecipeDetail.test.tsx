@@ -2,7 +2,8 @@ import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { describe, expect, it } from 'vitest';
-import RecipeDetail from './RecipeDetail';
+import RecipeDetail, { AddToPlan } from './RecipeDetail';
+import { useApp } from '../../state/AppProvider';
 import Recipes from './Recipes';
 import { AppProvider } from '../../state/AppProvider';
 import { STORAGE_KEY, defaultState } from '../../domain/storage';
@@ -76,6 +77,18 @@ function seedState(ageMonths = 8, customRecipes: Recipe[] = []): AppState {
     onboarded: true,
     customRecipes,
   };
+}
+
+/** Seed with Breakfast and Lunch switched on in the Plan page. */
+function withSlots(s: AppState): AppState {
+  return { ...s, plan: { ...s.plan, activeSlots: ['breakfast', 'lunch'] } };
+}
+
+/** Captures the live app state (persistence is debounced, so read it here). */
+let latestState: AppState;
+function StateProbe() {
+  latestState = useApp().state;
+  return null;
 }
 
 function renderDetail(id: string, seed?: AppState) {
@@ -268,6 +281,149 @@ describe('RecipeDetail page', () => {
       expect(screen.getByText(/^Serve as: /)).toBeInTheDocument();
       expect(screen.queryByText(/guessed/)).not.toBeInTheDocument();
       expect(screen.queryByRole('button', { name: 'Edit serve as' })).not.toBeInTheDocument();
+    });
+  });
+
+  it('shows time, effort, tags and the tag explainer', () => {
+    renderDetail('custom-grapes', seedState(10, [GRAPE_RECIPE]));
+    expect(screen.getByText('Easy')).toBeInTheDocument();
+    expect(screen.getByText('Time not given')).toBeInTheDocument();
+    const tags = screen.getByRole('list', { name: 'Nutrition tags' });
+    expect(within(tags).getByText('Dairy')).toBeInTheDocument();
+    expect(
+      screen.getByText(/not how much of a nutrient it provides/),
+    ).toBeInTheDocument();
+  });
+
+  it('labels a simple idea', () => {
+    const idea: Recipe = { ...GRAPE_RECIPE, id: 'custom-idea', kind: 'simple-idea' };
+    renderDetail('custom-idea', seedState(10, [idea]));
+    expect(screen.getByText('Simple idea')).toBeInTheDocument();
+  });
+
+  it('"Add to plan" stores the recipe in the chosen slot and confirms', async () => {
+    const user = userEvent.setup();
+    const storage = makeStorage(withSlots(seedState(10, [GRAPE_RECIPE])));
+    render(
+      <AppProvider storage={storage}>
+        <StateProbe />
+        <MemoryRouter initialEntries={['/recipes/custom-grapes']}>
+          <Routes>
+            <Route path="/recipes/:id" element={<RecipeDetail />} />
+          </Routes>
+        </MemoryRouter>
+      </AppProvider>,
+    );
+    await user.click(screen.getByRole('button', { name: 'Add to plan' }));
+    await user.selectOptions(screen.getByLabelText('Day'), '2');
+    await user.selectOptions(screen.getByLabelText('Meal'), 'lunch');
+    await user.click(screen.getByRole('button', { name: 'Add' }));
+    expect(screen.getByText(/^Added to /)).toBeInTheDocument();
+    const plan = latestState.plan;
+    expect(plan.days[2].lunch).toBe('custom-grapes');
+    expect(plan.activeSlots).toEqual(['breakfast', 'lunch']);
+  });
+
+  it('offers only the meals switched on, and points to the Plan page when none are', async () => {
+    const user = userEvent.setup();
+    const { unmount } = renderDetail('custom-grapes', withSlots(seedState(10, [GRAPE_RECIPE])));
+    await user.click(screen.getByRole('button', { name: 'Add to plan' }));
+    const options = within(screen.getByLabelText('Meal')).getAllByRole('option');
+    expect(options.map((o) => o.textContent)).toEqual(['Breakfast', 'Lunch']);
+    unmount();
+
+    renderDetail('custom-grapes', seedState(10, [GRAPE_RECIPE]));
+    await user.click(screen.getByRole('button', { name: 'Add to plan' }));
+    expect(screen.getByText(/Choose your meals on the Plan page/)).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Add' })).not.toBeInTheDocument();
+  });
+
+  it('never plans a ghosted recipe, even if the Add control is used directly', async () => {
+    const user = userEvent.setup();
+    const storage = makeStorage(withSlots(seedState(8, [HONEY_RECIPE])));
+    render(
+      <AppProvider storage={storage}>
+        <StateProbe />
+        <MemoryRouter>
+          <AddToPlan recipe={HONEY_RECIPE} />
+        </MemoryRouter>
+      </AppProvider>,
+    );
+    await user.click(screen.getByRole('button', { name: 'Add to plan' }));
+    await user.click(screen.getByRole('button', { name: 'Add' }));
+    expect(screen.queryByText(/^Added to /)).not.toBeInTheDocument();
+    const days = latestState.plan.days;
+    expect(days.every((d) => Object.keys(d).length === 0)).toBe(true);
+  });
+
+  it('does not offer "Add to plan" on a ghosted recipe', () => {
+    renderDetail('custom-honey', seedState(8, [HONEY_RECIPE]));
+    expect(screen.queryByRole('button', { name: 'Add to plan' })).not.toBeInTheDocument();
+  });
+
+  it('"I made this" records today once per day and confirms', async () => {
+    const user = userEvent.setup();
+    renderDetail('custom-grapes', seedState(10, [GRAPE_RECIPE]));
+    const button = screen.getByRole('button', { name: 'I made this' });
+    expect(button).not.toHaveAttribute('data-variant', 'primary');
+    await user.click(button);
+    expect(screen.getByText('Saved for today.')).toBeInTheDocument();
+    await user.click(button);
+    expect(screen.getByText('Already saved for today.')).toBeInTheDocument();
+  });
+
+  describe('pasted recipe', () => {
+    const PASTED: Recipe = {
+      id: 'custom-pasted',
+      origin: 'custom',
+      title: 'Oat bowl',
+      stages: ['9-12'],
+      mealTypes: ['breakfast'],
+      ingredients: [{ name: 'oats', category: 'grains' }],
+      steps: ['Cook the oats.', 'Add a little honey on top.'],
+      texture: 'soft',
+      servings: 1,
+      imported: {
+        from: 'chatgpt',
+        text: 'Oat bowl\nOats\nCook the oats.\nAdd a little honey on top.',
+        date: '2026-11-10',
+      },
+    };
+
+    it('shows the fixed-list note, Original text and the text mention', () => {
+      renderDetail('custom-pasted', seedState(8, [PASTED]));
+      expect(screen.getByText(/uses a fixed list of foods/)).toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: 'Original text' })).toBeInTheDocument();
+      expect(screen.getByText(/Add a little honey on top\./, { selector: 'q' })).toBeInTheDocument();
+    });
+
+    it('renders an https link with rel="noopener noreferrer"', () => {
+      const linked: Recipe = {
+        ...PASTED,
+        imported: { ...PASTED.imported!, url: 'https://example.com/oats' },
+      };
+      renderDetail('custom-pasted', seedState(8, [linked]));
+      const link = screen.getByRole('link', { name: 'https://example.com/oats' });
+      expect(link).toHaveAttribute('href', 'https://example.com/oats');
+      expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+    });
+
+    it('does not render a javascript: URL as a link', () => {
+      const bad: Recipe = {
+        ...PASTED,
+        imported: { ...PASTED.imported!, url: 'javascript:alert(1)' },
+      };
+      renderDetail('custom-pasted', seedState(8, [bad]));
+      expect(screen.queryByRole('link', { name: /javascript:/ })).not.toBeInTheDocument();
+      expect(document.querySelector('a[href^="javascript:"]')).toBeNull();
+    });
+
+    it('clears a mention with "Not used in this recipe" and lists it as cleared', async () => {
+      const user = userEvent.setup();
+      renderDetail('custom-pasted', seedState(8, [PASTED]));
+      await user.click(screen.getByRole('button', { name: /Not used in this recipe/ }));
+      expect(screen.queryByText('Not yet')).not.toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: 'Not used in this recipe' })).toBeInTheDocument();
     });
   });
 });

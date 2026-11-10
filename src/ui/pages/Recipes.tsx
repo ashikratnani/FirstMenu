@@ -23,6 +23,8 @@ import {
   SegmentedControl,
   SegmentedControlItem,
 } from '@astryxdesign/core/SegmentedControl';
+import { recipeEffort, recipeMinutes } from '../../domain/effort';
+import { recipeNutritionTags } from '../../domain/nutrition';
 import { useApp } from '../../state/AppProvider';
 import { selectAllRecipes, selectStage } from '../../state/selectors';
 import type { Recipe } from '../../domain/types';
@@ -41,6 +43,7 @@ import {
   type RecipeView,
   type StageFilter,
 } from './recipeView';
+import { PASTED_BADGE, effortLabel, tagLabel, timeLabel } from './makeView';
 import styles from './Recipes.module.css';
 
 /** One recipe card: a clickable card opening the recipe page, with badges. */
@@ -53,7 +56,17 @@ function RecipeCard({ view }: { view: RecipeView }) {
     freezerMonths !== null ? freezerBadgeText(freezerMonths) : null;
 
   // The card link's accessible name must carry EVERY visible state (Req 14.3).
-  const accessibleName = [recipe.title, reason, doorText, freezerText]
+  const time = recipeMinutes(recipe);
+  const facts = [
+    timeLabel({ minutes: time?.minutes, minutesKind: time?.kind }),
+    effortLabel(recipeEffort(recipe)),
+    ...recipeNutritionTags(recipe).map(tagLabel),
+  ].join(' · ');
+  const pasted =
+    recipe.imported !== undefined && recipe.imported.from !== 'shared' ? PASTED_BADGE : null;
+  const simpleIdea = recipe.kind === 'simple-idea' ? 'Simple idea' : null;
+
+  const accessibleName = [recipe.title, reason, doorText, freezerText, simpleIdea, facts, pasted]
     .filter((part): part is string => part !== null)
     .join('. ');
 
@@ -68,14 +81,17 @@ function RecipeCard({ view }: { view: RecipeView }) {
       >
         <span className={styles.cardBody}>
           <span className={styles.title}>{recipe.title}</span>
+          <span className={styles.facts}>{facts}</span>
           {reason && (
             <span className={styles.ghostReason}>
               <GhostArt />
               <span>{reason}</span>
             </span>
           )}
-          {(doorText || freezerText) && (
+          {(doorText || freezerText || pasted || simpleIdea) && (
             <span className={styles.badges}>
+              {simpleIdea && <Badge variant="green" label={simpleIdea} />}
+              {pasted && <Badge variant="blue" label={pasted} />}
               {doorText && <Badge variant="orange" label={doorText} />}
               {freezerText && (
                 <Badge variant="yellow" icon={<PumpkinArt />} label={freezerText} />

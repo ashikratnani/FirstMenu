@@ -141,8 +141,10 @@ describe('exactly one filled primary button per screen (Req 17.10)', () => {
     expect(shellAddRecipe()).toBeUndefined();
   });
 
-  it('the recipe page has no primary of its own, so the shell "Add recipe" is primary', () => {
+  it('the recipe page has one filled primary (the shell "Add recipe"); "Add to plan" and "I made this" are secondary', () => {
     renderAt('/recipes/custom-blorp', seed());
     expect(primaries()).toEqual(['Add recipe']);
+    expect(screen.getByRole('button', { name: 'I made this' })).not.toHaveAttribute('data-variant', 'primary');
+    expect(screen.getByRole('button', { name: 'Add to plan' })).not.toHaveAttribute('data-variant', 'primary');
   });
 });

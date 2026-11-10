@@ -110,6 +110,22 @@ const BUILTIN_RECIPE_ID = 'b-carrots-and-apples';
 
 /** A custom recipe so the recipe library, foods, prep and grocery are all
  *  non-empty where relevant. Peas fire no safety reminders at 8 months. */
+function pastedRecipe(): Recipe {
+  return {
+    id: 'custom-pasted-oats',
+    origin: 'custom',
+    title: 'Pasted Oat Bowl',
+    stages: ['6-8'],
+    mealTypes: ['breakfast'],
+    ingredients: [{ name: 'oats', quantity: 1, unit: 'cup', category: 'grains' }],
+    steps: ['Cook the oats.', 'Add a little honey on top.'],
+    texture: 'smooth',
+    servings: 2,
+    statedMinutes: 10,
+    imported: { from: 'chatgpt', text: 'Pasted Oat Bowl\nOats\nCook the oats.', date: '2026-01-01' },
+  };
+}
+
 function peaRecipe(): Recipe {
   return {
     id: 'custom-sweet-pea-mash',
@@ -144,7 +160,7 @@ function seededState(overrides: Partial<AppState> = {}): AppState {
     ...base,
     child: { name: 'Baby', birthDate: birthDateMonthsAgo(8) },
     onboarded: true,
-    customRecipes: [peaRecipe()],
+    customRecipes: [peaRecipe(), pastedRecipe()],
     foods: {
       'allergen:egg': { status: 'tried', date: birthDateMonthsAgo(1) },
       pea: { status: 'tried', date: birthDateMonthsAgo(1) },
@@ -187,6 +203,7 @@ describe('Accessibility: axe on every main page (color-contrast disabled)', () =
     ['Recipes', '/recipes', /^recipes$/i],
     // RecipeDetail's h1 is the recipe title, not a generic page title.
     ['RecipeDetail', `/recipes/${BUILTIN_RECIPE_ID}`, /^carrots and apples$/i],
+    ['RecipeDetail (pasted, with a text mention)', '/recipes/custom-pasted-oats', /^pasted oat bowl$/i],
     ['New recipe (editor)', '/recipes/new', /^new recipe$/i],
     [
       'Edit recipe (editor)',
@@ -211,6 +228,13 @@ describe('Accessibility: axe on every main page (color-contrast disabled)', () =
       expect(
         screen.getByRole('heading', { level: 1, name: heading }),
       ).toBeInTheDocument();
+      if (path === '/recipes/custom-pasted-oats') {
+        // The text mention must actually be on screen, or axe checks nothing.
+        expect(screen.getByRole('heading', { name: 'Not yet' })).toBeInTheDocument();
+        expect(
+          screen.getByRole('button', { name: /Not used in this recipe/ }),
+        ).toBeInTheDocument();
+      }
       const results = await axe(container, AXE_OPTIONS);
       expect(results).toHaveNoViolations();
     },

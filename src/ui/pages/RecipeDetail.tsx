@@ -13,14 +13,19 @@
 
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Badge } from '@astryxdesign/core/Badge';
 import { Button } from '@astryxdesign/core/Button';
 import { CheckboxInput } from '@astryxdesign/core/CheckboxInput';
+import { recipeEffort, recipeMinutes } from '../../domain/effort';
 import { recipeServeAs } from '../../domain/make';
+import { recipeNutritionTags } from '../../domain/nutrition';
+import { localYmd } from '../../domain/suggest';
 import { useApp } from '../../state/AppProvider';
 import { selectAgeMonths, selectAllRecipes } from '../../state/selectors';
 import { screenRecipe } from '../../domain/safety/screen';
-import type { Ingredient, Recipe, ServeAs } from '../../domain/types';
-import { ghostReason, recipeView } from './recipeView';
+import type { Ingredient, MealType, Recipe, ServeAs } from '../../domain/types';
+import { MEAL_TYPES, dayLabel, ghostReason, mealTypeLabel, recipeView } from './recipeView';
+import { FIXED_LIST_NOTE, TAG_EXPLAINER, effortLabel, tagLabel, timeLabel } from './makeView';
 import Disclaimer from '../components/Disclaimer';
 import styles from './RecipeDetail.module.css';
 
@@ -124,9 +129,108 @@ function ServeAsLine({ recipe }: { recipe: Recipe }) {
   );
 }
 
+/**
+ * "Add to plan" (Req 1.5): pick a day and meal, then add. A ghosted recipe
+ * never gets this control (Req 5.2): the page does not render it for a ghost,
+ * and the Add handler re-derives the ghost state before dispatching, like the
+ * slot picker does. Only the meals switched on in the Plan page are offered.
+ */
+export function AddToPlan({ recipe }: { recipe: Recipe }) {
+  const { state, dispatch } = useApp();
+  const slots = MEAL_TYPES.filter((m) => state.plan.activeSlots.includes(m));
+  const [open, setOpen] = useState(false);
+  const [day, setDay] = useState(0);
+  const [meal, setMeal] = useState<MealType | ''>('');
+  const [message, setMessage] = useState('');
+  const chosenMeal: MealType | undefined =
+    meal !== '' && slots.includes(meal)
+      ? meal
+      : (slots.find((m) => recipe.mealTypes.includes(m)) ?? slots[0]);
+
+  return (
+    <div className={styles.planAction}>
+      {!open ? (
+        <Button label="Add to plan" variant="secondary" onClick={() => setOpen(true)} />
+      ) : (
+        <fieldset className={styles.serveAsEditor}>
+          <legend>Add to plan</legend>
+          {chosenMeal === undefined ? (
+            <p>No meals are switched on. Choose your meals on the Plan page first.</p>
+          ) : (
+            <div className={styles.planFields}>
+              <label>
+                Day{' '}
+                <select value={day} onChange={(e) => setDay(Number(e.target.value))}>
+                  {state.plan.days.map((_, i) => (
+                    <option key={i} value={i}>
+                      {dayLabel(i)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                Meal{' '}
+                <select value={chosenMeal} onChange={(e) => setMeal(e.target.value as MealType)}>
+                  {slots.map((m) => (
+                    <option key={m} value={m}>
+                      {mealTypeLabel(m)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+          )}
+          <div className={styles.serveAsActions}>
+            {chosenMeal !== undefined && (
+              <Button
+                label="Add"
+                variant="secondary"
+                onClick={() => {
+                  // Req 5.2: never plan a ghost, even if this is called directly.
+                  if (recipeView(recipe, state).isGhosted) return;
+                  dispatch({ type: 'setSlot', slot: { day, meal: chosenMeal }, recipeId: recipe.id });
+                  setMessage(`Added to ${dayLabel(day)}, ${mealTypeLabel(chosenMeal)}.`);
+                  setOpen(false);
+                }}
+              />
+            )}
+            <Button label="Cancel" onClick={() => setOpen(false)} />
+          </div>
+        </fieldset>
+      )}
+      <p role="status" className={styles.status}>
+        {message}
+      </p>
+    </div>
+  );
+}
+
+/** "I made this" (Req 17.5): records today, once per day. */
+function MadeThis({ recipe }: { recipe: Recipe }) {
+  const { state, dispatch } = useApp();
+  const [message, setMessage] = useState('');
+  return (
+    <div className={styles.planAction}>
+      <Button
+        label="I made this"
+        variant="secondary"
+        onClick={() => {
+          const today = localYmd(new Date());
+          const already = state.madeLog.some((e) => e.recipeId === recipe.id && e.date === today);
+          dispatch({ type: 'markMade', recipeId: recipe.id, today });
+          setMessage(already ? 'Already saved for today.' : 'Saved for today.');
+        }}
+      />
+      <p role="status" className={styles.status}>
+        {message}
+      </p>
+    </div>
+  );
+}
+
 export default function RecipeDetail() {
   const { id } = useParams<{ id: string }>();
-  const { state, deleteCustomRecipe } = useApp();
+  const { state, dispatch, deleteCustomRecipe } = useApp();
   const navigate = useNavigate();
 
   const recipe = selectAllRecipes(state).find((r) => r.id === id);
@@ -147,6 +251,11 @@ export default function RecipeDetail() {
   const screen = screenRecipe(recipe, ageMonths);
   const view = recipeView(recipe, state);
   const { blocks, reminders } = screen;
+  const time = recipeMinutes(recipe);
+  const tags = recipeNutritionTags(recipe);
+  const imported = recipe.imported;
+  const importedLink =
+    imported?.url && /^https?:\/\//i.test(imported.url) ? imported.url : undefined;
 
   const storage = recipe.storage;
   const source = recipe.source;
@@ -167,6 +276,8 @@ export default function RecipeDetail() {
 
       <h1>{recipe.title}</h1>
 
+      {recipe.kind === 'simple-idea' && <p className={styles.simpleIdea}>Simple idea</p>}
+
       {/* Ghost / block reasons, prominent near the top (Req 5.3). No control
           here lets the user bypass a block. */}
       {view.isGhosted && (
@@ -176,7 +287,7 @@ export default function RecipeDetail() {
           aria-label={`Not yet. ${ghostReason(view)}`}
         >
           <h2 className={styles.ghostHeading}>Not yet</h2>
-          {blocks.length > 0 ? (
+          {blocks.length > 0 || view.textMentions.length > 0 ? (
             <ul className={styles.blockList}>
               {blocks.map((block, i) => (
                 <li key={`${block.ruleId}-${block.ingredientIndex}-${i}`}>
@@ -188,6 +299,24 @@ export default function RecipeDetail() {
                       Available at {block.availableAtMonths} months.
                     </span>
                   )}
+                </li>
+              ))}
+              {view.textMentions.map((mention) => (
+                <li key={`${mention.ruleId}-${mention.sentence}`}>
+                  <span className={styles.blockLabel}>{mention.label}</span> is mentioned in
+                  the {mention.where === 'title' ? 'title' : mention.where}:{' '}
+                  <q>{mention.sentence}</q> {mention.message}{' '}
+                  <Button
+                    label="Not used in this recipe"
+                    size="sm"
+                    onClick={() =>
+                      dispatch({
+                        type: 'clearTextMention',
+                        recipeId: recipe.id,
+                        mention: { ruleId: mention.ruleId, sentence: mention.sentence },
+                      })
+                    }
+                  />
                 </li>
               ))}
             </ul>
@@ -203,6 +332,21 @@ export default function RecipeDetail() {
           Serves {recipe.servings} {recipe.servings === 1 ? 'portion' : 'portions'}
         </span>
       </p>
+
+      <p className={styles.meta}>
+        <span>{timeLabel({ minutes: time?.minutes, minutesKind: time?.kind })}</span>
+        <span>{effortLabel(recipeEffort(recipe))}</span>
+      </p>
+      {tags.length > 0 && (
+        <ul className={styles.tags} aria-label="Nutrition tags">
+          {tags.map((tag) => (
+            <li key={tag}>
+              <Badge label={tagLabel(tag)} />
+            </li>
+          ))}
+        </ul>
+      )}
+      <p className={styles.explainer}>{TAG_EXPLAINER}</p>
 
       <ServeAsLine key={`${recipe.id}-${recipe.serveAs?.join() ?? ''}`} recipe={recipe} />
 
@@ -295,6 +439,39 @@ export default function RecipeDetail() {
           )}
         </section>
       )}
+
+      {imported && (
+        <section aria-labelledby="recipe-original" className={styles.original}>
+          <h2 id="recipe-original">Original text</h2>
+          <p className={styles.explainer}>{FIXED_LIST_NOTE}</p>
+          {importedLink && (
+            <p>
+              Link you saved:{' '}
+              <a href={importedLink} target="_blank" rel="noopener noreferrer">
+                {importedLink}
+              </a>
+            </p>
+          )}
+          {(recipe.clearedMentions?.length ?? 0) > 0 && (
+            <>
+              <h3 className={styles.adaptationsHeading}>Not used in this recipe</h3>
+              <ul className={styles.adaptations}>
+                {recipe.clearedMentions?.map((m) => (
+                  <li key={`${m.ruleId}-${m.sentence}`}>
+                    <q>{m.sentence}</q>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+          <pre className={styles.originalText}>{imported.text}</pre>
+        </section>
+      )}
+
+      <section aria-label="Plan and history" className={styles.historyActions}>
+        {!view.isGhosted && <AddToPlan recipe={recipe} />}
+        <MadeThis recipe={recipe} />
+      </section>
 
       {recipe.origin === 'custom' && (
         <section aria-label="Recipe actions" className={styles.actions}>
