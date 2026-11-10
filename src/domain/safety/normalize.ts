@@ -11,14 +11,26 @@
  * e.g. "Cow's Milk" -> "cow s milk".
  */
 export function normalize(name: string): string {
-  return name
+  const cached = normalizeCache.get(name);
+  if (cached !== undefined) return cached;
+  const result = name
     .normalize('NFKD')
     .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, ' ')
     .trim()
     .replace(/\s+/g, ' ');
+  // Speed only (active spec Requirement 14.9): the screen normalizes the same
+  // ingredient name once per rule term, so strings repeat many times. The
+  // function is pure, so the cache cannot change a result. It is cleared when
+  // it grows past the limit so it cannot grow without bound.
+  if (normalizeCache.size >= NORMALIZE_CACHE_LIMIT) normalizeCache.clear();
+  normalizeCache.set(name, result);
+  return result;
 }
+
+const NORMALIZE_CACHE_LIMIT = 20000;
+const normalizeCache = new Map<string, string>();
 
 /** Normalize then split into non-empty tokens. */
 export function tokenize(name: string): string[] {
@@ -67,5 +79,22 @@ export function termMatchesTokens(
 
 /** Convenience: does `term` match anywhere in the ingredient `name`? */
 export function matchesTerm(name: string, term: string): boolean {
-  return termMatchesTokens(tokenize(name), tokenize(term));
+  return termMatchesTokens(cachedTokens(name), cachedTokens(term));
+}
+
+// Speed only (active spec Requirement 14.9): the screen calls matchesTerm for
+// every rule term against the same ingredient name, so the same strings are
+// tokenized again and again. These arrays are read-only and never leave this
+// module (tokenize() above still returns a fresh array to its callers). The
+// cache is cleared when it passes the limit so it cannot grow without bound.
+const TOKEN_CACHE_LIMIT = 20000;
+const tokenCache = new Map<string, string[]>();
+
+function cachedTokens(text: string): string[] {
+  const cached = tokenCache.get(text);
+  if (cached !== undefined) return cached;
+  const tokens = tokenize(text);
+  if (tokenCache.size >= TOKEN_CACHE_LIMIT) tokenCache.clear();
+  tokenCache.set(text, tokens);
+  return tokens;
 }

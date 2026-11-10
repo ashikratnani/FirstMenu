@@ -12,6 +12,11 @@
 //   - a PUMPKIN badge ("Freezes for N months") when freezer-friendly.
 // Ghosting/door/pumpkin logic lives in recipeView.ts.
 //
+// The list is shown RECIPES_PAGE_SIZE (50) cards at a time with a "Show more"
+// button, so 500+ recipes never render at once (Requirement 14.9). The user's
+// own recipes come first, so they are never buried behind the built-ins. The
+// count goes back to one page whenever a filter changes.
+//
 // The page's "new recipe" action is the shell's primary "Add recipe" button,
 // so there is one clear primary action per screen (issue #36).
 
@@ -23,20 +28,21 @@ import {
   SegmentedControl,
   SegmentedControlItem,
 } from '@astryxdesign/core/SegmentedControl';
-import { recipeEffort, recipeMinutes } from '../../domain/effort';
-import { recipeNutritionTags } from '../../domain/nutrition';
+import { recipeDerived } from '../../domain/make';
 import { useApp } from '../../state/AppProvider';
 import { selectAllRecipes, selectStage } from '../../state/selectors';
 import type { Recipe } from '../../domain/types';
 import { GhostArt, PumpkinArt } from '../components/foodArt';
 import {
   MEAL_TYPES,
+  RECIPES_PAGE_SIZE,
   STAGES,
   doorBadgeText,
   emptiedSlotLabel,
   freezerBadgeText,
   ghostReason,
   mealTypeLabel,
+  pageStatusText,
   recipeView,
   stageLabel,
   type MealFilter,
@@ -56,11 +62,11 @@ function RecipeCard({ view }: { view: RecipeView }) {
     freezerMonths !== null ? freezerBadgeText(freezerMonths) : null;
 
   // The card link's accessible name must carry EVERY visible state (Req 14.3).
-  const time = recipeMinutes(recipe);
+  const derived = recipeDerived(recipe);
   const facts = [
-    timeLabel({ minutes: time?.minutes, minutesKind: time?.kind }),
-    effortLabel(recipeEffort(recipe)),
-    ...recipeNutritionTags(recipe).map(tagLabel),
+    timeLabel({ minutes: derived.minutes, minutesKind: derived.minutesKind }),
+    effortLabel(derived.effort),
+    ...derived.tags.map(tagLabel),
   ].join(' · ');
   const pasted =
     recipe.imported !== undefined && recipe.imported.from !== 'shared' ? PASTED_BADGE : null;
@@ -113,19 +119,38 @@ export default function Recipes() {
     childStage ?? 'all',
   );
   const [mealFilter, setMealFilter] = useState<MealFilter>('all');
+  // How many cards are shown. Changing a filter goes back to the first page.
+  const [shownCount, setShownCount] = useState(RECIPES_PAGE_SIZE);
 
   const recipes = selectAllRecipes(state);
 
-  const views = useMemo(() => {
-    return recipes
+  const matching = useMemo(() => {
+    const own = recipes.filter((r: Recipe) => r.origin === 'custom');
+    const builtIn = recipes.filter((r: Recipe) => r.origin !== 'custom');
+    return [...own, ...builtIn]
       .filter((r: Recipe) =>
         stageFilter === 'all' ? true : r.stages.includes(stageFilter),
       )
       .filter((r: Recipe) =>
         mealFilter === 'all' ? true : r.mealTypes.includes(mealFilter),
-      )
-      .map((recipe) => recipeView(recipe, state));
-  }, [recipes, state, stageFilter, mealFilter]);
+      );
+  }, [recipes, stageFilter, mealFilter]);
+
+  // Only the visible page is turned into views (the safety screen runs for
+  // these cards only, not for every recipe in the library).
+  const views = useMemo(
+    () => matching.slice(0, shownCount).map((recipe) => recipeView(recipe, state)),
+    [matching, shownCount, state],
+  );
+
+  const changeStage = (value: StageFilter) => {
+    setStageFilter(value);
+    setShownCount(RECIPES_PAGE_SIZE);
+  };
+  const changeMeal = (value: MealFilter) => {
+    setMealFilter(value);
+    setShownCount(RECIPES_PAGE_SIZE);
+  };
 
   return (
     <>
@@ -159,7 +184,7 @@ export default function Recipes() {
             label="Stage"
             size="sm"
             value={stageFilter}
-            onChange={(value) => setStageFilter(value as StageFilter)}
+            onChange={(value) => changeStage(value as StageFilter)}
           >
             <SegmentedControlItem value="all" label="All" />
             {STAGES.map((stage) => (
@@ -180,7 +205,7 @@ export default function Recipes() {
             label="Meal type"
             size="sm"
             value={mealFilter}
-            onChange={(value) => setMealFilter(value as MealFilter)}
+            onChange={(value) => changeMeal(value as MealFilter)}
           >
             <SegmentedControlItem value="all" label="All" />
             {MEAL_TYPES.map((meal) => (
@@ -194,14 +219,27 @@ export default function Recipes() {
         </div>
       </div>
 
-      {views.length === 0 ? (
+      {matching.length === 0 ? (
         <p className={styles.empty}>No recipes match these filters.</p>
       ) : (
-        <ul className={styles.grid}>
-          {views.map((view) => (
-            <RecipeCard key={view.recipe.id} view={view} />
-          ))}
-        </ul>
+        <>
+          <ul className={styles.grid} aria-label="Recipes">
+            {views.map((view) => (
+              <RecipeCard key={view.recipe.id} view={view} />
+            ))}
+          </ul>
+          <div className={styles.more}>
+            <p className={styles.moreStatus} role="status">
+              {pageStatusText(views.length, matching.length)}
+            </p>
+            {views.length < matching.length && (
+              <Button
+                label="Show more"
+                onClick={() => setShownCount((n) => n + RECIPES_PAGE_SIZE)}
+              />
+            )}
+          </div>
+        </>
       )}
     </>
   );

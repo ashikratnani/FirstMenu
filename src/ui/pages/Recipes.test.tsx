@@ -126,17 +126,18 @@ describe('Recipes library page', () => {
     ).not.toBeInTheDocument();
   });
 
-  it('showing all stages reveals every built-in recipe', async () => {
+  it('showing all stages reveals every built-in recipe (after "Show more")', async () => {
     const user = userEvent.setup();
     renderRecipes(seedState(8));
 
     await user.click(within(screen.getByRole('radiogroup', { name: 'Stage' })).getByRole('radio', { name: 'All' }));
+    // Pages of 50: keep tapping "Show more" until the whole library is listed.
+    while (screen.queryByRole('button', { name: 'Show more' })) {
+      await user.click(screen.getByRole('button', { name: 'Show more' }));
+    }
+    const hrefs = new Set(screen.getAllByRole('link').map((a) => a.getAttribute('href')));
     for (const recipe of BUILTIN_RECIPES) {
-      expect(
-        screen.getByRole('link', {
-          name: new RegExp(recipe.title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')),
-        }),
-      ).toBeInTheDocument();
+      expect(hrefs.has(`/recipes/${recipe.id}`), recipe.id).toBe(true);
     }
   });
 
@@ -311,5 +312,67 @@ describe('Recipes library page', () => {
     expect(name).toContain('Simple idea');
     expect(within(cardFor(/Plain Egg/)).queryByText('Simple idea')).not.toBeInTheDocument();
     expect(screen.getByRole('link', { name: /Plain Egg/ }).getAttribute('aria-label') ?? '').not.toContain('Simple idea');
+  });
+});
+
+/** `count` distinct custom recipes, all tagged for every stage. */
+function manyCustomRecipes(count: number): Recipe[] {
+  return Array.from({ length: count }, (_, i) => ({
+    id: `custom-many-${i}`,
+    origin: 'custom' as const,
+    title: `Pager Test Dish ${String(i).padStart(3, '0')}`,
+    stages: ['6-8', '9-12', '12-23', '24-36'] as Recipe['stages'],
+    mealTypes: i % 2 === 0 ? (['lunch'] as Recipe['mealTypes']) : (['dinner'] as Recipe['mealTypes']),
+    ingredients: [{ name: `food ${i}`, category: 'other' as const }],
+    steps: ['Mix.'],
+    texture: 'soft',
+    servings: 1,
+  }));
+}
+
+describe('Recipes library paging (Requirement 14.9)', () => {
+  const cards = () => within(screen.getByRole('list', { name: 'Recipes' })).getAllByRole('listitem');
+
+  it('shows 50 cards at a time and adds 50 per "Show more"', async () => {
+    const user = userEvent.setup();
+    // 120 custom recipes alone are more than two pages, whatever the built-in count.
+    renderRecipes(seedState(8, manyCustomRecipes(120)));
+
+    expect(cards()).toHaveLength(50);
+    expect(screen.getByText(/^Showing 50 of \d+ recipes$/)).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Show more' }));
+    expect(cards()).toHaveLength(100);
+
+    await user.click(screen.getByRole('button', { name: 'Show more' }));
+    expect(cards().length).toBeGreaterThan(100);
+  });
+
+  it('removes "Show more" once everything is listed and says how many are shown', async () => {
+    const user = userEvent.setup();
+    renderRecipes(seedState(8, manyCustomRecipes(60)));
+    while (screen.queryByRole('button', { name: 'Show more' })) {
+      await user.click(screen.getByRole('button', { name: 'Show more' }));
+    }
+    const total = cards().length;
+    expect(total).toBeGreaterThanOrEqual(60);
+    expect(screen.getByText(`Showing ${total} of ${total} recipes`)).toBeInTheDocument();
+  });
+
+  it('goes back to the first page when a filter changes', async () => {
+    const user = userEvent.setup();
+    renderRecipes(seedState(8, manyCustomRecipes(120)));
+    await user.click(screen.getByRole('button', { name: 'Show more' }));
+    expect(cards()).toHaveLength(100);
+
+    await user.click(screen.getByRole('radio', { name: 'Lunch' }));
+    expect(cards()).toHaveLength(50);
+    expect(screen.getByRole('button', { name: 'Show more' })).toBeInTheDocument();
+  });
+
+  it('lists the user\'s own recipes before the built-ins, so they are on the first page', () => {
+    renderRecipes(seedState(8, manyCustomRecipes(3)));
+    const first = cards()[0];
+    expect(within(first).getByText('Pager Test Dish 000')).toBeInTheDocument();
   });
 });

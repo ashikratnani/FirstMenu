@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ghostReason, recipeView } from './recipeView';
+import { RECIPES_PAGE_SIZE, ghostReason, pageStatusText, recipeView } from './recipeView';
 import { defaultState } from '../../domain/storage';
 import type { Recipe } from '../../domain/types';
 
@@ -62,5 +62,16 @@ describe('recipeView with text mentions', () => {
 
   it('does not ghost a typed recipe for the same text', () => {
     expect(recipeView(pasted({ steps: ['Stir in honey.'], imported: undefined }), state, 8).isGhosted).toBe(false);
+  });
+});
+
+describe('library paging helpers', () => {
+  it('shows pages of 50', () => {
+    expect(RECIPES_PAGE_SIZE).toBe(50);
+  });
+
+  it('words the status line for one and many recipes', () => {
+    expect(pageStatusText(50, 142)).toBe('Showing 50 of 142 recipes');
+    expect(pageStatusText(1, 1)).toBe('Showing 1 of 1 recipe');
   });
 });
