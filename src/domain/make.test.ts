@@ -329,6 +329,7 @@ describe('recipeServeAs (Req 16.13)', () => {
     [['9-12', '12-23'], 'mashed'],
     [['24-36', '12-23'], 'pieces'],
     [['6-8', '9-12'], 'puree'],
+    [[], 'mashed'],
   ] as const)('falls back to the youngest stage default for %j', (stages, form) => {
     const out = recipeServeAs(base({ stages: [...stages] }));
     expect(out).toEqual({ forms: [form], guessed: true });
@@ -388,6 +389,54 @@ describe('filters (Req 16.9)', () => {
     const out = makeResults(all, have('egg'), AGE_10, NO_FOODS, { filters: ['meal:dinner'] });
     expect(titles(out.missingOne)).toEqual(['Beef Stew']);
     expect(out.readyNow).toEqual([]);
+  });
+
+  it('applies filters to the ghosted group: a ghosted recipe that does not match is dropped', () => {
+    const match = recipe('Honey Breakfast', ['honey'], { mealTypes: ['breakfast'] });
+    const other = recipe('Honey Dinner', ['honey'], { mealTypes: ['dinner'] });
+    const none = makeResults([match, other], have(), AGE_10, NO_FOODS);
+    expect(titles(none.ghosted).sort()).toEqual(['Honey Breakfast', 'Honey Dinner']);
+    const out = makeResults([match, other], have(), AGE_10, NO_FOODS, { filters: ['meal:breakfast'] });
+    expect(titles(out.ghosted)).toEqual(['Honey Breakfast']);
+  });
+
+  describe('quick', () => {
+    const quick = (r: Recipe) =>
+      titles(makeResults([r], have('egg'), AGE_10, NO_FOODS, { filters: ['quick'] }).readyNow);
+
+    it('excludes a recipe with no time', () => {
+      expect(quick(recipe('No time', ['egg']))).toEqual([]);
+    });
+
+    it('includes exactly 15 minutes and excludes 16', () => {
+      expect(quick(recipe('Fifteen', ['egg'], { statedMinutes: 15 }))).toEqual(['Fifteen']);
+      expect(quick(recipe('Sixteen', ['egg'], { statedMinutes: 16 }))).toEqual([]);
+    });
+
+    it('uses an estimated time', () => {
+      const fast = recipe('Est 15', ['egg'], { steps: ['Simmer 10 minutes.'] });
+      const slow = recipe('Est 20', ['egg'], { steps: ['Simmer 15 minutes.'] });
+      expect(makeResults([fast], have('egg'), AGE_10, NO_FOODS).readyNow[0]).toMatchObject({
+        minutes: 15,
+        minutesKind: 'estimated',
+      });
+      expect(quick(fast)).toEqual(['Est 15']);
+      expect(quick(slow)).toEqual([]);
+    });
+  });
+
+  describe('freezer', () => {
+    const freezer = (r: Recipe) =>
+      titles(makeResults([r], have('egg'), AGE_10, NO_FOODS, { filters: ['freezer'] }).readyNow);
+
+    it('excludes storage set without freezerMonths, and no storage', () => {
+      expect(freezer(recipe('Fridge only', ['egg'], { storage: { fridgeDays: 3 } }))).toEqual([]);
+      expect(freezer(recipe('No storage', ['egg']))).toEqual([]);
+    });
+
+    it('includes a recipe with freezerMonths', () => {
+      expect(freezer(recipe('Frozen', ['egg'], { storage: { freezerMonths: 2 } }))).toEqual(['Frozen']);
+    });
   });
 
   it('applies filters to results with no foods typed, using the pantry', () => {
@@ -477,6 +526,17 @@ describe('More ideas (Req 16.12)', () => {
     const out = makeResults([honey, fine], none, AGE_10, NO_FOODS, { filters: ['meal:dinner'] });
     expect(titles(out.moreIdeas)).toEqual(['Fine']);
     expect(titles(out.ghosted)).toEqual(['Honey Oats']);
+  });
+
+  it('puts younger-stage recipes after the child stage for a toddler when missing counts tie, even if quicker', () => {
+    const ownTwo = recipe('Own two', ['a', 'b'], { stages: ['12-23'], statedMinutes: 60 });
+    const youngTwo = recipe('Young two', ['a', 'b'], { stages: ['9-12'], statedMinutes: 5 });
+    const ownThree = recipe('Own three', ['a', 'b', 'c'], { stages: ['12-23'], statedMinutes: 5 });
+    const out = makeResults([youngTwo, ownThree, ownTwo], none, 15, NO_FOODS, {
+      filters: ['meal:dinner'],
+    });
+    expect(titles(out.moreIdeas)).toEqual(['Own two', 'Young two', 'Own three']);
+    expect(out.moreIdeas.map((r) => r.youngerStage)).toEqual([false, true, false]);
   });
 
   it('respects the stage rule', () => {

@@ -92,13 +92,14 @@ interface MakeResult {
 
 makeResults(recipes, have: Set<string>, ageMonths, foods, options): {
   readyNow: MakeResult[]; missingOne: MakeResult[]; ghosted: MakeResult[];
+  moreIdeas: MakeResult[];   // only when a filter is active (Requirement 16.12)
 }
 ```
 
 1. `have` = pantry ∪ onHand.
 2. For each recipe, required ingredients = not `optional` and not ignored.
 3. `missing` = required ingredients whose plain key is not in `have`, de-duplicated.
-4. Ghosted (v1 rules, reactions, or uncleared text mentions) → `ghosted`, regardless of `missing`.
+4. Ghosted (v1 rules, reactions, or uncleared text mentions) → `ghosted`, regardless of `missing`. Filters apply to the ghosted group too, so the "left out" count (Requirement 3.5) shrinks when filters are on: it counts only ghosted recipes that match every active filter.
 5. `missing.length === 0` → `readyNow`; `=== 1` → `missingOne`; else dropped.
 6. Stage filter (default on): keep recipes whose `stages` include the child's stage. For toddler stages, also keep recipes tagged only for younger stages, and sort them after the child's-stage recipes within each group (Requirement 13.8).
 7. "Iron-rich only" filter: keep recipes tagged Iron-rich. This toggle and the `tag:iron-rich` search filter are the same filter: typing "iron rich" turns the toggle on, and turning the toggle off removes the phrase.
