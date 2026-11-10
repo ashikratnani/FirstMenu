@@ -40,7 +40,7 @@ const ESTIMATE_QUARTER_CUP =
 export const BATCH_2_RECIPES: Recipe[] = [
   // --- Peanut ---------------------------------------------------------------
   {
-    // Soft dip served with fruit or vegetable slices, so a finger food for
+    // Dip served with fruit or vegetable slices, so a finger food for
     // 12 months and up. Yogurt and peanut butter, no blocked ingredient.
     // Makes 12 Tbsp (3/4 cup); at a 1/4 cup portion that is 3 servings.
     id: 'b-fh-peanut-butter-yogurt-dip',
@@ -63,9 +63,9 @@ export const BATCH_2_RECIPES: Recipe[] = [
     ],
     steps: [
       'Stir the yogurt and peanut butter together in a small bowl until smooth. Mix in the cinnamon if you like.',
-      'Serve with soft or cooked slices of fruit or vegetables. Offer the dip thinly spread, never by the spoonful.',
+      'Serve with slices of fruit or vegetables.',
     ],
-    texture: 'soft, smooth dip for soft finger foods',
+    texture: 'smooth dip',
     servings: 3,
   },
   {
@@ -349,8 +349,8 @@ export const BATCH_2_RECIPES: Recipe[] = [
     servings: 4,
   },
   {
-    // Breadcrumb and parmesan coated baked white fish, cut into strips or flaked
-    // for little hands. 8 servings stated by the source.
+    // Breadcrumb and parmesan coated baked white fish. 8 servings stated by the
+    // source.
     id: 'b-fh-crispy-parmesan-baked-fish',
     origin: 'builtin',
     source: {
@@ -378,15 +378,14 @@ export const BATCH_2_RECIPES: Recipe[] = [
       'Mix the breadcrumbs, parmesan, thyme, onion powder and paprika in a small bowl, then spread the mixture on a flat plate or a sheet of wax paper.',
       'Dip each fish fillet in the milk, then press it into the crumbs to coat every side. Throw away any leftover crumbs and milk.',
       'Lay the fish on the baking sheet in a single layer. Bake 10 to 15 minutes, depending on thickness, until the fish reaches 145\u00b0F or is opaque and flakes easily with a fork.',
-      'Check carefully for bones and cut into strips or small flakes before serving.',
     ],
     texture: 'flaky, lightly crumbed fish',
     servings: 8,
   },
   {
-    // Folded tortilla filled with tuna, corn, pepper and cheese; cut into small
-    // strips for little hands. The source says tuna in water; the screen only
-    // blocks high-mercury fish such as bigeye tuna, which canned tuna is not.
+    // Folded tortilla filled with tuna, corn, pepper and cheese. The source says
+    // tuna in water; the screen only blocks high-mercury fish such as bigeye
+    // tuna, which canned tuna is not.
     id: 'b-fh-tuna-quesadillas',
     origin: 'builtin',
     source: {
@@ -411,9 +410,9 @@ export const BATCH_2_RECIPES: Recipe[] = [
       'Wash the vegetables. Mix the tuna, corn, bell pepper and cheese in a bowl.',
       'Spread a quarter of the filling over half of each tortilla and fold the tortilla over it.',
       'Heat each quesadilla in a skillet over medium heat until the cheese melts.',
-      'Flip and cook another 30 seconds to 1 minute. Let cool, then cut into small pieces.',
+      'Flip and cook another 30 seconds to 1 minute.',
     ],
-    texture: 'soft folded tortilla with a melted filling, cut small',
+    texture: 'soft folded tortilla with a melted filling',
     servings: 4,
   },
 
@@ -467,9 +466,9 @@ export const BATCH_2_RECIPES: Recipe[] = [
       'Sauce: in a saucepan, bring 1 cup of the saved broth, the soy sauce, brown sugar and minced garlic to a boil. Stir the cornstarch into the cold water, add it slowly, and stir over medium heat until the sauce thickens.',
       'Wrap: soak one wrapper in warm water until soft and clear, then pat it dry right away. Lay it on a plate, put a lettuce leaf on it, and add 2 Tbsp of filling.',
       'Fold the bottom of the wrapper over the filling, fold in one side, and roll to the other side to seal. Repeat with the remaining wrappers and filling.',
-      'Serve with the sauce spooned over the top. Cut into small pieces for young children.',
+      'Serve with the sauce spooned over the top.',
     ],
-    texture: 'soft rolls with tender chopped filling, cut small',
+    texture: 'soft rolls with tender chopped filling',
     servings: 8,
   },
 
@@ -507,7 +506,7 @@ export const BATCH_2_RECIPES: Recipe[] = [
       'Let the sweet potatoes cool, then scoop the flesh out of the skins into a large food processor.',
       'Add the chickpeas, tahini, olive oil, lemon juice, garlic, paprika, coriander and cinnamon. Puree about 4 minutes until smooth, scraping down the bowl as needed and pureeing another 15 seconds if needed.',
       'If it is too thick, slowly add up to 1/8 cup water.',
-      'Serve right away, or cover and refrigerate. Serve with pita bread, crackers or veggies for older children.',
+      'Serve right away, or cover and refrigerate. Serve with pita bread, crackers or veggies.',
     ],
     texture: 'smooth, creamy puree',
     servings: 6,
