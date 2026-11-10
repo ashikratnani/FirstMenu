@@ -346,13 +346,13 @@ describe('validation rules (Requirement 18.5)', () => {
 });
 
 describe('cleaning', () => {
-  it('trims strings and removes control characters; line breaks become spaces', () => {
+  it('trims strings and keeps invisible characters; line breaks become spaces', () => {
     const r = recipeOf(
       obj({ title: '  Rice\u0000 bowl  ', steps: ['Add the\nhoney\tnow.\u0007'], ingredients: [{ name: ' ri\u200bce ' }] }),
     );
-    expect(r.parsed.title).toBe('Rice bowl');
-    expect(r.parsed.steps[0].text).toBe('Add the honey now.');
-    expect(r.parsed.ingredients[0].name).toBe('rice');
+    expect(r.parsed.title).toBe('Rice\u0000 bowl');
+    expect(r.parsed.steps[0].text).toBe('Add the honey now.\u0007');
+    expect(r.parsed.ingredients[0].name).toBe('ri\u200bce');
   });
 
   it('does not interpret markdown', () => {
@@ -370,21 +370,95 @@ describe('cleaning', () => {
     expect(mentionIds(obj({ extra: `Add ho${c}ney` }))).toEqual(['honey']);
     const named = obj({ ingredients: [{ name: `ho${c}ney` }] });
     const rec = toRecipe(recipeOf(named).parsed, named);
-    expect(rec.ingredients[0].name).toBe('honey');
     expect(screenRecipe(rec, AGE).blocks.length).toBeGreaterThan(0);
   });
+});
 
-  it('no default-ignorable code point can hide honey', () => {
-    const di = /^\p{Default_Ignorable_Code_Point}$/u;
-    let count = 0;
-    for (let cp = 0; cp <= 0x10ffff; cp++) {
+/** Findings of a recipe: text mentions and ingredient blocks, as sorted strings. */
+function findingsOf(recipe: Recipe): string[] {
+  const mentions = screenTextMentions(recipe, AGE).map((m) => `m:${m.ruleId}`);
+  const blocks = screenRecipe(recipe, AGE).blocks.map((b) => `b:${b.ruleId}`);
+  return [...mentions, ...blocks].sort();
+}
+
+function plainFindings(raw: string, as: 'step' | 'ingredient'): string[] {
+  const text =
+    as === 'step'
+      ? `Rice\n\nIngredients\n- rice\n\nSteps\n1. ${raw}\n`
+      : `Rice\n\nIngredients\n- ${raw}\n\nSteps\n1. Cook.\n`;
+  return findingsOf(toRecipe(parseRecipeText(text), text));
+}
+
+function jsonFindings(reply: string): string[] {
+  return findingsOf(toRecipe(recipeOf(reply).parsed, reply));
+}
+
+const IGNORABLES: number[] = [];
+for (let cp = 0; cp <= 0x10ffff; cp++) {
+  if (/^[\p{Default_Ignorable_Code_Point}\p{Cf}\p{Variation_Selector}]$/u.test(String.fromCodePoint(cp))) IGNORABLES.push(cp);
+}
+for (const cp of [0x0b, 0x0c, 0x85, 0x2028, 0x2029, 0x00ad, 0x034f, 0x2060, 0x3164, 0xffa0, 0x2800, 0x7f, 0x01]) IGNORABLES.push(cp);
+
+describe('invisible characters get the same findings as the plain-text path', () => {
+  it('covers many code points', () => {
+    expect(IGNORABLES.length).toBeGreaterThan(100);
+  });
+
+  // JSON may be stricter than the plain-text path (never weaker), so the plain findings must be contained.
+  it.each(['sep', 'hide'] as const)('as a %s in every field', (mode) => {
+    for (const cp of IGNORABLES) {
       const c = String.fromCodePoint(cp);
-      if (!di.test(c)) continue;
-      count++;
-      const ids = mentionIds(obj({ steps: [`Stir in ho${c}ney.`] }));
-      expect(ids, `U+${cp.toString(16)}`).toEqual(['honey']);
+      const label = `U+${cp.toString(16)} ${mode}`;
+      const text = mode === 'sep' ? `Stir in${c}honey.` : `Stir in ho${c}ney.`;
+      const stepRef = plainFindings(text, 'step');
+      expect(jsonFindings(obj({ steps: [text] })), `${label} step`).toEqual(expect.arrayContaining(stepRef));
+      expect(jsonFindings(obj({ notes: [text] })), `${label} note`).toEqual(expect.arrayContaining(stepRef));
+      expect(jsonFindings(obj({ extra: text })), `${label} extra`).toEqual(expect.arrayContaining(stepRef));
+      const unit = jsonFindings(obj({ ingredients: [{ name: 'rice', quantity: 1, unit: text }] }));
+      expect(unit, `${label} unit`).toEqual(jsonFindings(obj({ ingredients: [{ name: 'rice', quantity: 1, unit: text }] })));
+
+      const name = mode === 'sep' ? `raw${c}honey` : `ho${c}ney`;
+      const nameRef = plainFindings(name, 'ingredient');
+      expect(jsonFindings(obj({ ingredients: [{ name }] })), `${label} name`).toEqual(expect.arrayContaining(nameRef));
     }
-    expect(count).toBeGreaterThan(100);
+  }, 120000);
+
+  it('the ordinary separator and hider examples from review', () => {
+    expect(mentionIds(obj({ steps: ['Stir in\u200Bhoney.'] }))).toEqual(['honey']);
+    const rec = toRecipe(recipeOf(obj({ ingredients: [{ name: 'raw\u200Bhoney' }] })).parsed, '');
+    expect(screenRecipe(rec, AGE).blocks.length).toBeGreaterThan(0);
+  });
+});
+
+describe('plain-text and JSON paths agree on hostile strings', () => {
+  const hostile = [
+    'Stir in honey.',
+    'Stir in\u200Bhoney.',
+    'Stir in ho\u200Bney.',
+    'Stir in\u2060honey.',
+    'Stir in\u00ADhoney.',
+    'Stir in\u034Fhoney.',
+    'Stir in\u000Bhoney.',
+    'Stir in\u000Choney.',
+    'Stir in\u0085honey.',
+    'Stir in\u2028honey.',
+    'Stir in\u3164honey.',
+    'Stir in h\u17B4oney.',
+    'Add whole peanuts.',
+    'Add pea\u200Bnuts.',
+    'Serve with unpasteurised milk.',
+    'A harmless sentence about ri\u200Bce.',
+  ];
+  it.each(hostile)('%j', (raw) => {
+    expect(jsonFindings(obj({ steps: [raw] }))).toEqual(plainFindings(raw, 'step'));
+    expect(jsonFindings(obj({ ingredients: [{ name: raw }] }))).toEqual(plainFindings(raw, 'ingredient'));
+  });
+});
+
+describe('duplicate keys written with invisible characters', () => {
+  it('still collide', () => {
+    const e = invalidOf('{"firstmenu_recipe":1,"title":"T","ingredients":[{"name":"rice"}],"steps":["Cook."],"a\u200Bb":1,"ab":2}');
+    expect(e[0].message).toContain('appears twice');
   });
 });
 
@@ -677,7 +751,7 @@ describe('deep nesting and huge numbers (PR #72 round 2)', () => {
       const code = h.codePointAt(0)!.toString(16);
       it(`U+${code} in notes, a name, an extra key value and a unit`, () => {
         expect(mentionIds(obj({ notes: [`add ${word}`] }))).not.toEqual([]);
-        expect(recipeOf(obj({ ingredients: [{ name: word }] })).parsed.ingredients[0].name).toBe('honey');
+        expect(screenRecipe(toRecipe(recipeOf(obj({ ingredients: [{ name: word }] })).parsed, ''), AGE).blocks.length).toBeGreaterThan(0);
         expect(mentionIds(obj({ extra: word }))).not.toEqual([]);
         const r = recipeOf(obj({ ingredients: [{ name: 'rice', quantity: 1, unit: word }] }));
         expect(r.extras).toContain('ingredients[0].unit');

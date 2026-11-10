@@ -174,16 +174,16 @@ function messageFor(issue: z.core.$ZodIssue, root: unknown): JsonIssue {
 // ---------------------------------------------------------------------------
 
 /**
- * Trim, turn line breaks and tabs into spaces (so words never glue together
- * and hide from the screen) and remove other control and invisible format
- * characters (so a hidden character cannot split a food word). Markdown is
+ * Trim and turn whitespace-like characters (tabs, line breaks, vertical tab,
+ * form feed, NEL, line and paragraph separators) into plain spaces so words
+ * never glue together. Invisible and default-ignorable characters are KEPT:
+ * the safety screen reads each of them both as nothing and as a space, and
+ * deleting one here would throw the "as a space" reading away. Markdown is
  * left as it is.
  */
 export function cleanString(s: string): string {
   return s
-    .replace(/[\t\r\n\u2028\u2029]+/g, ' ')
-    .replace(/[\p{Cc}\p{Cf}\p{Default_Ignorable_Code_Point}\u3164\uFFA0\u115F\u1160\u2800]/gu, '')
-    .replace(/\p{Variation_Selector}/gu, '')
+    .replace(/[\t\n\v\f\r\u0085\u2028\u2029]+/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
 }
@@ -196,9 +196,20 @@ class DuplicateKeyError extends Error {
   }
 }
 
-/** Key identity for the duplicate check: cleaned, then Unicode-normalised. */
+/** Display only: a copy without invisible characters (the screened text keeps them). */
+function withoutInvisible(s: string): string {
+  return s.replace(/[\p{Cc}\p{Cf}\p{Default_Ignorable_Code_Point}\p{Variation_Selector}\u3164\uFFA0\u115F\u1160\u2800]/gu, '');
+}
+
+/**
+ * Key identity for the duplicate check: invisible characters removed, then
+ * Unicode-normalised. Only used to compare keys (stricter than the stored key).
+ */
 function keyId(k: string): string {
-  return cleanString(k).normalize('NFKC');
+  return withoutInvisible(cleanString(k))
+    .normalize('NFKC')
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
 function duplicateIssue(path: string): JsonIssue {
@@ -217,7 +228,7 @@ function cleanDeep(value: unknown, depth: number, parts: Array<string | number> 
     const id = keyId(k);
     const cleaned = cleanString(k);
     if (seen.has(id) || Object.prototype.hasOwnProperty.call(out, cleaned)) {
-      throw new DuplicateKeyError(pathText([...parts, cleaned]));
+      throw new DuplicateKeyError(pathText([...parts, withoutInvisible(cleaned)]));
     }
     seen.add(id);
     Object.defineProperty(out, cleaned, {
@@ -286,7 +297,7 @@ function findDuplicateKey(json: string): string | null {
         const key = readString();
         const here = [...parts, cleanString(key)];
         const id = keyId(key);
-        if (seen.has(id)) return pathText(here);
+        if (seen.has(id)) return pathText([...parts, withoutInvisible(cleanString(key))]);
         seen.add(id);
         ws();
         i++; // :
