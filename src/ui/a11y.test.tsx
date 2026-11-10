@@ -189,9 +189,6 @@ function renderApp(path: string, seed: AppState) {
   );
 }
 
-// The heavier Astryx pages sit near the 5s default under load.
-vi.setConfig({ testTimeout: 20000 });
-
 describe('Accessibility: axe on every main page (color-contrast disabled)', () => {
   // Each entry is [label, path, heading]; all render through the shell with the
   // same onboarded seed so the OnboardingGate lets the page render. `heading`
