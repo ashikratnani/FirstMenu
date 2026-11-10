@@ -103,26 +103,3 @@ export function buildFixupPrompt(): string {
     RECIPE_JSON_TEMPLATE,
   ].join('\n');
 }
-
-export interface PromptInput {
-  ageMonths: number;
-  /** Human-readable on-hand and pantry food labels. */
-  have: string[];
-  stage: StageId;
-  leaveOut: string[];
-}
-
-/**
- * Kept only so the current Ask ChatGPT component compiles until task 11.6
- * replaces it with the question box. Builds the old "what can I make" sentence
- * as the question of `buildWrappedPrompt`; the old free-text reply format is
- * gone.
- */
-export function buildPrompt({ ageMonths, have, stage, leaveOut }: PromptInput): string {
-  return buildWrappedPrompt({
-    question: `Suggest one quick and easy recipe using: ${have.join(', ')}. If you can, include an iron-rich food.`,
-    ageMonths,
-    stage,
-    leaveOut,
-  });
-}

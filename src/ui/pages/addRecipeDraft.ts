@@ -22,6 +22,12 @@ export type LineList = 'ingredients' | 'steps' | 'notes';
 export interface DraftLine {
   id: number;
   text: string;
+  /**
+   * A note the preview does not list (a plain one-word ingredient unit that
+   * matched no rule). It still counts for the safety screen, but is left out
+   * of the saved recipe.
+   */
+  hidden?: boolean;
 }
 
 export interface Draft {
@@ -64,15 +70,50 @@ export function ingredientFromText(text: string): Ingredient {
   return ingredient;
 }
 
-export function draftFromParsed(parsed: ParsedRecipe): Draft {
+/**
+ * Which of the last notes of a Recipe JSON result are `ingredients[n].unit`
+ * notes to hide: the unit is one plain word and its path is not in `extras`
+ * (the parser lists a unit path there when it is odd or matched a rule).
+ */
+function hiddenUnitNotes(parsed: ParsedRecipe, extras: readonly string[]): Set<number> {
+  const unitIndexes: number[] = [];
+  parsed.ingredients.forEach((ing, i) => {
+    if (ing.unit !== undefined && /\p{L}/u.test(ing.unit)) unitIndexes.push(i);
+  });
+  const hidden = new Set<number>();
+  const first = parsed.notes.length - unitIndexes.length;
+  unitIndexes.forEach((ingIndex, n) => {
+    const unit = parsed.ingredients[ingIndex].unit ?? '';
+    const path = `ingredients[${ingIndex}].unit`;
+    const noteIndex = first + n;
+    if (
+      first >= 0 &&
+      parsed.notes[noteIndex].text === `${path}: ${unit}` &&
+      /^\p{L}+$/u.test(unit) &&
+      !extras.includes(path)
+    ) {
+      hidden.add(noteIndex);
+    }
+  });
+  return hidden;
+}
+
+/**
+ * `jsonExtras` is given for a Recipe JSON result (the parser's `extras`); it
+ * turns on hiding of plain ingredient-unit notes.
+ */
+export function draftFromParsed(parsed: ParsedRecipe, jsonExtras?: readonly string[]): Draft {
   let nextId = 1;
+  const hiddenNotes = jsonExtras ? hiddenUnitNotes(parsed, jsonExtras) : new Set<number>();
   const lines = (texts: string[]): DraftLine[] =>
     texts.map((text) => ({ id: nextId++, text }));
   const draft: Draft = {
     title: parsed.title,
     ingredients: lines(parsed.ingredients.map(ingredientText)),
     steps: lines(parsed.steps.map((s) => s.text)),
-    notes: lines(parsed.notes.map((n) => n.text)),
+    notes: lines(parsed.notes.map((n) => n.text)).map((l, i) =>
+      hiddenNotes.has(i) ? { ...l, hidden: true } : l,
+    ),
     warnings: parsed.warnings,
     nextId: 0,
   };
@@ -121,6 +162,8 @@ export interface BuildContext {
   originalText: string;
   today: string;
   cleared: ClearedMention[];
+  /** Leave out hidden notes (for Save). The safety screen builds with them. */
+  omitHidden?: boolean;
 }
 
 /**
@@ -150,7 +193,10 @@ export function buildRecipe(draft: Draft, ctx: BuildContext): Recipe {
     servings: draft.servings ?? 1,
     imported,
   };
-  const notes = draft.notes.map((l) => l.text.trim()).filter((t) => t !== '');
+  const notes = draft.notes
+    .filter((l) => !(ctx.omitHidden && l.hidden))
+    .map((l) => l.text.trim())
+    .filter((t) => t !== '');
   if (notes.length > 0) recipe.notes = notes;
   if (draft.statedMinutes !== undefined) recipe.statedMinutes = draft.statedMinutes;
   if (ctx.cleared.length > 0) recipe.clearedMentions = ctx.cleared;

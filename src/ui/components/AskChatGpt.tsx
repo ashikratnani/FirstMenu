@@ -1,15 +1,17 @@
-// "Ask ChatGPT" prompt helper for the Make screen's empty state (Req 3.10,
-// 8.1, 8.6). Builds the question on the device and lets the user copy it or
-// open ChatGPT in a new tab, with the Requirement 8.9 notice beside those
+// "Ask ChatGPT" prompt helper for the Make screen's empty state and Add recipe
+// (Req 3.10, 8.1, 8.6, 18.1 to 18.3, 18.12). The question box is pre-filled
+// from the foods on hand and stays editable (at most 1,000 characters). The
+// wrapped prompt is built on the device from that question; the user copies it
+// or opens ChatGPT in a new tab, with the Requirement 8.9 notice beside those
 // controls. The app never calls an AI service itself. After the user copies
 // the question or opens ChatGPT, a "Paste the answer" step appears (Req 8.7):
 // on Make it links to Add recipe with ChatGPT preselected; on Add recipe the
 // page passes `onPasteAnswer` to move to its own paste box.
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@astryxdesign/core/Button';
-import { buildPrompt, PROMPT_NOTICE } from '../../domain/prompt';
+import { buildWrappedPrompt, MAX_QUESTION_CHARS, PROMPT_NOTICE } from '../../domain/prompt';
 import type { StageId } from '../../domain/types';
 import styles from './AskChatGpt.module.css';
 
@@ -33,23 +35,35 @@ export default function AskChatGpt({ ageMonths, stage, have, leaveOut, onPasteAn
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState('');
   const [asked, setAsked] = useState(false);
-  const prompt = buildPrompt({
-    ageMonths,
-    stage,
-    have: have.length > 0 ? have : ['common kitchen foods'],
-    leaveOut,
-  });
+  // Until the user edits the box, it follows the foods on hand.
+  const [edited, setEdited] = useState<string | null>(null);
+  const suggestion = `Suggest one quick and easy recipe using: ${
+    have.length > 0 ? have.join(', ') : 'common kitchen foods'
+  }. If you can, include an iron-rich food.`;
+  const question = edited ?? suggestion;
+  const prompt = buildWrappedPrompt({ question, ageMonths, stage, leaveOut });
 
-  async function copy(textarea: HTMLTextAreaElement | null) {
+  const [manual, setManual] = useState(false);
+  const manualBox = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    if (!manual) return;
+    manualBox.current?.focus();
+    manualBox.current?.select();
+  }, [manual]);
+
+  async function copy() {
     setAsked(true);
     try {
       await navigator.clipboard.writeText(prompt);
+      setManual(false);
       setMessage('Copied. Paste it into ChatGPT.');
     } catch {
-      // Clipboard API unavailable: select the text and ask the user to copy.
-      textarea?.focus();
-      textarea?.select();
-      setMessage('Select the question above and copy it.');
+      // Clipboard API unavailable: show the full text to select and copy.
+      setManual(true);
+      setMessage(
+        'Copying did not work here. Select the text below and copy it, then paste it into ChatGPT.',
+      );
     }
   }
 
@@ -67,18 +81,14 @@ export default function AskChatGpt({ ageMonths, stage, have, leaveOut, onPasteAn
           <textarea
             id="chatgpt-question"
             className={styles.text}
-            readOnly
-            rows={8}
-            value={prompt}
+            rows={5}
+            maxLength={MAX_QUESTION_CHARS}
+            value={question}
+            onChange={(event) => setEdited(event.target.value)}
           />
           <p className={styles.notice}>{PROMPT_NOTICE}</p>
           <div className={styles.row}>
-            <Button
-              label="Copy question"
-              onClick={() =>
-                void copy(document.getElementById('chatgpt-question') as HTMLTextAreaElement | null)
-              }
-            />
+            <Button label="Copy question" onClick={() => void copy()} />
             <a
               className={styles.link}
               href={CHATGPT_URL}
@@ -93,6 +103,16 @@ export default function AskChatGpt({ ageMonths, stage, have, leaveOut, onPasteAn
             <p className={styles.status} role="status">
               {message}
             </p>
+          )}
+          {manual && (
+            <textarea
+              ref={manualBox}
+              className={styles.text}
+              aria-label="Full text to copy"
+              readOnly
+              rows={8}
+              value={prompt}
+            />
           )}
           {asked && (
             <div className={styles.pasteStep}>

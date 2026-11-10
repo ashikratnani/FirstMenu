@@ -1,6 +1,8 @@
 // Add recipe (`/add`, active spec Requirements 6, 7.3 to 7.5, 11.2, 17.7,
-// 17.10), built on Astryx components. The parent pastes a recipe from ChatGPT
-// or an Instagram caption, reads it, checks the preview and saves it without
+// 17.10, 18), built on Astryx components. The parent pastes a recipe from
+// ChatGPT (Recipe JSON, read by `parseRecipeReply`) or an Instagram caption
+// (free text, also the fallback when a reply has no JSON), reads it, checks the
+// preview and saves it without
 // typing anything. Parsing and the safety screen run on the device; the
 // optional link is never fetched and the clipboard is read only when the
 // "Paste" button is tapped.
@@ -20,7 +22,8 @@ import { foodLabel } from '../../domain/foods';
 import { MAX_PASTE_CHARS, parseRecipeText } from '../../domain/importText';
 import { recipeEffort, recipeMinutes } from '../../domain/effort';
 import { recipeNutritionTags } from '../../domain/nutrition';
-import { leaveOutFor } from '../../domain/prompt';
+import { buildFixupPrompt, leaveOutFor } from '../../domain/prompt';
+import { parseRecipeReply, type JsonIssue } from '../../domain/recipeJson';
 import { screenRecipe, screenTextMentions } from '../../domain/safety/screen';
 import { localYmd } from '../../domain/suggest';
 import type { ClearedMention, ImportedInfo } from '../../domain/types';
@@ -50,6 +53,9 @@ const SOURCES: ReadonlyArray<{ value: Source; label: string }> = [
   { value: 'instagram', label: 'Instagram' },
   { value: 'other', label: 'Other' },
 ];
+
+export const PLAIN_TEXT_NOTICE =
+  "This isn't in the expected format, so it was read as plain text. Check each line.";
 
 export const PASTE_FALLBACK = 'Paste with your keyboard or long-press';
 
@@ -165,6 +171,13 @@ export default function AddRecipe() {
   const [url, setUrl] = useState('');
   const [text, setText] = useState('');
   const [message, setMessage] = useState('');
+  const [problem, setProblem] = useState<
+    { kind: 'invalid'; errors: JsonIssue[] } | { kind: 'ai-error'; message: string } | null
+  >(null);
+  const [notices, setNotices] = useState({ extras: false, outside: false });
+  const [readAsJson, setReadAsJson] = useState(false);
+  const [showReply, setShowReply] = useState(false);
+  const [copyMessage, setCopyMessage] = useState('');
   const [draft, setDraft] = useState<Draft | null>(null);
   const [cleared, setCleared] = useState<ClearedMention[]>([]);
   const [markMode, setMarkMode] = useState(false);
@@ -188,10 +201,47 @@ export default function AddRecipe() {
       return;
     }
     setMessage('');
+    setCopyMessage('');
     setCleared([]);
     setMarkMode(false);
     setMarked(new Set());
-    setDraft(draftFromParsed(parseRecipeText(source)));
+    setProblem(null);
+    setShowReply(false);
+    setReadAsJson(false);
+    setNotices({ extras: false, outside: false });
+    const result = parseRecipeReply(source);
+    if (result.kind === 'recipe') {
+      setNotices({
+        extras: result.extras.length > 0,
+        outside: result.outsideNotable,
+      });
+      setReadAsJson(true);
+      setDraft(draftFromParsed(result.parsed, result.extras));
+    } else if (result.kind === 'no-json') {
+      readAsPlainText(source, true);
+    } else {
+      setProblem(result);
+    }
+  }
+
+  /** The free-text parser (Requirement 18.7): the fallback and "Read as plain text instead". */
+  function readAsPlainText(source: string, withNotice: boolean) {
+    const parsed = parseRecipeText(source);
+    if (withNotice) parsed.warnings = [PLAIN_TEXT_NOTICE, ...parsed.warnings];
+    setProblem(null);
+    setReadAsJson(false);
+    setDraft(draftFromParsed(parsed));
+  }
+
+  async function copyFixup() {
+    try {
+      await navigator.clipboard.writeText(buildFixupPrompt());
+      setCopyMessage('Copied. Paste it into the chat and ask for the recipe again.');
+    } catch {
+      setCopyMessage(
+        'Copying did not work here. Try again, or ask the chat to resend the recipe as JSON.',
+      );
+    }
   }
 
   // The clipboard is read here, inside the tap, and nowhere else (Req 17.7).
@@ -213,20 +263,22 @@ export default function AddRecipe() {
     pasteBox.current?.focus();
   }
 
+  const buildContext = useMemo(
+    () => ({
+      id: recipeId,
+      stage,
+      from: source,
+      url,
+      originalText: text,
+      today: localYmd(new Date()),
+      cleared,
+    }),
+    [recipeId, stage, source, url, text, cleared],
+  );
+  // The screen sees every note, including hidden unit notes; Save leaves those out.
   const recipe = useMemo(
-    () =>
-      draft
-        ? buildRecipe(draft, {
-            id: recipeId,
-            stage,
-            from: source,
-            url,
-            originalText: text,
-            today: localYmd(new Date()),
-            cleared,
-          })
-        : null,
-    [draft, recipeId, stage, source, url, text, cleared],
+    () => (draft ? buildRecipe(draft, buildContext) : null),
+    [draft, buildContext],
   );
 
   const screen = useMemo(
@@ -243,13 +295,17 @@ export default function AddRecipe() {
   }
 
   function save() {
-    if (!recipe) return;
-    dispatch({ type: 'saveCustomRecipe', recipe });
-    navigate(`/recipes/${recipe.id}`);
+    if (!recipe || !draft) return;
+    const toSave = buildRecipe(draft, { ...buildContext, omitHidden: true });
+    dispatch({ type: 'saveCustomRecipe', recipe: toSave });
+    navigate(`/recipes/${toSave.id}`);
   }
 
   function startOver() {
     setDraft(null);
+    setProblem(null);
+    setNotices({ extras: false, outside: false });
+    setShowReply(false);
     setMarkMode(false);
     setMessage('');
   }
@@ -308,6 +364,31 @@ export default function AddRecipe() {
                 {message}
               </p>
             )}
+            {problem?.kind === 'ai-error' && (
+              <p className={styles.warning} role="alert">
+                The chat could not give a recipe
+                {problem.message !== '' ? `: ${problem.message}` : '.'} Try again, or paste the
+                recipe text instead.
+              </p>
+            )}
+            {problem?.kind === 'invalid' && (
+              <div className={styles.warning} role="alert">
+                <p>This reply could not be read as a FirstMenu recipe. Nothing was saved.</p>
+                <ul className={styles.findings}>
+                  {problem.errors.map((error, index) => (
+                    <li key={`${error.path}-${index}`}>{error.message}</li>
+                  ))}
+                </ul>
+                <div className={styles.row}>
+                  <Button label="Copy a fix-up request" onClick={() => void copyFixup()} />
+                  <Button
+                    label="Read as plain text instead"
+                    onClick={() => readAsPlainText(text, false)}
+                  />
+                </div>
+                {copyMessage && <p role="status">{copyMessage}</p>}
+              </div>
+            )}
             <p className={styles.help}>{INSTAGRAM_HELP}</p>
           </section>
 
@@ -344,6 +425,30 @@ export default function AddRecipe() {
             {effortLabel(recipeEffort(recipe))}
             {recipeNutritionTags(recipe).map((tag) => ` · ${tagLabel(tag)}`)}
           </p>
+
+          {readAsJson && (
+            <p className={styles.help} role="status">
+              Read as a FirstMenu recipe
+            </p>
+          )}
+          {notices.extras && (
+            <p className={styles.warning} role="status">
+              Extra text was added to the notes. Check it below.
+            </p>
+          )}
+          {notices.outside && (
+            <div className={styles.warning} role="status">
+              <p>Text outside the recipe was ignored.</p>
+              <Button
+                label={showReply ? 'Hide the reply' : 'Show the reply'}
+                size="sm"
+                onClick={() => setShowReply((value) => !value)}
+              >
+                {showReply ? 'Hide' : 'Show'}
+              </Button>
+              {showReply && <pre className={styles.reply}>{text}</pre>}
+            </div>
+          )}
 
           {draft.warnings.map((warning) => (
             <p key={warning} className={styles.warning} role="status">
@@ -432,7 +537,7 @@ export default function AddRecipe() {
             <section aria-label="Mark lines as ingredients" className={styles.markBox}>
               <h3 className={styles.subheading}>Mark lines as ingredients</h3>
               <ul className={styles.lines}>
-                {[...draft.steps, ...draft.notes].map((line) => (
+                {[...draft.steps, ...draft.notes.filter((l) => !l.hidden)].map((line) => (
                   <li key={line.id} className={styles.line}>
                     <CheckboxInput
                       label={line.text}
@@ -487,25 +592,27 @@ export default function AddRecipe() {
                 </ol>
               </section>
 
-              {draft.notes.length > 0 && (
+              {draft.notes.some((l) => !l.hidden) && (
                 <section aria-label="Notes">
                   <h3 className={styles.subheading}>Notes</h3>
                   <ul className={styles.lines}>
-                    {draft.notes.map((line) => (
-                      <LineRow
-                        key={line.id}
-                        list="notes"
-                        line={line}
-                        onEdit={(t) => update((d) => editLine(d, 'notes', line.id, t))}
-                        onRemove={() => update((d) => removeLine(d, 'notes', line.id))}
-                        onMove={(to) => update((d) => moveLine(d, 'notes', line.id, to))}
-                      />
-                    ))}
+                    {draft.notes
+                      .filter((l) => !l.hidden)
+                      .map((line) => (
+                        <LineRow
+                          key={line.id}
+                          list="notes"
+                          line={line}
+                          onEdit={(t) => update((d) => editLine(d, 'notes', line.id, t))}
+                          onRemove={() => update((d) => removeLine(d, 'notes', line.id))}
+                          onMove={(to) => update((d) => moveLine(d, 'notes', line.id, to))}
+                        />
+                      ))}
                   </ul>
                 </section>
               )}
 
-              {draft.steps.length + draft.notes.length > 0 && (
+              {draft.steps.length + draft.notes.filter((l) => !l.hidden).length > 0 && (
                 <div className={styles.row}>
                   <Button
                     label="Mark lines as ingredients"

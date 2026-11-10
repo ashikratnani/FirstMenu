@@ -1,8 +1,17 @@
-import { render, screen, within } from '@testing-library/react';
+import { cleanup, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import AddRecipe, { INSTAGRAM_HELP, PASTE_FALLBACK } from './AddRecipe';
+import { spyOnNetwork } from '../../test/networkSpy';
+import AddRecipe, { INSTAGRAM_HELP, PASTE_FALLBACK, PLAIN_TEXT_NOTICE } from './AddRecipe';
+import validJson from '../../domain/__fixtures__/json/valid.json?raw';
+import fencedJson from '../../domain/__fixtures__/json/fenced-with-prose.txt?raw';
+import brokenJson from '../../domain/__fixtures__/json/broken.txt?raw';
+import fractionJson from '../../domain/__fixtures__/json/quantity-fraction.json?raw';
+import unknownKeysJson from '../../domain/__fixtures__/json/unknown-keys.json?raw';
+import unitBlockedJson from '../../domain/__fixtures__/json/unit-blocked-food.json?raw';
+import errorJson from '../../domain/__fixtures__/json/error-object.json?raw';
+import { buildFixupPrompt } from '../../domain/prompt';
 import { PROMPT_NOTICE } from '../../domain/prompt';
 import { AppProvider, useApp } from '../../state/AppProvider';
 import { STORAGE_KEY, defaultState } from '../../domain/storage';
@@ -126,7 +135,7 @@ describe('Add recipe: paste, preview, save (Req 6.1, 6.4, 6.7, 6.8)', () => {
 
   it('records the source and link, and never fetches the link', async () => {
     const user = userEvent.setup();
-    const fetchSpy = vi.spyOn(globalThis, 'fetch');
+    const network = spyOnNetwork();
     const { getState } = renderAdd();
     await user.click(screen.getByRole('radio', { name: 'Instagram' }));
     expect(screen.getByRole('radio', { name: 'Instagram' })).toBeChecked();
@@ -138,7 +147,7 @@ describe('Add recipe: paste, preview, save (Req 6.1, 6.4, 6.7, 6.8)', () => {
       from: 'instagram',
       url: 'https://example.com/reel',
     });
-    expect(fetchSpy).not.toHaveBeenCalled();
+    network.expectNoNetwork();
   });
 
   it('rejects a link that is not a web address', async () => {
@@ -345,6 +354,7 @@ describe('Add recipe: Paste button (Req 17.7)', () => {
 describe('Add recipe: prompt helper (Req 8.1, 8.6 to 8.9)', () => {
   it('copies the question, then "Paste the answer" selects ChatGPT and moves to the paste box', async () => {
     const user = userEvent.setup();
+    const network = spyOnNetwork();
     renderAdd();
     const writeText = vi.fn().mockResolvedValue(undefined);
     Object.defineProperty(navigator, 'clipboard', {
@@ -363,5 +373,268 @@ describe('Add recipe: prompt helper (Req 8.1, 8.6 to 8.9)', () => {
     await user.click(screen.getByRole('button', { name: 'Paste the answer' }));
     expect(screen.getByRole('radio', { name: 'ChatGPT' })).toBeChecked();
     expect(screen.getByRole('textbox', { name: 'Recipe text' })).toHaveFocus();
+    network.expectNoNetwork();
   });
 });
+
+const oats = { quantity: 1, unit: 'cup', name: 'rolled oats' };
+
+function jsonWith(fields: Record<string, unknown>): string {
+  return JSON.stringify({
+    firstmenu_recipe: 1,
+    title: 'Oat bowl',
+    ingredients: [oats],
+    steps: ['Cook the oats.'],
+    ...fields,
+  });
+}
+
+describe('Add recipe: Recipe JSON intake (Req 18.3 to 18.12, 6.1)', () => {
+  it('previews a JSON reply, keeps the raw reply as original text and saves', async () => {
+    const user = userEvent.setup();
+    const network = spyOnNetwork();
+    const { getState } = renderAdd('/add?from=chatgpt');
+    await pasteAndRead(user, validJson);
+    const preview = screen.getByRole('region', { name: 'Preview' });
+    expect(within(preview).getByRole('textbox', { name: 'Title' })).toHaveValue('Egg and rice bowl');
+    expect(within(preview).getByText('1 cup cooked rice')).toBeInTheDocument();
+    expect(screen.getByText('Read as a FirstMenu recipe')).toBeInTheDocument();
+    expect(screen.queryByText(PLAIN_TEXT_NOTICE)).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Save recipe' }));
+    const recipe = getState().customRecipes[0];
+    expect(recipe.imported).toMatchObject({ from: 'chatgpt', text: validJson });
+    expect(recipe.statedMinutes).toBe(15);
+    expect(recipe.servings).toBe(2);
+    network.expectNoNetwork();
+  });
+
+  it('reads a fenced reply, hides plain unit notes and says long outside text was ignored', async () => {
+    const user = userEvent.setup();
+    renderAdd();
+    await pasteAndRead(user, fencedJson);
+    const preview = screen.getByRole('region', { name: 'Preview' });
+    expect(within(preview).getByRole('textbox', { name: 'Title' })).toHaveValue('Banana oat pancakes');
+    expect(within(preview).queryByText(/ingredients\[\d+\]\.unit/)).not.toBeInTheDocument();
+    expect(within(preview).queryByText(/Here is a recipe/)).not.toBeInTheDocument();
+  });
+
+  it('shows the outside-text notice with a Show toggle when a second object is present', async () => {
+    const user = userEvent.setup();
+    renderAdd();
+    const reply = `${validJson}\nAlso {"other": true}`;
+    await pasteAndRead(user, reply);
+    expect(screen.getByText('Text outside the recipe was ignored.')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Show the reply' }));
+    expect(screen.getByText(/Also \{"other": true\}/)).toBeInTheDocument();
+  });
+
+  it('adds extra text to the notes with a notice and screens it', async () => {
+    const user = userEvent.setup();
+    renderAdd();
+    await pasteAndRead(user, unknownKeysJson);
+    expect(screen.getByText(/Extra text was added to the notes/)).toBeInTheDocument();
+    const preview = screen.getByRole('region', { name: 'Preview' });
+    expect(within(preview).getByText(/ingredients\[0\]\.brand: Nutella/)).toBeInTheDocument();
+    // "honey" inside an unknown key is screened as a text mention.
+    expect(within(preview).getByText(/Honey is mentioned in the note/i)).toBeInTheDocument();
+  });
+
+  it('screens a blocked food in a multi-word ingredient unit and keeps the note visible', async () => {
+    const user = userEvent.setup();
+    renderAdd();
+    await pasteAndRead(user, unitBlockedJson);
+    const preview = screen.getByRole('region', { name: 'Preview' });
+    // The unit note stays visible. The ingredient line is a block, so it has no "Not used" button.
+    expect(within(preview).getByText(/ingredients\[1\]\.unit: tbsp honey/)).toBeInTheDocument();
+    expect(within(preview).getByText(/Delete the ingredient line to fix this/)).toBeInTheDocument();
+    expect(
+      within(preview).queryByRole('button', { name: /Not used in this recipe/ }),
+    ).not.toBeInTheDocument();
+
+    // With the ingredient line deleted, the note is a text mention that only "Not used" clears.
+    await user.click(
+      within(preview).getByRole('button', { name: 'Delete ingredient: 1 tbsp honey mashed banana' }),
+    );
+    expect(within(preview).getByText(/Honey is mentioned in the note/)).toBeInTheDocument();
+    await user.click(within(preview).getByRole('textbox', { name: 'Title' }));
+    expect(within(preview).getByText(/Honey is mentioned in the note/)).toBeInTheDocument();
+    await user.click(
+      within(preview).getByRole('button', {
+        name: 'Not used in this recipe: ingredients[1].unit: tbsp honey',
+      }),
+    );
+    expect(within(preview).queryByText(/Honey is mentioned/)).not.toBeInTheDocument();
+    expect(within(preview).queryByText(/Not safe yet/)).not.toBeInTheDocument();
+  });
+
+  it('screens a single-word unit that is a blocked food and only "Not used" clears it', async () => {
+    const user = userEvent.setup();
+    renderAdd();
+    await pasteAndRead(
+      user,
+      jsonWith({ ingredients: [oats, { quantity: 1, unit: 'honey', name: 'mashed banana' }] }),
+    );
+    const preview = screen.getByRole('region', { name: 'Preview' });
+    // The unit note stays visible. The ingredient line is a block, so it has no "Not used" button.
+    expect(within(preview).getByText(/ingredients\[1\]\.unit: honey/)).toBeInTheDocument();
+    expect(within(preview).getByText(/Delete the ingredient line to fix this/)).toBeInTheDocument();
+    expect(
+      within(preview).queryByRole('button', { name: /Not used in this recipe/ }),
+    ).not.toBeInTheDocument();
+
+    // With the ingredient line deleted, the note is a text mention that only "Not used" clears.
+    await user.click(
+      within(preview).getByRole('button', { name: 'Delete ingredient: 1 honey mashed banana' }),
+    );
+    expect(within(preview).getByText(/Honey is mentioned in the note/)).toBeInTheDocument();
+    await user.click(within(preview).getByRole('textbox', { name: 'Title' }));
+    expect(within(preview).getByText(/Honey is mentioned in the note/)).toBeInTheDocument();
+    await user.click(
+      within(preview).getByRole('button', {
+        name: 'Not used in this recipe: ingredients[1].unit: honey',
+      }),
+    );
+    expect(within(preview).queryByText(/Honey is mentioned/)).not.toBeInTheDocument();
+    expect(within(preview).queryByText(/Not safe yet/)).not.toBeInTheDocument();
+  });
+
+  it('ghosts honey in a step and only "Not used" clears it', async () => {
+    const user = userEvent.setup();
+    renderAdd();
+    await pasteAndRead(
+      user,
+      jsonWith({ steps: ['Cook the oats.', 'Drizzle a little honey on top.'] }),
+    );
+    const preview = screen.getByRole('region', { name: 'Preview' });
+    expect(within(preview).getByText(/Honey is mentioned in the step/)).toBeInTheDocument();
+    await user.click(within(preview).getByRole('textbox', { name: 'Title' }));
+    expect(within(preview).getByText(/Honey is mentioned in the step/)).toBeInTheDocument();
+    await user.click(
+      within(preview).getByRole('button', {
+        name: 'Not used in this recipe: Drizzle a little honey on top.',
+      }),
+    );
+    expect(within(preview).queryByText(/Honey is mentioned/)).not.toBeInTheDocument();
+  });
+
+  it('blocks honey in an ingredient name with no "Not used" button', async () => {
+    const user = userEvent.setup();
+    renderAdd();
+    await pasteAndRead(
+      user,
+      jsonWith({ ingredients: [oats, { quantity: 1, unit: 'tbsp', name: 'honey' }] }),
+    );
+    const preview = screen.getByRole('region', { name: 'Preview' });
+    expect(within(preview).getByText(/Delete the ingredient line to fix this/)).toBeInTheDocument();
+    expect(
+      within(preview).queryByRole('button', { name: /Not used in this recipe/ }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('ghosts honey in the notes', async () => {
+    const user = userEvent.setup();
+    renderAdd();
+    await pasteAndRead(user, jsonWith({ notes: ['Add honey for older kids.'] }));
+    const preview = screen.getByRole('region', { name: 'Preview' });
+    expect(within(preview).getByText(/Honey is mentioned in the note/)).toBeInTheDocument();
+    expect(
+      within(preview).getByRole('button', { name: /Not used in this recipe/ }),
+    ).toBeInTheDocument();
+  });
+
+  it('gives the same findings for the same recipe as JSON and as plain text (Req 18.8)', async () => {
+    const user = userEvent.setup();
+    const json = jsonWith({
+      ingredients: [oats, { quantity: 1, unit: 'tbsp', name: 'banana' }],
+      steps: ['Cook the oats.', 'Drizzle a little honey on top.'],
+      notes: ['Add honey for older kids.'],
+    });
+    const plain = [
+      'Oat bowl',
+      'Ingredients:',
+      '1 cup rolled oats',
+      '1 tbsp banana',
+      'Steps:',
+      '1. Cook the oats.',
+      '2. Drizzle a little honey on top.',
+      'Notes:',
+      'Add honey for older kids.',
+    ].join('\n');
+    const findings = async (text: string) => {
+      renderAdd();
+      await pasteAndRead(user, text);
+      const preview = screen.getByRole('region', { name: 'Preview' });
+      const found = within(preview)
+        .getAllByText(/Not safe yet:/)
+        .map((el) => el.parentElement?.textContent ?? '');
+      cleanup();
+      return found;
+    };
+    const fromJson = await findings(json);
+    const fromPlain = await findings(plain);
+    expect(fromJson).toHaveLength(2);
+    expect(fromJson).toEqual(fromPlain);
+  });
+
+  it('does not save a plain unit note into the recipe', async () => {
+    const user = userEvent.setup();
+    const { getState } = renderAdd();
+    await pasteAndRead(user, validJson);
+    await user.click(screen.getByRole('button', { name: 'Save recipe' }));
+    expect(getState().customRecipes[0].notes).toEqual(['Keeps 2 days in the fridge.']);
+  });
+
+  it('shows field-level errors, a fix-up request and a plain-text escape for an invalid reply', async () => {
+    const user = userEvent.setup();
+    const network = spyOnNetwork();
+    renderAdd();
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'clipboard', {
+      value: { writeText, readText: vi.fn() },
+      configurable: true,
+    });
+    await pasteAndRead(user, fractionJson);
+    expect(screen.queryByRole('region', { name: 'Preview' })).not.toBeInTheDocument();
+    expect(screen.getByText(/quantity must be a number such as 0\.5/)).toBeInTheDocument();
+    expect(primariesOnPage()).toEqual(['Paste']);
+
+    await user.click(screen.getByRole('button', { name: 'Copy a fix-up request' }));
+    expect(writeText).toHaveBeenCalledWith(buildFixupPrompt());
+
+    await user.click(screen.getByRole('button', { name: 'Read as plain text instead' }));
+    expect(screen.getByRole('region', { name: 'Preview' })).toBeInTheDocument();
+    expect(screen.queryByText('Read as a FirstMenu recipe')).not.toBeInTheDocument();
+    network.expectNoNetwork();
+  });
+
+  it('explains a cut-off reply instead of reading it as plain text', async () => {
+    const user = userEvent.setup();
+    renderAdd();
+    await pasteAndRead(user, brokenJson);
+    expect(screen.getByText(/The JSON couldn't be read/)).toBeInTheDocument();
+    expect(screen.queryByRole('region', { name: 'Preview' })).not.toBeInTheDocument();
+  });
+
+  it('shows the message of an ai-error reply and saves nothing', async () => {
+    const user = userEvent.setup();
+    const { getState } = renderAdd();
+    await pasteAndRead(user, errorJson);
+    expect(screen.getByRole('alert')).toHaveTextContent(/because it is private/);
+    expect(screen.queryByRole('region', { name: 'Preview' })).not.toBeInTheDocument();
+    expect(getState().customRecipes).toHaveLength(0);
+  });
+
+  it('reads a reply with no JSON as plain text and says so', async () => {
+    const user = userEvent.setup();
+    renderAdd();
+    await pasteAndRead(user, REPLY);
+    expect(screen.getByText(PLAIN_TEXT_NOTICE)).toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: 'Title' })).toHaveValue('Banana oat mash');
+  });
+});
+
+function primariesOnPage(): string[] {
+  return Array.from(document.querySelectorAll('[data-variant="primary"]')).map(
+    (el) => el.getAttribute('aria-label') ?? el.textContent?.trim() ?? '',
+  );
+}
