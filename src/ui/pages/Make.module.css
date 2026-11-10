@@ -107,3 +107,42 @@
   flex: 1 1 16rem;
   min-width: 0;
 }
+
+.tryTitle {
+  margin: 0;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.bannerText {
+  margin: 0;
+}
+
+.hintRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.hintReason {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}
+
+.againList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.againItem {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}

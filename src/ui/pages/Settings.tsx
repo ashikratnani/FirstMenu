@@ -22,6 +22,7 @@ import { useApp } from '../../state/AppProvider';
 import { selectAgeMonths, selectStage } from '../../state/selectors';
 import type { FoodRecord } from '../../domain/types';
 import PantryEditor from '../components/PantryEditor';
+import { usePagePrimaryAction } from '../components/primaryActionContext';
 import { stageLabel } from './recipeView';
 import styles from './Settings.module.css';
 import {
@@ -63,6 +64,8 @@ function hasRecord(
 
 export default function Settings() {
   const { state, dispatch } = useApp();
+  // Save is this screen's primary button (Req 17.10).
+  usePagePrimaryAction(true);
 
   const [name, setName] = useState(state.child?.name ?? '');
   const [birthDate, setBirthDate] = useState(state.child?.birthDate ?? '');

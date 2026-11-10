@@ -2,7 +2,8 @@
 //
 // - TopNav carries the app name, the primary nav and ONE primary action,
 //   "Add recipe", which stays visible on phones (maintainer UI feedback,
-//   issue #36: primary actions must be clear and easy to reach).
+//   issue #36: primary actions must be clear and easy to reach). It is
+//   secondary while a page reports its own primary button (PrimaryAction.tsx).
 // - Below the md breakpoint, AppShell moves the nav into an accessible drawer
 //   (focus-trapped dialog with a toggle button).
 // - AppShell renders the skip link and the main landmark itself.
@@ -26,6 +27,8 @@ import {
 import RouterLinkProvider from '../theme/RouterLinkProvider';
 import styles from './Layout.module.css';
 import Disclaimer, { FirstRunDisclaimer } from './Disclaimer';
+import { PrimaryActionProvider } from './PrimaryAction';
+import { usePrimaryActionActive } from './primaryActionContext';
 import PlanNav from './PlanNav';
 import { isPlanPath } from './planNav';
 import StorageBanner from './StorageBanner';
@@ -58,30 +61,11 @@ const NAV_ITEMS: ReadonlyArray<{
   { to: '/settings', label: 'Settings', match: (p) => p === '/settings' },
 ];
 
-/**
- * Each screen gets exactly one filled primary button (issue #36):
- * - hidden on the new-recipe editor (you are already there) and on
- *   onboarding (every route redirects there until setup is done);
- * - secondary on screens with their own primary action (Settings and edit
- *   Save, the Print button);
- * - primary everywhere else.
- */
-function addRecipeVariant(pathname: string): 'primary' | 'secondary' | null {
-  if (
-    pathname === '/recipes/new' ||
-    pathname === '/add' ||
-    pathname === '/onboarding'
-  ) {
-    return null;
-  }
-  if (
-    pathname === '/settings' ||
-    pathname === '/print' ||
-    pathname.endsWith('/edit')
-  ) {
-    return 'secondary';
-  }
-  return 'primary';
+/** Screens where the shell's "Add recipe" button is not shown at all. */
+function hidesAddRecipe(pathname: string): boolean {
+  // Hidden on the new-recipe editor and Add recipe (you are already there)
+  // and on onboarding (every route redirects there until setup is done).
+  return pathname === '/recipes/new' || pathname === '/add' || pathname === '/onboarding';
 }
 
 /** Intercept fragment links (the AppShell skip link) so HashRouter never sees them. */
@@ -99,9 +83,16 @@ function handleFragmentLinkClick(event: MouseEvent<HTMLDivElement>) {
   target.scrollIntoView?.();
 }
 
-export default function Layout() {
+/**
+ * Each screen gets exactly one filled primary button (Requirement 17.10, issue
+ * #36). The shell's "Add recipe" is primary unless the screen reports its own
+ * primary button through `usePagePrimaryAction`, and is hidden where
+ * `hidesAddRecipe` says so.
+ */
+function LayoutShell() {
   const { pathname } = useLocation();
-  const addVariant = addRecipeVariant(pathname);
+  const pageHasPrimary = usePrimaryActionActive();
+  const addVariant = hidesAddRecipe(pathname) ? null : pageHasPrimary ? 'secondary' : 'primary';
 
   const topNav = (
     <TopNav
@@ -147,5 +138,13 @@ export default function Layout() {
         </footer>
       </div>
     </RouterLinkProvider>
+  );
+}
+
+export default function Layout() {
+  return (
+    <PrimaryActionProvider>
+      <LayoutShell />
+    </PrimaryActionProvider>
   );
 }

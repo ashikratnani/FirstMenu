@@ -1,13 +1,16 @@
+import { useState } from 'react';
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import {
   HashRouter,
   MemoryRouter,
   Route,
   Routes,
+  useNavigate,
 } from 'react-router-dom';
 import { describe, expect, it } from 'vitest';
 import { AppProvider } from '../../state/AppProvider';
 import Layout from './Layout';
+import { usePagePrimaryAction } from './primaryActionContext';
 
 /** An in-memory Storage so tests never touch real localStorage. */
 function makeStorage(): Storage {
@@ -35,6 +38,12 @@ function addRecipeButton(): HTMLElement | undefined {
     .find((a) => a.hasAttribute('data-variant'));
 }
 
+/** A placeholder page that reports whether it shows its own primary button. */
+function Page({ primary, label }: { primary: boolean; label: string }) {
+  usePagePrimaryAction(primary);
+  return <p>{label}</p>;
+}
+
 function renderShell(initialPath = '/') {
   const storage = makeStorage();
 
@@ -47,7 +56,15 @@ function renderShell(initialPath = '/') {
             <Route path="/plan" element={<p>plan content</p>} />
             <Route path="/prep" element={<p>prep content</p>} />
             <Route path="/recipes" element={<p>recipes content</p>} />
-            <Route path="/recipes/new" element={<p>editor content</p>} />
+            {/* Placeholder pages report their own primary button the way the
+                real Settings, Print, edit and Make pages do. */}
+            <Route path="/settings" element={<Page primary label="settings content" />} />
+            <Route path="/print" element={<Page primary label="print content" />} />
+            <Route path="/recipes/:id/edit" element={<Page primary label="edit content" />} />
+            <Route path="/recipes/new" element={<Page primary label="editor content" />} />
+            <Route path="/add" element={<Page primary label="add content" />} />
+            <Route path="/onboarding" element={<Page primary label="onboarding content" />} />
+            <Route path="/quiet" element={<Page primary={false} label="quiet content" />} />
             <Route path="*" element={<p>other content</p>} />
           </Route>
         </Routes>
@@ -117,27 +134,94 @@ describe('Layout (app shell)', () => {
     expect(within(main).getByText(/home content/i)).toBeInTheDocument();
   });
 
-  it('hides the "Add recipe" action on the recipe editor itself', () => {
-    renderShell('/recipes/new');
-    expect(addRecipeButton()).toBeUndefined();
-  });
-
-  it('hides the "Add recipe" action during onboarding', () => {
-    renderShell('/onboarding');
-    expect(addRecipeButton()).toBeUndefined();
-  });
+  it.each(['/recipes/new', '/add', '/onboarding'])(
+    'hides the "Add recipe" action on %s, even though the page has its own primary button',
+    (path) => {
+      renderShell(path);
+      expect(addRecipeButton()).toBeUndefined();
+    },
+  );
 
   it.each(['/settings', '/print', '/recipes/r1/edit'])(
-    'shows "Add recipe" as a secondary button on %s, which has its own primary action',
+    'shows "Add recipe" as secondary on %s because the page reports its own primary button',
     (path) => {
       renderShell(path);
       expect(addRecipeButton()).toHaveAttribute('data-variant', 'secondary');
     },
   );
 
-  it('shows "Add recipe" as the primary button on the week plan', () => {
-    renderShell('/plan');
+  it.each(['/plan', '/quiet'])(
+    'shows "Add recipe" as the primary button on %s, where the page reports none',
+    (path) => {
+      renderShell(path);
+      expect(addRecipeButton()).toHaveAttribute('data-variant', 'primary');
+    },
+  );
+
+  it('follows the page: primary again once the page stops reporting its own', () => {
+    function Toggle() {
+      const [own, setOwn] = useState(true);
+      usePagePrimaryAction(own);
+      return (
+        <button type="button" onClick={() => setOwn(false)}>
+          drop my primary
+        </button>
+      );
+    }
+    render(
+      <AppProvider storage={makeStorage()}>
+        <MemoryRouter initialEntries={['/']}>
+          <Routes>
+            <Route element={<Layout />}>
+              <Route path="/" element={<Toggle />} />
+            </Route>
+          </Routes>
+        </MemoryRouter>
+      </AppProvider>,
+    );
+    expect(addRecipeButton()).toHaveAttribute('data-variant', 'secondary');
+    fireEvent.click(screen.getByRole('button', { name: 'drop my primary' }));
     expect(addRecipeButton()).toHaveAttribute('data-variant', 'primary');
+  });
+
+  it('is primary again after leaving a page that had its own primary button', () => {
+    function Go() {
+      const navigate = useNavigate();
+      return (
+        <button type="button" onClick={() => navigate('/plan')}>
+          go to plan
+        </button>
+      );
+    }
+    render(
+      <AppProvider storage={makeStorage()}>
+        <MemoryRouter initialEntries={['/settings']}>
+          <Routes>
+            <Route element={<Layout />}>
+              <Route
+                path="/settings"
+                element={
+                  <>
+                    <Page primary label="settings content" />
+                    <Go />
+                  </>
+                }
+              />
+              <Route path="/plan" element={<p>plan content</p>} />
+            </Route>
+          </Routes>
+        </MemoryRouter>
+      </AppProvider>,
+    );
+    expect(addRecipeButton()).toHaveAttribute('data-variant', 'secondary');
+    fireEvent.click(screen.getByRole('button', { name: 'go to plan' }));
+    expect(screen.getByText('plan content')).toBeInTheDocument();
+    expect(addRecipeButton()).toHaveAttribute('data-variant', 'primary');
+  });
+
+  it('a page rendered without the shell can report a primary action safely', () => {
+    render(<Page primary label="alone" />);
+    expect(screen.getByText('alone')).toBeInTheDocument();
   });
 
   it('shows one primary "Add recipe" action linking to the Add recipe page', () => {

@@ -2,8 +2,8 @@
 // 3.10), on Astryx components. The parent sets her pantry once, taps what else
 // she has today, and sees recipes she can make now, quickest and easiest first.
 //
-// Matching, grouping and sorting live in domain/make.ts; this page only shows
-// them. Ghosted recipes never appear in the two groups; their count is shown
+// Matching, grouping and sorting live in domain/make.ts and the suggestion
+// rules in domain/suggest.ts (Requirement 17); this page only shows them. Ghosted recipes never appear in the two groups; their count is shown
 // and they expand as ghosts with their reasons (Req 3.5).
 
 import { useEffect, useMemo, useState } from 'react';
@@ -24,17 +24,39 @@ import {
   type MakeResult,
 } from '../../domain/make';
 import { leaveOutFor } from '../../domain/prompt';
-import { PANTRY_SETUP_ID, isDismissed, localYmd } from '../../domain/suggest';
+import { isRecipeGhosted } from '../../domain/plan';
+import {
+  MAKE_AGAIN_ID,
+  MEAL_HINT_ID,
+  NEW_FOOD_ID,
+  PANTRY_SETUP_ID,
+  STALE_ON_HAND_ID,
+  isDismissed,
+  localYmd,
+  makeAgainList,
+  mealHint,
+  mealHintReason,
+  pantryId,
+  pantrySuggestions,
+  pickNewFood,
+  pickTryThis,
+  staleOnHandDays,
+  staleOnHandReason,
+  tryThisId,
+  type SuggestContext,
+} from '../../domain/suggest';
 import { stageFor } from '../../domain/age';
 import { useApp } from '../../state/AppProvider';
 import { selectAgeMonths, selectAllRecipes } from '../../state/selectors';
 import AskChatGpt from '../components/AskChatGpt';
 import GhostCard from '../components/GhostCard';
 import PantryEditor from '../components/PantryEditor';
+import { usePagePrimaryAction } from '../components/primaryActionContext';
 import ResultCard from '../components/ResultCard';
+import Suggestion from '../components/Suggestion';
 import { doorBadgeText, ghostReason, recipeView } from './recipeView';
 import { removeFilterPhrases, removeTypedWord } from './makeText';
-import { plural } from './makeView';
+import { effortLabel, plural, timeLabel } from './makeView';
 import styles from './Make.module.css';
 
 /** How many suggested food chips are shown at once. */
@@ -105,6 +127,80 @@ export default function Make() {
     () => recipesNamed(recipes, search.titleWords, have, ageMonths, state.foods, { allStages, filters }),
     [recipes, search.titleWords, have, ageMonths, state.foods, allStages, filters],
   );
+
+  // --- Smart suggestions (Requirement 17) ---------------------------------
+  // Suggestions look at the whole recipe set, not at the search filters: the
+  // sole-recipe rule for Try this counts every non-ghosted Ready now recipe.
+  const suggestionGroups = useMemo(
+    () =>
+      filters.length === 0
+        ? groups
+        : makeResults(recipes, have, ageMonths, state.foods, { allStages }),
+    [filters, groups, recipes, have, ageMonths, state.foods, allStages],
+  );
+  const hint = mealHint(state.dismissed, now);
+  const suggestCtx = useMemo<SuggestContext>(() => {
+    const ironRich = new Set(
+      [...suggestionGroups.readyNow, ...suggestionGroups.missingOne]
+        .filter((r) => r.tags.includes('iron-rich'))
+        .map((r) => r.recipe.id),
+    );
+    return {
+      now,
+      mealHint: hint,
+      madeLog: state.madeLog,
+      foods: state.foods,
+      ironRich: (recipe) => ironRich.has(recipe.id),
+    };
+  }, [now, hint, state.madeLog, state.foods, suggestionGroups]);
+  const newFood = useMemo(
+    () =>
+      pickNewFood(
+        [...suggestionGroups.readyNow, ...suggestionGroups.missingOne],
+        state.dismissed,
+        suggestCtx,
+      ),
+    [suggestionGroups, state.dismissed, suggestCtx],
+  );
+  const tryPicks = useMemo(
+    () =>
+      pickTryThis(suggestionGroups.readyNow, {
+        ...suggestCtx,
+        newFoodKey: newFood?.food,
+        dismissed: state.dismissed,
+      }),
+    [suggestionGroups, suggestCtx, newFood, state.dismissed],
+  );
+  const [tryOffset, setTryOffset] = useState(0);
+  const tryPick = tryPicks.length > 0 ? tryPicks[tryOffset % tryPicks.length] : undefined;
+  // The Try this button is this screen's one primary button (Req 17.10).
+  usePagePrimaryAction(tryPick !== undefined);
+
+  const staleDays = staleOnHandDays(state, now);
+  const pantryIdea = pantrySuggestions(state)[0];
+  // At most two banners at once: new food, then stale on-hand, then pantry.
+  const banners = (
+    [
+      newFood !== undefined && 'new-food',
+      staleDays !== undefined && 'stale',
+      pantryIdea !== undefined && 'pantry',
+    ] as const
+  )
+    .filter((banner): banner is 'new-food' | 'stale' | 'pantry' => banner !== false)
+    .slice(0, 2);
+  const makeAgain = useMemo(
+    () =>
+      makeAgainList(
+        state.madeLog,
+        recipes,
+        (recipe) => isRecipeGhosted(recipe, state, ageMonths),
+        state.dismissed,
+        now,
+      ),
+    [state, recipes, ageMonths, now],
+  );
+  const dismiss = (id: string) =>
+    dispatch({ type: 'dismissSuggestion', id, at: new Date().toISOString() });
 
   const recentFoods = useMemo(
     () =>
@@ -308,10 +404,111 @@ export default function Make() {
             ))}
           </ul>
         )}
+        {hint !== undefined && !filters.includes(`meal:${hint}`) && (
+          <div className={styles.hintRow}>
+            <Token
+              label={`Suggested: ${FILTER_LABELS[`meal:${hint}`]}`}
+              color="orange"
+              description={`Remove the suggested ${hint} chip`}
+              onClick={() => setManualFilters((current) => [...current, `meal:${hint}`])}
+              onRemove={() => dismiss(MEAL_HINT_ID)}
+            />
+            <span className={styles.hintReason}>{mealHintReason(hint)}</span>
+          </div>
+        )}
         {search.unrecognized.length > 0 && (
           <p className={styles.hint}>Not recognized: {search.unrecognized.join(', ')}</p>
         )}
       </section>
+
+      {tryPick !== undefined && (
+        <Suggestion
+          id="try-this"
+          title="Try this"
+          reason={tryPick.reason}
+          onDismiss={() => dismiss(tryThisId(tryPick.result.recipe.id))}
+          actions={
+            <>
+              <Button
+                label="Open recipe"
+                variant="primary"
+                href={`/recipes/${tryPick.result.recipe.id}`}
+              />
+              {tryPicks.length > 1 && (
+                <Button label="Show another" onClick={() => setTryOffset((n) => n + 1)} />
+              )}
+            </>
+          }
+        >
+          <p className={styles.tryTitle}>{tryPick.result.recipe.title}</p>
+          <p className={styles.hint}>
+            {timeLabel(tryPick.result)} · {effortLabel(tryPick.result.effort)}
+          </p>
+        </Suggestion>
+      )}
+
+      {banners.map((banner) => {
+        if (banner === 'new-food' && newFood !== undefined) {
+          return (
+            <Suggestion
+              key={banner}
+              id="new-food"
+              title="Ready for a new food?"
+              reason={newFood.reason}
+              onDismiss={() => dismiss(NEW_FOOD_ID)}
+            >
+              <p className={styles.bannerText}>
+                <Link to={`/recipes/${newFood.result.recipe.id}`}>{newFood.result.recipe.title}</Link>{' '}
+                introduces <Link to="/foods">{foodLabel(newFood.food)}</Link>.
+              </p>
+            </Suggestion>
+          );
+        }
+        if (banner === 'stale' && staleDays !== undefined) {
+          return (
+            <Suggestion
+              key={banner}
+              id="stale-on-hand"
+              title="Still have these?"
+              reason={staleOnHandReason(staleDays)}
+              onDismiss={() => dismiss(STALE_ON_HAND_ID)}
+              actions={
+                <>
+                  <Button label="Yes, keep" onClick={() => dispatch({ type: 'keepOnHand', today })} />
+                  <Button label="Clear" onClick={() => dispatch({ type: 'clearOnHand', today })} />
+                </>
+              }
+            >
+              <p className={styles.bannerText}>{state.onHand.map(foodLabel).join(', ')}</p>
+            </Suggestion>
+          );
+        }
+        if (banner === 'pantry' && pantryIdea !== undefined) {
+          return (
+            <Suggestion
+              key={banner}
+              id="pantry"
+              title="Add to pantry?"
+              reason={pantryIdea.reason}
+              dismissLabel="No thanks"
+              onDismiss={() => dismiss(pantryId(pantryIdea.food))}
+              actions={
+                <Button
+                  label="Add"
+                  onClick={() =>
+                    dispatch({ type: 'setPantry', foods: [...state.pantry, pantryIdea.food] })
+                  }
+                />
+              }
+            >
+              <p className={styles.bannerText}>
+                You often have {foodLabel(pantryIdea.food)}. Add to pantry?
+              </p>
+            </Suggestion>
+          );
+        }
+        return null;
+      })}
 
       <section aria-labelledby="make-onhand" className={styles.section}>
         <h2 id="make-onhand" className={styles.subheading}>
@@ -371,6 +568,30 @@ export default function Make() {
         renderGroup('make-ready', 'Ready now', groups.readyNow, false)}
       {groups.missingOne.length > 0 &&
         renderGroup('make-missing', 'Missing one', groups.missingOne, true)}
+
+      {makeAgain.length > 0 && (
+        <Suggestion
+          id="make-again"
+          title="Make again"
+          reason={`Made on ${makeAgain[0].date}`}
+          onDismiss={() => dismiss(MAKE_AGAIN_ID)}
+        >
+          <ul className={styles.againList}>
+            {makeAgain.map(({ recipe, date }) => (
+              <li key={recipe.id} className={styles.againItem}>
+                <span>
+                  {recipe.title} <span className={styles.hint}>(made on {date})</span>
+                </span>
+                <Button
+                  label={`Make again: ${recipe.title}`}
+                  size="sm"
+                  href={`/recipes/${recipe.id}`}
+                />
+              </li>
+            ))}
+          </ul>
+        </Suggestion>
+      )}
 
       {named.results.length + named.ghosted.length > 0 && (
         <section aria-labelledby="make-named" className={styles.group}>
