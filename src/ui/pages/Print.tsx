@@ -2,7 +2,7 @@
 // the whole week in one place: the week grid, the prep list and the grocery
 // list, all DERIVED every render from the current state (nothing is stored),
 // reusing the SAME helpers the on-screen pages use:
-//   - week grid  -> recipeView()/ghostReason() (Home.tsx pattern);
+//   - week grid  -> recipeView()/ghostReason() (Plan.tsx pattern);
 //   - prep list  -> computePrepList() (Prep.tsx pattern);
 //   - grocery    -> computeGroceryList() (Grocery.tsx pattern).
 // No new health/safety wording is invented here: ghost reasons and prep
@@ -48,7 +48,7 @@ export default function Print() {
   const ageMonths = selectAgeMonths(state) ?? 0;
   const { plan } = state;
 
-  // Active slots in MEAL_TYPES order (mirrors Home.tsx) so the grid is stable.
+  // Active slots in MEAL_TYPES order (mirrors Plan.tsx) so the grid is stable.
   const activeSlots = MEAL_TYPES.filter((meal) =>
     plan.activeSlots.includes(meal),
   );

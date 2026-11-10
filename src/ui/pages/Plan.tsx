@@ -1,4 +1,5 @@
-// Week home screen (Task 10.2, Req 5.2/5.4/7.6/7.8/8.2/8.4/8.5). Per design
+// Plan screen at /plan (the v1 week home, moved by task 9.1; Task 10.2,
+// Req 5.2/5.4/7.6/7.8/8.2/8.4/8.5). Per design
 // "Theme mapping" this is a PLAIN, BRIGHT grid of seven day cards with NO
 // themed scene; the theme lives in the badges/cards, not here.
 //
@@ -39,11 +40,11 @@ import {
   recipeView,
 } from './recipeView';
 import { dayDateLabel, dayDateYmd } from './weekView';
-import styles from './Home.module.css';
+import styles from './Plan.module.css';
 
 const DAY_INDEXES = [0, 1, 2, 3, 4, 5, 6] as const;
 
-export default function Home() {
+export default function Plan() {
   const { state, dispatch } = useApp();
   const recipes = selectAllRecipes(state);
   const ageMonths = selectAgeMonths(state) ?? 0;

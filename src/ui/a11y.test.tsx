@@ -180,7 +180,8 @@ describe('Accessibility: axe on every main page (color-contrast disabled)', () =
   // route can't let axe silently pass on the wrong page's markup — axe only
   // runs once the intended page has actually rendered.
   const pages: ReadonlyArray<[string, string, RegExp]> = [
-    ['Home (week)', '/', /^this week$/i],
+    ['Make', '/', /^what can i make\?$/i],
+    ['Plan (week)', '/plan', /^this week$/i],
     ['Recipes', '/recipes', /^recipes$/i],
     // RecipeDetail's h1 is the recipe title, not a generic page title.
     ['RecipeDetail', `/recipes/${BUILTIN_RECIPE_ID}`, /^carrots and apples$/i],
@@ -279,14 +280,13 @@ describe('Accessibility: keyboard affordances (app shell)', () => {
     const nav = screen.getByRole('navigation', { name: /primary/i });
     const links = screen.getAllByRole('link').filter((a) => nav.contains(a));
 
-    // Expect at least the eight primary nav entries (Week..Settings) as anchors.
+    // Expect the seven primary nav entries (Req 1.2) as anchors.
     const expectedLabels = [
-      'Week',
-      'Recipes',
+      'Make',
+      'My recipes',
+      'Add recipe',
       'Foods',
-      'Prep',
-      'Grocery',
-      'Share',
+      'Plan',
       'Sources',
       'Settings',
     ];
@@ -321,10 +321,27 @@ describe('Accessibility: keyboard affordances (app shell)', () => {
     }
   });
 
-  it('exposes the Home add-slot control as a reachable, named button', () => {
+  it('exposes the Plan sub-navigation as real links in one landmark', () => {
+    renderApp('/plan', seededState());
+
+    const sub = screen.getByRole('navigation', { name: 'Plan' });
+    const links = screen.getAllByRole('link').filter((a) => sub.contains(a));
+    expect(links.map((a) => a.getAttribute('href'))).toEqual([
+      '/plan',
+      '/prep',
+      '/grocery',
+      '/share',
+      '/print',
+    ]);
+    // Roving focus: the current link is a tab stop and the rest are reached
+    // with the arrow keys, so exactly one is in the tab order.
+    expect(links.filter((a) => a.getAttribute('tabindex') === '0')).toHaveLength(1);
+  });
+
+  it('exposes the Plan add-slot control as a reachable, named button', () => {
     // An empty breakfast slot (Day 1) renders an "Add" button with an
     // accessible name naming the meal and day.
-    renderApp('/', seededState());
+    renderApp('/plan', seededState());
 
     const add = screen.getByRole('button', {
       name: /add a breakfast for day 1/i,

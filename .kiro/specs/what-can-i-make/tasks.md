@@ -86,8 +86,8 @@ Branch names use the `v2/` prefix (for example `v2/6-paste-parser`) so they don'
   - [x] 8.2 Implement `domain/suggest.ts` per "Smart suggestions" in the design: `pickTryThis` with scoring and reasons, time-of-day meal hint, stale on-hand check, new-food-due check using `NEW_FOOD_SPACING_DAYS`, Make again list, pantry learning. Reducer actions: record made, record on-hand day, dismiss suggestion, keep on-hand. Tests with a fixed `now`: each score rule, ghosted recipes never picked, hint boundaries (10:29 vs 10:30), 4-hour hint dismissal, 24-hour dismissals, spacing at 2 and 3 days, a reaction record restarts the wait, no food recorded yet, Try this untried-food rules (two or more never; with a new food due, only the banner's food; with none due, only when it is the sole non-ghosted Ready now recipe, counted before filtering and dismissals: one-untried plus two-untried recipes gives no card, and dismissing the only fully tried recipe gives no card; "Has a new food: <food>" reason in both allowed cases; the day after a reaction, no untried-food pick while others exist; no allowed pick hides the card; with a new food due, the sole-recipe exception does not apply; while the new-food banner is dismissed a new food counts as not due), `isDismissed` for each row of the dismissal table, the new-food reason when no food is recorded, no meal hint from 21:00 to 04:59, made-log dedupe per day and cap, deleted recipe removed from the log, export/import round-trip, suggestion state absent from share payloads.
     - _Requirements: 17.1 – 17.6, 17.8, 17.9, 17.11_
 
-- [ ] 9. Navigation and Plan move (Astryx)
-  - [ ] 9.1 Move the week grid to `/plan` with a Week · Prep · Grocery · Share · Print sub-navigation. Main nav: Make, My recipes, Add recipe, Foods, Plan, Sources, Settings. Keep old routes working.
+- [x] 9. Navigation and Plan move (Astryx)
+  - [x] 9.1 Move the week grid to `/plan` with a Week · Prep · Grocery · Share · Print sub-navigation. Main nav: Make, My recipes, Add recipe, Foods, Plan, Sources, Settings. Keep old routes working.
     - _Requirements: 1.2 – 1.4_
 
 - [ ] 10. Make screen (Astryx)

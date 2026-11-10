@@ -8,7 +8,8 @@
 
 import { lazy } from 'react';
 
-export const Home = lazy(() => import('./Home'));
+export const Make = lazy(() => import('./Make'));
+export const Plan = lazy(() => import('./Plan'));
 export const Recipes = lazy(() => import('./Recipes'));
 export const RecipeDetail = lazy(() => import('./RecipeDetail'));
 export const RecipeEditor = lazy(() => import('./RecipeEditor'));

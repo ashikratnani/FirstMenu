@@ -1,6 +1,6 @@
 // Slot picker (Task 10.2, Req 5.2/7.3/8.3). A small picker that lists the
 // candidate recipes for one plan slot (a {day, meal} location) so the user can
-// fill or replace it from the week view (Home.tsx).
+// fill or replace it from the week view (Plan.tsx).
 //
 // Ordering (Req 8.3 / design "slot picker"): ELIGIBLE (non-ghosted) recipes
 // first, then ghosted recipes. Candidate derivation + ordering lives in the

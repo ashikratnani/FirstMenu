@@ -5,7 +5,7 @@
 // Nothing here invents health/safety wording: the print page reuses
 // ghostReason()/recipeView() (week grid), computePrepList() (prep list) and
 // computeGroceryList() (grocery list) for all derived data. These helpers only
-// carry the plain labels the Print page shares with Home/Prep/Grocery.
+// carry the plain labels the Print page shares with Plan/Prep/Grocery.
 
 import type { GroceryCategory } from '../../domain/types';
 import type { CookSession } from '../../domain/prep';

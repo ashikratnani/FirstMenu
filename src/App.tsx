@@ -7,8 +7,9 @@ import Layout from './ui/components/Layout';
 import {
   Foods,
   Grocery,
-  Home,
+  Make,
   Onboarding,
+  Plan,
   Prep,
   Print,
   RecipeDetail,
@@ -74,7 +75,14 @@ export default function App() {
       <Route element={<Layout />}>
         <Route element={<OnboardingGate />}>
           <Route element={<PageOutlet />}>
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<Make />} />
+            <Route path="/plan" element={<Plan />} />
+            {/* Task 11.1 builds the Add recipe page here; until then it
+                opens the typed editor. */}
+            <Route
+              path="/add"
+              element={<Navigate to="/recipes/new" replace />}
+            />
             <Route path="/recipes" element={<Recipes />} />
             <Route path="/recipes/new" element={<RecipeEditor />} />
             <Route path="/recipes/:id" element={<RecipeDetail />} />

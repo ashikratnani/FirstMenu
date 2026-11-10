@@ -1,7 +1,7 @@
 /*
  * Read-only shared-plan view (Task 13.2). Rendered OUTSIDE the app Layout, so
  * this module provides its own page padding via a <main> shell. It mirrors the
- * Home / Prep / Grocery presentation but with every mutating control stripped:
+ * Plan / Prep / Grocery presentation but with every mutating control stripped:
  * plain day cards, recipe cards, and single-column prep/grocery lists. Ghost
  * state is carried by text + accessible name (no color-only signalling). Stays
  * usable at 360px width (Req 14.6).
