@@ -3,7 +3,12 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { spyOnNetwork } from '../../test/networkSpy';
-import AddRecipe, { INSTAGRAM_HELP, PASTE_FALLBACK, PLAIN_TEXT_NOTICE } from './AddRecipe';
+import AddRecipe, {
+  INSTAGRAM_HELP,
+  PASTE_FALLBACK,
+  PLAIN_TEXT_NOTICE,
+  REEL_ERROR,
+} from './AddRecipe';
 import validJson from '../../domain/__fixtures__/json/valid.json?raw';
 import fencedJson from '../../domain/__fixtures__/json/fenced-with-prose.txt?raw';
 import brokenJson from '../../domain/__fixtures__/json/broken.txt?raw';
@@ -11,7 +16,7 @@ import fractionJson from '../../domain/__fixtures__/json/quantity-fraction.json?
 import unknownKeysJson from '../../domain/__fixtures__/json/unknown-keys.json?raw';
 import unitBlockedJson from '../../domain/__fixtures__/json/unit-blocked-food.json?raw';
 import errorJson from '../../domain/__fixtures__/json/error-object.json?raw';
-import { buildFixupPrompt } from '../../domain/prompt';
+import { buildFixupPrompt, buildReelPrompt } from '../../domain/prompt';
 import { PROMPT_NOTICE } from '../../domain/prompt';
 import { AppProvider, useApp } from '../../state/AppProvider';
 import { STORAGE_KEY, defaultState } from '../../domain/storage';
@@ -630,6 +635,121 @@ describe('Add recipe: Recipe JSON intake (Req 18.3 to 18.12, 6.1)', () => {
     await pasteAndRead(user, REPLY);
     expect(screen.getByText(PLAIN_TEXT_NOTICE)).toBeInTheDocument();
     expect(screen.getByRole('textbox', { name: 'Title' })).toHaveValue('Banana oat mash');
+  });
+});
+
+describe('Add recipe: Instagram reel prompt (Req 19.1 to 19.8, 6.9, 6.10)', () => {
+  const REEL = 'https://www.instagram.com/reel/abc123/';
+
+  async function openReel(user: ReturnType<typeof userEvent.setup>) {
+    await user.click(screen.getByRole('button', { name: 'From an Instagram reel' }));
+  }
+
+  it('rewords the Instagram help to point to the reel option', () => {
+    renderAdd();
+    expect(INSTAGRAM_HELP).toMatch(/From an Instagram reel/);
+    expect(screen.getByText(INSTAGRAM_HELP)).toBeInTheDocument();
+  });
+
+  it('validates the URL: https only, at most 500 characters, other hosts only warn', async () => {
+    const user = userEvent.setup();
+    renderAdd();
+    await openReel(user);
+    const box = screen.getByRole('textbox', { name: 'Reel link' });
+    await user.click(box);
+    await user.paste('http://www.instagram.com/reel/abc/');
+    expect(screen.getByRole('alert')).toHaveTextContent('https://');
+    await user.clear(box);
+    await user.paste('https://example.com/video');
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    expect(screen.getByText(/doesn't look like an Instagram link/)).toBeInTheDocument();
+    await user.clear(box);
+    await user.paste(REEL);
+    expect(screen.queryByText(/doesn't look like an Instagram link/)).not.toBeInTheDocument();
+    await user.clear(box);
+    await user.paste(`https://www.instagram.com/${'a'.repeat(500)}`);
+    expect(screen.getByRole('alert')).toHaveTextContent(/too long/);
+  });
+
+  it('copies the reel prompt with no child data and offers Meta AI as a plain link', async () => {
+    const user = userEvent.setup();
+    const network = spyOnNetwork();
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    mockClipboard(async () => '');
+    Object.defineProperty(navigator, 'clipboard', {
+      value: { writeText },
+      configurable: true,
+    });
+    renderAdd();
+    await openReel(user);
+    await user.click(screen.getByRole('button', { name: 'Copy reel prompt' }));
+    expect(writeText).not.toHaveBeenCalled();
+    await user.click(screen.getByRole('textbox', { name: 'Reel link' }));
+    await user.paste(REEL);
+    await user.click(screen.getByRole('button', { name: 'Copy reel prompt' }));
+    const prompt = writeText.mock.calls[0][0] as string;
+    expect(prompt).toBe(buildReelPrompt({ url: REEL }));
+    expect(prompt).toContain(REEL);
+    expect(prompt).not.toMatch(/Baby|month/i);
+    expect(prompt).not.toContain(birthDateMonthsAgo(8));
+    const meta = screen.getByRole('link', { name: 'Open Meta AI' });
+    expect(meta).toHaveAttribute('href', 'https://www.meta.ai/');
+    expect(meta).toHaveAttribute('target', '_blank');
+    expect(screen.getByText(/any AI chat app that can open your\s+Instagram/)).toBeInTheDocument();
+    network.expectNoNetwork();
+  });
+
+  it('presets Instagram, saves the URL only as the link and never fetches it', async () => {
+    const user = userEvent.setup();
+    const network = spyOnNetwork();
+    mockClipboard(async () => '');
+    const { getState } = renderAdd();
+    await openReel(user);
+    await user.click(screen.getByRole('textbox', { name: 'Reel link' }));
+    await user.paste(REEL);
+    await user.click(screen.getByRole('button', { name: 'Copy reel prompt' }));
+    await user.click(screen.getByRole('button', { name: 'Paste the answer' }));
+    expect(screen.getByRole('radio', { name: 'Instagram' })).toBeChecked();
+    expect(screen.getByRole('textbox', { name: /Link/ })).toHaveValue(REEL);
+    await pasteAndRead(user, validJson);
+    await user.click(screen.getByRole('button', { name: 'Save recipe' }));
+    const saved = getState().customRecipes[0];
+    expect(saved.imported?.from).toBe('instagram');
+    expect(saved.imported?.url).toBe(REEL);
+    expect(JSON.stringify(saved.steps)).not.toContain(REEL);
+    network.expectNoNetwork();
+  });
+
+  it('shows the reel error and the caption tip for the cannot_access error object', async () => {
+    const user = userEvent.setup();
+    const network = spyOnNetwork();
+    mockClipboard(async () => '');
+    const { getState } = renderAdd();
+    await openReel(user);
+    await user.click(screen.getByRole('textbox', { name: 'Reel link' }));
+    await user.paste(REEL);
+    await user.click(screen.getByRole('button', { name: 'Copy reel prompt' }));
+    await user.click(screen.getByRole('button', { name: 'Paste the answer' }));
+    await pasteAndRead(user, errorJson);
+    expect(screen.getByRole('alert')).toHaveTextContent(REEL_ERROR);
+    expect(screen.getByRole('alert')).toHaveTextContent(/pasting the caption instead/i);
+    expect(screen.queryByRole('region', { name: 'Preview' })).not.toBeInTheDocument();
+    expect(getState().customRecipes).toHaveLength(0);
+    network.expectNoNetwork();
+  });
+
+  it('reads an invalid reply and a reply with no JSON like any other answer', async () => {
+    const user = userEvent.setup();
+    renderAdd();
+    await pasteAndRead(user, brokenJson);
+    expect(screen.getByText(/The JSON couldn't be read/)).toBeInTheDocument();
+  });
+
+  it('has one filled primary button with the reel panel open, and none added by it', async () => {
+    const user = userEvent.setup();
+    renderAdd();
+    await openReel(user);
+    expect(primariesOnPage()).toEqual(['Paste']);
   });
 });
 

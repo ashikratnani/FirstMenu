@@ -30,6 +30,7 @@ import type { ClearedMention, ImportedInfo } from '../../domain/types';
 import { useApp } from '../../state/AppProvider';
 import { selectAgeMonths, selectStage } from '../../state/selectors';
 import AskChatGpt from '../components/AskChatGpt';
+import ReelPrompt from '../components/ReelPrompt';
 import { usePagePrimaryAction } from '../components/primaryActionContext';
 import {
   buildRecipe,
@@ -60,7 +61,10 @@ export const PLAIN_TEXT_NOTICE =
 export const PASTE_FALLBACK = 'Paste with your keyboard or long-press';
 
 export const INSTAGRAM_HELP =
-  "Instagram reels can't be opened here. Copy the caption instead. On a phone, you can also copy text from a screenshot by pressing and holding on it.";
+  "FirstMenu can't open Instagram reels. Use \"From an Instagram reel\" below to get a prompt for Meta AI, or copy the caption instead. On a phone, you can also copy text from a screenshot by pressing and holding on it.";
+
+export const REEL_ERROR =
+  "The AI app couldn't open this reel. Try pasting the caption instead.";
 
 const LIST_LABELS: Record<LineList, string> = {
   ingredients: 'ingredient',
@@ -263,6 +267,14 @@ export default function AddRecipe() {
     pasteBox.current?.focus();
   }
 
+  // The reel URL becomes the recipe's link and is never opened (Req 19.6).
+  function focusPasteBoxForReel(reelUrl: string) {
+    setSource('instagram');
+    if (reelUrl !== '') setUrl(reelUrl);
+    setMessage('');
+    pasteBox.current?.focus();
+  }
+
   const buildContext = useMemo(
     () => ({
       id: recipeId,
@@ -366,9 +378,15 @@ export default function AddRecipe() {
             )}
             {problem?.kind === 'ai-error' && (
               <p className={styles.warning} role="alert">
-                The chat could not give a recipe
-                {problem.message !== '' ? `: ${problem.message}` : '.'} Try again, or paste the
-                recipe text instead.
+                {source === 'instagram' ? (
+                  REEL_ERROR
+                ) : (
+                  <>
+                    The chat could not give a recipe
+                    {problem.message !== '' ? `: ${problem.message}` : '.'} Try again, or paste
+                    the recipe text instead.
+                  </>
+                )}
               </p>
             )}
             {problem?.kind === 'invalid' && (
@@ -400,6 +418,10 @@ export default function AddRecipe() {
               leaveOut={leaveOutFor(ageMonths, state.foods)}
               onPasteAnswer={focusPasteBox}
             />
+          </section>
+
+          <section className={styles.section}>
+            <ReelPrompt onPasteAnswer={focusPasteBoxForReel} />
           </section>
 
           <p className={styles.help}>
@@ -627,6 +649,10 @@ export default function AddRecipe() {
             <Button label="Save recipe" variant="primary" onClick={save} />
             <Button label="Start over" variant="ghost" onClick={startOver} />
           </div>
+          <section className={styles.section}>
+            <ReelPrompt onPasteAnswer={focusPasteBoxForReel} />
+          </section>
+
           <p className={styles.help}>
             <Link to="/recipes/new">Type a recipe instead</Link>
           </p>
