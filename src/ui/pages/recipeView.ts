@@ -111,7 +111,7 @@ export function recipeView(
   state: AppState,
   ageMonthsOverride?: number,
 ): RecipeView {
-  // Most callers (Recipes/Home) derive age from the child via the state. The
+  // Most callers (Recipes/Plan) derive age from the child via the state. The
   // shared view has NO child, so it passes payload.ageMonths explicitly as the
   // override; when omitted behavior is unchanged (selectAgeMonths(state) ?? 0).
   const ageMonths = ageMonthsOverride ?? selectAgeMonths(state) ?? 0;

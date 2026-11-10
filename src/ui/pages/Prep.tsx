@@ -1,6 +1,6 @@
 // Prep screen (Task 11.2, Req 9.2/9.3/9.5). The prep list is DERIVED every
 // render with computePrepList(plan, recipes, state, ageMonths) from
-// domain/prep.ts; nothing here is stored (mirrors how Home.tsx derives the week
+// domain/prep.ts; nothing here is stored (mirrors how Plan.tsx derives the week
 // view and the new-food spacing warning). Editing the prep-day date input
 // dispatches the existing setPrepDate action, so the next render recomputes the
 // whole list (a session's store can flip or a thaw reminder appear/disappear).

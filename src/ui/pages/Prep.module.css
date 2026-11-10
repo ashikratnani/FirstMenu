@@ -1,5 +1,5 @@
 /*
- * Prep screen (Task 11.2). Mirrors Home.module.css tokens and structure: a
+ * Prep screen (Task 11.2). Mirrors Plan.module.css tokens and structure: a
  * controls panel for the editable prep day, then the derived cook sessions and
  * thaw reminders. Per design "Theme mapping" the store state is carried by card
  * TEXT + accessible name (no color-only signalling); the pumpkin badge is a

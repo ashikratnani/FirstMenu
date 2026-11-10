@@ -1,4 +1,4 @@
-// Shared, React-free helpers for the week view (Home.tsx) and the SlotPicker
+// Shared, React-free helpers for the week view (Plan.tsx) and the SlotPicker
 // component (Task 10.2). Kept in a non-component module (like recipeView.ts) so
 // the page, the picker and their tests import the SAME derivations with no
 // react-refresh lint warning.
