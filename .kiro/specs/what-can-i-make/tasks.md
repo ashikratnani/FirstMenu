@@ -111,10 +111,10 @@ Branch names use the `v2/` prefix (for example `v2/6-paste-parser`) so they don'
   - [x] 11.4 Add the primary "Paste" button to Add recipe (clipboard read only on tap, fallback message when not allowed); "Read recipe" secondary; during a preview "Save recipe" is the only primary button and "Paste" is hidden; the shell's "Add recipe" is hidden on `/add`. Component tests with a mocked clipboard: success fills and reads the recipe; rejection shows the fallback; one filled primary button before and during a preview.
     - _Requirements: 17.7, 17.10_
 
-- [ ] 12. Recipe page and library
-  - [ ] 12.1 Add time, effort, nutrition tags with the explainer, "Original text", cleared mentions, "Simple idea" label and "Add to plan" to the recipe page. Show time, effort and tags in the library, plus a "From ChatGPT / Instagram" badge. Add stated time to the typed editor. Add nutrition lists and sources to the Sources page, plus a "New food spacing" entry citing `NEW_FOOD_SPACING_SOURCES`, with a Sources page test that the entry lists every spacing source with its URL.
-    - _Requirements: 1.5, 4.5, 4.6, 5.4, 6.8, 7.4, 11.3, 14.4, 17.4_
-  - [ ] 12.2 Add a secondary "I made this" button to the recipe page (records today once per day, confirms with a short status message). Component test: one filled primary button on the recipe page.
+- [x] 12. Recipe page and library
+  - [x] 12.1 Add time, effort, nutrition tags with the explainer, "Original text", cleared mentions, "Simple idea" label and "Add to plan" to the recipe page. Show time, effort and tags in the library, plus a "From ChatGPT / Instagram" badge. Add stated time to the typed editor. Add nutrition lists and sources to the Sources page, plus a "New food spacing" entry citing `NEW_FOOD_SPACING_SOURCES`, with a Sources page test that the entry lists every spacing source with its URL.
+    - _Requirements: 1.5, 4.5, 4.6, 5.4, 6.8, 7.4, 11.2, 11.3, 14.4, 17.4_
+  - [x] 12.2 Add a secondary "I made this" button to the recipe page (records today once per day, confirms with a short status message). Component test: one filled primary button on the recipe page.
     - _Requirements: 17.5, 17.10_
 
 - [ ] 13. Convert remaining pages to Astryx

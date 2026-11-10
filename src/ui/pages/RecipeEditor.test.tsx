@@ -185,6 +185,26 @@ describe('RecipeEditor', () => {
     expect(custom[0].title).toBe('Banana Avocado Mash');
   });
 
+  it('sets and keeps a stated total time, and keeps pasted fields when editing (Req 4.6)', async () => {
+    const user = userEvent.setup();
+    const pasted: Recipe = {
+      ...CUSTOM_MASH,
+      imported: { from: 'chatgpt', text: 'original', date: '2026-01-01' },
+    };
+    const { getState } = renderApp(seedState(8, [pasted]), '/recipes/custom-mash/edit');
+    const minutes = screen.getByLabelText('Total time in minutes (optional)') as HTMLInputElement;
+    expect(minutes.value).toBe('');
+    await user.type(minutes, '25');
+    await user.click(screen.getByRole('button', { name: 'Save recipe' }));
+    const saved = getState().customRecipes[0];
+    expect(saved.statedMinutes).toBe(25);
+    expect(saved.imported?.text).toBe('original');
+
+    await user.clear(minutes);
+    await user.click(screen.getByRole('button', { name: 'Save recipe' }));
+    expect(getState().customRecipes[0].statedMinutes).toBeUndefined();
+  });
+
   it('deleting a custom recipe empties its plan slot and surfaces the notice', async () => {
     const user = userEvent.setup();
     const seed = seedState(8, [CUSTOM_MASH]);

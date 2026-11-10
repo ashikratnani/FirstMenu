@@ -23,6 +23,17 @@ const TAG_LABELS: Record<NutritionTag, string> = {
   'healthy-fat': 'Healthy fat',
 };
 
+/** Said wherever tags are explained (Req 5.4). */
+export const TAG_EXPLAINER =
+  'Tags show which food groups are in a recipe, not how much of a nutrient it provides.';
+
+/** Library badge for a pasted recipe (shared links are not pasted). */
+export const PASTED_BADGE = 'From ChatGPT / Instagram';
+
+/** Said on the Add recipe preview and on pasted recipe pages (Req 11.2). */
+export const FIXED_LIST_NOTE =
+  "FirstMenu's safety check uses a fixed list of foods. It can miss foods, amounts and preparations, so check every recipe yourself and ask your pediatrician if you are unsure.";
+
 export function effortLabel(effort: Effort): string {
   return EFFORT_LABELS[effort];
 }

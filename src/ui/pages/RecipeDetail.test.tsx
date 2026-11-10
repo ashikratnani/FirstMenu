@@ -270,4 +270,80 @@ describe('RecipeDetail page', () => {
       expect(screen.queryByRole('button', { name: 'Edit serve as' })).not.toBeInTheDocument();
     });
   });
+
+  it('shows time, effort, tags and the tag explainer', () => {
+    renderDetail('custom-grapes', seedState(10, [GRAPE_RECIPE]));
+    expect(screen.getByText('Easy')).toBeInTheDocument();
+    expect(screen.getByText('Time not given')).toBeInTheDocument();
+    const tags = screen.getByRole('list', { name: 'Nutrition tags' });
+    expect(within(tags).getByText('Dairy')).toBeInTheDocument();
+    expect(
+      screen.getByText(/not how much of a nutrient it provides/),
+    ).toBeInTheDocument();
+  });
+
+  it('labels a simple idea', () => {
+    const idea: Recipe = { ...GRAPE_RECIPE, id: 'custom-idea', kind: 'simple-idea' };
+    renderDetail('custom-idea', seedState(10, [idea]));
+    expect(screen.getByText('Simple idea')).toBeInTheDocument();
+  });
+
+  it('"Add to plan" puts the recipe in the chosen slot and confirms', async () => {
+    const user = userEvent.setup();
+    renderDetail('custom-grapes', seedState(10, [GRAPE_RECIPE]));
+    await user.click(screen.getByRole('button', { name: 'Add to plan' }));
+    await user.selectOptions(screen.getByLabelText('Day'), '2');
+    await user.click(screen.getByRole('button', { name: 'Add' }));
+    expect(screen.getByText(/^Added to /)).toBeInTheDocument();
+  });
+
+  it('does not offer "Add to plan" on a ghosted recipe', () => {
+    renderDetail('custom-honey', seedState(8, [HONEY_RECIPE]));
+    expect(screen.queryByRole('button', { name: 'Add to plan' })).not.toBeInTheDocument();
+  });
+
+  it('"I made this" records today once per day and confirms', async () => {
+    const user = userEvent.setup();
+    renderDetail('custom-grapes', seedState(10, [GRAPE_RECIPE]));
+    const button = screen.getByRole('button', { name: 'I made this' });
+    expect(button).not.toHaveAttribute('data-variant', 'primary');
+    await user.click(button);
+    expect(screen.getByText('Saved for today.')).toBeInTheDocument();
+    await user.click(button);
+    expect(screen.getByText('Already saved for today.')).toBeInTheDocument();
+  });
+
+  describe('pasted recipe', () => {
+    const PASTED: Recipe = {
+      id: 'custom-pasted',
+      origin: 'custom',
+      title: 'Oat bowl',
+      stages: ['9-12'],
+      mealTypes: ['breakfast'],
+      ingredients: [{ name: 'oats', category: 'grains' }],
+      steps: ['Cook the oats.', 'Add a little honey on top.'],
+      texture: 'soft',
+      servings: 1,
+      imported: {
+        from: 'chatgpt',
+        text: 'Oat bowl\nOats\nCook the oats.\nAdd a little honey on top.',
+        date: '2026-11-10',
+      },
+    };
+
+    it('shows the fixed-list note, Original text and the text mention', () => {
+      renderDetail('custom-pasted', seedState(8, [PASTED]));
+      expect(screen.getByText(/uses a fixed list of foods/)).toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: 'Original text' })).toBeInTheDocument();
+      expect(screen.getByText(/Add a little honey on top\./, { selector: 'q' })).toBeInTheDocument();
+    });
+
+    it('clears a mention with "Not used in this recipe" and lists it as cleared', async () => {
+      const user = userEvent.setup();
+      renderDetail('custom-pasted', seedState(8, [PASTED]));
+      await user.click(screen.getByRole('button', { name: /Not used in this recipe/ }));
+      expect(screen.queryByText('Not yet')).not.toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: 'Not used in this recipe' })).toBeInTheDocument();
+    });
+  });
 });

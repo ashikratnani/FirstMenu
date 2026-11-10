@@ -274,4 +274,31 @@ describe('Recipes library page', () => {
       within(cardFor(/Carrots and Apples/)).getByText('Freezes for 1 month'),
     ).toBeInTheDocument();
   });
+
+  it('shows time, effort and tags on each card', () => {
+    const timed: Recipe = {
+      ...EGG_RECIPE,
+      id: 'custom-timed',
+      title: 'Timed Egg',
+      ingredients: [{ name: 'egg', category: 'dairy-eggs' }],
+      statedMinutes: 12,
+    };
+    renderRecipes(seedState(10, [timed]));
+    const card = cardFor(/Timed Egg/);
+    expect(within(card).getByText('12 min · Easy · Iron-rich · Protein')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Timed Egg.*12 min · Easy/ })).toBeInTheDocument();
+  });
+
+  it('badges pasted recipes "From ChatGPT / Instagram" but not typed ones', () => {
+    const pasted: Recipe = {
+      ...EGG_RECIPE,
+      id: 'custom-pasted',
+      title: 'Pasted Egg',
+      imported: { from: 'instagram', text: 'x', date: '2026-01-01' },
+    };
+    const typed: Recipe = { ...EGG_RECIPE, id: 'custom-typed', title: 'Typed Egg' };
+    renderRecipes(seedState(10, [pasted, typed]));
+    expect(within(cardFor(/Pasted Egg/)).getByText('From ChatGPT / Instagram')).toBeInTheDocument();
+    expect(within(cardFor(/Typed Egg/)).queryByText('From ChatGPT / Instagram')).not.toBeInTheDocument();
+  });
 });

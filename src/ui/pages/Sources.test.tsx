@@ -2,11 +2,13 @@ import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, expect, it } from 'vitest';
 import {
+  NEW_FOOD_SPACING_SOURCES,
   RULES,
   SOURCES,
   type Source,
   type SourceId,
 } from '../../domain/safety/rules';
+import { NUTRITION_RULES, UNCONFIRMED_TAGS } from '../../domain/nutrition';
 import { BUILTIN_RECIPES } from '../../data/recipes';
 import Sources from './Sources';
 
@@ -15,12 +17,16 @@ function sourceUrls(source: Source): string[] {
   return source.urls && source.urls.length > 0 ? source.urls : [source.url];
 }
 
-/** Distinct source ids cited across every rule, derived from rules.ts. */
+/** Distinct source ids cited by safety rules, nutrition lists and new-food spacing. */
 function distinctCitedSourceIds(): SourceId[] {
   const seen = new Set<SourceId>();
   for (const rule of RULES) {
     for (const id of rule.sources) seen.add(id);
   }
+  for (const rule of NUTRITION_RULES) {
+    for (const id of rule.sources) seen.add(id);
+  }
+  for (const id of NEW_FOOD_SPACING_SOURCES) seen.add(id);
   return [...seen];
 }
 
@@ -182,6 +188,42 @@ describe('Sources page', () => {
       expect(links.length).toBeGreaterThan(0);
       expect(links[0]).toHaveAttribute('rel', 'noopener noreferrer');
       expect(links[0]).toHaveAttribute('target', '_blank');
+    }
+  });
+
+  it('lists every nutrition tag food list with its sources, and says tags are not amounts', () => {
+    renderSources();
+    const heading = screen.getByRole('heading', { name: 'Nutrition tags' });
+    expect(
+      screen.getByText(/not how much of a nutrient it provides/),
+    ).toBeInTheDocument();
+    const list = heading.nextElementSibling?.nextElementSibling;
+    expect(list?.tagName).toBe('UL');
+    const items = [...(list?.querySelectorAll(':scope > li') ?? [])];
+    expect(items.length).toBe(NUTRITION_RULES.length + UNCONFIRMED_TAGS.length);
+    NUTRITION_RULES.forEach((rule, index) => {
+      const hrefs = [...items[index].querySelectorAll('a')].map((a) => a.getAttribute('href'));
+      for (const id of rule.sources) {
+        for (const url of sourceUrls(SOURCES[id])) expect(hrefs).toContain(url);
+      }
+    });
+    expect(items[items.length - 1].textContent).toMatch(/Healthy fat.*No food list yet/);
+  });
+
+  it('has a "New food spacing" entry that lists every spacing source with its URL', () => {
+    renderSources();
+    const heading = screen.getByRole('heading', { name: 'New food spacing' });
+    const entry = heading.nextElementSibling as HTMLElement;
+    expect(entry).not.toBeNull();
+    expect(NEW_FOOD_SPACING_SOURCES.length).toBeGreaterThan(0);
+    const anchors = [...entry.querySelectorAll('a')];
+    for (const id of NEW_FOOD_SPACING_SOURCES) {
+      for (const url of sourceUrls(SOURCES[id])) {
+        const match = anchors.filter((a) => a.getAttribute('href') === url);
+        expect(match.length, `spacing source ${id} should link to ${url}`).toBeGreaterThan(0);
+        expect(match[0]).toHaveAttribute('rel', 'noopener noreferrer');
+        expect(match[0]).toHaveTextContent(SOURCES[id].title);
+      }
     }
   });
 });

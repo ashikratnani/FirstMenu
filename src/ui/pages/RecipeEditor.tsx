@@ -170,6 +170,7 @@ function buildRecipe(
     steps: string[];
     texture: string;
     servings: string;
+    statedMinutes: string;
     fridgeDays: string;
     freezerMonths: string;
     makeAheadNote: string;
@@ -213,6 +214,12 @@ function buildRecipe(
     texture: form.texture.trim(),
     servings,
   };
+
+  // Stated total time (Req 4.6): a whole number of minutes, blank for none.
+  const minutesNum = Number(form.statedMinutes);
+  if (form.statedMinutes.trim() !== '' && Number.isFinite(minutesNum) && minutesNum > 0) {
+    recipe.statedMinutes = Math.round(minutesNum);
+  }
 
   const fridgeNum = Number(form.fridgeDays);
   const freezerNum = Number(form.freezerMonths);
@@ -265,6 +272,9 @@ export default function RecipeEditor() {
   const [texture, setTexture] = useState(editing?.texture ?? '');
   const [servings, setServings] = useState(
     editing?.servings === undefined ? '' : String(editing.servings),
+  );
+  const [statedMinutes, setStatedMinutes] = useState(
+    editing?.statedMinutes === undefined ? '' : String(editing.statedMinutes),
   );
   const [fridgeDays, setFridgeDays] = useState(
     editing?.storage?.fridgeDays === undefined
@@ -381,6 +391,7 @@ export default function RecipeEditor() {
         steps,
         texture,
         servings,
+        statedMinutes,
         fridgeDays,
         freezerMonths,
         makeAheadNote,
@@ -390,6 +401,16 @@ export default function RecipeEditor() {
 
     // Run the real safety screen and show the findings; saving is not gated on
     // them (a block simply ghosts the recipe later).
+    // Keep what the form does not edit (a pasted recipe's original text,
+    // notes, cleared mentions, kind, serve-as), so editing never drops it.
+    if (editing) {
+      if (editing.imported) recipe.imported = editing.imported;
+      if (editing.notes) recipe.notes = editing.notes;
+      if (editing.clearedMentions) recipe.clearedMentions = editing.clearedMentions;
+      if (editing.kind) recipe.kind = editing.kind;
+      if (editing.serveAs) recipe.serveAs = editing.serveAs;
+    }
+
     const result = screenRecipe(recipe, selectAgeMonths(state) ?? 0);
     setScreen(result);
     setSavedId(recipeId);
@@ -700,6 +721,21 @@ export default function RecipeEditor() {
             step="1"
             value={servings}
             onChange={(e) => setServings(e.target.value)}
+          />
+        </div>
+
+        <div className={styles.field}>
+          <label className={styles.label} htmlFor="recipe-minutes">
+            Total time in minutes (optional)
+          </label>
+          <input
+            id="recipe-minutes"
+            className={styles.input}
+            type="number"
+            min="1"
+            step="1"
+            value={statedMinutes}
+            onChange={(e) => setStatedMinutes(e.target.value)}
           />
         </div>
 
