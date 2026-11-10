@@ -116,11 +116,14 @@ describe('App', () => {
     ).not.toBeInTheDocument();
   });
 
-  it('opens the typed editor from /add until the Add recipe page exists', () => {
+  it('opens the Add recipe page at /add, with a link to the typed editor', () => {
     renderApp('/add');
     expect(
-      screen.getByRole('heading', { name: /^new recipe$/i }),
+      screen.getByRole('heading', { name: /^add recipe$/i }),
     ).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: /type a recipe instead/i }),
+    ).toHaveAttribute('href', '/recipes/new');
   });
 
   it('shows the not-medical-advice disclaimer', () => {

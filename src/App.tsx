@@ -5,6 +5,7 @@ import Layout from './ui/components/Layout';
 // Pages load the first time they are opened (routes.ts, decision in issue
 // #37). Tests get eager versions through an alias in vitest.config.ts.
 import {
+  AddRecipe,
   Foods,
   Grocery,
   Make,
@@ -77,12 +78,7 @@ export default function App() {
           <Route element={<PageOutlet />}>
             <Route path="/" element={<Make />} />
             <Route path="/plan" element={<Plan />} />
-            {/* Task 11.1 builds the Add recipe page here; until then it
-                opens the typed editor. */}
-            <Route
-              path="/add"
-              element={<Navigate to="/recipes/new" replace />}
-            />
+            <Route path="/add" element={<AddRecipe />} />
             <Route path="/recipes" element={<Recipes />} />
             <Route path="/recipes/new" element={<RecipeEditor />} />
             <Route path="/recipes/:id" element={<RecipeDetail />} />

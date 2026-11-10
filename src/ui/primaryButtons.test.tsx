@@ -4,6 +4,7 @@
 // styled buttons until task 13 converts them, so those are counted by name.
 
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, expect, it } from 'vitest';
 import App from '../App';
@@ -73,6 +74,7 @@ function primaries(): string[] {
   );
   const native = screen
     .queryAllByRole('button', { name: /^(Print|Save recipe)$/ })
+    .filter((el) => !el.hasAttribute('data-variant'))
     .map((el) => el.textContent?.trim() ?? '');
   return [...astryx, ...native];
 }
@@ -116,14 +118,28 @@ describe('exactly one filled primary button per screen (Req 17.10)', () => {
     expect(shellAddRecipe()).toHaveAttribute('data-variant', 'secondary');
   });
 
-  it.each(['/recipes/new', '/add'])(
-    '%s: Save recipe is primary and the shell button is hidden',
-    (path) => {
-      renderAt(path, seed());
-      expect(primaries()).toEqual(['Save recipe']);
-      expect(shellAddRecipe()).toBeUndefined();
-    },
-  );
+  it('/recipes/new: Save recipe is primary and the shell button is hidden', () => {
+    renderAt('/recipes/new', seed());
+    expect(primaries()).toEqual(['Save recipe']);
+    expect(shellAddRecipe()).toBeUndefined();
+  });
+
+  it('/add: Paste is the only primary before a preview and the shell button is hidden', () => {
+    renderAt('/add', seed());
+    expect(primaries()).toEqual(['Paste']);
+    expect(shellAddRecipe()).toBeUndefined();
+  });
+
+  it('/add during a preview: Save recipe is the only primary and Paste is hidden', async () => {
+    const user = userEvent.setup();
+    renderAt('/add', seed());
+    await user.click(screen.getByRole('textbox', { name: 'Recipe text' }));
+    await user.paste('Banana mash\nIngredients:\n- 1 banana\nSteps:\n1. Mash it.');
+    await user.click(screen.getByRole('button', { name: 'Read recipe' }));
+    expect(primaries()).toEqual(['Save recipe']);
+    expect(screen.queryByRole('button', { name: 'Paste' })).not.toBeInTheDocument();
+    expect(shellAddRecipe()).toBeUndefined();
+  });
 
   it('the recipe page has no primary of its own, so the shell "Add recipe" is primary', () => {
     renderAt('/recipes/custom-blorp', seed());

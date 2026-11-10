@@ -917,3 +917,17 @@ describe('Make screen clock (day rollover)', () => {
     expect(screen.queryByText('Suggested: Breakfast')).not.toBeInTheDocument();
   });
 });
+
+describe('Make prompt helper: Paste the answer (Req 8.7)', () => {
+  it('shows "Paste the answer" only after copying, linking to Add recipe with ChatGPT preselected', async () => {
+    const user = userEvent.setup();
+    renderMake(seedState({ pantry: [], customRecipes: [TWO_MISSING] }));
+    await user.click(screen.getByRole('button', { name: 'Ask ChatGPT' }));
+    expect(screen.queryByRole('link', { name: 'Paste the answer' })).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Copy question' }));
+    expect(screen.getByRole('link', { name: 'Paste the answer' })).toHaveAttribute(
+      'href',
+      '/add?from=chatgpt',
+    );
+  });
+});

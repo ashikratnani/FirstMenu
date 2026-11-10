@@ -101,14 +101,14 @@ Branch names use the `v2/` prefix (for example `v2/6-paste-parser`) so they don'
   - [x] 10.4 Add the suggestions to the Make screen in the order in the design: suggested meal chip (with the search filter chips), Try this card (the screen's one primary button when shown, with "Show another" and "Why this?"), new-food suggestion, stale on-hand prompt, pantry suggestion, Make again row; at most two banners at once; every suggestion dismissible. Replace Layout's `addRecipeVariant` with `PrimaryActionProvider` / `usePagePrimaryAction` per the design, and move Settings, Print and edit pages onto it. Component tests: Try this opens the right recipe; dismissing hides it; the meal chip doesn't filter results until tapped and doesn't come back within 4 hours after ✕; each suggestion shows its reason; exactly one filled primary button on Make, Settings, Print, edit and Add recipe; with no allowed Try this pick the card is hidden and the shell's "Add recipe" is primary; rewrite the trial's pathname-based Layout tests so placeholder pages report through `usePagePrimaryAction`; all suggestion buttons are secondary.
     - _Requirements: 17.1 – 17.6, 17.8 – 17.10_
 
-- [ ] 11. Add recipe and prompt helper (Astryx)
-  - [ ] 11.1 Build `ui/pages/AddRecipe.tsx` at `/add`: source picker and link, paste box, preview with line editing and moving, "mark lines as ingredients" mode, safety results with text mentions and "Not used in this recipe", Save. Link to the typed editor. Include the Instagram and screenshot help text and the fixed-list disclaimer.
+- [x] 11. Add recipe and prompt helper (Astryx)
+  - [x] 11.1 Build `ui/pages/AddRecipe.tsx` at `/add`: source picker and link, paste box, preview with line editing and moving, "mark lines as ingredients" mode, safety results with text mentions and "Not used in this recipe", Save. Link to the typed editor. Include the Instagram and screenshot help text and the fixed-list disclaimer.
     - _Requirements: 6.1, 6.4 – 6.11, 7.3 – 7.5, 11.2_
-  - [ ] 11.2 Build the prompt helper UI on Make and Add recipe: copy, open ChatGPT, "Paste the answer", notice.
+  - [x] 11.2 Build the prompt helper UI on Make and Add recipe: copy, open ChatGPT, "Paste the answer", notice.
     - _Requirements: 8.1, 8.6 – 8.9_
-  - [ ] 11.3 Component tests: paste → preview → save with no typing; a text mention ghosts and "Not used" clears it.
+  - [x] 11.3 Component tests: paste → preview → save with no typing; a text mention ghosts and "Not used" clears it.
     - _Requirements: 6.4, 7.3, 7.4_
-  - [ ] 11.4 Add the primary "Paste" button to Add recipe (clipboard read only on tap, fallback message when not allowed); "Read recipe" secondary; during a preview "Save recipe" is the only primary button and "Paste" is hidden; the shell's "Add recipe" is hidden on `/add`. Component tests with a mocked clipboard: success fills and reads the recipe; rejection shows the fallback; one filled primary button before and during a preview.
+  - [x] 11.4 Add the primary "Paste" button to Add recipe (clipboard read only on tap, fallback message when not allowed); "Read recipe" secondary; during a preview "Save recipe" is the only primary button and "Paste" is hidden; the shell's "Add recipe" is hidden on `/add`. Component tests with a mocked clipboard: success fills and reads the recipe; rejection shows the fallback; one filled primary button before and during a preview.
     - _Requirements: 17.7, 17.10_
 
 - [ ] 12. Recipe page and library
