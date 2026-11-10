@@ -100,6 +100,14 @@ function cardFor(name: RegExp): HTMLElement {
   return item;
 }
 
+/** Tap "Show more" until the whole (filtered) library is listed. */
+async function showAllCards() {
+  const user = userEvent.setup();
+  while (screen.queryByRole('button', { name: 'Show more' })) {
+    await user.click(screen.getByRole('button', { name: 'Show more' }));
+  }
+}
+
 describe('Recipes library page', () => {
   it('lists built-in and custom recipes, each linking to /recipes/:id', () => {
     renderRecipes(seedState(8, [HONEY_RECIPE]));
@@ -126,17 +134,18 @@ describe('Recipes library page', () => {
     ).not.toBeInTheDocument();
   });
 
-  it('showing all stages reveals every built-in recipe', async () => {
+  it('showing all stages reveals every built-in recipe (after "Show more")', async () => {
     const user = userEvent.setup();
     renderRecipes(seedState(8));
 
     await user.click(within(screen.getByRole('radiogroup', { name: 'Stage' })).getByRole('radio', { name: 'All' }));
+    // Pages of 50: keep tapping "Show more" until the whole library is listed.
+    while (screen.queryByRole('button', { name: 'Show more' })) {
+      await user.click(screen.getByRole('button', { name: 'Show more' }));
+    }
+    const hrefs = new Set(screen.getAllByRole('link').map((a) => a.getAttribute('href')));
     for (const recipe of BUILTIN_RECIPES) {
-      expect(
-        screen.getByRole('link', {
-          name: new RegExp(recipe.title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')),
-        }),
-      ).toBeInTheDocument();
+      expect(hrefs.has(`/recipes/${recipe.id}`), recipe.id).toBe(true);
     }
   });
 
@@ -181,12 +190,13 @@ describe('Recipes library page', () => {
     ).toBeInTheDocument();
   });
 
-  it('shows a ghost state for a recipe whose food has a recorded reaction', () => {
+  it('shows a ghost state for a recipe whose food has a recorded reaction', async () => {
     renderRecipes(
       seedState(10, [EGG_RECIPE], {
         'allergen:egg': { status: 'reaction', date: '2026-11-10' },
       }),
     );
+    await showAllCards();
 
     const egg = screen.getByRole('link', {
       name: /Egg Scramble\. Not yet: egg\. Reaction recorded\./,
@@ -224,10 +234,11 @@ describe('Recipes library page', () => {
     expect(carrots.getAttribute('aria-label') ?? '').toMatch(/Not yet/);
   });
 
-  it('names an allergen untried food by its group label in the door badge', () => {
+  it('names an allergen untried food by its group label in the door badge', async () => {
     // Egg (10 months, untried, no reaction) -> door badge "New food: egg", not
     // the raw "allergen:egg" key.
     renderRecipes(seedState(10, [EGG_RECIPE]));
+    await showAllCards();
     expect(
       within(cardFor(/Egg Scramble/)).getByText('New food: egg'),
     ).toBeInTheDocument();
@@ -275,7 +286,7 @@ describe('Recipes library page', () => {
     ).toBeInTheDocument();
   });
 
-  it('shows time, effort and tags on each card', () => {
+  it('shows time, effort and tags on each card', async () => {
     const timed: Recipe = {
       ...EGG_RECIPE,
       id: 'custom-timed',
@@ -284,12 +295,13 @@ describe('Recipes library page', () => {
       statedMinutes: 12,
     };
     renderRecipes(seedState(10, [timed]));
+    await showAllCards();
     const card = cardFor(/Timed Egg/);
     expect(within(card).getByText('12 min · Easy · Iron-rich · Protein')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /Timed Egg.*12 min · Easy/ })).toBeInTheDocument();
   });
 
-  it('badges pasted recipes "From ChatGPT / Instagram" but not typed ones', () => {
+  it('badges pasted recipes "From ChatGPT / Instagram" but not typed ones', async () => {
     const pasted: Recipe = {
       ...EGG_RECIPE,
       id: 'custom-pasted',
@@ -298,18 +310,76 @@ describe('Recipes library page', () => {
     };
     const typed: Recipe = { ...EGG_RECIPE, id: 'custom-typed', title: 'Typed Egg' };
     renderRecipes(seedState(10, [pasted, typed]));
+    await showAllCards();
     expect(within(cardFor(/Pasted Egg/)).getByText('From ChatGPT / Instagram')).toBeInTheDocument();
     expect(within(cardFor(/Typed Egg/)).queryByText('From ChatGPT / Instagram')).not.toBeInTheDocument();
   });
 
-  it('badges a simple idea and includes "Simple idea" in the card accessible name', () => {
+  it('badges a simple idea and includes "Simple idea" in the card accessible name', async () => {
     const idea: Recipe = { ...EGG_RECIPE, id: 'custom-idea', title: 'Egg Idea', kind: 'simple-idea' };
     const plain: Recipe = { ...EGG_RECIPE, id: 'custom-plain', title: 'Plain Egg' };
     renderRecipes(seedState(10, [idea, plain]));
+    await showAllCards();
     expect(within(cardFor(/Egg Idea/)).getByText('Simple idea')).toBeInTheDocument();
     const name = screen.getByRole('link', { name: /Egg Idea/ }).getAttribute('aria-label') ?? '';
     expect(name).toContain('Simple idea');
     expect(within(cardFor(/Plain Egg/)).queryByText('Simple idea')).not.toBeInTheDocument();
     expect(screen.getByRole('link', { name: /Plain Egg/ }).getAttribute('aria-label') ?? '').not.toContain('Simple idea');
+  });
+});
+
+/** `count` distinct custom recipes, all tagged for every stage. */
+function manyCustomRecipes(count: number): Recipe[] {
+  return Array.from({ length: count }, (_, i) => ({
+    id: `custom-many-${i}`,
+    origin: 'custom' as const,
+    title: `Pager Test Dish ${String(i).padStart(3, '0')}`,
+    stages: ['6-8', '9-12', '12-23', '24-36'] as Recipe['stages'],
+    mealTypes: i % 2 === 0 ? (['lunch'] as Recipe['mealTypes']) : (['dinner'] as Recipe['mealTypes']),
+    ingredients: [{ name: `food ${i}`, category: 'other' as const }],
+    steps: ['Mix.'],
+    texture: 'soft',
+    servings: 1,
+  }));
+}
+
+describe('Recipes library paging (Requirement 14.9)', () => {
+  const cards = () => within(screen.getByRole('list', { name: 'Recipes' })).getAllByRole('listitem');
+
+  it('shows 50 cards at a time and adds 50 per "Show more"', async () => {
+    const user = userEvent.setup();
+    // 120 custom recipes alone are more than two pages, whatever the built-in count.
+    renderRecipes(seedState(8, manyCustomRecipes(120)));
+
+    expect(cards()).toHaveLength(50);
+    expect(screen.getByText(/^Showing 50 of \d+ recipes$/)).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Show more' }));
+    expect(cards()).toHaveLength(100);
+
+    await user.click(screen.getByRole('button', { name: 'Show more' }));
+    expect(cards().length).toBeGreaterThan(100);
+  });
+
+  it('removes "Show more" once everything is listed and says how many are shown', async () => {
+    const user = userEvent.setup();
+    renderRecipes(seedState(8, manyCustomRecipes(60)));
+    while (screen.queryByRole('button', { name: 'Show more' })) {
+      await user.click(screen.getByRole('button', { name: 'Show more' }));
+    }
+    const total = cards().length;
+    expect(total).toBeGreaterThanOrEqual(60);
+    expect(screen.getByText(`Showing ${total} of ${total} recipes`)).toBeInTheDocument();
+  });
+
+  it('goes back to the first page when a filter changes', async () => {
+    const user = userEvent.setup();
+    renderRecipes(seedState(8, manyCustomRecipes(120)));
+    await user.click(screen.getByRole('button', { name: 'Show more' }));
+    expect(cards()).toHaveLength(100);
+
+    await user.click(screen.getByRole('radio', { name: 'Lunch' }));
+    expect(cards()).toHaveLength(50);
+    expect(screen.getByRole('button', { name: 'Show more' })).toBeInTheDocument();
   });
 });

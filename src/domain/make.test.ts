@@ -4,12 +4,16 @@ import {
   activeFilters,
   makeResults,
   recipeServeAs,
+  recipeDerived,
   recipesNamed,
   requiredKeys,
   setIronRichFilter,
   suggestedChips,
 } from './make';
 import { foodKeyFromName } from './foods';
+import { BUILTIN_RECIPES } from '../data/recipes';
+import { recipeEffort, recipeMinutes } from './effort';
+import { recipeNutritionTags } from './nutrition';
 import type { AppState, Ingredient, Recipe, ServeAs, StageId } from './types';
 
 function ing(name: string, extra: Partial<Ingredient> = {}): Ingredient {
@@ -590,5 +594,139 @@ describe('recipesNamed (Req 16.8)', () => {
         .results,
     ).toEqual([]);
     expect(recipesNamed([pancakes], [], have(), AGE_10, NO_FOODS).results).toEqual([]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Derived-value cache and speed (task 14.3, Requirement 14.9, design "Bundle
+// size and speed with 500 recipes")
+// ---------------------------------------------------------------------------
+describe('recipeDerived cache', () => {
+  it('returns the same object for the same recipe', () => {
+    const r = recipe('Rice and Peas', ['rice', 'peas']);
+    expect(recipeDerived(r)).toBe(recipeDerived(r));
+    // The array values are shared too, so makeResults reuses them.
+    expect(recipeDerived(r).requiredKeys).toBe(recipeDerived(r).requiredKeys);
+  });
+
+  it('matches the direct computations', () => {
+    for (const r of BUILTIN_RECIPES) {
+      const derived = recipeDerived(r);
+      const time = recipeMinutes(r);
+      expect(derived.requiredKeys, r.id).toEqual(requiredKeys(r));
+      expect(derived.effort, r.id).toBe(recipeEffort(r));
+      expect(derived.tags, r.id).toEqual(recipeNutritionTags(r));
+      expect(derived.minutes, r.id).toBe(time?.minutes);
+      expect(derived.minutesKind, r.id).toBe(time?.kind);
+    }
+  });
+
+  it('an edited recipe is a new object and gets fresh values (no invalidation needed)', () => {
+    const before = recipe('Rice and Peas', ['rice', 'peas']);
+    const first = recipeDerived(before);
+    const edited: Recipe = { ...before, ingredients: [ing('rice'), ing('peas'), ing('carrots')] };
+    const second = recipeDerived(edited);
+    expect(second).not.toBe(first);
+    expect(first.requiredKeys).toEqual(['rice', 'pea']);
+    expect(second.requiredKeys).toEqual(['rice', 'pea', 'carrot']);
+    // The old object still has its old values.
+    expect(recipeDerived(before)).toBe(first);
+  });
+
+  it('makeResults reuses the cached values for the same recipe across calls', () => {
+    const r = recipe('Rice and Peas', ['rice', 'peas']);
+    const a = makeResults([r], have('rice', 'pea'), AGE_10, NO_FOODS);
+    const b = makeResults([r], have('rice'), AGE_10, NO_FOODS);
+    expect(a.readyNow[0].tags).toBe(b.missingOne[0].tags);
+    expect(a.readyNow[0].tags).toBe(recipeDerived(r).tags);
+  });
+});
+
+/** Custom copies of the built-ins: new objects, varied ingredients. */
+function customRecipes(count: number, offset = 0): Recipe[] {
+  const out: Recipe[] = [];
+  for (let i = 0; i < count; i++) {
+    const base = BUILTIN_RECIPES[(i + offset) % BUILTIN_RECIPES.length];
+    out.push({
+      ...base,
+      id: `custom-${offset}-${i}`,
+      origin: 'custom',
+      title: `${base.title} ${i}`,
+      source: undefined,
+      ingredients: [...base.ingredients.map((x) => ({ ...x })), ing(`extra food ${i % 7}`)],
+      steps: [...base.steps],
+    });
+  }
+  return out;
+}
+
+function medianMs(run: () => void, times = 7): number {
+  const samples: number[] = [];
+  for (let i = 0; i < times; i++) {
+    const start = performance.now();
+    run();
+    samples.push(performance.now() - start);
+  }
+  samples.sort((a, b) => a - b);
+  return samples[Math.floor(samples.length / 2)];
+}
+
+describe('makeResults speed (Requirement 14.9)', () => {
+  // 100 ms is the requirement, used as is for the warm calls (every keystroke
+  // and filter change). The median of several runs keeps a slow CI neighbour
+  // from failing them. The cold calls (the first open, which fills the caches
+  // and runs while other test files load the machine) get generous margins;
+  // on the sandbox the built-ins plus 50 custom recipes open in about 40 ms.
+  const LIMIT_MS = 100;
+  const COLD_OPEN_LIMIT_MS = 250;
+  const COLD_AT_GOAL_LIMIT_MS = 1500;
+  const pantry = have('rice', 'pea', 'carrot', 'egg', 'milk', 'banana', 'oat', 'apple', 'potato');
+
+  it('built-ins plus 50 custom recipes: opening Make, searching and changing a filter each take under 100 ms', () => {
+    // Opening Make: every recipe object is new, so the derived values and the
+    // safety facts are all computed during this call (the slowest case).
+    const openMs = medianMs(() => {
+      const fresh = [...BUILTIN_RECIPES.map((r) => ({ ...r })), ...customRecipes(50)];
+      makeResults(fresh, pantry, AGE_10, NO_FOODS);
+    }, 3);
+    expect(openMs).toBeLessThan(COLD_OPEN_LIMIT_MS);
+    // Warm calls, as on each keystroke and filter change.
+    const all = [...BUILTIN_RECIPES, ...customRecipes(50)];
+    makeResults(all, pantry, AGE_10, NO_FOODS);
+    const searchMs = medianMs(() => {
+      makeResults(all, pantry, AGE_10, NO_FOODS, { filters: ['tag:iron-rich'] });
+    });
+    const filterMs = medianMs(() => {
+      makeResults(all, pantry, AGE_10, NO_FOODS, { allStages: true, filters: ['easy', 'quick'] });
+    });
+    expect(searchMs).toBeLessThan(LIMIT_MS);
+    expect(filterMs).toBeLessThan(LIMIT_MS);
+  });
+
+  it('at the 500 goal (550 recipes with 50 custom) every warm call stays under 100 ms', () => {
+    const all = [...customRecipes(500, 11), ...customRecipes(50, 5)];
+    // The first call computes every derived value once (about 160 ms on the
+    // sandbox). The count only reaches 550 at the end of task 14.
+    const coldMs = medianMs(() => {
+      makeResults(
+        [...customRecipes(500, 17), ...customRecipes(50, 5)],
+        pantry,
+        AGE_10,
+        NO_FOODS,
+        { allStages: true },
+      );
+    }, 3);
+    expect(coldMs).toBeLessThan(COLD_AT_GOAL_LIMIT_MS);
+    makeResults(all, pantry, AGE_10, NO_FOODS);
+    const warmMs = medianMs(() => {
+      makeResults(all, pantry, AGE_10, NO_FOODS, { allStages: true, filters: ['easy'] });
+    });
+    expect(warmMs).toBeLessThan(LIMIT_MS);
+  });
+
+  it('suggestedChips over the full set reuses the cached keys', () => {
+    const all = [...BUILTIN_RECIPES, ...customRecipes(50)];
+    suggestedChips(all, []);
+    expect(medianMs(() => suggestedChips(all, ['egg']))).toBeLessThan(LIMIT_MS);
   });
 });

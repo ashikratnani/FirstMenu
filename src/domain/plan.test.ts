@@ -382,3 +382,44 @@ describe('newFoodSpacingWarning', () => {
     expect(result).toBeNull();
   });
 });
+
+describe('isRecipeGhosted caching', () => {
+  const honeyPasted = (extra: Partial<Recipe> = {}): Recipe => ({
+    ...foodRecipe('cache-honey', 'oats'),
+    steps: ['Stir in honey.'],
+    imported: { from: 'other', text: 'x', date: '2026-01-05' },
+    ...extra,
+  });
+
+  it('changes when a reaction is added and then removed for the same recipe object', () => {
+    const recipe = foodRecipe('cache-r', 'squash');
+    const clean = defaultState();
+    const reacted: AppState = {
+      ...clean,
+      foods: { squash: { status: 'reaction', date: '2025-12-01' } },
+    };
+    expect(isRecipeGhosted(recipe, clean, 8)).toBe(false);
+    expect(isRecipeGhosted(recipe, reacted, 8)).toBe(true);
+    expect(isRecipeGhosted(recipe, clean, 8)).toBe(false);
+  });
+
+  it('answers per age for the same recipe (honey at 8, 12, then 8 months)', () => {
+    const recipe = honeyPasted();
+    const state = defaultState();
+    expect(isRecipeGhosted(recipe, state, 8)).toBe(true);
+    expect(isRecipeGhosted(recipe, state, 12)).toBe(false);
+    expect(isRecipeGhosted(recipe, state, 8)).toBe(true);
+  });
+
+  it('a cleared mention is a new recipe object with a different result', () => {
+    const recipe = honeyPasted();
+    const state = defaultState();
+    expect(isRecipeGhosted(recipe, state, 8)).toBe(true);
+    const cleared = {
+      ...recipe,
+      clearedMentions: [{ ruleId: 'honey', sentence: 'Stir in honey.' }],
+    };
+    expect(isRecipeGhosted(cleared, state, 8)).toBe(false);
+    expect(isRecipeGhosted(recipe, state, 8)).toBe(true);
+  });
+});

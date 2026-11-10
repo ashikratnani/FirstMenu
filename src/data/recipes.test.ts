@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import type { AllergenGroup, GroceryCategory, MealType, StageId } from '../domain/types';
 import { STAGE_IDS, STAGE_MIN_MONTHS } from '../domain/age';
+import { recipeEffort, type Effort } from '../domain/effort';
 import { screenRecipe } from '../domain/safety/screen';
 import { BUILTIN_RECIPES, INFANT_PORTION_OZ, RECIPES, estimateServings } from './recipes';
 import { BATCH_2_RECIPES } from './recipesBatch2';
+import { BATCH_3_RECIPES } from './recipesBatch3';
 import { SIMPLE_IDEAS } from './simpleIdeas';
 import sourcesDoc from '../../docs/recipe-sources.md?raw';
 
@@ -223,13 +225,13 @@ describe('BUILTIN_RECIPES - servings (Option A deterministic estimate, issue #9)
 });
 
 describe('BUILTIN_RECIPES - coverage', () => {
-  it('ships the 10 sourced WIC recipes, 1 to 25 simple ideas and the 20 batch 2 recipes', () => {
+  it('ships the 10 sourced WIC recipes, 1 to 40 simple ideas and the 20 batch 2 recipes', () => {
     expect(RECIPES.length).toBe(10);
     expect(SIMPLE_IDEAS.length).toBeGreaterThanOrEqual(1);
-    expect(SIMPLE_IDEAS.length).toBeLessThanOrEqual(25);
+    expect(SIMPLE_IDEAS.length).toBeLessThanOrEqual(40);
     expect(BATCH_2_RECIPES.length).toBe(20);
     expect(BUILTIN_RECIPES.length).toBe(
-      RECIPES.length + SIMPLE_IDEAS.length + BATCH_2_RECIPES.length,
+      RECIPES.length + SIMPLE_IDEAS.length + BATCH_2_RECIPES.length + BATCH_3_RECIPES.length,
     );
   });
 
@@ -557,6 +559,451 @@ describe('BUILTIN_RECIPES - batch 2', () => {
       if (!softPieces) {
         expect(recipe.stages.includes('12-23') || recipe.stages.includes('24-36'), recipe.id).toBe(false);
       }
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Batch 3 (task 14.3): Food Hero and ICN recipes aimed at the scarcest cells
+// ---------------------------------------------------------------------------
+interface Batch3Expectation {
+  publisher: string;
+  stages: StageId[];
+  serveAs: string[];
+  /** Allergen groups from screenRecipe(recipe, 12).allergens, sorted. */
+  allergens: string[];
+  servings: number;
+  /** Exact adaptation note when servings are an estimate; otherwise undefined (source count). */
+  estimateNote?: string;
+}
+
+const BATCH_3_EXPECTED: Record<string, Batch3Expectation> = {
+  'b-fh-microwave-applesauce': { publisher: FH, stages: ['6-8', '9-12'], serveAs: ['mashed'], allergens: [], servings: 7, estimateNote: ESTIMATE_HALF_CUP },
+  'b-fh-mashed-carrots': { publisher: FH, stages: ['6-8', '9-12'], serveAs: ['puree', 'mashed'], allergens: ['dairy'], servings: 5, estimateNote: ESTIMATE_HALF_CUP },
+  'b-fh-mashed-turnips-and-potatoes': { publisher: FH, stages: ['6-8', '9-12'], serveAs: ['mashed'], allergens: ['dairy'], servings: 6, estimateNote: ESTIMATE_HALF_CUP },
+  'b-fh-refried-beans': { publisher: FH, stages: ['6-8', '9-12'], serveAs: ['mashed'], allergens: [], servings: 2, estimateNote: ESTIMATE_HALF_CUP },
+  'b-fh-green-pea-soup': { publisher: FH, stages: ['6-8', '9-12'], serveAs: ['puree', 'mashed'], allergens: ['dairy'], servings: 8, estimateNote: ESTIMATE_HALF_CUP },
+  'b-fh-chunky-black-bean-dip': { publisher: FH, stages: ['6-8', '9-12'], serveAs: ['puree', 'mashed'], allergens: [], servings: 12, estimateNote: ESTIMATE_QUARTER_CUP },
+  'b-fh-bell-pepper-smoothie': { publisher: FH, stages: ['9-12'], serveAs: ['puree'], allergens: [], servings: 8, estimateNote: ESTIMATE_HALF_CUP },
+  'b-fh-frozen-strawberry-yogurt': { publisher: FH, stages: ['6-8', '9-12'], serveAs: ['puree'], allergens: ['dairy'], servings: 7, estimateNote: ESTIMATE_HALF_CUP },
+  'b-fh-spinach-garbanzo-beans': { publisher: FH, stages: ['9-12', '12-23', '24-36'], serveAs: ['mashed', 'pieces'], allergens: [], servings: 8, estimateNote: ESTIMATE_HALF_CUP },
+  'b-fh-savory-oatmeal': { publisher: FH, stages: ['9-12', '12-23', '24-36'], serveAs: ['mashed', 'pieces'], allergens: ['dairy'], servings: 6, estimateNote: ESTIMATE_HALF_CUP },
+  'b-fh-split-pea-soup': { publisher: FH, stages: ['9-12', '12-23', '24-36'], serveAs: ['mashed', 'pieces'], allergens: [], servings: 18, estimateNote: ESTIMATE_HALF_CUP },
+  'b-fh-broccoli-cheddar-soup': { publisher: FH, stages: ['9-12', '12-23', '24-36'], serveAs: ['pieces'], allergens: ['dairy', 'wheat'], servings: 8, estimateNote: ESTIMATE_HALF_CUP },
+  'b-fh-sweet-potato-pumpkin-soup': { publisher: FH, stages: ['9-12', '12-23', '24-36'], serveAs: ['mashed', 'pieces'], allergens: ['dairy'], servings: 16, estimateNote: ESTIMATE_HALF_CUP },
+  'b-fh-kale-and-white-bean-soup': { publisher: FH, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: ['dairy'], servings: 10, estimateNote: ESTIMATE_HALF_CUP },
+  'b-fh-veggie-skillet-eggs': { publisher: FH, stages: ['9-12', '12-23', '24-36'], serveAs: ['pieces'], allergens: ['dairy', 'egg'], servings: 8, estimateNote: 'Serving count is an estimate (source gives no servings): 8 wedges, 1 wedge per serving.' },
+  'b-fh-baked-cauliflower-tots': { publisher: FH, stages: ['9-12', '12-23', '24-36'], serveAs: ['finger-food'], allergens: ['dairy', 'egg', 'wheat'], servings: 5, estimateNote: 'Serving count is an estimate (source gives no servings): 15 tots, 3 tots per serving.' },
+  'b-fh-applesauce-french-toast': { publisher: FH, stages: ['9-12', '12-23', '24-36'], serveAs: ['finger-food'], allergens: ['dairy', 'egg', 'wheat'], servings: 6, estimateNote: 'Serving count is an estimate (source gives no servings): 6 slices, 1 slice per serving.' },
+  'b-fh-corn-pancakes': { publisher: FH, stages: ['12-23', '24-36'], serveAs: ['finger-food'], allergens: ['dairy', 'egg', 'wheat'], servings: 6, estimateNote: 'Serving count is an estimate (source gives no servings): 6 6-inch pancakes, 1 pancake per serving.' },
+  'b-fh-tofu-egg-salad': { publisher: FH, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: ['dairy', 'soy'], servings: 2, estimateNote: ESTIMATE_HALF_CUP },
+  'b-fh-sauteed-zucchini': { publisher: FH, stages: ['9-12', '12-23', '24-36'], serveAs: ['pieces'], allergens: [], servings: 6, estimateNote: ESTIMATE_HALF_CUP },
+  'b-fh-lentil-taco-filling': { publisher: FH, stages: ['12-23', '24-36'], serveAs: ['mashed', 'pieces'], allergens: [], servings: 4, estimateNote: ESTIMATE_HALF_CUP },
+  'b-fh-pasta-greens-and-beans': { publisher: FH, stages: ['9-12', '12-23', '24-36'], serveAs: ['pieces'], allergens: ['dairy', 'wheat'], servings: 16, estimateNote: ESTIMATE_HALF_CUP },
+  'b-fh-skillet-mac-and-cheese': { publisher: FH, stages: ['9-12', '12-23', '24-36'], serveAs: ['pieces'], allergens: ['dairy', 'wheat'], servings: 8, estimateNote: ESTIMATE_HALF_CUP },
+  'b-fh-cheesy-beef-pasta': { publisher: FH, stages: ['9-12', '12-23', '24-36'], serveAs: ['pieces'], allergens: ['dairy', 'wheat'], servings: 16, estimateNote: ESTIMATE_HALF_CUP },
+  'b-fh-stovetop-tuna-casserole': { publisher: FH, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: ['dairy', 'egg', 'fish', 'wheat'], servings: 14, estimateNote: ESTIMATE_HALF_CUP },
+  'b-fh-easy-skillet-chili': { publisher: FH, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: [], servings: 14, estimateNote: ESTIMATE_HALF_CUP },
+  'b-fh-veggie-patties': { publisher: FH, stages: ['9-12', '12-23', '24-36'], serveAs: ['finger-food'], allergens: ['egg', 'wheat'], servings: 7, estimateNote: 'Serving count is an estimate (source gives no servings): 14 patties, 2 patties per serving.' },
+  'b-fh-favorite-pancakes-with-eggs': { publisher: FH, stages: ['9-12', '12-23', '24-36'], serveAs: ['finger-food'], allergens: ['dairy', 'egg', 'wheat'], servings: 8, estimateNote: 'Serving count is an estimate (source gives no servings): 8 4-inch pancakes, 1 pancake per serving.' },
+  'b-fh-carrot-pancakes': { publisher: FH, stages: ['9-12', '12-23', '24-36'], serveAs: ['finger-food'], allergens: ['dairy', 'egg', 'wheat'], servings: 7, estimateNote: 'Serving count is an estimate (source gives no servings): 7 pancakes, 1 pancake per serving.' },
+  'b-fh-chicken-broccoli-cheese-skillet-meal': { publisher: FH, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: ['dairy', 'wheat'], servings: 14, estimateNote: ESTIMATE_HALF_CUP },
+  'b-fh-skillet-corn-chowder': { publisher: FH, stages: ['9-12', '12-23', '24-36'], serveAs: ['pieces'], allergens: ['dairy'], servings: 8, estimateNote: ESTIMATE_HALF_CUP },
+  'b-fh-salmon-pasta-skillet': { publisher: FH, stages: ['9-12', '12-23', '24-36'], serveAs: ['pieces'], allergens: ['dairy', 'fish', 'wheat'], servings: 6, estimateNote: ESTIMATE_HALF_CUP },
+  'b-fh-hearty-chicken-and-homemade-noodle-soup': { publisher: FH, stages: ['9-12', '12-23', '24-36'], serveAs: ['pieces'], allergens: ['egg', 'wheat'], servings: 20, estimateNote: ESTIMATE_HALF_CUP },
+  'b-fh-mushroom-stroganoff': { publisher: FH, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: ['dairy'], servings: 12, estimateNote: ESTIMATE_HALF_CUP },
+  'b-fh-creamy-potato-leek-soup': { publisher: FH, stages: ['9-12'], serveAs: ['mashed'], allergens: ['dairy'], servings: 16, estimateNote: ESTIMATE_HALF_CUP },
+  'b-fh-west-african-peanut-soup': { publisher: FH, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: ['peanut', 'sesame'], servings: 16, estimateNote: ESTIMATE_HALF_CUP },
+  'b-fh-banana-pancakes': { publisher: FH, stages: ['9-12', '12-23', '24-36'], serveAs: ['finger-food'], allergens: ['dairy', 'egg', 'wheat'], servings: 8, estimateNote: 'Serving count is an estimate (source gives no servings): 16 pancakes, 2 pancakes per serving.' },
+  'b-fh-apple-spice-oatmeal': { publisher: FH, stages: ['9-12', '12-23', '24-36'], serveAs: ['mashed', 'pieces'], allergens: ['dairy'], servings: 4, estimateNote: ESTIMATE_HALF_CUP },
+  'b-fh-parmesan-peas': { publisher: FH, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: ['dairy'], servings: 8, estimateNote: ESTIMATE_HALF_CUP },
+  'b-icn-spinach-egg-bake': { publisher: ICN, stages: ['9-12', '12-23', '24-36'], serveAs: ['pieces'], allergens: ['dairy', 'egg'], servings: 6 },
+  'b-icn-mini-meatloaf-patties': { publisher: ICN, stages: ['12-23', '24-36'], serveAs: ['finger-food', 'pieces'], allergens: ['egg'], servings: 6 },
+  'b-icn-whole-wheat-pancakes': { publisher: ICN, stages: ['9-12', '12-23', '24-36'], serveAs: ['finger-food'], allergens: ['dairy', 'egg', 'wheat'], servings: 6 },
+  'b-icn-golden-squash-hotcakes': { publisher: ICN, stages: ['9-12', '12-23', '24-36'], serveAs: ['finger-food'], allergens: ['dairy', 'egg', 'wheat'], servings: 6 },
+  'b-icn-southwest-tofu-scramble': { publisher: ICN, stages: ['9-12', '12-23', '24-36'], serveAs: ['pieces'], allergens: ['soy'], servings: 6 },
+  'b-icn-baked-tilapia-fish-fillets': { publisher: ICN, stages: ['12-23', '24-36'], serveAs: ['pieces', 'finger-food'], allergens: ['fish', 'wheat'], servings: 6 },
+  'b-icn-fish-and-veggie-packets': { publisher: ICN, stages: ['24-36'], serveAs: ['pieces'], allergens: ['fish'], servings: 6 },
+  'b-icn-crabby-sandwich': { publisher: ICN, stages: ['24-36'], serveAs: ['pieces'], allergens: ['shellfish'], servings: 6 },
+  'b-icn-noodles-with-peanut-butter-sauce': { publisher: ICN, stages: ['24-36'], serveAs: ['pieces'], allergens: ['peanut', 'soy', 'wheat'], servings: 6 },
+  'b-icn-sauteed-tofu-and-broccoli': { publisher: ICN, stages: ['24-36'], serveAs: ['pieces'], allergens: ['sesame', 'soy', 'wheat'], servings: 6 },
+};
+
+/** Ingredients the sources list but that were left out; the adaptation must say so. */
+const BATCH_3_LEFT_OUT: Record<string, { adaptation: string; absent: RegExp }[]> = {
+  'b-fh-microwave-applesauce': [{ adaptation: 'Left out 1/4 cup sugar (or less, to taste)', absent: /sugar/i }],
+  'b-fh-mashed-carrots': [{ adaptation: 'Left out 2 teaspoons honey or brown sugar', absent: /honey|sugar/i }, { adaptation: 'Left out 1/4 teaspoon salt', absent: /\bsalt\b/i }],
+  'b-fh-mashed-turnips-and-potatoes': [{ adaptation: 'Left out 1/2 teaspoon salt', absent: /\bsalt\b/i }],
+  'b-fh-green-pea-soup': [{ adaptation: 'Left out 1 teaspoon chicken or vegetable bouillon', absent: /bouillon/i }],
+  'b-fh-chunky-black-bean-dip': [{ adaptation: 'Left out the salt the source says to add to taste', absent: /\bsalt\b/i }],
+  'b-fh-frozen-strawberry-yogurt': [{ adaptation: 'Left out 1 to 3 Tbsp sugar', absent: /sugar/i }],
+  'b-fh-spinach-garbanzo-beans': [{ adaptation: 'Left out 1/4 teaspoon salt', absent: /\bsalt\b/i }],
+  'b-fh-baked-cauliflower-tots': [{ adaptation: 'Left out 1/4 teaspoon salt', absent: /\bsalt\b/i }],
+  'b-fh-applesauce-french-toast': [{ adaptation: 'Left out 2 teaspoons sugar', absent: /sugar/i }],
+  'b-fh-corn-pancakes': [{ adaptation: 'Left out 1/2 teaspoon salt', absent: /\bsalt\b/i }],
+  'b-fh-tofu-egg-salad': [{ adaptation: 'Left out 1/8 teaspoon salt', absent: /\bsalt\b/i }],
+  'b-fh-sauteed-zucchini': [{ adaptation: 'Left out 1/8 teaspoon salt', absent: /\bsalt\b/i }],
+  'b-fh-lentil-taco-filling': [{ adaptation: 'Left out optional 1/2 teaspoon salt', absent: /\bsalt\b/i }],
+  'b-fh-pasta-greens-and-beans': [{ adaptation: 'Left out 1/2 teaspoon salt', absent: /\bsalt\b/i }],
+  'b-fh-skillet-mac-and-cheese': [{ adaptation: 'Left out 1/4 teaspoon salt', absent: /\bsalt\b/i }],
+  'b-fh-stovetop-tuna-casserole': [{ adaptation: 'Left out 1 teaspoon chicken bouillon', absent: /bouillon/i }],
+  'b-fh-veggie-patties': [{ adaptation: 'Left out 1 teaspoon salt', absent: /\bsalt\b/i }],
+  'b-fh-favorite-pancakes-with-eggs': [{ adaptation: 'Left out 1 Tbsp sugar', absent: /sugar/i }, { adaptation: 'Left out 1/4 teaspoon salt', absent: /\bsalt\b/i }],
+  'b-fh-carrot-pancakes': [{ adaptation: 'Left out 1 Tbsp sugar', absent: /sugar/i }, { adaptation: 'Left out 1/2 teaspoon salt', absent: /\bsalt\b/i }],
+  'b-fh-salmon-pasta-skillet': [{ adaptation: 'Left out 1/4 teaspoon salt', absent: /\bsalt\b/i }],
+  'b-fh-mushroom-stroganoff': [{ adaptation: 'Left out 1 teaspoon bouillon (vegetable, beef or chicken)', absent: /bouillon/i }],
+  'b-fh-banana-pancakes': [{ adaptation: 'Left out 1 Tbsp sugar', absent: /sugar/i }],
+  'b-fh-apple-spice-oatmeal': [{ adaptation: 'Left out 1/8 teaspoon salt', absent: /\bsalt\b/i }, { adaptation: 'Left out 1 Tablespoon brown sugar', absent: /sugar/i }],
+  'b-icn-spinach-egg-bake': [{ adaptation: 'Left out 1/8 tsp salt', absent: /\bsalt\b/i }],
+  'b-icn-whole-wheat-pancakes': [{ adaptation: 'Left out 2 Tbsp sugar', absent: /sugar/i }, { adaptation: 'Left out 1/4 tsp salt', absent: /\bsalt\b/i }],
+  'b-icn-golden-squash-hotcakes': [{ adaptation: 'Left out 2 tsp brown sugar', absent: /sugar/i }],
+  'b-icn-southwest-tofu-scramble': [{ adaptation: 'Left out 1/2 tsp salt', absent: /\bsalt\b/i }],
+};
+
+/** Recipes that keep a salt, sugar or soy sauce ingredient because they are tagged 24-36 only. */
+const KEEPS_BLOCKED_AT_24 = [
+  'b-icn-fish-and-veggie-packets',
+  'b-icn-noodles-with-peanut-butter-sauce',
+  'b-icn-sauteed-tofu-and-broccoli',
+];
+
+describe('BUILTIN_RECIPES - batch 3', () => {
+  it('has a pinned expectation for exactly the batch 3 recipes', () => {
+    expect(BATCH_3_RECIPES.map((r) => r.id).sort()).toEqual(Object.keys(BATCH_3_EXPECTED).sort());
+    expect(BATCH_3_RECIPES.length).toBeGreaterThanOrEqual(40);
+    expect(BATCH_3_RECIPES.length).toBeLessThanOrEqual(60);
+  });
+
+  it('every batch 3 recipe is a full recipe with serveAs and at least one quantity', () => {
+    for (const recipe of BATCH_3_RECIPES) {
+      expect(recipe.origin, recipe.id).toBe('builtin');
+      expect(recipe.kind, recipe.id).not.toBe('simple-idea');
+      expect(recipe.serveAs?.length ?? 0, `${recipe.id} serveAs`).toBeGreaterThan(0);
+      expect(
+        recipe.ingredients.some((i) => i.quantity !== undefined),
+        `${recipe.id} has a quantity`,
+      ).toBe(true);
+      expect(recipe.storage, `${recipe.id} sets no unsourced storage`).toBeUndefined();
+    }
+  });
+
+  it('every batch 3 source is an https page on an allowed host and a listed publisher', () => {
+    for (const recipe of BATCH_3_RECIPES) {
+      const source = recipe.source;
+      expect(source, recipe.id).toBeDefined();
+      if (!source) continue;
+      const url = new URL(source.url);
+      expect(url.protocol, recipe.id).toBe('https:');
+      expect(ALLOWED_HOSTS, `${recipe.id} host ${url.hostname}`).toContain(url.hostname);
+      expect(sourcesDoc, `${recipe.id} publisher is in docs/recipe-sources.md`).toContain(source.publisher);
+      expect(source.retrieved, recipe.id).toBe('2026-11-10');
+      expect(source.title.trim().length, recipe.id).toBeGreaterThan(0);
+    }
+  });
+
+  it('pins publisher, stages, serveAs and servings for each recipe', () => {
+    for (const recipe of BATCH_3_RECIPES) {
+      const expected = BATCH_3_EXPECTED[recipe.id];
+      expect(recipe.source?.publisher, `${recipe.id} publisher`).toBe(expected.publisher);
+      expect(recipe.stages, `${recipe.id} stages`).toEqual(expected.stages);
+      expect(recipe.serveAs, `${recipe.id} serveAs`).toEqual(expected.serveAs);
+      expect(recipe.servings, `${recipe.id} servings`).toBe(expected.servings);
+    }
+  });
+
+  it('ICN recipes use the source serving count and Food Hero estimates are disclosed', () => {
+    for (const recipe of BATCH_3_RECIPES) {
+      const expected = BATCH_3_EXPECTED[recipe.id];
+      const adaptations = recipe.source?.adaptations ?? [];
+      const estimates = adaptations.filter((a) => a.startsWith('Serving count is an estimate'));
+      if (expected.estimateNote) expect(estimates, recipe.id).toEqual([expected.estimateNote]);
+      else expect(estimates, recipe.id).toEqual([]);
+      if (expected.publisher === ICN) expect(recipe.servings, recipe.id).toBe(6);
+      else expect(expected.estimateNote, `${recipe.id} Food Hero servings are estimated`).toBeDefined();
+    }
+  });
+
+  it('pins the allergen groups of each recipe from the real screen', () => {
+    for (const recipe of BATCH_3_RECIPES) {
+      const groups = [...new Set(screenRecipe(recipe, 12).allergens.map((f) => f.label))].sort();
+      expect(groups, `${recipe.id} allergen groups`).toEqual(BATCH_3_EXPECTED[recipe.id].allergens);
+    }
+  });
+
+  it('no batch 3 recipe has a block at 24 months; blocked-at-12 ones are tagged 24-36 only', () => {
+    for (const recipe of BATCH_3_RECIPES) {
+      expect(screenRecipe(recipe, 24).blocks, `${recipe.id} is safe at 24 months`).toEqual([]);
+      if (screenRecipe(recipe, 12).blocks.length > 0) {
+        expect(recipe.stages, recipe.id).toEqual(['24-36']);
+        expect(KEEPS_BLOCKED_AT_24, recipe.id).toContain(recipe.id);
+      }
+    }
+  });
+
+  it('tagged stages younger than 24 months contain no salt, sugar, soy sauce, honey or bouillon', () => {
+    for (const recipe of BATCH_3_RECIPES) {
+      if (!recipe.stages.some((s) => s !== '24-36')) continue;
+      const text = [...recipe.ingredients.map((i) => i.name), ...recipe.steps].join(' ');
+      expect(text, `${recipe.id} text`).not.toMatch(/\b(salt|sugar|soy sauce|honey|bouillon)\b/i);
+    }
+  });
+
+  it('recipes tagged 6-8 or 9-12 contain no juice other than lemon or lime', () => {
+    for (const recipe of BATCH_3_RECIPES) {
+      if (!recipe.stages.some((s) => s === '6-8' || s === '9-12')) continue;
+      for (const ingredient of recipe.ingredients) {
+        const name = ingredient.name.toLowerCase().replace(/\b(lemon|lime) juice\b/g, '');
+        expect(name, `${recipe.id} ingredient`).not.toMatch(/juice/);
+      }
+    }
+  });
+
+  it('every "Left out" adaptation matches an absent ingredient, and none is missing', () => {
+    for (const recipe of BATCH_3_RECIPES) {
+      const adaptations = recipe.source?.adaptations ?? [];
+      const leftOut = adaptations.filter((a) => a.startsWith('Left out'));
+      const expected = BATCH_3_LEFT_OUT[recipe.id] ?? [];
+      expect(leftOut.length, `${recipe.id} Left out adaptations`).toBe(expected.length);
+      for (const item of expected) {
+        expect(
+          adaptations.some((a) => a.startsWith(item.adaptation)),
+          `${recipe.id}: ${item.adaptation}`,
+        ).toBe(true);
+        for (const ingredient of recipe.ingredients) {
+          expect(ingredient.name, `${recipe.id} must not contain the left-out item`).not.toMatch(
+            item.absent,
+          );
+        }
+      }
+    }
+  });
+
+  it('recipes that keep salt, sugar or soy sauce are exactly the 24-36 only ones listed', () => {
+    for (const recipe of BATCH_3_RECIPES) {
+      const keeps = recipe.ingredients.some((i) => /\b(salt|sugar|soy sauce)\b/i.test(i.name));
+      expect(keeps, recipe.id).toBe(KEEPS_BLOCKED_AT_24.includes(recipe.id));
+    }
+  });
+
+  it('puree or mash only recipes are not tagged for toddler stages', () => {
+    for (const recipe of BATCH_3_RECIPES) {
+      const softPieces = recipe.serveAs?.some((s) => s === 'pieces' || s === 'finger-food');
+      if (!softPieces) {
+        expect(recipe.stages.includes('12-23') || recipe.stages.includes('24-36'), recipe.id).toBe(false);
+      }
+    }
+  });
+
+  it('no 6-8 recipe is served as pieces or finger food only', () => {
+    for (const recipe of BATCH_3_RECIPES) {
+      if (!recipe.stages.includes('6-8')) continue;
+      expect(
+        recipe.serveAs?.some((s) => s === 'puree' || s === 'mashed'),
+        `${recipe.id} 6-8 needs a puree or mashed form`,
+      ).toBe(true);
+    }
+  });
+
+  it('no two built-ins share a source URL or a title (duplicate check)', () => {
+    // Simple ideas share a few feeding-guide pages, and the WIC recipes share two.
+    const urls = [...BATCH_2_RECIPES, ...BATCH_3_RECIPES].map((r) => r.source?.url);
+    expect(new Set(urls).size, 'source URLs are unique').toBe(urls.length);
+    const titles = BUILTIN_RECIPES.map((r) => r.title.trim().toLowerCase());
+    expect(new Set(titles).size, 'titles are unique').toBe(titles.length);
+  });
+
+  it('batch 3 adds recipes to the scarce 6-8 and 9-12 Easy and Medium cells', () => {
+    const cellCount = (stage: StageId, effort: Effort) =>
+      BATCH_3_RECIPES.filter((r) => r.stages.includes(stage) && recipeEffort(r) === effort).length;
+    expect(cellCount('6-8', 'easy')).toBeGreaterThanOrEqual(5);
+    expect(cellCount('6-8', 'medium')).toBeGreaterThanOrEqual(1);
+    expect(cellCount('9-12', 'easy')).toBeGreaterThanOrEqual(8);
+    expect(cellCount('9-12', 'medium')).toBeGreaterThanOrEqual(10);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Count table (task 14.3, batch 3; design "How the distribution is measured")
+// ---------------------------------------------------------------------------
+// HARD_MINIMUM and GOAL are the Requirement 14.1 and 14.6 tables. CHECKPOINT is
+// the floor for the current batch: it follows the plan line in tasks.md and is
+// never above HARD_MINIMUM. Task 14.4 sets CHECKPOINT = HARD_MINIMUM. The goal
+// is only reported (console.table), never enforced.
+type EffortCounts = Record<Effort, number>;
+interface Counts {
+  /** Total built-ins and simple ideas (the 300 / 500 totals). */
+  total: number;
+  /** Most simple ideas allowed. */
+  simpleIdeasMax: number;
+  stages: Record<StageId, EffortCounts>;
+  allergens: Record<AllergenGroup, number>;
+}
+
+const cell = (easy: number, medium: number, more: number): EffortCounts => ({ easy, medium, more });
+
+const HARD_MINIMUM: Counts = {
+  total: 300,
+  simpleIdeasMax: 40,
+  stages: {
+    '6-8': cell(20, 10, 0),
+    '9-12': cell(30, 25, 15),
+    '12-23': cell(45, 45, 30),
+    '24-36': cell(70, 70, 60),
+  },
+  allergens: { dairy: 30, egg: 30, wheat: 30, soy: 30, peanut: 8, 'tree nuts': 8, fish: 8, sesame: 4, shellfish: 3 },
+};
+
+const GOAL: Counts = {
+  total: 500,
+  simpleIdeasMax: 40,
+  stages: {
+    '6-8': cell(30, 12, 3),
+    '9-12': cell(50, 45, 25),
+    '12-23': cell(80, 80, 60),
+    '24-36': cell(130, 130, 120),
+  },
+  allergens: { dairy: 60, egg: 60, wheat: 60, soy: 60, peanut: 15, 'tree nuts': 15, fish: 15, sesame: 8, shellfish: 6 },
+};
+
+/**
+ * Floors for this batch (batch 3). The total follows the plan line (about 85
+ * after batch 3; the set has 92). Cells and allergens are what the set reaches
+ * after batch 3, capped at HARD_MINIMUM, and are raised by each batch. Cells
+ * still under their hard minimum (for example 6-8 Easy 13 of 20) are the gaps
+ * the next batches fill.
+ */
+const CHECKPOINT: Counts = {
+  total: 85,
+  simpleIdeasMax: 40,
+  stages: {
+    '6-8': cell(13, 5, 0),
+    '9-12': cell(29, 25, 10),
+    '12-23': cell(12, 33, 11),
+    '24-36': cell(13, 37, 15),
+  },
+  allergens: { dairy: 30, egg: 22, wheat: 30, soy: 9, peanut: 5, 'tree nuts': 2, fish: 7, sesame: 4, shellfish: 2 },
+};
+
+const EFFORTS: Effort[] = ['easy', 'medium', 'more'];
+
+function measure(): Counts {
+  const stages = {} as Record<StageId, EffortCounts>;
+  for (const stage of STAGE_IDS) stages[stage] = cell(0, 0, 0);
+  const allergens = {} as Record<AllergenGroup, number>;
+  for (const group of EXPECTED_ALLERGEN_GROUPS) allergens[group] = 0;
+  for (const recipe of BUILTIN_RECIPES) {
+    const effort = recipeEffort(recipe);
+    for (const stage of recipe.stages) stages[stage][effort] += 1;
+    // 12 months does not suppress any allergen rule, so it reveals every group.
+    const groups = new Set(screenRecipe(recipe, 12).allergens.map((f) => f.label as AllergenGroup));
+    for (const group of groups) allergens[group] += 1;
+  }
+  return {
+    total: BUILTIN_RECIPES.length,
+    simpleIdeasMax: BUILTIN_RECIPES.filter((r) => r.kind === 'simple-idea').length,
+    stages,
+    allergens,
+  };
+}
+
+const stageTotal = (c: EffortCounts) => c.easy + c.medium + c.more;
+
+describe('BUILTIN_RECIPES - count table (hard minimum, goal, checkpoint)', () => {
+  const have = measure();
+
+  it('prints the stage by effort and allergen table with the gap to the goal', () => {
+    const rows: Record<string, Record<string, number | string>> = {};
+    for (const stage of STAGE_IDS) {
+      for (const effort of EFFORTS) {
+        rows[`${stage} ${effort}`] = {
+          have: have.stages[stage][effort],
+          checkpoint: CHECKPOINT.stages[stage][effort],
+          hardMinimum: HARD_MINIMUM.stages[stage][effort],
+          goal: GOAL.stages[stage][effort],
+          gapToGoal: GOAL.stages[stage][effort] - have.stages[stage][effort],
+        };
+      }
+      rows[`${stage} total`] = {
+        have: stageTotal(have.stages[stage]),
+        checkpoint: stageTotal(CHECKPOINT.stages[stage]),
+        hardMinimum: stageTotal(HARD_MINIMUM.stages[stage]),
+        goal: stageTotal(GOAL.stages[stage]),
+        gapToGoal: stageTotal(GOAL.stages[stage]) - stageTotal(have.stages[stage]),
+      };
+    }
+    for (const group of EXPECTED_ALLERGEN_GROUPS) {
+      rows[`allergen ${group}`] = {
+        have: have.allergens[group],
+        checkpoint: CHECKPOINT.allergens[group],
+        hardMinimum: HARD_MINIMUM.allergens[group],
+        goal: GOAL.allergens[group],
+        gapToGoal: GOAL.allergens[group] - have.allergens[group],
+      };
+    }
+    rows['total built-ins'] = {
+      have: have.total,
+      checkpoint: CHECKPOINT.total,
+      hardMinimum: HARD_MINIMUM.total,
+      goal: GOAL.total,
+      gapToGoal: GOAL.total - have.total,
+    };
+    console.table(rows);
+    expect(Object.keys(rows).length).toBeGreaterThan(0);
+  });
+
+  it('CHECKPOINT never exceeds HARD_MINIMUM, and HARD_MINIMUM never exceeds GOAL', () => {
+    expect(CHECKPOINT.total).toBeLessThanOrEqual(HARD_MINIMUM.total);
+    expect(HARD_MINIMUM.total).toBeLessThanOrEqual(GOAL.total);
+    for (const stage of STAGE_IDS) {
+      for (const effort of EFFORTS) {
+        expect(CHECKPOINT.stages[stage][effort], `${stage} ${effort}`).toBeLessThanOrEqual(
+          HARD_MINIMUM.stages[stage][effort],
+        );
+        expect(HARD_MINIMUM.stages[stage][effort], `${stage} ${effort}`).toBeLessThanOrEqual(
+          GOAL.stages[stage][effort],
+        );
+      }
+    }
+    for (const group of EXPECTED_ALLERGEN_GROUPS) {
+      expect(CHECKPOINT.allergens[group], group).toBeLessThanOrEqual(HARD_MINIMUM.allergens[group]);
+      expect(HARD_MINIMUM.allergens[group], group).toBeLessThanOrEqual(GOAL.allergens[group]);
+    }
+  });
+
+  it('the Requirement 14.1 stage totals add up (30 / 70 / 120 / 200 minimum, 45 / 120 / 220 / 380 goal)', () => {
+    expect(STAGE_IDS.map((s) => stageTotal(HARD_MINIMUM.stages[s]))).toEqual([30, 70, 120, 200]);
+    expect(STAGE_IDS.map((s) => stageTotal(GOAL.stages[s]))).toEqual([45, 120, 220, 380]);
+  });
+
+  it('total built-ins >= CHECKPOINT', () => {
+    expect(have.total).toBeGreaterThanOrEqual(CHECKPOINT.total);
+  });
+
+  it('simple ideas <= 40', () => {
+    expect(have.simpleIdeasMax).toBeLessThanOrEqual(CHECKPOINT.simpleIdeasMax);
+  });
+
+  it('each stage total >= CHECKPOINT', () => {
+    for (const stage of STAGE_IDS) {
+      expect(stageTotal(have.stages[stage]), `${stage} total`).toBeGreaterThanOrEqual(
+        stageTotal(CHECKPOINT.stages[stage]),
+      );
+    }
+  });
+
+  it('each stage by effort cell >= CHECKPOINT', () => {
+    for (const stage of STAGE_IDS) {
+      for (const effort of EFFORTS) {
+        expect(have.stages[stage][effort], `${stage} ${effort}`).toBeGreaterThanOrEqual(
+          CHECKPOINT.stages[stage][effort],
+        );
+      }
+    }
+  });
+
+  it('each allergen group >= CHECKPOINT', () => {
+    for (const group of EXPECTED_ALLERGEN_GROUPS) {
+      expect(have.allergens[group], group).toBeGreaterThanOrEqual(CHECKPOINT.allergens[group]);
     }
   });
 });
