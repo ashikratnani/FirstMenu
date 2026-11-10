@@ -13,8 +13,7 @@
 // Ghosting/door/pumpkin logic lives in recipeView.ts.
 //
 // The list is shown RECIPES_PAGE_SIZE (50) cards at a time with a "Show more"
-// button, so 500+ recipes never render at once (Requirement 14.9). The user's
-// own recipes come first, so they are never buried behind the built-ins. The
+// button, so 500+ recipes never render at once (Requirement 14.9). The
 // count goes back to one page whenever a filter changes.
 //
 // The page's "new recipe" action is the shell's primary "Add recipe" button,
@@ -125,9 +124,7 @@ export default function Recipes() {
   const recipes = selectAllRecipes(state);
 
   const matching = useMemo(() => {
-    const own = recipes.filter((r: Recipe) => r.origin === 'custom');
-    const builtIn = recipes.filter((r: Recipe) => r.origin !== 'custom');
-    return [...own, ...builtIn]
+    return recipes
       .filter((r: Recipe) =>
         stageFilter === 'all' ? true : r.stages.includes(stageFilter),
       )

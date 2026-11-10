@@ -100,6 +100,14 @@ function cardFor(name: RegExp): HTMLElement {
   return item;
 }
 
+/** Tap "Show more" until the whole (filtered) library is listed. */
+async function showAllCards() {
+  const user = userEvent.setup();
+  while (screen.queryByRole('button', { name: 'Show more' })) {
+    await user.click(screen.getByRole('button', { name: 'Show more' }));
+  }
+}
+
 describe('Recipes library page', () => {
   it('lists built-in and custom recipes, each linking to /recipes/:id', () => {
     renderRecipes(seedState(8, [HONEY_RECIPE]));
@@ -182,12 +190,13 @@ describe('Recipes library page', () => {
     ).toBeInTheDocument();
   });
 
-  it('shows a ghost state for a recipe whose food has a recorded reaction', () => {
+  it('shows a ghost state for a recipe whose food has a recorded reaction', async () => {
     renderRecipes(
       seedState(10, [EGG_RECIPE], {
         'allergen:egg': { status: 'reaction', date: '2026-11-10' },
       }),
     );
+    await showAllCards();
 
     const egg = screen.getByRole('link', {
       name: /Egg Scramble\. Not yet: egg\. Reaction recorded\./,
@@ -225,10 +234,11 @@ describe('Recipes library page', () => {
     expect(carrots.getAttribute('aria-label') ?? '').toMatch(/Not yet/);
   });
 
-  it('names an allergen untried food by its group label in the door badge', () => {
+  it('names an allergen untried food by its group label in the door badge', async () => {
     // Egg (10 months, untried, no reaction) -> door badge "New food: egg", not
     // the raw "allergen:egg" key.
     renderRecipes(seedState(10, [EGG_RECIPE]));
+    await showAllCards();
     expect(
       within(cardFor(/Egg Scramble/)).getByText('New food: egg'),
     ).toBeInTheDocument();
@@ -276,7 +286,7 @@ describe('Recipes library page', () => {
     ).toBeInTheDocument();
   });
 
-  it('shows time, effort and tags on each card', () => {
+  it('shows time, effort and tags on each card', async () => {
     const timed: Recipe = {
       ...EGG_RECIPE,
       id: 'custom-timed',
@@ -285,12 +295,13 @@ describe('Recipes library page', () => {
       statedMinutes: 12,
     };
     renderRecipes(seedState(10, [timed]));
+    await showAllCards();
     const card = cardFor(/Timed Egg/);
     expect(within(card).getByText('12 min · Easy · Iron-rich · Protein')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /Timed Egg.*12 min · Easy/ })).toBeInTheDocument();
   });
 
-  it('badges pasted recipes "From ChatGPT / Instagram" but not typed ones', () => {
+  it('badges pasted recipes "From ChatGPT / Instagram" but not typed ones', async () => {
     const pasted: Recipe = {
       ...EGG_RECIPE,
       id: 'custom-pasted',
@@ -299,14 +310,16 @@ describe('Recipes library page', () => {
     };
     const typed: Recipe = { ...EGG_RECIPE, id: 'custom-typed', title: 'Typed Egg' };
     renderRecipes(seedState(10, [pasted, typed]));
+    await showAllCards();
     expect(within(cardFor(/Pasted Egg/)).getByText('From ChatGPT / Instagram')).toBeInTheDocument();
     expect(within(cardFor(/Typed Egg/)).queryByText('From ChatGPT / Instagram')).not.toBeInTheDocument();
   });
 
-  it('badges a simple idea and includes "Simple idea" in the card accessible name', () => {
+  it('badges a simple idea and includes "Simple idea" in the card accessible name', async () => {
     const idea: Recipe = { ...EGG_RECIPE, id: 'custom-idea', title: 'Egg Idea', kind: 'simple-idea' };
     const plain: Recipe = { ...EGG_RECIPE, id: 'custom-plain', title: 'Plain Egg' };
     renderRecipes(seedState(10, [idea, plain]));
+    await showAllCards();
     expect(within(cardFor(/Egg Idea/)).getByText('Simple idea')).toBeInTheDocument();
     const name = screen.getByRole('link', { name: /Egg Idea/ }).getAttribute('aria-label') ?? '';
     expect(name).toContain('Simple idea');
@@ -368,11 +381,5 @@ describe('Recipes library paging (Requirement 14.9)', () => {
     await user.click(screen.getByRole('radio', { name: 'Lunch' }));
     expect(cards()).toHaveLength(50);
     expect(screen.getByRole('button', { name: 'Show more' })).toBeInTheDocument();
-  });
-
-  it('lists the user\'s own recipes before the built-ins, so they are on the first page', () => {
-    renderRecipes(seedState(8, manyCustomRecipes(3)));
-    const first = cards()[0];
-    expect(within(first).getByText('Pager Test Dish 000')).toBeInTheDocument();
   });
 });
