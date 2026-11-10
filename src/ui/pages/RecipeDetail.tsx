@@ -157,42 +157,42 @@ export function AddToPlan({ recipe }: { recipe: Recipe }) {
           {chosenMeal === undefined ? (
             <p>No meals are switched on. Choose your meals on the Plan page first.</p>
           ) : (
-          <div className={styles.planFields}>
-            <label>
-              Day{' '}
-              <select value={day} onChange={(e) => setDay(Number(e.target.value))}>
-                {state.plan.days.map((_, i) => (
-                  <option key={i} value={i}>
-                    {dayLabel(i)}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label>
-              Meal{' '}
-              <select value={chosenMeal} onChange={(e) => setMeal(e.target.value as MealType)}>
-                {slots.map((m) => (
-                  <option key={m} value={m}>
-                    {mealTypeLabel(m)}
-                  </option>
-                ))}
-              </select>
-            </label>
-          </div>
+            <div className={styles.planFields}>
+              <label>
+                Day{' '}
+                <select value={day} onChange={(e) => setDay(Number(e.target.value))}>
+                  {state.plan.days.map((_, i) => (
+                    <option key={i} value={i}>
+                      {dayLabel(i)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                Meal{' '}
+                <select value={chosenMeal} onChange={(e) => setMeal(e.target.value as MealType)}>
+                  {slots.map((m) => (
+                    <option key={m} value={m}>
+                      {mealTypeLabel(m)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
           )}
           <div className={styles.serveAsActions}>
             {chosenMeal !== undefined && (
-            <Button
-              label="Add"
-              variant="secondary"
-              onClick={() => {
-                // Req 5.2: never plan a ghost, even if this is called directly.
-                if (recipeView(recipe, state).isGhosted) return;
-                dispatch({ type: 'setSlot', slot: { day, meal: chosenMeal }, recipeId: recipe.id });
-                setMessage(`Added to ${dayLabel(day)}, ${mealTypeLabel(chosenMeal)}.`);
-                setOpen(false);
-              }}
-            />
+              <Button
+                label="Add"
+                variant="secondary"
+                onClick={() => {
+                  // Req 5.2: never plan a ghost, even if this is called directly.
+                  if (recipeView(recipe, state).isGhosted) return;
+                  dispatch({ type: 'setSlot', slot: { day, meal: chosenMeal }, recipeId: recipe.id });
+                  setMessage(`Added to ${dayLabel(day)}, ${mealTypeLabel(chosenMeal)}.`);
+                  setOpen(false);
+                }}
+              />
             )}
             <Button label="Cancel" onClick={() => setOpen(false)} />
           </div>

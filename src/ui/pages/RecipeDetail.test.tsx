@@ -397,6 +397,27 @@ describe('RecipeDetail page', () => {
       expect(screen.getByText(/Add a little honey on top\./, { selector: 'q' })).toBeInTheDocument();
     });
 
+    it('renders an https link with rel="noopener noreferrer"', () => {
+      const linked: Recipe = {
+        ...PASTED,
+        imported: { ...PASTED.imported!, url: 'https://example.com/oats' },
+      };
+      renderDetail('custom-pasted', seedState(8, [linked]));
+      const link = screen.getByRole('link', { name: 'https://example.com/oats' });
+      expect(link).toHaveAttribute('href', 'https://example.com/oats');
+      expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+    });
+
+    it('does not render a javascript: URL as a link', () => {
+      const bad: Recipe = {
+        ...PASTED,
+        imported: { ...PASTED.imported!, url: 'javascript:alert(1)' },
+      };
+      renderDetail('custom-pasted', seedState(8, [bad]));
+      expect(screen.queryByRole('link', { name: /javascript:/ })).not.toBeInTheDocument();
+      expect(document.querySelector('a[href^="javascript:"]')).toBeNull();
+    });
+
     it('clears a mention with "Not used in this recipe" and lists it as cleared', async () => {
       const user = userEvent.setup();
       renderDetail('custom-pasted', seedState(8, [PASTED]));
