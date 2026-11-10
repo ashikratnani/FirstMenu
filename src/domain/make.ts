@@ -16,7 +16,7 @@ import { isOptional, recipeEffort, recipeMinutes, type Effort } from './effort';
 import { groceryFoodKey, isIgnoredFood } from './foods';
 import { recipeNutritionTags, type NutritionTag } from './nutrition';
 import { isRecipeGhosted } from './plan';
-import { matchesTerm } from './safety/normalize';
+import { matchesTerm, tokenMatches, tokenize } from './safety/normalize';
 import type { AppState, Recipe, ServeAs, StageId } from './types';
 
 export interface MakeResult {
@@ -186,6 +186,55 @@ function compareResults(a: MakeResult, b: MakeResult): number {
   return a.recipe.title.localeCompare(b.recipe.title);
 }
 
+function buildResult(recipe: Recipe, have: Set<string>, youngerStage: boolean): MakeResult {
+  const time = recipeMinutes(recipe);
+  return {
+    recipe,
+    missing: requiredKeys(recipe).filter((key) => !have.has(key)),
+    minutes: time?.minutes,
+    minutesKind: time?.kind,
+    effort: recipeEffort(recipe),
+    tags: recipeNutritionTags(recipe),
+    youngerStage,
+  };
+}
+
+/**
+ * Recipes whose title contains any of `titleWords` ("Recipes named ...",
+ * Req 16.8). Whole word, plural-aware. Same stage rule and filters as the
+ * other groups, but no cut on missing foods. Ghosted recipes come back
+ * separately so the screen can show them as ghosts. Sorted like the groups.
+ */
+export function recipesNamed(
+  recipes: Recipe[],
+  titleWords: string[],
+  have: Set<string>,
+  ageMonths: number,
+  foods: AppState['foods'],
+  options: MakeOptions = {},
+): { results: MakeResult[]; ghosted: MakeResult[] } {
+  const out = { results: [] as MakeResult[], ghosted: [] as MakeResult[] };
+  if (titleWords.length === 0) return out;
+  const filters = activeFilters(options);
+  const ghostState = { foods } as AppState;
+  for (const recipe of recipes) {
+    const titleTokens = tokenize(recipe.title);
+    const named = titleWords.some((word) =>
+      titleTokens.some((t) => tokenMatches(t, word) || tokenMatches(word, t)),
+    );
+    if (!named) continue;
+    const fit = options.allStages === true ? 'primary' : stageFit(recipe, ageMonths);
+    if (fit === 'none') continue;
+    const result = buildResult(recipe, have, fit === 'younger');
+    if (!matchesFilters(result, filters)) continue;
+    if (isRecipeGhosted(recipe, ghostState, ageMonths)) out.ghosted.push(result);
+    else out.results.push(result);
+  }
+  out.results.sort(compareResults);
+  out.ghosted.sort(compareResults);
+  return out;
+}
+
 /**
  * Sort recipes into Ready now (nothing missing), Missing one, and Ghosted.
  * `have` is pantry plus on-hand plain food keys. `foods` is `state.foods`
@@ -207,17 +256,8 @@ export function makeResults(
     const fit = options.allStages === true ? 'primary' : stageFit(recipe, ageMonths);
     if (fit === 'none') continue;
 
-    const missing = requiredKeys(recipe).filter((key) => !have.has(key));
-    const time = recipeMinutes(recipe);
-    const result: MakeResult = {
-      recipe,
-      missing,
-      minutes: time?.minutes,
-      minutesKind: time?.kind,
-      effort: recipeEffort(recipe),
-      tags: recipeNutritionTags(recipe),
-      youngerStage: fit === 'younger',
-    };
+    const result = buildResult(recipe, have, fit === 'younger');
+    const missing = result.missing;
 
     if (!matchesFilters(result, filters)) continue;
 

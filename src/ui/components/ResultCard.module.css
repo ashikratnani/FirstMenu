@@ -1,0 +1,41 @@
+/*
+ * Result card layout. Astryx draws the card, badges and buttons; this file
+ * only arranges them. Works at 360 px (Req 15.5).
+ */
+
+.item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.title {
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: var(--color-text-primary);
+}
+
+.meta,
+.missing {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}
+
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}

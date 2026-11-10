@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, expect, it, beforeEach, afterEach, vi } from 'vitest';
@@ -45,6 +45,11 @@ function onboardedState(birthDate: string): AppState {
     child: { name: 'Baby', birthDate },
     plan: { ...s.plan, startDate: '2026-11-01' },
   };
+}
+
+/** A checkbox in the "Foods already tried" group (the pantry also has an "egg"). */
+function triedFood(label: string): HTMLElement {
+  return within(screen.getByRole('group', { name: 'Foods already tried' })).getByLabelText(label);
 }
 
 function renderSettings(seed: AppState) {
@@ -110,8 +115,8 @@ describe('Settings', () => {
     renderSettings(seed);
 
     // Egg prefilled as checked; peanut not.
-    expect((screen.getByLabelText('egg') as HTMLInputElement).checked).toBe(true);
-    const peanut = screen.getByLabelText('peanut') as HTMLInputElement;
+    expect((triedFood('egg') as HTMLInputElement).checked).toBe(true);
+    const peanut = triedFood('peanut') as HTMLInputElement;
     expect(peanut.checked).toBe(false);
 
     await user.click(peanut);
@@ -132,7 +137,7 @@ describe('Settings', () => {
     };
     renderSettings(seed);
 
-    const egg = screen.getByLabelText('egg') as HTMLInputElement;
+    const egg = triedFood('egg') as HTMLInputElement;
     expect(egg.checked).toBe(true);
 
     await user.click(egg); // uncheck
@@ -182,7 +187,7 @@ describe('Settings', () => {
     const input = screen.getByLabelText(/birth date/i) as HTMLInputElement;
 
     // Also change a checkbox, so we can tell whether anything was saved.
-    await user.click(screen.getByLabelText('peanut'));
+    await user.click(triedFood('peanut'));
 
     fireEvent.change(input, { target: { value: '2099-01-01' } });
     expect(input).toHaveAttribute('aria-invalid', 'true');
@@ -200,7 +205,7 @@ describe('Settings', () => {
   it('lists the nine allergen groups', () => {
     renderSettings(onboardedState('2026-01-15'));
     for (const group of ALLERGEN_GROUPS) {
-      expect(screen.getByLabelText(group)).toBeInTheDocument();
+      expect(triedFood(group)).toBeInTheDocument();
     }
     expect(ALLERGEN_GROUPS).toHaveLength(9);
   });
@@ -267,5 +272,21 @@ describe('Settings', () => {
       date: '2026-09-01',
       note: 'rash',
     });
+  });
+  it('edits the pantry: tick a suggested food and type another (Req 2.1, 2.3)', async () => {
+    const user = userEvent.setup();
+    renderSettings(onboardedState('2026-01-15'));
+    const pantry = screen.getByRole('region', { name: 'Pantry' });
+    await user.click(within(pantry).getByRole('checkbox', { name: 'oat' }));
+    expect(captured!.pantry).toEqual(['oat']);
+
+    await user.type(
+      within(pantry).getByRole('textbox', { name: /add a food to your pantry/i }),
+      'Sweet potatoes{Enter}',
+    );
+    expect(captured!.pantry).toEqual(['oat', 'sweet potato']);
+
+    await user.click(within(pantry).getByRole('checkbox', { name: 'oat' }));
+    expect(captured!.pantry).toEqual(['sweet potato']);
   });
 });

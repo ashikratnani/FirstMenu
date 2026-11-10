@@ -4,6 +4,7 @@ import {
   activeFilters,
   makeResults,
   recipeServeAs,
+  recipesNamed,
   requiredKeys,
   setIronRichFilter,
   suggestedChips,
@@ -558,5 +559,36 @@ describe('More ideas (Req 16.12)', () => {
     expect(titles(out.missingOne)).toEqual(['Breakfast']);
     const empty = makeResults([r], have(), AGE_10, NO_FOODS, { filters: ['meal:breakfast'] });
     expect(titles(empty.moreIdeas)).toEqual(['Breakfast']);
+  });
+});
+
+describe('recipesNamed (Req 16.8)', () => {
+  const pancakes = recipe('Banana Pancakes', ['banana', 'egg', 'flour']);
+  const pudding = recipe('Rice Pudding', ['rice', 'milk']);
+  const honeyPancake = recipe('Honey Pancake', ['honey', 'flour'], { stages: ['9-12'] });
+
+  it('finds recipes by whole title word, plural-aware, whatever is missing', () => {
+    const out = recipesNamed([pancakes, pudding], ['pancake'], have(), AGE_10, NO_FOODS);
+    expect(titles(out.results)).toEqual(['Banana Pancakes']);
+    expect(out.results[0].missing.length).toBe(3);
+  });
+
+  it('returns ghosted recipes separately', () => {
+    const out = recipesNamed([pancakes, honeyPancake], ['pancakes'], have(), AGE_10, NO_FOODS);
+    expect(titles(out.results)).toEqual(['Banana Pancakes']);
+    expect(titles(out.ghosted)).toEqual(['Honey Pancake']);
+  });
+
+  it('applies the stage rule and filters, and does nothing without words', () => {
+    const young = recipe('Pancake Puree', ['banana'], { stages: ['6-8'] });
+    expect(titles(recipesNamed([young], ['pancake'], have(), AGE_10, NO_FOODS).results)).toEqual([]);
+    expect(
+      titles(recipesNamed([young], ['pancake'], have(), AGE_10, NO_FOODS, { allStages: true }).results),
+    ).toEqual(['Pancake Puree']);
+    expect(
+      recipesNamed([pancakes], ['pancake'], have(), AGE_10, NO_FOODS, { filters: ['meal:breakfast'] })
+        .results,
+    ).toEqual([]);
+    expect(recipesNamed([pancakes], [], have(), AGE_10, NO_FOODS).results).toEqual([]);
   });
 });

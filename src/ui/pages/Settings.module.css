@@ -118,3 +118,16 @@
   font-weight: 600;
   color: var(--color-text-primary);
 }
+
+.pantry {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 34rem;
+  margin: 0 0 24px;
+}
+
+.pantryHeading {
+  margin: 0;
+  font-size: 1.15rem;
+}
