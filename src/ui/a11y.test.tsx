@@ -183,6 +183,7 @@ describe('Accessibility: axe on every main page (color-contrast disabled)', () =
   const pages: ReadonlyArray<[string, string, RegExp]> = [
     ['Make', '/', /^what can i make\?$/i],
     ['Plan (week)', '/plan', /^this week$/i],
+    ['Add recipe', '/add', /^add recipe$/i],
     ['Recipes', '/recipes', /^recipes$/i],
     // RecipeDetail's h1 is the recipe title, not a generic page title.
     ['RecipeDetail', `/recipes/${BUILTIN_RECIPE_ID}`, /^carrots and apples$/i],

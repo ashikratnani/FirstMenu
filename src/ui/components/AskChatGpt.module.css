@@ -55,3 +55,10 @@
   font-size: 0.875rem;
   color: var(--color-text-secondary);
 }
+
+.pasteStep {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
