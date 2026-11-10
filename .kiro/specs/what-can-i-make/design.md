@@ -261,7 +261,7 @@ Worked examples (required tests). They use the built-in recipes as of November 8
 1. If `statedMinutes` is set, use it (`stated`).
 2. Otherwise scan each step for durations: a number or range followed by `minute(s)`, `min(s)`, `hour(s)`, `hr(s)`. Ranges ("20-25 minutes", "2 to 3 minutes") use the upper bound. Hours × 60.
 3. Within one step, durations joined by "or" are alternatives ("bake about 45 minutes, or microwave about 8 minutes"): use the smallest.
-4. Durations with "per side" or "each side" count twice.
+4. Durations with "per side", "each side" or "the other side" count twice.
 5. If at least one duration was found: `minutes = 5 + sum`, rounded up to the next 5 (`estimated`). The 5 minutes covers washing and setup.
 6. If none: undefined ("Time not given").
 
@@ -320,6 +320,8 @@ The tag explainer (Requirement 5.4): "Tags show which food groups are in a recip
 6. Oil, spice names (cinnamon, cumin, nutmeg, ginger, garlic powder, paprika, oregano), baking powder, baking soda, vanilla → `pantry`.
 7. Otherwise `other`.
 
+Details (task 5.1): matching uses the safety whole-token, plural-aware helpers. The Dairy tag's exceptions apply here too: the qualifier must directly precede the dairy term (`oat milk`, `peanut butter`, `coconut yogurt`), and `egg` has no exceptions (`egg fried rice`, `soy marinated eggs` stay `dairy-eggs`). `peanut`, `almond`, `oat`, `soy`, `coconut` or `rice` directly before milk or butter (plant milks, nut butters) → `pantry`; directly before other dairy terms → `other`; `breast` or `formula` directly before a dairy term → `other`. `green bean` is produce, `vanilla bean` pantry, `jelly bean` other. A word followed by `free` ("egg-free") is ignored; `dairy free` names are treated as dairy alternatives (milk or butter → `pantry`, other dairy terms → `other`), and `free range eggs` stays `dairy-eggs`. Only the matched bean exception phrase is removed before testing protein terms, so `chicken and green beans` is `protein`. Extra terms: `oatmeal` (grains, one token so `oat` does not match) and `steak` (protein). `buttermilk` counts as dairy.
+
 Used for pasted recipes only. Typed recipes keep the manual select, pre-filled with the guess.
 
 ## Paste parser (`importText.ts`)
@@ -343,7 +345,7 @@ parseRecipeText(text: string): ParsedRecipe
 2. Strip markdown: `#` headers, `**bold**`, `__bold__`, `*italic*`, inline code ticks.
 3. Strip emoji and decorative symbols, but keep `½ ¼ ¾ ⅓ ⅔`.
 4. Drop lines made only of hashtags and @mentions, and remove trailing hashtag runs from other lines.
-5. Drop common caption filler lines: lines containing "save this", "follow for", "link in bio", "comment", "share with", "tag a".
+5. Drop common caption filler lines: lines containing "save this", "follow for", "link in bio", "comment", "share with", "tag a". A filler-worded line is kept (it then lands in the steps or notes like any other line) when any block rule fires on it, checked at every age, so the text-mention screen still sees it: "Stir in a spoon of honey, then share with family." stays. Only pure filler is dropped.
 
 ### Sections
 
@@ -618,7 +620,8 @@ interface AppState {
 ### "Try this" pick
 
 ```ts
-pickTryThis(results: MakeResult[], ctx: { now: Date; mealHint?: MealType; madeLog; foods }): MakeResult[]
+pickTryThis(results: MakeResult[], ctx: { now: Date; mealHint?: MealType; madeLog; foods; newFoodKey?: string; dismissed?; ironRich? }): TryThisPick[]
+// TryThisPick = { result: MakeResult; score: number; newFood?: string (the one untried food); reason: string }
 ```
 
 Candidates are Ready now results that are not ghosted, filtered by untried foods (maintainer's option b, PR #41):
@@ -637,7 +640,7 @@ Score the remaining candidates (higher is better) and sort; ties go to title ord
 | Time 15 minutes or less (stated or estimated) | +2 |
 | Effort Easy | +1 |
 | Has the Iron-rich tag | +1 |
-| Made in the last 2 days | −3 (variety) |
+| Made today, yesterday or the day before (age 0 to 2 days) | −3 (variety) |
 
 "Show another" walks down the sorted list and wraps. The reason line lists the rules that scored, for example "Ready now · 10 min · Breakfast · Iron-rich".
 

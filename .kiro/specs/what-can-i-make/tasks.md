@@ -47,8 +47,8 @@ Branch names use the `v2/` prefix (for example `v2/6-paste-parser`) so they don'
   - [x] 2.4 Convert the app shell, recipe library and Settings form. Check tests, `vitest-axe`, keyboard, 360 px and the size budget, and report the results in the PR. Update `tech.md`. If any check fails, open `Decision needed: Astryx trial` and continue with tasks 3–8.
     - _Requirements: 15.1, 15.5 – 15.7_
 
-- [ ] 3. Time and effort
-  - [ ] 3.1 Implement `domain/effort.ts` (`recipeMinutes`, `recipeEffort`) per the design, with tests from the built-in recipes' steps and the listed edge cases.
+- [x] 3. Time and effort
+  - [x] 3.1 Implement `domain/effort.ts` (`recipeMinutes`, `recipeEffort`) per the design, with tests from the built-in recipes' steps and the listed edge cases.
     - _Requirements: 4.1 – 4.4, 10.3_
 
 - [ ] 4. Nutrition tags
@@ -57,31 +57,31 @@ Branch names use the `v2/` prefix (for example `v2/6-paste-parser`) so they don'
   - [ ] 4.2 Implement `domain/nutrition.ts` with `NUTRITION_VERSION`, using the safety matcher. Tests: term format, sources, each tag fires, `except` cases, optional ingredients ignored.
     - _Requirements: 5.1, 5.3, 5.5, 5.6, 10.3_
 
-- [ ] 5. Grocery category guess
-  - [ ] 5.1 Implement `domain/category.ts` (`guessCategory`) with one test per category and the fallback.
+- [x] 5. Grocery category guess
+  - [x] 5.1 Implement `domain/category.ts` (`guessCategory`) with one test per category and the fallback.
     - _Requirements: 6.7_
 
-- [ ] 6. Paste parser and text-mention screen
-  - [ ] 6.1 Write paste fixtures: ChatGPT in the prompt format, ChatGPT free markdown, an Instagram caption with emoji and hashtags, a caption without headings, and a reply that mentions "no salt" in a step.
+- [x] 6. Paste parser and text-mention screen
+  - [x] 6.1 Write paste fixtures: ChatGPT in the prompt format, ChatGPT free markdown, an Instagram caption with emoji and hashtags, a caption without headings, and a reply that mentions "no salt" in a step.
     - _Requirements: 6.3_
-  - [ ] 6.2 Implement `domain/importText.ts` (`parseRecipeText`) per the design, with tests for every fixture and parsing rule.
+  - [x] 6.2 Implement `domain/importText.ts` (`parseRecipeText`) per the design, with tests for every fixture and parsing rule.
     - _Requirements: 6.2, 6.3, 6.6_
-  - [ ] 6.3 Implement `screenTextMentions` in `safety/screen.ts` and include text mentions in the ghost decision. Tests per the design.
+  - [x] 6.3 Implement `screenTextMentions` in `safety/screen.ts` and include text mentions in the ghost decision. Tests per the design.
     - _Requirements: 7.1 – 7.6_
 
 - [ ] 7. Matching
-  - [ ] 7.1 Implement `domain/make.ts` (`makeResults`, suggested chips) per the design, including younger-stage recipes for toddlers. Tests.
+  - [ ] 7.1 Implement `domain/make.ts` (`makeResults`, suggested chips) per the design, including younger-stage recipes for toddlers. Tests. Note: the `tags` field on `MakeResult` (Req 3.8) and the Iron-rich filter (Req 3.9) land with 7.3 once `nutrition.ts` is merged; tick 7.1 in the 7.3 PR.
     - _Requirements: 3.3 – 3.9, 13.8_
-  - [ ] 7.2 Implement `data/foodNames.ts`, `data/searchPhrases.ts` and `domain/foodSearch.ts` (`buildVocabulary`, `searchHave`) per "Type what you have" in the design. Tests: every row of the worked-examples table in the design; separators and unseparated text; filler and request words; quantities; the single longest-match pass with ties going to foods ("sweet potato" vs "potato", "quick oats" vs "quick"); descriptor vs filter (step 4); other names and stop phrases ("bean curd" → tofu, "lemon curd" and "ladyfinger" → no food, listed under "Not recognized", "curd" → yogurt); typo distances and ties, and no typo match against stop phrases or dish-kind phrases; each dish-kind phrase ("something for breakfast", "finger food", "quick", "iron rich", "make ahead"); title words; unrecognized words; list checks (every target equals `groceryFoodKey({ name: target })`, no name mapped to two foods, no phrase that is also a food, plural-aware); descriptor adjacency ignoring only filler words ("mashed ripe banana", "quick cooked rice", "quick mashed banana"), with a request word keeping the phrase a filter ("eggs something quick"); stop phrases listed under "Not recognized".
+  - [x] 7.2 Implement `data/foodNames.ts`, `data/searchPhrases.ts` and `domain/foodSearch.ts` (`buildVocabulary`, `searchHave`) per "Type what you have" in the design. Tests: every row of the worked-examples table in the design; separators and unseparated text; filler and request words; quantities; the single longest-match pass with ties going to foods ("sweet potato" vs "potato", "quick oats" vs "quick"); descriptor vs filter (step 4); other names and stop phrases ("bean curd" → tofu, "lemon curd" and "ladyfinger" → no food, listed under "Not recognized", "curd" → yogurt); typo distances and ties, and no typo match against stop phrases or dish-kind phrases; each dish-kind phrase ("something for breakfast", "finger food", "quick", "iron rich", "make ahead"); title words; unrecognized words; list checks (every target equals `groceryFoodKey({ name: target })`, no name mapped to two foods, no phrase that is also a food, plural-aware); descriptor adjacency ignoring only filler words ("mashed ripe banana", "quick cooked rice", "quick mashed banana"), with a request word keeping the phrase a filter ("eggs something quick"); stop phrases listed under "Not recognized".
     - _Requirements: 16.1 – 16.4, 16.7 – 16.11_
   - [ ] 7.3 Add `serveAs` derivation for custom recipes and the filter logic, including "More ideas", to `make.ts`. Tests: derivation keywords, stage defaults when nothing matches, AND of filters, the "Iron-rich only" toggle and the "iron rich" phrase as one filter, "More ideas" ordering, cap and ghost exclusion, "More ideas" with only the toggle on, filters with no foods typed.
-    - _Requirements: 16.9, 16.12, 16.13_
+    - _Requirements: 3.8, 3.9, 16.9, 16.12, 16.13_
 
 - [ ] 8. Prompt helper logic
-  - [ ] 8.1 Implement `domain/prompt.ts` (`buildPrompt`) with per-stage texture hints. Tests: content, leave-out list at 10, 13 and 25 months, reaction foods, "toddler" wording at 12 months and over, no name or birth date.
+  - [ ] 8.1 Implement `domain/prompt.ts` (`buildPrompt`) with per-stage texture hints. Tests: content, leave-out list at 10, 13 and 25 months, reaction foods, "toddler" wording at 12 months and over, no name or birth date, suggestion state absent from the prompt.
     - _Requirements: 8.2 – 8.5, 13.5_
 
-  - [ ] 8.2 Implement `domain/suggest.ts` per "Smart suggestions" in the design: `pickTryThis` with scoring and reasons, time-of-day meal hint, stale on-hand check, new-food-due check using `NEW_FOOD_SPACING_DAYS`, Make again list, pantry learning. Reducer actions: record made, record on-hand day, dismiss suggestion, keep on-hand. Tests with a fixed `now`: each score rule, ghosted recipes never picked, hint boundaries (10:29 vs 10:30), 4-hour hint dismissal, 24-hour dismissals, spacing at 2 and 3 days, a reaction record restarts the wait, no food recorded yet, Try this untried-food rules (two or more never; with a new food due, only the banner's food; with none due, only when it is the sole non-ghosted Ready now recipe, counted before filtering and dismissals: one-untried plus two-untried recipes gives no card, and dismissing the only fully tried recipe gives no card; "Has a new food: <food>" reason in both allowed cases; the day after a reaction, no untried-food pick while others exist; no allowed pick hides the card; with a new food due, the sole-recipe exception does not apply; while the new-food banner is dismissed a new food counts as not due), `isDismissed` for each row of the dismissal table, the new-food reason when no food is recorded, no meal hint from 21:00 to 04:59, made-log dedupe per day and cap, deleted recipe removed from the log, export/import round-trip, suggestion state absent from share payloads and the prompt.
+  - [x] 8.2 Implement `domain/suggest.ts` per "Smart suggestions" in the design: `pickTryThis` with scoring and reasons, time-of-day meal hint, stale on-hand check, new-food-due check using `NEW_FOOD_SPACING_DAYS`, Make again list, pantry learning. Reducer actions: record made, record on-hand day, dismiss suggestion, keep on-hand. Tests with a fixed `now`: each score rule, ghosted recipes never picked, hint boundaries (10:29 vs 10:30), 4-hour hint dismissal, 24-hour dismissals, spacing at 2 and 3 days, a reaction record restarts the wait, no food recorded yet, Try this untried-food rules (two or more never; with a new food due, only the banner's food; with none due, only when it is the sole non-ghosted Ready now recipe, counted before filtering and dismissals: one-untried plus two-untried recipes gives no card, and dismissing the only fully tried recipe gives no card; "Has a new food: <food>" reason in both allowed cases; the day after a reaction, no untried-food pick while others exist; no allowed pick hides the card; with a new food due, the sole-recipe exception does not apply; while the new-food banner is dismissed a new food counts as not due), `isDismissed` for each row of the dismissal table, the new-food reason when no food is recorded, no meal hint from 21:00 to 04:59, made-log dedupe per day and cap, deleted recipe removed from the log, export/import round-trip, suggestion state absent from share payloads.
     - _Requirements: 17.1 – 17.6, 17.8, 17.9, 17.11_
 
 - [ ] 9. Navigation and Plan move (Astryx)
