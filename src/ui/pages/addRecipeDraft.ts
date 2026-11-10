@@ -7,12 +7,7 @@
 
 import { STAGE_TEXTURE_HINTS } from '../../domain/safety/rules';
 import { guessCategory } from '../../domain/category';
-import {
-  parseRecipeText,
-  DEFAULT_TITLE,
-  type ParsedIngredient,
-  type ParsedRecipe,
-} from '../../domain/importText';
+import { parseRecipeText, DEFAULT_TITLE, type ParsedIngredient, type ParsedRecipe } from '../../domain/importText';
 import type {
   ClearedMention,
   ImportedInfo,
@@ -129,10 +124,7 @@ export function draftFromParsed(parsed: ParsedRecipe, jsonExtras?: readonly stri
 
 /** Replace the text of one line. */
 export function editLine(draft: Draft, list: LineList, id: number, text: string): Draft {
-  return {
-    ...draft,
-    [list]: draft[list].map((l) => (l.id === id ? { ...l, text } : l)),
-  };
+  return { ...draft, [list]: draft[list].map((l) => (l.id === id ? { ...l, text } : l)) };
 }
 
 export function removeLine(draft: Draft, list: LineList, id: number): Draft {

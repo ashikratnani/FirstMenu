@@ -1,7 +1,8 @@
 // Add recipe (`/add`, active spec Requirements 6, 7.3 to 7.5, 11.2, 17.7,
 // 17.10, 18), built on Astryx components. The parent pastes a recipe from
 // ChatGPT (Recipe JSON, read by `parseRecipeReply`) or an Instagram caption
-// (free text, also the fallback when a reply has no JSON), reads it, checks the preview and saves it without
+// (free text, also the fallback when a reply has no JSON), reads it, checks the
+// preview and saves it without
 // typing anything. Parsing and the safety screen run on the device; the
 // optional link is never fetched and the clipboard is read only when the
 // "Paste" button is tapped.
@@ -306,10 +307,7 @@ export default function AddRecipe() {
   }
 
   const time = recipe ? recipeMinutes(recipe) : undefined;
-  const timeText = timeLabel({
-    minutes: time?.minutes,
-    minutesKind: time?.kind ?? 'stated',
-  });
+  const timeText = timeLabel({ minutes: time?.minutes, minutesKind: time?.kind ?? 'stated' });
   const blockCount = (screen?.blocks.length ?? 0) + mentions.length;
 
   return (
@@ -459,22 +457,22 @@ export default function AddRecipe() {
               )}
             {blockCount > 0 && (
               <p className={styles.warning}>
-                Not safe yet for your child. You can still save it, but it will not show up in your
-                ideas.
+                Not safe yet for your child. You can still save it, but it will
+                not show up in your ideas.
               </p>
             )}
             <ul className={styles.findings}>
               {screen.blocks.map((finding, index) => (
                 <li key={`block-${index}`}>
-                  <strong>Not safe yet:</strong> {finding.ingredientName}. {finding.message} Delete
-                  the ingredient line to fix this.
+                  <strong>Not safe yet:</strong> {finding.ingredientName}.{' '}
+                  {finding.message} Delete the ingredient line to fix this.
                 </li>
               ))}
               {mentions.map((mention) => (
                 <li key={`${mention.ruleId}-${mention.sentence}`}>
-                  <strong>Not safe yet:</strong> {mention.label} is mentioned in the{' '}
-                  {mention.where === 'title' ? 'title' : mention.where}: <q>{mention.sentence}</q>{' '}
-                  {mention.message}{' '}
+                  <strong>Not safe yet:</strong> {mention.label} is mentioned in
+                  the {mention.where === 'title' ? 'title' : mention.where}:{' '}
+                  <q>{mention.sentence}</q> {mention.message}{' '}
                   <Button
                     label={`Not used in this recipe: ${mention.sentence}`}
                     size="sm"
@@ -491,12 +489,14 @@ export default function AddRecipe() {
               ))}
               {screen.reminders.map((finding, index) => (
                 <li key={`reminder-${index}`}>
-                  <strong>Reminder:</strong> {finding.ingredientName}. {finding.message}
+                  <strong>Reminder:</strong> {finding.ingredientName}.{' '}
+                  {finding.message}
                 </li>
               ))}
               {screen.allergens.map((finding, index) => (
                 <li key={`allergen-${index}`}>
-                  <strong>Allergen:</strong> {finding.ingredientName}. {finding.message}
+                  <strong>Allergen:</strong> {finding.ingredientName}.{' '}
+                  {finding.message}
                 </li>
               ))}
             </ul>
@@ -605,7 +605,10 @@ export default function AddRecipe() {
 
               {draft.steps.length + draft.notes.filter((l) => !l.hidden).length > 0 && (
                 <div className={styles.row}>
-                  <Button label="Mark lines as ingredients" onClick={() => setMarkMode(true)} />
+                  <Button
+                    label="Mark lines as ingredients"
+                    onClick={() => setMarkMode(true)}
+                  />
                 </div>
               )}
             </>

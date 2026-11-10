@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react';
+import { cleanup, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -374,6 +374,18 @@ describe('Add recipe: prompt helper (Req 8.1, 8.6 to 8.9)', () => {
   });
 });
 
+const oats = { quantity: 1, unit: 'cup', name: 'rolled oats' };
+
+function jsonWith(fields: Record<string, unknown>): string {
+  return JSON.stringify({
+    firstmenu_recipe: 1,
+    title: 'Oat bowl',
+    ingredients: [oats],
+    steps: ['Cook the oats.'],
+    ...fields,
+  });
+}
+
 describe('Add recipe: Recipe JSON intake (Req 18.3 to 18.12, 6.1)', () => {
   it('previews a JSON reply, keeps the raw reply as original text and saves', async () => {
     const user = userEvent.setup();
@@ -423,13 +435,141 @@ describe('Add recipe: Recipe JSON intake (Req 18.3 to 18.12, 6.1)', () => {
     expect(within(preview).getByText(/Honey is mentioned in the note/i)).toBeInTheDocument();
   });
 
-  it('screens a blocked food in an ingredient unit and keeps the note visible', async () => {
+  it('screens a blocked food in a multi-word ingredient unit and keeps the note visible', async () => {
     const user = userEvent.setup();
     renderAdd();
     await pasteAndRead(user, unitBlockedJson);
     const preview = screen.getByRole('region', { name: 'Preview' });
+    // The unit note stays visible. The ingredient line is a block, so it has no "Not used" button.
     expect(within(preview).getByText(/ingredients\[1\]\.unit: tbsp honey/)).toBeInTheDocument();
-    expect(within(preview).getAllByText(/Not safe yet/).length).toBeGreaterThan(0);
+    expect(within(preview).getByText(/Delete the ingredient line to fix this/)).toBeInTheDocument();
+    expect(
+      within(preview).queryByRole('button', { name: /Not used in this recipe/ }),
+    ).not.toBeInTheDocument();
+
+    // With the ingredient line deleted, the note is a text mention that only "Not used" clears.
+    await user.click(
+      within(preview).getByRole('button', { name: 'Delete ingredient: 1 tbsp honey mashed banana' }),
+    );
+    expect(within(preview).getByText(/Honey is mentioned in the note/)).toBeInTheDocument();
+    await user.click(within(preview).getByRole('textbox', { name: 'Title' }));
+    expect(within(preview).getByText(/Honey is mentioned in the note/)).toBeInTheDocument();
+    await user.click(
+      within(preview).getByRole('button', {
+        name: 'Not used in this recipe: ingredients[1].unit: tbsp honey',
+      }),
+    );
+    expect(within(preview).queryByText(/Honey is mentioned/)).not.toBeInTheDocument();
+    expect(within(preview).queryByText(/Not safe yet/)).not.toBeInTheDocument();
+  });
+
+  it('screens a single-word unit that is a blocked food and only "Not used" clears it', async () => {
+    const user = userEvent.setup();
+    renderAdd();
+    await pasteAndRead(
+      user,
+      jsonWith({ ingredients: [oats, { quantity: 1, unit: 'honey', name: 'mashed banana' }] }),
+    );
+    const preview = screen.getByRole('region', { name: 'Preview' });
+    // The unit note stays visible. The ingredient line is a block, so it has no "Not used" button.
+    expect(within(preview).getByText(/ingredients\[1\]\.unit: honey/)).toBeInTheDocument();
+    expect(within(preview).getByText(/Delete the ingredient line to fix this/)).toBeInTheDocument();
+    expect(
+      within(preview).queryByRole('button', { name: /Not used in this recipe/ }),
+    ).not.toBeInTheDocument();
+
+    // With the ingredient line deleted, the note is a text mention that only "Not used" clears.
+    await user.click(
+      within(preview).getByRole('button', { name: 'Delete ingredient: 1 honey mashed banana' }),
+    );
+    expect(within(preview).getByText(/Honey is mentioned in the note/)).toBeInTheDocument();
+    await user.click(within(preview).getByRole('textbox', { name: 'Title' }));
+    expect(within(preview).getByText(/Honey is mentioned in the note/)).toBeInTheDocument();
+    await user.click(
+      within(preview).getByRole('button', {
+        name: 'Not used in this recipe: ingredients[1].unit: honey',
+      }),
+    );
+    expect(within(preview).queryByText(/Honey is mentioned/)).not.toBeInTheDocument();
+    expect(within(preview).queryByText(/Not safe yet/)).not.toBeInTheDocument();
+  });
+
+  it('ghosts honey in a step and only "Not used" clears it', async () => {
+    const user = userEvent.setup();
+    renderAdd();
+    await pasteAndRead(
+      user,
+      jsonWith({ steps: ['Cook the oats.', 'Drizzle a little honey on top.'] }),
+    );
+    const preview = screen.getByRole('region', { name: 'Preview' });
+    expect(within(preview).getByText(/Honey is mentioned in the step/)).toBeInTheDocument();
+    await user.click(within(preview).getByRole('textbox', { name: 'Title' }));
+    expect(within(preview).getByText(/Honey is mentioned in the step/)).toBeInTheDocument();
+    await user.click(
+      within(preview).getByRole('button', {
+        name: 'Not used in this recipe: Drizzle a little honey on top.',
+      }),
+    );
+    expect(within(preview).queryByText(/Honey is mentioned/)).not.toBeInTheDocument();
+  });
+
+  it('blocks honey in an ingredient name with no "Not used" button', async () => {
+    const user = userEvent.setup();
+    renderAdd();
+    await pasteAndRead(
+      user,
+      jsonWith({ ingredients: [oats, { quantity: 1, unit: 'tbsp', name: 'honey' }] }),
+    );
+    const preview = screen.getByRole('region', { name: 'Preview' });
+    expect(within(preview).getByText(/Delete the ingredient line to fix this/)).toBeInTheDocument();
+    expect(
+      within(preview).queryByRole('button', { name: /Not used in this recipe/ }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('ghosts honey in the notes', async () => {
+    const user = userEvent.setup();
+    renderAdd();
+    await pasteAndRead(user, jsonWith({ notes: ['Add honey for older kids.'] }));
+    const preview = screen.getByRole('region', { name: 'Preview' });
+    expect(within(preview).getByText(/Honey is mentioned in the note/)).toBeInTheDocument();
+    expect(
+      within(preview).getByRole('button', { name: /Not used in this recipe/ }),
+    ).toBeInTheDocument();
+  });
+
+  it('gives the same findings for the same recipe as JSON and as plain text (Req 18.8)', async () => {
+    const user = userEvent.setup();
+    const json = jsonWith({
+      ingredients: [oats, { quantity: 1, unit: 'tbsp', name: 'banana' }],
+      steps: ['Cook the oats.', 'Drizzle a little honey on top.'],
+      notes: ['Add honey for older kids.'],
+    });
+    const plain = [
+      'Oat bowl',
+      'Ingredients:',
+      '1 cup rolled oats',
+      '1 tbsp banana',
+      'Steps:',
+      '1. Cook the oats.',
+      '2. Drizzle a little honey on top.',
+      'Notes:',
+      'Add honey for older kids.',
+    ].join('\n');
+    const findings = async (text: string) => {
+      renderAdd();
+      await pasteAndRead(user, text);
+      const preview = screen.getByRole('region', { name: 'Preview' });
+      const found = within(preview)
+        .getAllByText(/Not safe yet:/)
+        .map((el) => el.parentElement?.textContent ?? '');
+      cleanup();
+      return found;
+    };
+    const fromJson = await findings(json);
+    const fromPlain = await findings(plain);
+    expect(fromJson).toHaveLength(2);
+    expect(fromJson).toEqual(fromPlain);
   });
 
   it('does not save a plain unit note into the recipe', async () => {

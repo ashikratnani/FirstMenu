@@ -12,7 +12,11 @@ import { stageFor } from './age';
 import { defaultState } from './storage';
 import type { AppState } from './types';
 
-function promptFor(ageMonths: number, state: AppState, question = 'Something with chicken, rice, peas'): string {
+function promptFor(
+  ageMonths: number,
+  state: AppState,
+  question = 'Something with chicken, rice, peas',
+): string {
   return buildWrappedPrompt({
     question,
     ageMonths,
