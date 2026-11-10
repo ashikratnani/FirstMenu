@@ -21,6 +21,8 @@ import { TextInput } from '@astryxdesign/core/TextInput';
 import { useApp } from '../../state/AppProvider';
 import { selectAgeMonths, selectStage } from '../../state/selectors';
 import type { FoodRecord } from '../../domain/types';
+import PantryEditor from '../components/PantryEditor';
+import { usePagePrimaryAction } from '../components/primaryActionContext';
 import { stageLabel } from './recipeView';
 import styles from './Settings.module.css';
 import {
@@ -62,6 +64,8 @@ function hasRecord(
 
 export default function Settings() {
   const { state, dispatch } = useApp();
+  // Save is this screen's primary button (Req 17.10).
+  usePagePrimaryAction(true);
 
   const [name, setName] = useState(state.child?.name ?? '');
   const [birthDate, setBirthDate] = useState(state.child?.birthDate ?? '');
@@ -176,6 +180,18 @@ export default function Settings() {
   return (
     <>
       <h1>Settings</h1>
+
+      {/* Pantry (Req 2.3): foods usually at home. Edits save as you go, so it
+          sits outside the profile form below. */}
+      <section className={styles.pantry} aria-labelledby="settings-pantry">
+        <h2 id="settings-pantry" className={styles.pantryHeading}>
+          Pantry
+        </h2>
+        <p className={styles.hint}>
+          Foods you usually have at home. The Make screen counts them as on hand.
+        </p>
+        <PantryEditor idPrefix="settings-pantry" />
+      </section>
 
       <form className={styles.form} onSubmit={handleSubmit}>
         <TextInput

@@ -225,4 +225,49 @@ describe('RecipeDetail page', () => {
       '/recipes',
     );
   });
+  describe('Serve as (Req 16.13)', () => {
+    const MASH: Recipe = {
+      id: 'custom-mash',
+      origin: 'custom',
+      title: 'Plain Bowl',
+      stages: ['9-12'],
+      mealTypes: ['lunch'],
+      ingredients: [{ name: 'pear', category: 'produce' }],
+      steps: ['Stir.'],
+      texture: 'soft',
+      servings: 1,
+    };
+
+    it('shows a guessed serving form for a custom recipe, then lets the user correct it', async () => {
+      const user = userEvent.setup();
+      renderDetail('custom-mash', seedState(10, [MASH]));
+      // Nothing in the text matches, so the stage default is used.
+      expect(screen.getByText('Serve as: Mashed (guessed)')).toBeInTheDocument();
+
+      await user.click(screen.getByRole('button', { name: 'Edit serve as' }));
+      await user.click(screen.getByRole('checkbox', { name: 'Finger food' }));
+      await user.click(screen.getByRole('checkbox', { name: 'Mashed' }));
+      await user.click(screen.getByRole('button', { name: 'Save serve as' }));
+
+      expect(screen.getByText('Serve as: Finger food')).toBeInTheDocument();
+      expect(screen.queryByText(/guessed/)).not.toBeInTheDocument();
+    });
+
+    it('needs at least one serving form to save, and Cancel keeps the old value', async () => {
+      const user = userEvent.setup();
+      renderDetail('custom-mash', seedState(10, [MASH]));
+      await user.click(screen.getByRole('button', { name: 'Edit serve as' }));
+      await user.click(screen.getByRole('checkbox', { name: 'Mashed' }));
+      expect(screen.getByRole('button', { name: 'Save serve as' })).toBeDisabled();
+      await user.click(screen.getByRole('button', { name: 'Cancel' }));
+      expect(screen.getByText('Serve as: Mashed (guessed)')).toBeInTheDocument();
+    });
+
+    it('shows a built-in recipe\'s form without an edit button', () => {
+      renderDetail('b-carrots-and-apples', seedState(8));
+      expect(screen.getByText(/^Serve as: /)).toBeInTheDocument();
+      expect(screen.queryByText(/guessed/)).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Edit serve as' })).not.toBeInTheDocument();
+    });
+  });
 });

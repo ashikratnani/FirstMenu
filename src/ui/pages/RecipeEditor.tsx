@@ -29,6 +29,7 @@
 import { useMemo, useState, type FormEvent } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useApp } from '../../state/AppProvider';
+import { usePagePrimaryAction } from '../components/primaryActionContext';
 import { selectAgeMonths } from '../../state/selectors';
 import { screenRecipe, type ScreenResult } from '../../domain/safety/screen';
 import { foodKeyFor, foodLabel } from '../../domain/foods';
@@ -231,6 +232,8 @@ function buildRecipe(
 }
 
 export default function RecipeEditor() {
+  // Save recipe is this screen's primary button (Req 17.10).
+  usePagePrimaryAction(true);
   const { id } = useParams<{ id: string }>();
   const { state, dispatch, deleteCustomRecipe } = useApp();
   const navigate = useNavigate();

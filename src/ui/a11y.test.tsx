@@ -17,7 +17,8 @@
 // page markup are exercised exactly as shipped. SharedView renders on its own
 // from an encoded fragment with NO AppProvider (Req 11.4), matching App.tsx.
 
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { describe, expect, it } from 'vitest';
 import { axe } from 'vitest-axe';
@@ -213,6 +214,142 @@ describe('Accessibility: axe on every main page (color-contrast disabled)', () =
       expect(results).toHaveNoViolations();
     },
   );
+
+  describe('Make with a populated pantry and on-hand foods (Req 15.5)', () => {
+    /** A local YYYY-MM-DD `days` days before today. */
+    function daysAgo(days: number): string {
+      const d = new Date();
+      d.setDate(d.getDate() - days);
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${d.getFullYear()}-${m}-${day}`;
+    }
+
+    function makeRecipe(id: string, title: string, foods: string[]): Recipe {
+      return {
+        id,
+        origin: 'custom',
+        title,
+        stages: ['6-8', '9-12'],
+        mealTypes: ['lunch', 'dinner'],
+        ingredients: foods.map((name) => ({ name, category: 'other' as const })),
+        steps: ['Mix.'],
+        texture: 'soft',
+        servings: 2,
+        statedMinutes: 10,
+      };
+    }
+
+    /** Ready now, Missing one, More ideas (iron filter) and a ghosted recipe,
+     *  plus on-hand chips, a made recipe and a dismissed pantry offer. */
+    function populated(overrides: Partial<AppState> = {}): AppState {
+      return seededState({
+        pantry: ['blorp', 'flib', 'lentil'],
+        // Tried foods make Ready now recipes eligible for Try this; the
+        // untried wumble in Missing one feeds the new-food banner.
+        foods: {
+          blorp: { status: 'tried', date: daysAgo(40) },
+          flib: { status: 'tried', date: daysAgo(40) },
+          lentil: { status: 'tried', date: daysAgo(40) },
+        },
+        onHand: ['flib', 'zonk'],
+        onHandUpdated: daysAgo(8),
+        onHandDays: {
+          carrot: [daysAgo(1), daysAgo(2), daysAgo(3)],
+        },
+        madeLog: [{ recipeId: 'c-ready', date: daysAgo(2) }],
+        dismissed: { 'pantry-setup': new Date().toISOString() },
+        customRecipes: [
+          makeRecipe('c-ready', 'Blorp Mash', ['blorp', 'flib']),
+          makeRecipe('c-one', 'Blorp Zonk Bowl', ['blorp', 'wumble']),
+          makeRecipe('c-iron', 'Lentil Blorp', ['lentil', 'blorp']),
+          makeRecipe('c-more', 'Lentil Wumble Stew', ['lentil', 'wumble', 'snarf']),
+          makeRecipe('c-honey', 'Honey Blorp Bites', ['honey', 'blorp']),
+        ],
+        ...overrides,
+      });
+    }
+
+    async function expectNoViolations(container: HTMLElement) {
+      const results = await axe(container, AXE_OPTIONS);
+      expect(results).toHaveNoViolations();
+    }
+
+    it('cards, chips, Try this, banners and Make again have no violations', async () => {
+      const { container } = renderApp('/', populated());
+      expect(screen.getByRole('heading', { level: 2, name: /Ready now/ })).toBeInTheDocument();
+      expect(screen.getByRole('heading', { level: 2, name: /Missing one/ })).toBeInTheDocument();
+      expect(screen.getByRole('list', { name: 'On hand today' })).toBeInTheDocument();
+      expect(screen.getByRole('list', { name: 'Tap what you have' })).toBeInTheDocument();
+      expect(screen.getByText('Try this')).toBeInTheDocument();
+      expect(screen.getByText('Ready for a new food?')).toBeInTheDocument();
+      expect(screen.getByText('Still have these?')).toBeInTheDocument();
+      expect(screen.getByText('Make again')).toBeInTheDocument();
+      await expectNoViolations(container);
+    });
+
+    it('the pantry suggestion banner has no violations', async () => {
+      // A fresh on-hand list leaves room for the third banner.
+      const { container } = renderApp('/', populated({ onHandUpdated: daysAgo(0) }));
+      expect(screen.getByText('Add to pantry?')).toBeInTheDocument();
+      await expectNoViolations(container);
+    });
+
+    it('the ghosted list has no violations', async () => {
+      const user = userEvent.setup();
+      const { container } = renderApp('/', populated());
+      await user.click(screen.getByRole('button', { name: 'Show left-out recipes' }));
+      expect(screen.getByRole('link', { name: /Open Honey Blorp Bites/ })).toBeInTheDocument();
+      await expectNoViolations(container);
+    });
+
+    it('More ideas has no violations with the iron-rich filter on', async () => {
+      const user = userEvent.setup();
+      const { container } = renderApp('/', populated());
+      await user.click(screen.getByRole('button', { name: 'Iron-rich only' }));
+      expect(screen.getByRole('heading', { level: 2, name: /More ideas/ })).toBeInTheDocument();
+      await expectNoViolations(container);
+    });
+
+    it('"Recipes named" has no violations', async () => {
+      const user = userEvent.setup();
+      const { container } = renderApp('/', populated());
+      await user.type(screen.getByRole('textbox', { name: 'What do you have?' }), 'stew');
+      await waitFor(() =>
+        expect(screen.getByRole('heading', { level: 2, name: /Recipes named/ })).toBeInTheDocument(),
+      );
+      await expectNoViolations(container);
+    });
+
+    it('the pantry dialog has no violations', async () => {
+      const user = userEvent.setup();
+      renderApp('/', populated());
+      await user.click(screen.getByRole('button', { name: 'Edit pantry' }));
+      const dialog = await screen.findByRole('dialog');
+      expect(dialog).toBeInTheDocument();
+      await expectNoViolations(document.body);
+    });
+
+    it('the empty state with the Ask ChatGPT panel open has no violations', async () => {
+      const user = userEvent.setup();
+      const { container } = renderApp(
+        '/',
+        populated({ pantry: [], onHand: [], onHandUpdated: undefined, madeLog: [] }),
+      );
+      // Iron-rich plus breakfast leaves nothing ready or missing one food.
+      await user.click(screen.getByRole('button', { name: 'Iron-rich only' }));
+      await user.type(
+        screen.getByRole('textbox', { name: 'What do you have?' }),
+        'something for breakfast',
+      );
+      expect(
+        await screen.findByRole('heading', { name: 'Nothing fits yet' }),
+      ).toBeInTheDocument();
+      await user.click(screen.getByRole('button', { name: 'Ask ChatGPT' }));
+      expect(screen.getByText(/AI recipes can be wrong/)).toBeInTheDocument();
+      await expectNoViolations(container);
+    });
+  });
 
   it('Onboarding (not onboarded) has no axe violations', async () => {
     // Render with onboarded:false so the onboarding form shows instead of the

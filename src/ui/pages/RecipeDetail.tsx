@@ -11,11 +11,15 @@
 // Foods page and recipeView.ts helpers. The page offers NO control that would
 // let a user bypass a block (blocks are presented honestly).
 
+import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Button } from '@astryxdesign/core/Button';
+import { CheckboxInput } from '@astryxdesign/core/CheckboxInput';
+import { recipeServeAs } from '../../domain/make';
 import { useApp } from '../../state/AppProvider';
 import { selectAgeMonths, selectAllRecipes } from '../../state/selectors';
 import { screenRecipe } from '../../domain/safety/screen';
-import type { Ingredient } from '../../domain/types';
+import type { Ingredient, Recipe, ServeAs } from '../../domain/types';
 import { ghostReason, recipeView } from './recipeView';
 import Disclaimer from '../components/Disclaimer';
 import styles from './RecipeDetail.module.css';
@@ -35,6 +39,89 @@ function fridgeText(days: number): string {
 /** "Freezes for N month(s)" (Req 6.1). */
 function freezerText(months: number): string {
   return `Freezes for ${months} ${months === 1 ? 'month' : 'months'}`;
+}
+
+const SERVE_AS_OPTIONS: ReadonlyArray<{ form: ServeAs; label: string }> = [
+  { form: 'puree', label: 'Puree' },
+  { form: 'mashed', label: 'Mashed' },
+  { form: 'finger-food', label: 'Finger food' },
+  { form: 'pieces', label: 'Pieces' },
+];
+
+function serveAsText(forms: ServeAs[]): string {
+  return SERVE_AS_OPTIONS.filter((o) => forms.includes(o.form))
+    .map((o) => o.label)
+    .join(', ');
+}
+
+/**
+ * "Serve as: Mashed (guessed)" (Req 16.13). Custom recipes can be corrected;
+ * saving stores the forms on the recipe, so "(guessed)" goes away.
+ */
+function ServeAsLine({ recipe }: { recipe: Recipe }) {
+  const { dispatch } = useApp();
+  const { forms, guessed } = recipeServeAs(recipe);
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState<ServeAs[]>(forms);
+
+  if (!editing) {
+    return (
+      <p className={styles.serveAs}>
+        <span>
+          Serve as: {serveAsText(forms)}
+          {guessed ? ' (guessed)' : ''}
+        </span>
+        {recipe.origin === 'custom' && (
+          <Button
+            label="Edit serve as"
+            size="sm"
+            onClick={() => {
+              setDraft(forms);
+              setEditing(true);
+            }}
+          />
+        )}
+      </p>
+    );
+  }
+
+  return (
+    <fieldset className={styles.serveAsEditor}>
+      <legend>Serve as</legend>
+      <ul className={styles.serveAsList}>
+        {SERVE_AS_OPTIONS.map(({ form, label }) => (
+          <li key={form}>
+            <CheckboxInput
+              label={label}
+              value={draft.includes(form)}
+              onChange={(checked) =>
+                setDraft((current) =>
+                  checked ? [...current, form] : current.filter((f) => f !== form),
+                )
+              }
+            />
+          </li>
+        ))}
+      </ul>
+      <div className={styles.serveAsActions}>
+        <Button
+          label="Save serve as"
+          isDisabled={draft.length === 0}
+          onClick={() => {
+            dispatch({
+              type: 'saveCustomRecipe',
+              recipe: {
+                ...recipe,
+                serveAs: SERVE_AS_OPTIONS.map((o) => o.form).filter((f) => draft.includes(f)),
+              },
+            });
+            setEditing(false);
+          }}
+        />
+        <Button label="Cancel" onClick={() => setEditing(false)} />
+      </div>
+    </fieldset>
+  );
 }
 
 export default function RecipeDetail() {
@@ -116,6 +203,8 @@ export default function RecipeDetail() {
           Serves {recipe.servings} {recipe.servings === 1 ? 'portion' : 'portions'}
         </span>
       </p>
+
+      <ServeAsLine key={`${recipe.id}-${recipe.serveAs?.join() ?? ''}`} recipe={recipe} />
 
       <section aria-labelledby="recipe-ingredients">
         <h2 id="recipe-ingredients">Ingredients</h2>

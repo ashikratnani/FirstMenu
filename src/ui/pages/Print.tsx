@@ -21,6 +21,7 @@ import { computePrepList } from '../../domain/prep';
 import { computeGroceryList } from '../../domain/grocery';
 import type { Recipe } from '../../domain/types';
 import Disclaimer from '../components/Disclaimer';
+import { usePagePrimaryAction } from '../components/primaryActionContext';
 import {
   MEAL_TYPES,
   dayLabel,
@@ -44,6 +45,8 @@ const DAY_INDEXES = [0, 1, 2, 3, 4, 5, 6] as const;
 
 export default function Print() {
   const { state } = useApp();
+  // The Print button is this screen's primary button (Req 17.10).
+  usePagePrimaryAction(true);
   const recipes = selectAllRecipes(state);
   const ageMonths = selectAgeMonths(state) ?? 0;
   const { plan } = state;

@@ -313,6 +313,11 @@ describe('isDismissed for each row of the dismissal table', () => {
     expect(isDismissed(dismissed, id, h(hours))).toBe(false);
   });
 
+  it('the first-use pantry offer stays skipped once skipped', () => {
+    const dismissed = { 'pantry-setup': dismissedAt };
+    expect(isDismissed(dismissed, 'pantry-setup', h(24 * 365))).toBe(true);
+  });
+
   it('pantry:<food> is permanent', () => {
     const dismissed = { 'pantry:rice': dismissedAt };
     expect(isDismissed(dismissed, 'pantry:rice', h(24 * 365 * 5))).toBe(true);

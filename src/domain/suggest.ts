@@ -47,13 +47,15 @@ export const MEAL_HINT_ID = 'meal-hint';
 export const NEW_FOOD_ID = 'new-food';
 export const STALE_ON_HAND_ID = 'stale-on-hand';
 export const MAKE_AGAIN_ID = 'make-again';
+/** The first-use pantry offer (Req 2.4): once skipped, it stays skipped. */
+export const PANTRY_SETUP_ID = 'pantry-setup';
 export const tryThisId = (recipeId: string) => `try-this:${recipeId}`;
 export const pantryId = (foodKey: string) => `pantry:${foodKey}`;
 
 /** Hours a dismissal hides a suggestion; `Infinity` is permanent ("No thanks"). */
 export function dismissalHours(id: string): number {
   if (id === MEAL_HINT_ID) return 4;
-  if (id.startsWith('pantry:')) return Infinity;
+  if (id === PANTRY_SETUP_ID || id.startsWith('pantry:')) return Infinity;
   return 24;
 }
 
