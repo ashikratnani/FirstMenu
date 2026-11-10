@@ -616,3 +616,49 @@ describe('duplicate keys', () => {
     expect(r.parsed.notes).toHaveLength(1);
   });
 });
+
+describe('deep nesting and huge numbers (PR #72 round 2)', () => {
+  const head = '{"firstmenu_recipe":1,"title":"T","ingredients":[{"name":"rice"}],"steps":["Cook."]';
+  for (const n of [9000, 19000]) {
+    it(`${n} nested arrays return invalid, never throw`, () => {
+      const text = `${head},"x":${'['.repeat(n)}${']'.repeat(n)}}`.slice(0, MAX_PASTE_CHARS);
+      const r = parseRecipeReply(text);
+      expect(['invalid', 'no-json']).toContain(r.kind);
+      const whole = `${head},"x":${'['.repeat(n)}`;
+      expect(() => parseRecipeReply(whole)).not.toThrow();
+    });
+    it(`${n} nested objects return invalid, never throw`, () => {
+      const text = `${head},"x":${'{"a":'.repeat(n / 3)}1${'}'.repeat(n / 3)}}`;
+      if (text.length <= MAX_PASTE_CHARS) expect(parseRecipeReply(text).kind).toBe('invalid');
+      expect(() => parseRecipeReply(text)).not.toThrow();
+    });
+  }
+  it('nested arrays inside the limit are accepted as extras', () => {
+    expect(parseRecipeReply(`${head},"x":[[1]]}`).kind).toBe('recipe');
+  });
+  it('quantity limits', () => {
+    const q = (v: string) => parseRecipeReply(`{"firstmenu_recipe":1,"title":"T","ingredients":[{"name":"rice","quantity":${v}}],"steps":["Cook."]}`).kind;
+    expect(q('1e308')).toBe('invalid');
+    expect(q('1e20')).toBe('invalid');
+    expect(q('10000.001')).toBe('invalid');
+    expect(q('10000')).toBe('recipe');
+    expect(q('0.5')).toBe('recipe');
+  });
+  describe('invisible characters cannot hide a food word', () => {
+    const hidden = ['\u3164', '\uffa0', '\u115f', '\u1160', '\ufe0f', '\u{e0100}', '\u2800'];
+    for (const h of hidden) {
+      const word = `ho${h}ney`;
+      const code = h.codePointAt(0)!.toString(16);
+      it(`U+${code} in notes, a name, an extra key value and a unit`, () => {
+        expect(mentionIds(obj({ notes: [`add ${word}`] }))).not.toEqual([]);
+        expect(recipeOf(obj({ ingredients: [{ name: word }] })).parsed.ingredients[0].name).toBe('honey');
+        expect(mentionIds(obj({ extra: word }))).not.toEqual([]);
+        const r = recipeOf(obj({ ingredients: [{ name: 'rice', quantity: 1, unit: word }] }));
+        expect(r.extras).toContain('ingredients[0].unit');
+      });
+    }
+    it('a harmless word with an invisible character does not fire', () => {
+      expect(mentionIds(obj({ notes: ['ri\u3164ce\ufe0f is fine'] }))).toEqual([]);
+    });
+  });
+});

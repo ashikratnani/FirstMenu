@@ -41,6 +41,7 @@ export const MAX_INGREDIENTS = 60;
 export const MAX_STEPS = 40;
 export const MAX_NOTES = 20;
 export const MAX_DEPTH = 6;
+export const MAX_QUANTITY = 10000;
 export const MAX_EXTRA_STRINGS = 50;
 export const MAX_EXTRA_STRING_CHARS = 500;
 const MAX_SCAN_STARTS = 200;
@@ -69,7 +70,7 @@ export type JsonParseResult =
 
 const ingredientSchema = z.looseObject({
   name: z.string().min(1).max(MAX_NAME_CHARS),
-  quantity: z.number().gt(0).nullable().optional(),
+  quantity: z.number().gt(0).max(MAX_QUANTITY).nullable().optional(),
   unit: z.string().nullable().optional(),
   optional: z.boolean().optional(),
 });
@@ -181,7 +182,8 @@ function messageFor(issue: z.core.$ZodIssue, root: unknown): JsonIssue {
 export function cleanString(s: string): string {
   return s
     .replace(/[\t\r\n\u2028\u2029]+/g, ' ')
-    .replace(/[\p{Cc}\p{Cf}]/gu, '')
+    .replace(/[\p{Cc}\p{Cf}\u3164\uFFA0\u115F\u1160\u2800]/gu, '')
+    .replace(/\p{Variation_Selector}/gu, '')
     .replace(/\s+/g, ' ')
     .trim();
 }
@@ -270,6 +272,7 @@ function findDuplicateKey(json: string): string | null {
   const value = (parts: Array<string | number>): string | null => {
     ws();
     const c = json[i];
+    if ((c === '{' || c === '[') && parts.length >= MAX_DEPTH) throw new LimitError();
     if (c === '{') {
       i++;
       const seen = new Set<string>();
@@ -471,6 +474,14 @@ function outsideNotable(text: string, c: Candidate): boolean {
 }
 
 export function parseRecipeReply(text: string): JsonParseResult {
+  try {
+    return parseRecipeReplyUnsafe(text);
+  } catch {
+    return invalid({ path: '', message: UNREADABLE });
+  }
+}
+
+function parseRecipeReplyUnsafe(text: string): JsonParseResult {
   if (text.trim() === '') return { kind: 'no-json' };
   if (text.length > MAX_PASTE_CHARS) {
     return invalid({ path: '', message: 'The text is too long to read (over 20,000 characters).' });
@@ -482,7 +493,12 @@ export function parseRecipeReply(text: string): JsonParseResult {
     return invalid({ path: '', message: UNREADABLE });
   }
 
-  const duplicate = findDuplicateKey(text.slice(found.start, found.end));
+  let duplicate: string | null;
+  try {
+    duplicate = findDuplicateKey(text.slice(found.start, found.end));
+  } catch {
+    return invalid({ path: '', message: TOO_MUCH_EXTRA });
+  }
   if (duplicate !== null) return invalid(duplicateIssue(duplicate));
 
   let data: Record<string, unknown>;
@@ -513,9 +529,15 @@ export function parseRecipeReply(text: string): JsonParseResult {
   const unitNotes: string[] = [];
   const unitPaths: string[] = [];
   let unitTooLong = false;
+  let quantityIssue: JsonIssue | null = null;
   r.ingredients.forEach((ing, i) => {
     const out: ParsedIngredient = { name: ing.name, optional: ing.optional === true, line: ++line };
-    if (typeof ing.quantity === 'number') out.quantity = Math.round(ing.quantity * 1000) / 1000;
+    if (typeof ing.quantity === 'number') {
+      const q = Math.round(ing.quantity * 1000) / 1000;
+      if (!Number.isFinite(q) || q > MAX_QUANTITY) {
+        quantityIssue = { path: `ingredients[${i}].quantity`, message: `ingredients[${i}].quantity must be at most ${MAX_QUANTITY}` };
+      } else out.quantity = q;
+    }
     const unit = ing.unit ?? '';
     if (unit !== '') {
       if (unit.length > MAX_EXTRA_STRING_CHARS) unitTooLong = true;
@@ -530,6 +552,7 @@ export function parseRecipeReply(text: string): JsonParseResult {
     }
     ingredients.push(out);
   });
+  if (quantityIssue) return invalid(quantityIssue);
   if (unitTooLong) return invalid({ path: '', message: TOO_MUCH_EXTRA });
 
   const steps: ParsedLine[] = r.steps.map((t) => ({ text: t, line: ++line }));
