@@ -120,6 +120,8 @@ export const SOURCES: Record<SourceId, Source> = {
   'CDC-solids': {
     title: 'CDC: When, what and how to introduce solid foods',
     url: 'https://www.cdc.gov/infant-toddler-nutrition/foods-and-drinks/when-what-and-how-to-introduce-solid-foods.html',
+    retrieved: '2026-11-10',
+    note: 'Texture hints read from a web.archive.org copy captured 2025-01-26 (page dated December 5, 2023; the live page returned 403). Re-check against the live page.',
   },
   // Nutrition tag sources (task 4.1). Used by domain/nutrition.ts, not by safety
   // rules. CDC pages were read from Internet Archive copies (CDC returns 403 to
@@ -135,7 +137,7 @@ export const SOURCES: Record<SourceId, Source> = {
     title: 'CDC: Foods and drinks to encourage',
     url: 'https://www.cdc.gov/infant-toddler-nutrition/foods-and-drinks/foods-and-drinks-to-encourage.html',
     retrieved: '2026-11-09',
-    note: 'Read from a web.archive.org copy dated 2023-11-24 (the live page returned 403). Re-check against the live page.',
+    note: 'Read from a web.archive.org copy dated 2023-11-24 (the live page returned 403). Re-check against the live page. The archive copy read for the texture hints was captured 2025-01-26 and carries the page date November 24, 2023.',
   },
   'USDA-FNS-iron': {
     title: 'USDA FNS: For parents, making sure your baby gets enough iron (PDF)',
@@ -145,6 +147,58 @@ export const SOURCES: Record<SourceId, Source> = {
   'HHS-CFOC': {
     title: 'Caring for Our Children 4.5.0.10: Foods that are choking hazards',
     url: 'https://childcareta.acf.hhs.gov/cfoc/basic/chapter/4/4.5.0.10',
+  },
+};
+
+/**
+ * Stage texture hints (Req 13.5). Each hint is limited to wording the cited
+ * Internet Archive copy supports (CDC returns 403 to the sandbox; maintainer
+ * decision on issue #54). `quote` is the supporting text from the page, and
+ * `archiveNote` says which copy it was read from. Hints never use a pronoun.
+ * Gaps: the CDC pages give no age-specific texture wording for 2 to 3 years
+ * and do not use the phrase "small, bite-sized pieces"; the 24-36 hint uses
+ * the page's general "bite-sized" wording for children eating family foods.
+ */
+export interface StageTextureHint {
+  hint: string;
+  quote: string;
+  sources: SourceId[];
+  archiveNote: string;
+}
+
+const SOLIDS_ARCHIVE =
+  'web.archive.org copy captured 2025-01-26 of the CDC page dated December 5, 2023';
+const ENCOURAGE_ARCHIVE =
+  'web.archive.org copy captured 2025-01-26 of the CDC page dated November 24, 2023';
+
+export const STAGE_TEXTURE_HINTS: Record<'6-8' | '9-12' | '12-23' | '24-36', StageTextureHint> = {
+  '6-8': {
+    hint: 'mashed, pureed or strained, very smooth',
+    quote:
+      "At first, it's easier for your child to eat mashed, pureed, or strained foods that are very smooth in texture.",
+    sources: ['CDC-solids'],
+    archiveNote: SOLIDS_ARCHIVE,
+  },
+  '9-12': {
+    hint: 'mashed, with thicker and lumpier foods as eating develops; soft food cut into small pieces',
+    quote:
+      "You can introduce thicker and more lumpy foods as your baby's ability to eat develops. ... Cut soft food into small pieces or thin slices.",
+    sources: ['CDC-solids'],
+    archiveNote: SOLIDS_ARCHIVE,
+  },
+  '12-23': {
+    hint: 'soft, small, bite-sized pieces',
+    quote:
+      'At first, foods may need to be soft and mashed or bite-sized. ... Proteins: soft, small pieces of beef, lamb, chicken, fish, turkey, eggs, or tofu.',
+    sources: ['CDC-encourage'],
+    archiveNote: ENCOURAGE_ARCHIVE,
+  },
+  '24-36': {
+    hint: 'bite-sized pieces',
+    quote:
+      "It is important to provide foods that match your child's eating skills. At first, foods may need to be soft and mashed or bite-sized.",
+    sources: ['CDC-encourage'],
+    archiveNote: ENCOURAGE_ARCHIVE,
   },
 };
 

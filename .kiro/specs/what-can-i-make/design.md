@@ -484,7 +484,7 @@ defaultSlots('12-23' | '24-36') = [breakfast, lunch, dinner, snack]
 | `12-23` | 12–23 months | soft, small, bite-sized pieces | CDC-encourage |
 | `24-36` | 2–3 years | small, bite-sized pieces | CDC-encourage |
 
-Task 1.3b confirms the hint wording against the sources and adjusts it to match them.
+Task 1.3b confirmed the hint wording against Wayback copies of the CDC pages (`STAGE_TEXTURE_HINTS` in `rules.ts` holds each hint, its quote and sources). The CDC pages do not use the phrase "small, bite-sized pieces" and give no age-specific wording for 2 to 3 years, so the toddler hints use "bite-sized" wording the pages do support.
 
 ### Juice limit reminder (Requirement 13.7)
 

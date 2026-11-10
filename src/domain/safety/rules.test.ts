@@ -5,6 +5,7 @@ import {
   RULES,
   RULESET_VERSION,
   SOURCES,
+  STAGE_TEXTURE_HINTS,
   type SourceId,
 } from './rules';
 import { tokenize } from './normalize';
@@ -148,5 +149,46 @@ describe('juice-limit reminder (active spec Requirement 13.7)', () => {
     for (const rule of RULES) {
       if (rule.id !== 'juice-limit') expect(rule.fromMonths).toBeUndefined();
     }
+  });
+});
+
+describe('stage texture hints (Req 13.5)', () => {
+  const stages = ['6-8', '9-12', '12-23', '24-36'] as const;
+
+  it('has a hint for each of the four stages', () => {
+    expect(Object.keys(STAGE_TEXTURE_HINTS).sort()).toEqual([...stages].sort());
+  });
+
+  for (const stage of stages) {
+    const entry = STAGE_TEXTURE_HINTS[stage];
+
+    it(`${stage}: cites existing sources with URLs, a quote and an archive note`, () => {
+      expect(entry.hint.trim().length).toBeGreaterThan(0);
+      expect(entry.quote.trim().length).toBeGreaterThan(0);
+      expect(entry.archiveNote).toMatch(/web\.archive\.org/);
+      expect(entry.sources.length).toBeGreaterThan(0);
+      for (const id of entry.sources) {
+        expect(SOURCES[id]?.url, `${stage} cites ${id}`).toMatch(/^https:\/\//);
+        expect(SOURCES[id]?.note, `${id} carries the archive note`).toMatch(/web\.archive\.org/);
+      }
+    });
+
+    it(`${stage}: hint has no pronoun`, () => {
+      expect(entry.hint).not.toMatch(/\b(he|she|his|her|him|hers|they|their)\b/i);
+    });
+  }
+
+  it('toddler hints are supported by CDC-encourage, infant hints by CDC-solids', () => {
+    expect(STAGE_TEXTURE_HINTS['6-8'].sources).toEqual(['CDC-solids']);
+    expect(STAGE_TEXTURE_HINTS['9-12'].sources).toEqual(['CDC-solids']);
+    expect(STAGE_TEXTURE_HINTS['12-23'].sources).toEqual(['CDC-encourage']);
+    expect(STAGE_TEXTURE_HINTS['24-36'].sources).toEqual(['CDC-encourage']);
+  });
+
+  it('every quote is a phrase the archived page was read to contain', () => {
+    expect(STAGE_TEXTURE_HINTS['6-8'].quote).toContain('mashed, pureed, or strained foods that are very smooth');
+    expect(STAGE_TEXTURE_HINTS['9-12'].quote).toContain('thicker and more lumpy foods');
+    expect(STAGE_TEXTURE_HINTS['12-23'].quote).toContain('soft and mashed or bite-sized');
+    expect(STAGE_TEXTURE_HINTS['24-36'].quote).toContain('bite-sized');
   });
 });
