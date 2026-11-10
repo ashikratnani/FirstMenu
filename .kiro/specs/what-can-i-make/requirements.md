@@ -11,6 +11,8 @@ FirstMenu v1 (spec: `.kiro/specs/first-menu/`) is built and live. It plans a wee
 
 In a second review the maintainer also asked for more built-in recipes, support for toddlers (up to 3 years), and a new UI built on Meta's Astryx design system.
 
+Maintainer changes of November 10, 2026 (approved in session): recipes now arrive through a JSON prompt flow instead of unstructured pastes (Requirements 18 and 19), and a short problem-first onboarding helps new users (Requirement 20). Free-text pasting stays as a fallback.
+
 This spec changes FirstMenu's focus to answer those. The safety screen, ghosted foods, first tastes, built-in recipes, theme, local storage and disclaimers from v1 stay. The week plan, prep list, grocery list, print view and plan share link stay as secondary features with no new work beyond what's listed here.
 
 Constraints carried over from v1: no backend, no account, no network requests other than the app's own files, React + TypeScript + Vite on GitHub Pages, MIT license. Deadline: Friday, December 4, 2026, 2:00 PM PT (submission planned Thursday, December 3).
@@ -31,6 +33,11 @@ Terms from the v1 glossary keep their meaning. New terms:
 - **Stated time**: a total time written in the recipe text. **Estimated time**: a time the app computes from durations in the steps.
 - **Effort**: Easy, Medium or More, computed from the recipe.
 - **Nutrition tag**: a food-group label (Iron-rich, Protein, Vegetable, Fruit, Whole grain, Dairy, Healthy fat) shown when a recipe contains a food from that group.
+- **Recipe JSON**: the fixed JSON format (`firstmenu_recipe` version 1) defined in the design that the app asks an AI chat app to reply in, and that the app parses strictly.
+- **Question**: the text the user types for ChatGPT (for example "a quick lunch with eggs and rice").
+- **Wrapped prompt**: the question plus the app's age, safety and output-format context, ready to copy.
+- **Reel prompt**: a prompt built from an Instagram reel URL that asks an AI chat app to extract the recipe as Recipe JSON.
+- **Problem choices**: the short list of things a new user says they want help with during onboarding.
 - **Prompt helper**: the feature that writes a ChatGPT prompt for the user to copy.
 - **Text mention**: a block-rule food found in a pasted recipe's title, steps or notes rather than its ingredient list.
 - **Stages**: `6–8 months`, `9–11 months` (id `9-12`, kept from v1), `12–23 months` and `24–36 months`. The last two are the **toddler stages**.
@@ -111,9 +118,9 @@ Terms from the v1 glossary keep their meaning. New terms:
 
 #### Acceptance Criteria
 
-1. THE Add recipe screen SHALL have one large text box for pasting and a "Read recipe" button.
-2. THE app SHALL parse the text in the browser, with no network request, into a title, ingredients (quantity, unit, name, optional flag), steps, stated time, servings and notes.
-3. THE parser SHALL handle ChatGPT-style text (headings, markdown bold and headers, bullets and numbered lists) and Instagram-style captions (emoji, hashtags, @mentions, "save this" lines, inline lists).
+1. THE Add recipe screen SHALL have one large text box for pasting and a "Read recipe" button. The box accepts Recipe JSON (Requirement 18) or plain text; plain text uses the free-text parser as a fallback.
+2. THE app SHALL parse the text in the browser (Recipe JSON strictly, plain text with the free-text parser), with no network request, into a title, ingredients (quantity, unit, name, optional flag), steps, stated time, servings and notes.
+3. THE free-text parser (the fallback) SHALL handle ChatGPT-style text (headings, markdown bold and headers, bullets and numbered lists) and Instagram-style captions (emoji, hashtags, @mentions, "save this" lines, inline lists).
 4. AFTER parsing, THE app SHALL show a preview with the safety screen results, time, effort and nutrition tags. The user SHALL be able to save without typing anything.
 5. IN the preview, THE user SHALL be able to fix the title, delete or edit any ingredient or step line, and move a line between ingredients, steps and notes.
 6. IF the parser finds no ingredients THEN the app SHALL say so and let the user mark which lines are ingredients.
@@ -142,8 +149,8 @@ Terms from the v1 glossary keep their meaning. New terms:
 
 #### Acceptance Criteria
 
-1. THE Make screen and the Add recipe screen SHALL offer "Ask ChatGPT".
-2. THE app SHALL build a prompt containing: the child's age in months, the on-hand and pantry foods, a texture hint for the stage, the foods to leave out, a request for something quick and easy (iron-rich if possible), and the reply format from the design.
+1. THE Make screen and the Add recipe screen SHALL offer "Ask ChatGPT", which opens the question box of Requirement 18.
+2. THE app SHALL build a prompt containing: the child's age in months, a texture hint for the stage, the foods to leave out, and the Recipe JSON reply format from the design, wrapped around the user's question (Requirement 18). The on-hand foods and the request for something quick and easy (iron-rich if possible) are not added by the prompt builder: they appear only in the editable pre-filled question of Requirement 18.1, so the user sees and controls them.
 3. THE foods to leave out SHALL be the labels of the block rules that apply at the child's age, plus foods with a recorded reaction.
 4. THE prompt SHALL ask ChatGPT not to mention the left-out foods anywhere in its reply.
 5. THE app SHALL NOT include the child's name or birth date in the prompt.
@@ -193,8 +200,8 @@ Terms from the v1 glossary keep their meaning. New terms:
 
 #### Acceptance Criteria
 
-1. THE README, `docs/kiro-usage.md` and the demo script SHALL describe the new flow: pantry, on hand, ready-now results, paste from ChatGPT, safety catch, nutrition tags.
-2. THE deployed app SHALL be checked end to end on a phone before submission, including pasting a real ChatGPT reply and a real Instagram caption.
+1. THE README, `docs/kiro-usage.md` and the demo script SHALL describe the new flow: pantry, on hand, ready-now results, the ChatGPT and Instagram JSON prompt flows, safety catch, nutrition tags, onboarding.
+2. THE deployed app SHALL be checked end to end on a phone before submission, including a real ChatGPT reply in Recipe JSON, a real reel prompt run in Meta AI or another AI chat app, and the onboarding on a phone.
 
 ### Requirement 13: Toddler support
 
@@ -218,7 +225,7 @@ Terms from the v1 glossary keep their meaning. New terms:
 
 #### Acceptance Criteria
 
-1. THE app SHALL ship **500 built-in recipes and simple ideas as the goal and no fewer than 300 as the hard minimum**, of which at most 40 are simple ideas. A recipe tagged for several stages counts toward each of them. Each stage SHALL meet the hard-minimum counts below, split by effort, and SHOULD reach the goal counts, which are a target and not tested (Easy, Medium, More, as computed by `recipeEffort` in `domain/effort.ts`, Requirement 10.3). This replaces the counts in v1 Requirement 2.1. The 300 minimum, the stage table and the cap of 40 simple ideas are proposed, pending maintainer approval (see #68).
+1. THE app SHALL ship **500 built-in recipes and simple ideas as the goal and no fewer than 300 as the hard minimum**, of which at most 40 are simple ideas. A recipe tagged for several stages counts toward each of them. Each stage SHALL meet the hard-minimum counts below, split by effort, and SHOULD reach the goal counts, which are a target and not tested (Easy, Medium, More, as computed by `recipeEffort` in `domain/effort.ts`, Requirement 10.3). This replaces the counts in v1 Requirement 2.1. The 300 minimum, the stage table and the cap of 40 simple ideas are approved by the maintainer on #68.
 
    | Stage | Goal (Easy / Medium / More) | Goal total | Hard minimum (Easy / Medium / More) | Minimum total |
    | --- | --- | --- | --- | --- |
@@ -227,13 +234,13 @@ Terms from the v1 glossary keep their meaning. New terms:
    | `12–23 months` | 80 / 80 / 60 | 220 | 45 / 45 / 30 | 120 |
    | `24–36 months` | 130 / 130 / 120 | 380 | 70 / 70 / 60 | 200 |
 
-   The older the stage, the more recipes it gets. Within a stage the split aims to be even, but it is not required to be. Only `6–8` leans toward Easy (30 / 12 / 3), because few recipes suit a 6-month-old, and that is accepted; `9–12` is close to even (50 / 45 / 25), with More the smallest cell. The `6–8` More cell has a minimum of 0 because More means more than 8 required ingredients or more than 7 steps (Requirement 10.3 and the design's Effort rules), which few recipes suit a 6-month-old, and the task 14.4 CI check would otherwise fail; reaching 3 is a goal only. This 0 (proposed, was 2) and the Medium minimum of 10 (was 8, so the stage total of 30 still adds up) are pending maintainer approval (see issue #68). The goal totals add up to 765 stage tags over 500 recipes (about 1.5 stages per recipe). The invariant tests SHALL fail below the hard minimum and SHALL report the goal as a count table without failing; the goal is never enforced by a test.
+   The older the stage, the more recipes it gets. Within a stage the split aims to be even, but it is not required to be. Only `6–8` leans toward Easy (30 / 12 / 3), because few recipes suit a 6-month-old, and that is accepted; `9–12` is close to even (50 / 45 / 25), with More the smallest cell. The `6–8` More cell has a minimum of 0 because More means more than 8 required ingredients or more than 7 steps (Requirement 10.3 and the design's Effort rules), which few recipes suit a 6-month-old, and the task 14.4 CI check would otherwise fail; reaching 3 is a goal only. This 0 (was 2) and the Medium minimum of 10 (was 8, so the stage total of 30 still adds up) are approved by the maintainer on #68. The goal totals add up to 765 stage tags over 500 recipes (about 1.5 stages per recipe). The invariant tests SHALL fail below the hard minimum and SHALL report the goal as a count table without failing; the goal is never enforced by a test.
 2. BUILT-IN recipes MAY come from any publisher that meets every recipe source criterion in the design (an accountable public health, government, university or extension, children's hospital, or dietitian-led nonprofit publisher; free to read; exact quantities; not a blog, social media, brand, aggregator or AI site). Minnesota and other WIC programs, USDA FNS, the ICN Child Nutrition Recipe Box and Food Hero already qualify. EACH new publisher SHALL be checked by pr-reviewer before its first recipe merges and recorded in `docs/recipe-sources.md` with the verdict. (Changed from a fixed list by the maintainer on November 9, 2026.)
 3. A built-in recipe MAY differ from its source by scaling every quantity by the same factor to make 2 to 6 servings, recorded as an adaptation ("Scaled from 25 servings to 4"). This adds to the changes allowed by v1 Requirement 2.9.
 4. A simple idea MAY have no ingredient quantities and SHALL be labeled "Simple idea" in the app. This is an exception to v1 Requirement 2.8 for simple ideas only.
 5. EVERY built-in recipe and simple idea SHALL keep v1's sourcing rules: source title, publisher, URL and retrieval date recorded and shown; ingredients from the source; steps in the app's own words; storage times from the source or a cited food-safety source.
-6. THE built-in set SHALL include recipes containing each of the nine allergen groups, in at least these numbers (hard minimum / goal): dairy, egg, wheat and soy 30 / 60 each; peanut, tree nuts and fish 8 / 15 each; sesame 4 / 8; shellfish 3 / 6. Most goals are double the minimum; peanut, tree nuts and fish are 8 / 15, a little under double. This restores v1 Requirement 2.5, which issue #7 had relaxed, and scales it to the larger set. These allergen minimums and goals are proposed, pending maintainer approval (see #68). Counts come from the real safety screen, as in the v1 tests.
-7. IF qualifying publishers can't reach the hard minimums in criterion 1 or the allergen minimums in criterion 6 THEN the shortfall SHALL be reported to the maintainer before the set ships short. Falling short of a goal but meeting every hard minimum needs no report beyond the final numbers on issue #7, because the maintainer set the 500 goal on November 11, 2026. The hard minimums (300 total, the per-stage, per-effort and per-allergen counts, the cap of 40 simple ideas and the November 30 freeze) are proposed, pending maintainer approval (see issue #68).
+6. THE built-in set SHALL include recipes containing each of the nine allergen groups, in at least these numbers (hard minimum / goal): dairy, egg, wheat and soy 30 / 60 each; peanut, tree nuts and fish 8 / 15 each; sesame 4 / 8; shellfish 3 / 6. Most goals are double the minimum; peanut, tree nuts and fish are 8 / 15, a little under double. This restores v1 Requirement 2.5, which issue #7 had relaxed, and scales it to the larger set. These allergen minimums and goals are approved by the maintainer on #68. Counts come from the real safety screen, as in the v1 tests.
+7. IF qualifying publishers can't reach the hard minimums in criterion 1 or the allergen minimums in criterion 6 THEN the shortfall SHALL be reported to the maintainer before the set ships short. Falling short of a goal but meeting every hard minimum needs no report beyond the final numbers on issue #7, because the maintainer set the 500 goal on November 11, 2026. The hard minimums (300 total, the per-stage, per-effort and per-allergen counts, the cap of 40 simple ideas and the November 30 freeze) are approved by the maintainer on #68.
 8. NEW built-in recipes SHALL be added in batches of about 50 (40 to 60). EACH batch SHALL have a review issue listing its recipes with source links, stage tags and adaptations, for the primary user to review. Reviews SHALL NOT block later batches; feedback SHALL be applied when it arrives. No batch SHALL merge after November 30, 2026.
 9. WITH 500 built-in recipes THE app SHALL stay fast on a mid-range phone: opening Make, searching and changing a filter SHALL each finish rendering within 100 ms of the interaction for the full built-in set plus 50 custom recipes (measured by a Vitest timing test on `makeResults`, with generous CI margins), and the built-in data SHALL stay within the recipe data budget in the design.
 
@@ -292,13 +299,68 @@ These suggestions come from the maintainer's UI feedback (issue #36): the app sh
 10. EACH screen SHALL have at most one filled primary button at a time. On the Make screen it is the "Try this" button when that card is shown. On Add recipe it is "Paste" before a preview and "Save recipe" during a preview, and the shell's "Add recipe" button is hidden there.
 11. ALL suggestion state (made log, on-hand date, food counts, dismissals) SHALL be stored on the device in schema v2, SHALL be included in export and import, and SHALL NOT be included in share links or the ChatGPT prompt.
 
+### Requirement 18: JSON prompt flow for ChatGPT
+
+**User Story:** As a parent, I want to type the question I would ask ChatGPT, run it, paste the answer and have the app add the recipe, so that I never retype a recipe and the app can read the answer reliably.
+
+#### Acceptance Criteria
+
+1. THE "Ask ChatGPT" screen SHALL have a text box for the user's question, pre-filled with a suggestion based on what the user has on hand (editable), and a limit of 1,000 characters.
+2. THE app SHALL build the wrapped prompt: the child's age in months and stage texture hint, the foods to leave out (Requirement 8.3), the instruction not to mention those foods, the user's question inside a clearly marked block, and the Recipe JSON output template with the instruction to reply with only the JSON. The prompt SHALL NOT contain the child's name or birth date.
+3. THE user SHALL be able to copy the wrapped prompt and open ChatGPT in a new tab, then paste the reply into Add recipe (with the source preset to ChatGPT).
+4. THE app SHALL parse a pasted reply as Recipe JSON when it contains a JSON object: it SHALL accept the object alone or inside a markdown code fence with text around it, and SHALL ignore text outside the object as recipe content: that text is not shown as steps or notes and is not saved in the recipe, and is kept only in the original text (Requirement 18.10). THE preview SHALL say when a long outside text (over 200 characters) or a second JSON object was ignored.
+5. THE Recipe JSON parser SHALL be strict: a wrong version, a missing or empty title, no ingredients, no steps, an ingredient with no name, a quantity that is not a number, or a wrong type SHALL be rejected with a plain-language message that names the field. A rejected reply SHALL NOT be saved.
+6. WHEN the reply is rejected THEN the app SHALL offer a "Copy a fix-up request" prompt that asks the AI chat app to resend the recipe in the exact format, and SHALL offer "Read as plain text instead".
+7. IF the reply contains no JSON object THEN the app SHALL read it with the free-text parser, say "This isn't in the expected format, so it was read as plain text. Check each line.", and continue with the same preview.
+8. THE parsed recipe SHALL go through exactly the same preview, line editing, safety screen (ingredient screen plus text-mention screen on title, steps and notes, Requirement 7), time, effort and nutrition tags as a text paste. THE app SHALL NOT offer any way to skip or clear a text mention except the user's tap on "Not used in this recipe".
+9. EVERY string inside the reply's JSON object, at any depth, that the format does not define (extra fields, nested values, ingredient-level extra fields, an ingredient's unit) SHALL be added to the recipe's notes and screened as recipe text, so nothing inside the object is dropped unscreened. IF the reply has more such text than the limits in the design THEN the app SHALL reject it as invalid rather than truncate it. An ingredient's `unit` SHALL be screened through the text-mention screen, not the ingredient-name match (v1 Requirement 4.1 is not widened). Text outside the object is covered by 18.4.
+10. THE raw reply SHALL be kept as the recipe's original text (Requirement 6.8).
+11. A reply of more than 20,000 characters SHALL NOT be parsed.
+12. THE app SHALL NOT call any AI service. The question and the reply stay on the device.
+
+### Requirement 19: Instagram reel prompt flow
+
+**User Story:** As a parent, I find recipes in Instagram reels. I want the app to give me a prompt for Meta AI or another AI chat app that is connected to my Instagram, so that the recipe comes back in a form the app can read.
+
+#### Acceptance Criteria
+
+1. THE Add recipe screen SHALL have a "From an Instagram reel" option with a box for the reel URL.
+2. THE app SHALL accept only an `https://` URL up to 500 characters. IF the host is not `instagram.com`, `www.instagram.com` or `instagr.am` THEN the app SHALL show a warning but still allow the prompt.
+3. THE app SHALL build the reel prompt: the URL, an instruction to open the reel and extract the recipe from the caption, spoken audio and on-screen text, to leave a quantity empty rather than guess it, to reply with only Recipe JSON in the template of Requirement 18, and to reply with the `error` object of the template when the reel can't be opened.
+4. THE reel prompt SHALL NOT contain the child's name, birth date or age.
+5. THE user SHALL be able to copy the reel prompt and open Meta AI (`https://www.meta.ai/`) in a new tab with one tap each, and the screen SHALL say that any AI chat app that can open the user's Instagram works.
+6. THE app SHALL NEVER fetch, embed or preview the URL. THE URL SHALL be kept only as the recipe's optional link (Requirement 6.9), with the source preset to Instagram.
+7. THE pasted reply SHALL follow Requirement 18.4 to 18.11, including the full safety screen. A reply with the `error` object SHALL show "The AI app couldn't open this reel" and a tip to paste the caption instead.
+8. THE Add recipe screen SHALL keep the help text that reels can't be opened by FirstMenu (Requirement 6.10), reworded to point to this option.
+
+### Requirement 20: Short problem-first onboarding
+
+**User Story:** As a new parent, I want to say what I need help with and see the app do one useful thing right away, so that I understand what the app is for without a long tour.
+
+#### Acceptance Criteria
+
+1. AFTER the child profile (birth date, required, v1 Requirement 1), THE first run SHALL show one screen of problem choices (multi-select, one tap each): "What can I make with what I have", "Save recipes from ChatGPT or Instagram", "Plan the week and make a grocery list", "What's safe for my child", and "Just looking".
+2. THE problem choices SHALL be skippable with one tap ("Skip"), which goes straight to the Make screen. The child profile step itself SHALL NOT be skippable, because the safety screen needs the age.
+3. THE app SHALL then run one quick solve for the first problem chosen, in this fixed order of the list above, each finishing in at most three taps and using only data and code on the device:
+   1. What can I make: the user types what they have; live results show the Ready now and Missing one recipes; "Keep these foods" stores them as on-hand and opens Make.
+   2. Save recipes: the user sees the question box for ChatGPT and the reel box side by side with "Try an example", which parses a bundled sample reply and shows the preview with its safety result without saving; "Open Add recipe" goes on.
+   3. Plan and grocery: one tap fills the week using the existing plan logic and shows the grocery list, with "Keep this plan" and "Not now".
+   4. What's safe: shows the leave-out list for the child's age with its sources and a free-text food check, with the existing disclaimers (`SCREEN_LIMITS` and `NOT_MEDICAL_ADVICE`) beside the result. WHEN no rule fires for the typed food THEN it SHALL show exactly "FirstMenu's list has no rule for {food} at this age." and never "safe", "OK" or a green state (approved by the maintainer on #65).
+4. THE quick solve SHALL be skippable at every step. WHEN a user chose more than one problem THEN the end screen SHALL link to the other chosen features in one line each.
+5. THE onboarding after the profile SHALL be at most three screens, shall not require typing except in the quick solve, and SHALL NOT hold back the Make screen: finishing or skipping lands on Make.
+6. THE tried-foods checklist (v1 Requirement 7.2) SHALL be offered as an optional collapsed section on the profile screen ("Foods already tried") instead of an open list, so the first screen is short. Nothing it records changes.
+7. USERS who already finished onboarding SHALL NOT be shown the new screens automatically; they see them only when they open "Quick tour" (20.10), which opens the problems step at `/onboarding/tour`. THE onboarding SHALL add no stored fields (it uses the existing `onboarded` flag) and make no network request.
+8. THE onboarding SHALL meet Requirement 15 (Astryx, WCAG 2.1 AA, keyboard, 360 px, one filled primary button per screen) and SHALL be loaded with the Make screen's chunk or lazily, within the size budget of Requirement 15.6.
+9. EVERY quick-solve screen that shows safety results (What's safe, and the Save recipes example preview) SHALL show the disclaimers of Requirement 11 (`NOT_MEDICAL_ADVICE` and `SCREEN_LIMITS`) next to the results, not only in the page footer.
+10. THE onboarding SHALL be re-openable from Settings as "Quick tour".
+
 ## Out of scope
 
 - Calling any AI service from the app, or any backend.
 - Suggestions based on how often to re-offer allergens, until a cited source gives an interval.
 - Semantic search with a language model or embeddings (Requirement 16 uses a fixed name list and typo rules instead).
 - Food names in languages other than English.
-- Opening Instagram links, transcribing reel audio or video, or reading text from images inside the app.
+- Opening or fetching Instagram links, transcribing reel audio or video, or reading text from images inside the app (the AI chat app the user chooses does this, Requirement 19).
 - Nutrient amounts, calorie or portion tracking.
 - Image cards for Instagram stories (possible later, depending on Requirement 9 review).
 - New work on the week plan, prep list, grocery list, print view or plan share link.
