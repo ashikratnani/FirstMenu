@@ -13,10 +13,10 @@ export default defineConfig({
     manifest: true,
     rollupOptions: {
       output: {
-        // Built-in recipe data (src/data/recipes.ts, simpleIdeas.ts) gets its own
+        // Built-in recipe data (src/data/recipes.ts, recipesBatch<n>.ts, simpleIdeas.ts) gets its own
         // chunk so size-report.mjs can report it apart from the page budgets.
         manualChunks(id) {
-          if (/\/src\/data\/(recipes|simpleIdeas)\.ts$/.test(id)) return 'recipe-data';
+          if (/\/src\/data\/(recipes|recipesBatch\d+|simpleIdeas)\.ts$/.test(id)) return 'recipe-data';
         },
       },
     },

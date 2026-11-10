@@ -66,6 +66,7 @@
 // helper so the pinned numbers cannot silently drift.
 
 import type { Recipe } from '../domain/types';
+import { BATCH_2_RECIPES } from './recipesBatch2';
 import { SIMPLE_IDEAS } from './simpleIdeas';
 
 const BABYFOOD_URL = 'https://www.health.state.mn.us/people/wic/recipes/babyfood.html';
@@ -495,5 +496,8 @@ export const RECIPES: Recipe[] = [
   },
 ];
 
-/** Everything built in: the 10 sourced recipes plus the simple ideas. */
-export const BUILTIN_RECIPES: Recipe[] = [...RECIPES, ...SIMPLE_IDEAS];
+/**
+ * Everything built in: the 10 sourced WIC recipes, the simple ideas and the
+ * batch 2 recipes (Food Hero, ICN, NHLBI; see recipesBatch2.ts).
+ */
+export const BUILTIN_RECIPES: Recipe[] = [...RECIPES, ...SIMPLE_IDEAS, ...BATCH_2_RECIPES];
