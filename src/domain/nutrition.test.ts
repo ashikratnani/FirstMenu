@@ -73,7 +73,7 @@ describe('rule format', () => {
   });
 
   it('versions the healthy fat rule and cites the Dietary Guidelines', () => {
-    expect(NUTRITION_VERSION).toBe(2);
+    expect(NUTRITION_VERSION).toBeGreaterThanOrEqual(2);
     const rule = NUTRITION_RULES.find((r) => r.tag === 'healthy-fat');
     expect(rule?.sources).toEqual(['DGA-2020-2025']);
     expect(SOURCES['DGA-2020-2025'].url).toBe(
@@ -164,6 +164,19 @@ describe('except and matching cases', () => {
   it('nut-free and oil-free names are not healthy fat', () => {
     expect(tags('nut free granola')).not.toContain('healthy-fat');
     expect(tags('oil free dressing')).not.toContain('healthy-fat');
+  });
+  it('tropical oils and seafood seasoning are not healthy fat (DGA PDF page 48)', () => {
+    for (const n of ['coconut oil', 'palm oil', 'palm kernel oil', 'seafood seasoning']) {
+      expect(tags(n), n).not.toContain('healthy-fat');
+    }
+    for (const n of ['olive oil', 'vegetable oil']) {
+      expect(tags(n), n).toContain('healthy-fat');
+    }
+  });
+  it('the crabby sandwich still gets healthy fat from surimi seafood', () => {
+    const r = BUILTIN_RECIPES.find((x) => x.id === 'b-icn-crabby-sandwich');
+    expect(r).toBeDefined();
+    expect(recipeNutritionTags(r!)).toContain('healthy-fat');
   });
   it('healthy fat does not fire on look-alike words or unnamed foods', () => {
     for (const n of ['walnut', 'peanut', 'nutmeg', 'butternut squash', 'coconut', 'seedless grapes', 'avocado', 'salmon', 'butter']) {

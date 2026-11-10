@@ -59,6 +59,11 @@
 // seafood, nut, seed, oil. Salmon, avocado, nut butter and olive oil are not
 // named there as fat sources; olive oil still matches through "oil", and nut
 // butter through "nut" only when the name has the token "nut".
+// Exceptions, same PDF, PDF page 48 (printed page 35), "Oils": "The fat in some
+// tropical plants, such as coconut oil, palm kernel oil, and palm oil, are not
+// included in the oils category because they contain a higher percentage of
+// saturated fat than do other oils." So those three are excluded. Seafood
+// seasoning is a spice mix, not seafood, so it is excluded too.
 
 import { matchesTerm } from './safety/normalize';
 import type { SourceId } from './safety/rules';
@@ -129,7 +134,7 @@ export const NUTRITION_RULES: NutritionRule[] = [
   {
     tag: 'healthy-fat',
     terms: ['seafood', 'nut', 'seed', 'oil'],
-    except: ['nut free', 'oil free'],
+    except: ['nut free', 'oil free', 'coconut oil', 'palm oil', 'palm kernel oil', 'seafood seasoning'],
     sources: ['DGA-2020-2025'],
   },
 ];
