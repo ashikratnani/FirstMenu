@@ -34,20 +34,3 @@
 .firstRun p {
   margin: 0 0 calc(var(--space) * 0.5);
 }
-
-.acknowledge {
-  margin-top: calc(var(--space) * 0.5);
-  padding: calc(var(--space) * 0.75) var(--space);
-  border: none;
-  border-radius: var(--radius);
-  background: var(--fm-color-accent);
-  color: var(--fm-color-on-accent);
-  font: inherit;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.acknowledge:focus-visible {
-  outline: 3px solid var(--fm-color-focus);
-  outline-offset: 2px;
-}

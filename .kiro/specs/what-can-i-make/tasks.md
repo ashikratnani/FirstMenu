@@ -133,8 +133,8 @@ Branch names use the `v2/` prefix (for example `v2/6-paste-parser`) so they don'
   - [x] 12.2 Add a secondary "I made this" button to the recipe page (records today once per day, confirms with a short status message). Component test: one filled primary button on the recipe page.
     - _Requirements: 17.5, 17.10_
 
-- [ ] 13. Convert remaining pages to Astryx
-  - [ ] 13.1 Convert Foods, recipe page, typed editor, Prep, Grocery, Share, Sources and Onboarding. Keep print CSS. Apply any UI feedback received under task 2.1 (the November 10 feedback, that the UI is clean but daunting to new users, is handled by task 18). Re-run `vitest-axe` on every page.
+- [x] 13. Convert remaining pages to Astryx
+  - [x] 13.1 Convert Foods, recipe page, typed editor, Prep, Grocery, Share, Sources and Onboarding. Keep print CSS. Apply any UI feedback received under task 2.1 (the November 10 feedback, that the UI is clean but daunting to new users, is handled by task 18). Re-run `vitest-axe` on every page.
     - _Requirements: 15.1, 15.5, 15.8_
 
 - [ ] 14. More built-in recipes (starts after task 1, runs in batches alongside tasks 2–13)
@@ -156,7 +156,7 @@ Branch names use the `v2/` prefix (for example `v2/6-paste-parser`) so they don'
 - [ ] 16. Verify
   - [ ] 16.1 Real-world checks of the JSON flows (replaces asking for real pastes, November 10, 2026). Run the wrapped prompt in ChatGPT and the reel prompt in Meta AI (or another AI chat app) as the maintainer or a tester, for at least three different questions and two reels. Save the replies with personal details removed as extra JSON fixtures, record how often the reply parsed on the first try, and fix prompt or parser gaps. Anything that needs an account or a paid service is reported to the maintainer, not worked around. Also keep the existing free-text fixtures as the fallback tests.
     - _Requirements: 18.4 – 18.7, 19.7, 12.2_
-  - [ ] 16.2 Carried over from v1: manual iOS VoiceOver and 360 px pass (v1 task 16.1), then deploy and check end to end on a phone with a baby profile and a toddler profile, including a real ChatGPT JSON reply, a reel prompt run in an AI chat app, and the onboarding (v1 task 17.1).
+  - [ ] 16.2 Carried over from v1: manual iOS VoiceOver and 360 px pass (v1 task 16.1), then deploy and check end to end on a phone with a baby profile and a toddler profile, including a real ChatGPT JSON reply, a reel prompt run in an AI chat app, and the onboarding (v1 task 17.1). Also do the real-browser 360 px and keyboard checks (jsdom cannot cover them) on the pages converted in task 13: Foods, recipe page, typed editor (recipe editor), Prep, Grocery, Share, Sources, Onboarding, Add recipe, Print (check the print preview still hides the button) and the Disclaimer button.
     - _Requirements: 11.1, 12.2, 13.1_
 
 - [ ] 17. Deliverables

@@ -7,6 +7,7 @@
 //  - <FirstRunDisclaimer /> renders a prominent, dismissible banner on first
 //    run (when disclaimerAcknowledged is false) with an acknowledge button.
 
+import { Button } from '@astryxdesign/core/Button';
 import { useApp } from '../../state/AppProvider';
 import styles from './Disclaimer.module.css';
 
@@ -51,13 +52,10 @@ export function FirstRunDisclaimer() {
         <p>{NOT_MEDICAL_ADVICE}</p>
         <p>{SCREEN_LIMITS}</p>
       </div>
-      <button
-        type="button"
-        className={styles.acknowledge}
+      <Button
+        label="I understand"
         onClick={() => dispatch({ type: 'acknowledgeDisclaimer' })}
-      >
-        I understand
-      </button>
+      />
     </section>
   );
 }

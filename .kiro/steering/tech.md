@@ -24,8 +24,16 @@ calls an AI service.
   with `@astryxdesign/theme-neutral` plus FirstMenu color overrides in
   `ui/theme/firstmenu.css`; `ui/theme/RouterLinkProvider.tsx` makes Astryx
   links React Router links; app-only CSS variables use the `--fm-` prefix so
-  they never clash with Astryx tokens. Astryx's `reset.css` is not loaded until
-  every page is converted (task 13). Do not use Astryx DateInput; use native
+  they never clash with Astryx tokens. Astryx's `reset.css` stays off as a
+  separate decision (it was not turned on when task 13 converted the pages).
+  After task 13 these stay native on purpose: `<select>` (recipe page "Add to
+  plan", editor ingredient category) and `<input type="date">` (issue #37; also the Prep page prep-day input,
+  which is the only native control left in `Prep.tsx`). The
+  recipe editor's number fields are Astryx `TextInput` with
+  `inputMode="decimal"`; `validateForm` in `RecipeEditor.tsx` checks them
+  (servings and minutes whole numbers above 0, quantity above 0, fridge days
+  and freezer months whole numbers from 0) and shows an inline error. Do not
+  use Astryx DateInput; use native
   `<input type="date">` (issue #37). Pages are lazy-loaded through
   `ui/pages/routes.ts`; add new pages there and to `routes.eager.ts`.
 - Build checks in CI: `npm run check:contrast`, `check:external`, `check:size`.

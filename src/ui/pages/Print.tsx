@@ -15,6 +15,7 @@
 // button and removes color fills so the printed output is clean black-on-white;
 // the page stays readable on screen.
 
+import { Button } from '@astryxdesign/core/Button';
 import { useApp } from '../../state/AppProvider';
 import { selectAgeMonths, selectAllRecipes } from '../../state/selectors';
 import { computePrepList } from '../../domain/prep';
@@ -72,13 +73,9 @@ export default function Print() {
     <div className={styles.page}>
       <div className={styles.toolbar}>
         <h1>Print your week</h1>
-        <button
-          type="button"
-          className={`${styles.printButton} print-hide`}
-          onClick={printNow}
-        >
-          Print
-        </button>
+        <span className="print-hide">
+          <Button label="Print" variant="primary" size="lg" onClick={printNow} />
+        </span>
       </div>
 
       {/* (1) WEEK GRID -------------------------------------------------- */}

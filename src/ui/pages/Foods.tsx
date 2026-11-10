@@ -16,6 +16,8 @@
 // two; a reaction ghost offers "clear reaction" (the clearReaction action).
 // Block-covered ghosts are NOT user-clearable (Req 7.4/7.6).
 
+import { Button } from '@astryxdesign/core/Button';
+import { Link } from '@astryxdesign/core/Link';
 import { useApp } from '../../state/AppProvider';
 import { selectAgeMonths, selectFoodViews } from '../../state/selectors';
 import { allergenGuidance } from '../../domain/foods';
@@ -99,12 +101,8 @@ export default function Foods() {
   /** The two record controls shared by doors and monsters. */
   const tryControls = (key: string) => (
     <div className={styles.controls}>
-      <button type="button" onClick={() => recordTried(key)}>
-        Tried, no reaction
-      </button>
-      <button type="button" onClick={() => recordReaction(key)}>
-        Noticed a reaction
-      </button>
+      <Button label="Tried, no reaction" size="sm" onClick={() => recordTried(key)} />
+      <Button label="Noticed a reaction" size="sm" onClick={() => recordReaction(key)} />
     </div>
   );
 
@@ -149,13 +147,13 @@ export default function Foods() {
                         {guidance.sources.map((id, i) => (
                           <span key={id}>
                             {i > 0 ? ', ' : ''}
-                            <a
+                            <Link
                               href={SOURCES[id].url}
                               target="_blank"
                               rel="noopener noreferrer"
                             >
                               {SOURCES[id].title}
-                            </a>
+                            </Link>
                           </span>
                         ))}
                       </p>
@@ -224,12 +222,11 @@ export default function Foods() {
                       {REACTION_ADVICE}
                     </p>
                     <div className={styles.controls}>
-                      <button
-                        type="button"
+                      <Button
+                        label="Clear reaction"
+                        size="sm"
                         onClick={() => clearReaction(view.key)}
-                      >
-                        Clear reaction
-                      </button>
+                      />
                     </div>
                   </GhostCard>
                 );

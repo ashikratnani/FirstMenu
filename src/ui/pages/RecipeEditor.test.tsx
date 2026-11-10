@@ -437,6 +437,65 @@ describe('RecipeEditor', () => {
     ).not.toBeInTheDocument();
   });
 
+  describe('numeric field validation', () => {
+    async function fillValid(user: ReturnType<typeof userEvent.setup>) {
+      await user.type(screen.getByLabelText('Title'), 'Pear Mash');
+      await user.click(screen.getByLabelText('6–8 months'));
+      await user.click(screen.getByLabelText('Lunch'));
+      await user.type(screen.getByLabelText('Ingredient 1 name'), 'pear');
+      await user.type(screen.getByLabelText('Step 1'), 'Mash the pear.');
+      await user.type(screen.getByLabelText('Texture'), 'smooth');
+    }
+
+    const cases: Array<[string, string, string, string]> = [
+      ['Servings', 'abc', 'Servings must be a whole number of 1 or more.', 'x'],
+      ['Servings', '0', 'Servings must be a whole number of 1 or more.', 'x'],
+      ['Servings', '-2', 'Servings must be a whole number of 1 or more.', 'x'],
+      ['Servings', '1.5', 'Servings must be a whole number of 1 or more.', 'x'],
+      ['Quantity', 'lots', 'Quantity must be a number greater than 0.', 'x'],
+      ['Quantity', '0', 'Quantity must be a number greater than 0.', 'x'],
+      ['Quantity', '-1', 'Quantity must be a number greater than 0.', 'x'],
+      ['Total time in minutes (optional)', '0', 'Minutes must be a whole number of 1 or more.', 'x'],
+      ['Total time in minutes (optional)', '-5', 'Minutes must be a whole number of 1 or more.', 'x'],
+      ['Total time in minutes (optional)', 'soon', 'Minutes must be a whole number of 1 or more.', 'x'],
+      ['Fridge days', '-1', 'Fridge days must be a whole number, 0 or more.', 'x'],
+      ['Fridge days', '2.5', 'Fridge days must be a whole number, 0 or more.', 'x'],
+      ['Fridge days', 'two', 'Fridge days must be a whole number, 0 or more.', 'x'],
+      ['Freezer months', '-3', 'Freezer months must be a whole number, 0 or more.', 'x'],
+      ['Freezer months', '1.5', 'Freezer months must be a whole number, 0 or more.', 'x'],
+    ];
+
+    it.each(cases)('rejects %s = %s with an inline error and does not save', async (label, value, message) => {
+      const user = userEvent.setup();
+      const { getState } = renderApp(seedState(8), '/recipes/new');
+      await fillValid(user);
+      await user.type(screen.getByLabelText(label), value);
+      await user.click(screen.getByRole('button', { name: 'Save recipe' }));
+
+      expect(getState().customRecipes).toHaveLength(0);
+      expect(screen.getByText(message)).toHaveAttribute('role', 'alert');
+      expect(screen.getByLabelText(label)).toHaveAttribute('aria-invalid', 'true');
+      expect(
+        screen.queryByRole('region', { name: 'Safety screen results' }),
+      ).not.toBeInTheDocument();
+    });
+
+    it('saves valid numbers, including 0 fridge days and blank optional fields', async () => {
+      const user = userEvent.setup();
+      const { getState } = renderApp(seedState(8), '/recipes/new');
+      await fillValid(user);
+      await user.type(screen.getByLabelText('Servings'), '4');
+      await user.type(screen.getByLabelText('Quantity'), '1.5');
+      await user.type(screen.getByLabelText('Fridge days'), '0');
+      await user.click(screen.getByRole('button', { name: 'Save recipe' }));
+
+      const saved = getState().customRecipes[0];
+      expect(saved.servings).toBe(4);
+      expect(saved.ingredients[0].quantity).toBe(1.5);
+      expect(saved.storage).toEqual({ fridgeDays: 0 });
+    });
+  });
+
   it('redirects to a not-found view when editing a built-in id', () => {
     renderApp(seedState(8), '/recipes/b-carrots-and-apples/edit');
     expect(

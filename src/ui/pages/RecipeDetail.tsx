@@ -16,6 +16,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Badge } from '@astryxdesign/core/Badge';
 import { Button } from '@astryxdesign/core/Button';
 import { CheckboxInput } from '@astryxdesign/core/CheckboxInput';
+import { Link as ExternalLink } from '@astryxdesign/core/Link';
 import { recipeEffort, recipeMinutes } from '../../domain/effort';
 import { recipeServeAs } from '../../domain/make';
 import { recipeNutritionTags } from '../../domain/nutrition';
@@ -409,9 +410,9 @@ export default function RecipeDetail() {
         <section aria-labelledby="recipe-source" className={styles.source}>
           <h2 id="recipe-source">Source</h2>
           <p>
-            <a href={source.url} target="_blank" rel="noopener noreferrer">
+            <ExternalLink href={source.url} target="_blank" rel="noopener noreferrer">
               {source.title}
-            </a>{' '}
+            </ExternalLink>{' '}
             &mdash; {source.publisher}
           </p>
           <p className={styles.retrieved}>Retrieved {source.retrieved}</p>
@@ -428,13 +429,13 @@ export default function RecipeDetail() {
           {source.storageSource && (
             <p className={styles.storageSource}>
               Storage times:{' '}
-              <a
+              <ExternalLink
                 href={source.storageSource}
                 target="_blank"
                 rel="noopener noreferrer"
               >
                 {source.publisher}
-              </a>
+              </ExternalLink>
             </p>
           )}
         </section>
@@ -447,9 +448,9 @@ export default function RecipeDetail() {
           {importedLink && (
             <p>
               Link you saved:{' '}
-              <a href={importedLink} target="_blank" rel="noopener noreferrer">
+              <ExternalLink href={importedLink} target="_blank" rel="noopener noreferrer">
                 {importedLink}
-              </a>
+              </ExternalLink>
             </p>
           )}
           {(recipe.clearedMentions?.length ?? 0) > 0 && (
@@ -478,13 +479,7 @@ export default function RecipeDetail() {
           <Link to={`/recipes/${recipe.id}/edit`} className={styles.edit}>
             Edit
           </Link>
-          <button
-            type="button"
-            className={styles.delete}
-            onClick={handleDelete}
-          >
-            Delete
-          </button>
+          <Button label="Delete" variant="destructive" onClick={handleDelete} />
         </section>
       )}
 

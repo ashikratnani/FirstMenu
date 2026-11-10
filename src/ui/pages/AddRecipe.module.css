@@ -99,34 +99,10 @@ ul.lines {
   gap: 8px;
 }
 
-.lineButton {
-  min-height: 40px;
-  padding: 0 12px;
-  border: 1px solid var(--color-border-emphasized);
-  border-radius: var(--radius-element);
-  background: var(--color-background-surface);
-  color: var(--color-text-primary);
-  font: inherit;
-  font-size: 0.875rem;
-  cursor: pointer;
-}
-
 .editForm {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-}
-
-.editInput {
-  flex: 1 1 14rem;
-  min-height: 40px;
-  box-sizing: border-box;
-  padding: 0 12px;
-  border: 1px solid var(--color-border-emphasized);
-  border-radius: var(--radius-element);
-  background: var(--color-background-surface);
-  color: var(--color-text-primary);
-  font: inherit;
 }
 
 .markBox {
@@ -135,32 +111,3 @@ ul.lines {
   gap: 12px;
 }
 
-.markLabel {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  min-height: 40px;
-}
-
-.sourcePicker {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 20px;
-  margin: 0;
-  padding: 0;
-  border: 0;
-}
-
-.legend {
-  padding: 0;
-  margin-bottom: 4px;
-  font-size: 0.875rem;
-  font-weight: 500;
-}
-
-.sourceOption {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-height: 40px;
-}

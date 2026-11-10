@@ -28,6 +28,9 @@
 
 import { useMemo, useState, type FormEvent } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Button } from '@astryxdesign/core/Button';
+import { CheckboxInput } from '@astryxdesign/core/CheckboxInput';
+import { TextInput } from '@astryxdesign/core/TextInput';
 import { useApp } from '../../state/AppProvider';
 import { usePagePrimaryAction } from '../components/primaryActionContext';
 import { selectAgeMonths } from '../../state/selectors';
@@ -104,6 +107,31 @@ interface FormErrors {
   ingredients?: string;
   steps?: string;
   texture?: string;
+  servings?: string;
+  statedMinutes?: string;
+  fridgeDays?: string;
+  freezerMonths?: string;
+  /** Quantity messages keyed by ingredient row index. */
+  quantities?: Record<number, string>;
+}
+
+/**
+ * Check a numeric text field. Blank is allowed (the field is optional or has a
+ * default). Otherwise the text must be a finite number that is positive (or
+ * non-negative when `allowZero`), and a whole number when `integer`. Mirrors
+ * the v1 type="number" min/step constraints. Returns a message or undefined.
+ */
+function numberError(
+  raw: string,
+  opts: { integer: boolean; allowZero: boolean },
+  message: string,
+): string | undefined {
+  if (raw.trim() === '') return undefined;
+  const n = Number(raw);
+  if (!Number.isFinite(n)) return message;
+  if (opts.integer && !Number.isInteger(n)) return message;
+  if (opts.allowZero ? n < 0 : n <= 0) return message;
+  return undefined;
 }
 
 /**
@@ -119,6 +147,10 @@ function validateForm(form: {
   ingredients: IngredientForm[];
   steps: string[];
   texture: string;
+  servings: string;
+  statedMinutes: string;
+  fridgeDays: string;
+  freezerMonths: string;
 }): FormErrors {
   const errors: FormErrors = {};
   if (form.title.trim() === '') {
@@ -139,6 +171,40 @@ function validateForm(form: {
   if (form.texture.trim() === '') {
     errors.texture = 'Add a texture note.';
   }
+  const servings = numberError(
+    form.servings,
+    { integer: true, allowZero: false },
+    'Servings must be a whole number of 1 or more.',
+  );
+  if (servings) errors.servings = servings;
+  const minutes = numberError(
+    form.statedMinutes,
+    { integer: true, allowZero: false },
+    'Minutes must be a whole number of 1 or more.',
+  );
+  if (minutes) errors.statedMinutes = minutes;
+  const fridge = numberError(
+    form.fridgeDays,
+    { integer: true, allowZero: true },
+    'Fridge days must be a whole number, 0 or more.',
+  );
+  if (fridge) errors.fridgeDays = fridge;
+  const freezer = numberError(
+    form.freezerMonths,
+    { integer: true, allowZero: true },
+    'Freezer months must be a whole number, 0 or more.',
+  );
+  if (freezer) errors.freezerMonths = freezer;
+  const quantities: Record<number, string> = {};
+  form.ingredients.forEach((row, index) => {
+    const q = numberError(
+      row.quantity,
+      { integer: false, allowZero: false },
+      'Quantity must be a number greater than 0.',
+    );
+    if (q) quantities[index] = q;
+  });
+  if (Object.keys(quantities).length > 0) errors.quantities = quantities;
   return errors;
 }
 
@@ -370,6 +436,10 @@ export default function RecipeEditor() {
       ingredients,
       steps,
       texture,
+      servings,
+      statedMinutes,
+      fridgeDays,
+      freezerMonths,
     });
     setErrors(validation);
     if (Object.keys(validation).length > 0) {
@@ -433,16 +503,11 @@ export default function RecipeEditor() {
 
       <form className={styles.form} onSubmit={handleSubmit}>
         <div className={styles.field}>
-          <label className={styles.label} htmlFor="recipe-title">
-            Title
-          </label>
-          <input
-            id="recipe-title"
-            className={styles.input}
-            type="text"
+          <TextInput
+            label="Title"
             value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            aria-invalid={errors.title ? true : undefined}
+            onChange={(value) => setTitle(value)}
+            status={errors.title ? { type: 'error' } : undefined}
             aria-describedby={errors.title ? 'recipe-title-error' : undefined}
             autoComplete="off"
           />
@@ -457,16 +522,13 @@ export default function RecipeEditor() {
           <legend className={styles.legend}>Stages</legend>
           <ul className={styles.checkRow}>
             {STAGES.map((stage) => {
-              const inputId = `recipe-stage-${stage}`;
               return (
                 <li key={stage} className={styles.check}>
-                  <input
-                    id={inputId}
-                    type="checkbox"
-                    checked={stages.includes(stage)}
+                  <CheckboxInput
+                    label={stageLabel(stage)}
+                    value={stages.includes(stage)}
                     onChange={() => toggleStage(stage)}
                   />
-                  <label htmlFor={inputId}>{stageLabel(stage)}</label>
                 </li>
               );
             })}
@@ -482,16 +544,13 @@ export default function RecipeEditor() {
           <legend className={styles.legend}>Meal types</legend>
           <ul className={styles.checkRow}>
             {MEAL_TYPES.map((meal) => {
-              const inputId = `recipe-meal-${meal}`;
               return (
                 <li key={meal} className={styles.check}>
-                  <input
-                    id={inputId}
-                    type="checkbox"
-                    checked={mealTypes.includes(meal)}
+                  <CheckboxInput
+                    label={mealTypeLabel(meal)}
+                    value={mealTypes.includes(meal)}
                     onChange={() => toggleMeal(meal)}
                   />
-                  <label htmlFor={inputId}>{mealTypeLabel(meal)}</label>
                 </li>
               );
             })}
@@ -519,62 +578,51 @@ export default function RecipeEditor() {
               return (
                 <li key={index} className={styles.ingredientRow}>
                   <div className={styles.field}>
-                    <label className={styles.label} htmlFor={`${rowId}-name`}>
-                      Ingredient {index + 1} name
-                    </label>
-                    <input
-                      id={`${rowId}-name`}
-                      className={styles.input}
-                      type="text"
+                    <TextInput
+                      label={`Ingredient ${index + 1} name`}
                       value={row.name}
-                      onChange={(e) =>
-                        updateIngredient(index, { name: e.target.value })
-                      }
+                      onChange={(value) => updateIngredient(index, { name: value })}
                       autoComplete="off"
                     />
                   </div>
 
                   <div className={styles.field}>
-                    <label
-                      className={styles.label}
-                      htmlFor={`${rowId}-quantity`}
-                    >
-                      Quantity
-                    </label>
-                    <input
-                      id={`${rowId}-quantity`}
-                      className={styles.input}
-                      type="number"
-                      min="0"
-                      step="any"
+                    <TextInput
+                      label="Quantity"
                       value={row.quantity}
-                      onChange={(e) =>
-                        updateIngredient(index, { quantity: e.target.value })
+                      onChange={(value) => updateIngredient(index, { quantity: value })}
+                      inputMode="decimal"
+                      status={
+                        errors.quantities?.[index] ? { type: 'error' } : undefined
+                      }
+                      aria-describedby={
+                        errors.quantities?.[index]
+                          ? `${rowId}-quantity-error`
+                          : undefined
                       }
                     />
+                    {errors.quantities?.[index] && (
+                      <p
+                        id={`${rowId}-quantity-error`}
+                        className={styles.error}
+                        role="alert"
+                      >
+                        {errors.quantities[index]}
+                      </p>
+                    )}
                   </div>
 
                   <div className={styles.field}>
-                    <label className={styles.label} htmlFor={`${rowId}-unit`}>
-                      Unit
-                    </label>
-                    <input
-                      id={`${rowId}-unit`}
-                      className={styles.input}
-                      type="text"
+                    <TextInput
+                      label="Unit"
                       value={row.unit}
-                      onChange={(e) =>
-                        updateIngredient(index, { unit: e.target.value })
-                      }
+                      onChange={(value) => updateIngredient(index, { unit: value })}
                       autoComplete="off"
                     />
                   </div>
 
                   <div className={styles.field}>
-                    <label
-                      className={styles.label}
-                      htmlFor={`${rowId}-category`}
-                    >
+                    <label className={styles.label} htmlFor={`${rowId}-category`}>
                       Category
                     </label>
                     <select
@@ -596,17 +644,10 @@ export default function RecipeEditor() {
                   </div>
 
                   <div className={styles.field}>
-                    <label className={styles.label} htmlFor={`${rowId}-food`}>
-                      Counts as (food override)
-                    </label>
-                    <input
-                      id={`${rowId}-food`}
-                      className={styles.input}
-                      type="text"
+                    <TextInput
+                      label="Counts as (food override)"
                       value={row.food}
-                      onChange={(e) =>
-                        updateIngredient(index, { food: e.target.value })
-                      }
+                      onChange={(value) => updateIngredient(index, { food: value })}
                       placeholder={derivedFood || undefined}
                       autoComplete="off"
                     />
@@ -618,25 +659,17 @@ export default function RecipeEditor() {
                     )}
                   </div>
 
-                  <button
-                    type="button"
-                    className={styles.removeButton}
+                  <Button
+                    label={`Remove ingredient ${index + 1}`}
+                    size="sm"
                     onClick={() => removeIngredient(index)}
-                    disabled={ingredients.length === 1}
-                  >
-                    Remove ingredient {index + 1}
-                  </button>
+                    isDisabled={ingredients.length === 1}
+                  />
                 </li>
               );
             })}
           </ul>
-          <button
-            type="button"
-            className={styles.addButton}
-            onClick={addIngredient}
-          >
-            Add ingredient
-          </button>
+          <Button label="Add ingredient" size="sm" onClick={addIngredient} />
           {errors.ingredients && (
             <p className={styles.error} role="alert">
               {errors.ingredients}
@@ -648,37 +681,27 @@ export default function RecipeEditor() {
           <legend className={styles.legend}>Steps</legend>
           <ul className={styles.rows}>
             {steps.map((step, index) => {
-              const stepId = `recipe-step-${index}`;
               return (
                 <li key={index} className={styles.stepRow}>
                   <div className={styles.field}>
-                    <label className={styles.label} htmlFor={stepId}>
-                      Step {index + 1}
-                    </label>
-                    <input
-                      id={stepId}
-                      className={styles.input}
-                      type="text"
+                    <TextInput
+                      label={`Step ${index + 1}`}
                       value={step}
-                      onChange={(e) => updateStep(index, e.target.value)}
+                      onChange={(value) => updateStep(index, value)}
                       autoComplete="off"
                     />
                   </div>
-                  <button
-                    type="button"
-                    className={styles.removeButton}
+                  <Button
+                    label={`Remove step ${index + 1}`}
+                    size="sm"
                     onClick={() => removeStep(index)}
-                    disabled={steps.length === 1}
-                  >
-                    Remove step {index + 1}
-                  </button>
+                    isDisabled={steps.length === 1}
+                  />
                 </li>
               );
             })}
           </ul>
-          <button type="button" className={styles.addButton} onClick={addStep}>
-            Add step
-          </button>
+          <Button label="Add step" size="sm" onClick={addStep} />
           {errors.steps && (
             <p className={styles.error} role="alert">
               {errors.steps}
@@ -687,16 +710,11 @@ export default function RecipeEditor() {
         </fieldset>
 
         <div className={styles.field}>
-          <label className={styles.label} htmlFor="recipe-texture">
-            Texture
-          </label>
-          <input
-            id="recipe-texture"
-            className={styles.input}
-            type="text"
+          <TextInput
+            label="Texture"
             value={texture}
-            onChange={(e) => setTexture(e.target.value)}
-            aria-invalid={errors.texture ? true : undefined}
+            onChange={(value) => setTexture(value)}
+            status={errors.texture ? { type: 'error' } : undefined}
             aria-describedby={
               errors.texture ? 'recipe-texture-error' : undefined
             }
@@ -710,93 +728,84 @@ export default function RecipeEditor() {
         </div>
 
         <div className={styles.field}>
-          <label className={styles.label} htmlFor="recipe-servings">
-            Servings
-          </label>
-          <input
-            id="recipe-servings"
-            className={styles.input}
-            type="number"
-            min="1"
-            step="1"
+          <TextInput
+            label="Servings"
             value={servings}
-            onChange={(e) => setServings(e.target.value)}
+            onChange={(value) => setServings(value)}
+            inputMode="decimal"
+            status={errors.servings ? { type: 'error' } : undefined}
+            aria-describedby={errors.servings ? 'recipe-servings-error' : undefined}
           />
+          {errors.servings && (
+            <p id="recipe-servings-error" className={styles.error} role="alert">
+              {errors.servings}
+            </p>
+          )}
         </div>
 
         <div className={styles.field}>
-          <label className={styles.label} htmlFor="recipe-minutes">
-            Total time in minutes (optional)
-          </label>
-          <input
-            id="recipe-minutes"
-            className={styles.input}
-            type="number"
-            min="1"
-            step="1"
+          <TextInput
+            label="Total time in minutes (optional)"
             value={statedMinutes}
-            onChange={(e) => setStatedMinutes(e.target.value)}
+            onChange={(value) => setStatedMinutes(value)}
+            inputMode="decimal"
+            status={errors.statedMinutes ? { type: 'error' } : undefined}
+            aria-describedby={errors.statedMinutes ? 'recipe-minutes-error' : undefined}
           />
+          {errors.statedMinutes && (
+            <p id="recipe-minutes-error" className={styles.error} role="alert">
+              {errors.statedMinutes}
+            </p>
+          )}
         </div>
 
         <fieldset className={styles.fieldset}>
           <legend className={styles.legend}>Storage (optional)</legend>
           <div className={styles.field}>
-            <label className={styles.label} htmlFor="recipe-fridge-days">
-              Fridge days
-            </label>
-            <input
-              id="recipe-fridge-days"
-              className={styles.input}
-              type="number"
-              min="0"
-              step="1"
+            <TextInput
+              label="Fridge days"
               value={fridgeDays}
-              onChange={(e) => setFridgeDays(e.target.value)}
+              onChange={(value) => setFridgeDays(value)}
+              inputMode="decimal"
+              status={errors.fridgeDays ? { type: 'error' } : undefined}
+              aria-describedby={errors.fridgeDays ? 'recipe-fridge-error' : undefined}
             />
+            {errors.fridgeDays && (
+              <p id="recipe-fridge-error" className={styles.error} role="alert">
+                {errors.fridgeDays}
+              </p>
+            )}
           </div>
           <div className={styles.field}>
-            <label className={styles.label} htmlFor="recipe-freezer-months">
-              Freezer months
-            </label>
-            <input
-              id="recipe-freezer-months"
-              className={styles.input}
-              type="number"
-              min="0"
-              step="1"
+            <TextInput
+              label="Freezer months"
               value={freezerMonths}
-              onChange={(e) => setFreezerMonths(e.target.value)}
+              onChange={(value) => setFreezerMonths(value)}
+              inputMode="decimal"
+              status={errors.freezerMonths ? { type: 'error' } : undefined}
+              aria-describedby={errors.freezerMonths ? 'recipe-freezer-error' : undefined}
             />
+            {errors.freezerMonths && (
+              <p id="recipe-freezer-error" className={styles.error} role="alert">
+                {errors.freezerMonths}
+              </p>
+            )}
           </div>
         </fieldset>
 
         <div className={styles.field}>
-          <label className={styles.label} htmlFor="recipe-make-ahead">
-            Make-ahead note (optional)
-          </label>
-          <input
-            id="recipe-make-ahead"
-            className={styles.input}
-            type="text"
+          <TextInput
+            label="Make-ahead note (optional)"
             value={makeAheadNote}
-            onChange={(e) => setMakeAheadNote(e.target.value)}
+            onChange={(value) => setMakeAheadNote(value)}
             autoComplete="off"
           />
         </div>
 
         <div className={styles.actions}>
-          <button type="submit" className={styles.submit}>
-            Save recipe
-          </button>
+          <Button label="Save recipe" type="submit" variant="primary" size="lg" />
           {isEditMode && (
-            <button
-              type="button"
-              className={styles.delete}
-              onClick={handleDelete}
-            >
-              Delete recipe
-            </button>
+            <Button label="Delete recipe" variant="destructive" onClick={handleDelete} />
           )}
         </div>
       </form>

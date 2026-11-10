@@ -149,9 +149,6 @@
   color: var(--fm-color-accent);
 }
 
-.delete {
-  cursor: pointer;
-}
 
 /* Footer disclaimer -------------------------------------------------------- */
 .footer {

@@ -22,20 +22,7 @@
   flex-wrap: wrap;
 }
 
-.printButton {
-  padding: calc(var(--space) * 0.5) var(--space);
-  border: 1px solid var(--fm-color-accent);
-  border-radius: var(--radius);
-  background: var(--fm-color-accent);
-  color: var(--fm-color-on-accent);
-  font-size: 0.95rem;
-  cursor: pointer;
-}
 
-.printButton:focus-visible {
-  outline: 3px solid var(--fm-color-focus);
-  outline-offset: 2px;
-}
 
 .section {
   display: flex;

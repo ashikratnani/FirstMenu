@@ -81,13 +81,7 @@
   color: var(--fm-color-heading);
 }
 
-.submit {
-  align-self: flex-start;
-  padding: calc(var(--space) * 0.5) var(--space);
-  border: 1px solid var(--fm-color-border);
-  border-radius: var(--radius);
-  background: var(--fm-color-accent, var(--fm-color-surface));
-  color: var(--fm-color-text);
-  font: inherit;
-  cursor: pointer;
+.actions {
+  display: flex;
+  align-items: center;
 }

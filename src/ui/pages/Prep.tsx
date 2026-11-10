@@ -12,7 +12,7 @@
 // every store state is carried by visible TEXT + accessible name (no color-only
 // signalling) and any illustration stays aria-hidden with the state in text.
 
-import { Link } from 'react-router-dom';
+import { Link } from '@astryxdesign/core/Link';
 import { useApp } from '../../state/AppProvider';
 import { selectAgeMonths, selectAllRecipes } from '../../state/selectors';
 import { computePrepList, type CookSession } from '../../domain/prep';
@@ -118,7 +118,7 @@ export default function Prep() {
                       >
                         {recipe !== undefined ? (
                           <Link
-                            to={`/recipes/${recipe.id}`}
+                            href={`/recipes/${recipe.id}`}
                             className={styles.sessionTitle}
                           >
                             {title}

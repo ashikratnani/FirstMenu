@@ -18,6 +18,8 @@
 
 import { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Button } from '@astryxdesign/core/Button';
+import { TextInput } from '@astryxdesign/core/TextInput';
 import { useApp } from '../../state/AppProvider';
 import { encodeSharePayload, isShareLinkLong } from '../../domain/share';
 import styles from './Share.module.css';
@@ -65,29 +67,18 @@ export default function Share() {
         </h2>
 
         <div className={styles.copyRow}>
-          <button
-            type="button"
-            className={styles.copyButton}
-            onClick={() => void copy()}
-          >
-            Copy link
-          </button>
+          <Button label="Copy link" onClick={() => void copy()} />
           <span className={styles.copied} role="status">
             {copied ? 'Copied' : ''}
           </span>
         </div>
 
-        <label htmlFor="share-url" className={styles.fieldLabel}>
-          Or copy it by hand:
-        </label>
-        <input
-          id="share-url"
+        <TextInput
+          label="Or copy it by hand:"
           ref={inputRef}
-          className={styles.urlField}
-          type="text"
-          readOnly
+          isReadOnly
           value={url}
-          onFocus={(e) => e.currentTarget.select()}
+          onFocus={(e) => (e.currentTarget as HTMLInputElement).select()}
         />
       </section>
 

@@ -16,6 +16,7 @@
 // guarded so it only runs when there is actually a stale key to drop.
 
 import { useEffect } from 'react';
+import { CheckboxInput } from '@astryxdesign/core/CheckboxInput';
 import { useApp } from '../../state/AppProvider';
 import { selectAgeMonths, selectAllRecipes } from '../../state/selectors';
 import {
@@ -102,21 +103,15 @@ export default function Grocery() {
                 const accessibleName = `${line.label}, ${amount}.${reminderText}`;
                 return (
                   <li key={line.key} className={styles.line}>
-                    <label className={styles.lineLabel}>
-                      <input
-                        type="checkbox"
-                        className={styles.checkbox}
-                        checked={checked}
-                        aria-label={accessibleName}
-                        onChange={() =>
-                          dispatch({ type: 'toggleGroceryItem', key: line.key })
-                        }
-                      />
-                      <span className={styles.lineText}>
-                        <span className={styles.lineName}>{line.label}</span>
-                        <span className={styles.lineAmount}>{amount}</span>
-                      </span>
-                    </label>
+                    <CheckboxInput
+                      label={line.label}
+                      description={amount}
+                      aria-label={accessibleName}
+                      value={checked}
+                      onChange={() =>
+                        dispatch({ type: 'toggleGroceryItem', key: line.key })
+                      }
+                    />
                     {line.reminders.length > 0 && (
                       <ul className={styles.reminderList}>
                         {line.reminders.map((reminder) => (

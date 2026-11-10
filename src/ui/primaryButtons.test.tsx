@@ -1,7 +1,8 @@
 // "Each screen has at most one filled primary button" (Requirement 17.10),
 // checked on the real pages inside the real shell. Astryx primaries carry
-// data-variant="primary". Print and the recipe editor still use their own
-// styled buttons until task 13 converts them, so those are counted by name.
+// data-variant="primary". Every page now uses Astryx buttons (task 13); the
+// by-name count of native "Print" and "Save recipe" buttons is kept as a guard
+// so a native filled button added later is still counted.
 
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';

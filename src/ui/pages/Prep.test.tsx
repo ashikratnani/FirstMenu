@@ -1,5 +1,6 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
+import RouterLinkProvider from '../theme/RouterLinkProvider';
 import { describe, expect, it, beforeEach } from 'vitest';
 import Prep from './Prep';
 import { AppProvider, useApp } from '../../state/AppProvider';
@@ -104,8 +105,10 @@ function renderPrep(seed?: AppState) {
   return render(
     <AppProvider storage={makeStorage(seed)}>
       <MemoryRouter initialEntries={['/prep']}>
-        <StateProbe />
-        <Prep />
+        <RouterLinkProvider>
+          <StateProbe />
+          <Prep />
+        </RouterLinkProvider>
       </MemoryRouter>
     </AppProvider>,
   );
