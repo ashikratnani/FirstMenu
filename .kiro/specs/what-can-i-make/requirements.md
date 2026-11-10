@@ -329,13 +329,13 @@ These suggestions come from the maintainer's UI feedback (issue #36): the app sh
 
 #### Acceptance Criteria
 
-1. AFTER the child profile (birth date, required, v1 Requirement 1), THE first run SHALL show one screen of problem choices (multi-select, one tap each): "What can I make with what I have", "Save recipes from ChatGPT or Instagram", "Plan the week and make a grocery list", "What's safe for my baby", and "Just looking".
+1. AFTER the child profile (birth date, required, v1 Requirement 1), THE first run SHALL show one screen of problem choices (multi-select, one tap each): "What can I make with what I have", "Save recipes from ChatGPT or Instagram", "Plan the week and make a grocery list", "What's safe for my child", and "Just looking".
 2. THE problem choices SHALL be skippable with one tap ("Skip"), which goes straight to the Make screen. The child profile step itself SHALL NOT be skippable, because the safety screen needs the age.
 3. THE app SHALL then run one quick solve for the first problem chosen, in this fixed order of the list above, each finishing in at most three taps and using only data and code on the device:
    1. What can I make: the user types what they have; live results show the Ready now and Missing one recipes; "Keep these foods" stores them as on-hand and opens Make.
    2. Save recipes: the user sees the question box for ChatGPT and the reel box side by side with "Try an example", which parses a bundled sample reply and shows the preview with its safety result without saving; "Open Add recipe" goes on.
    3. Plan and grocery: one tap fills the week using the existing plan logic and shows the grocery list, with "Keep this plan" and "Not now".
-   4. What's safe: shows the foods to leave out at the child's age with their sources, and a box to check any food by name using the safety screen. WHEN the check finds no rule for the food THEN the app SHALL NOT show "safe", "OK" or a green state; it SHALL show "FirstMenu's list has no rule for {food} at this age." followed by the fixed-list limit sentence (`SCREEN_LIMITS`) and the not-medical-advice line (`NOT_MEDICAL_ADVICE`), the same constants the other screens use.
+   4. What's safe: shows only the leave-out list for the child's age with its sources and the existing disclaimers (`SCREEN_LIMITS` and `NOT_MEDICAL_ADVICE`), with no free-text food check and no "safe", "OK" or green state. A free-text food check is pending Decision needed #65 and MUST NOT be built until the maintainer answers.
 4. THE quick solve SHALL be skippable at every step. WHEN a user chose more than one problem THEN the end screen SHALL link to the other chosen features in one line each.
 5. THE onboarding after the profile SHALL be at most three screens, shall not require typing except in the quick solve, and SHALL NOT hold back the Make screen: finishing or skipping lands on Make.
 6. THE tried-foods checklist (v1 Requirement 7.2) SHALL be offered as an optional collapsed section on the profile screen ("Foods already tried") instead of an open list, so the first screen is short. Nothing it records changes.
