@@ -95,3 +95,15 @@
   gap: 16px;
   padding: 16px;
 }
+
+.searchRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.searchRow > :first-child {
+  flex: 1 1 16rem;
+  min-width: 0;
+}

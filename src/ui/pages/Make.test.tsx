@@ -320,3 +320,187 @@ describe('Make screen empty state (Req 3.10)', () => {
     expect(screen.queryByRole('heading', { name: 'Nothing fits yet' })).not.toBeInTheDocument();
   });
 });
+
+describe('Make screen search box (Req 3.1, 3.9, 16.5 to 16.9, 16.12)', () => {
+  const CHICKEN_PLATE = recipe('c-plate', 'Chicken Plate', ['chicken', 'rice', 'pea']);
+  const WITH_BROCCOLI = recipe('c-bro', 'Broccoli Rice', ['broccoli', 'rice']);
+  const PANCAKES = recipe('c-pan', 'Banana Pancakes', ['banana', 'flour', 'egg'], {
+    mealTypes: ['breakfast'],
+  });
+  const PORRIDGE = recipe('c-por', 'Warm Porridge', ['oat', 'milk'], { mealTypes: ['breakfast'] });
+  const SUPPER = recipe('c-sup', 'Late Stew', ['carrot', 'potato'], { mealTypes: ['dinner'] });
+  const FINGER = recipe('c-fin', 'Pea Bites', ['pea', 'rice'], { serveAs: ['finger-food'] });
+  const SOFT = recipe('c-soft', 'Pea Puree', ['pea', 'rice'], { serveAs: ['puree'] });
+  const LENTIL = recipe('c-len', 'Lentil Soup', ['lentil', 'rice']);
+
+  const seed = (extra: Partial<AppState> = {}) =>
+    seedState({
+      pantry: [],
+      customRecipes: [CHICKEN_PLATE, WITH_BROCCOLI, PANCAKES, PORRIDGE, SUPPER, FINGER, SOFT, LENTIL],
+      ...extra,
+    });
+
+  const box = () => screen.getByRole('textbox', { name: 'What do you have?' });
+
+  it('has one text box on the screen', () => {
+    renderMake(seed());
+    expect(screen.getAllByRole('textbox')).toHaveLength(1);
+  });
+
+  it('shows three chips for "leftover chicken, rice and peas" and updates results', async () => {
+    const user = userEvent.setup();
+    renderMake(seed());
+    expect(screen.queryByRole('link', { name: /Chicken Plate/ })).not.toBeInTheDocument();
+
+    await user.type(box(), 'leftover chicken, rice and peas');
+
+    const chips = await screen.findByRole('list', { name: 'Recognized foods' });
+    expect(within(chips).getAllByRole('listitem').map((li) => li.textContent)).toEqual([
+      expect.stringContaining('chicken'),
+      expect.stringContaining('rice'),
+      expect.stringContaining('pea'),
+    ]);
+    // Results behave as if those foods were on hand, before Enter.
+    expect(
+      await within(group(/Ready now/)).findByRole('link', { name: /Chicken Plate/ }),
+    ).toBeInTheDocument();
+    // Nothing is stored yet.
+    expect(screen.queryByRole('list', { name: 'On hand today' })).not.toBeInTheDocument();
+  });
+
+  it('a chip can be removed before adding, and its recipe drops back out', async () => {
+    const user = userEvent.setup();
+    renderMake(seed());
+    await user.type(box(), 'chicken rice peas');
+    await screen.findByRole('link', { name: /Chicken Plate/ });
+    const chips = screen.getByRole('list', { name: 'Recognized foods' });
+    await user.click(within(chips).getByRole('button', { name: /Remove chicken/ }));
+    expect(await screen.findByRole('region', { name: /Missing one/ })).toBeInTheDocument();
+    expect(within(group(/Missing one/)).getByRole('link', { name: /Chicken Plate/ })).toBeInTheDocument();
+  });
+
+  it('a typo needs a tap before it counts', async () => {
+    const user = userEvent.setup();
+    renderMake(seed({ pantry: ['rice'] }));
+    await user.type(box(), 'brocoli');
+
+    const didYouMean = await screen.findByRole('button', { name: 'Did you mean broccoli?' });
+    // Not counted yet: Broccoli Rice still needs broccoli.
+    expect(within(group(/Missing one/)).getByRole('link', { name: /Broccoli Rice/ })).toBeInTheDocument();
+    expect(screen.queryByRole('list', { name: 'Recognized foods' })).not.toBeInTheDocument();
+
+    await user.click(didYouMean);
+    expect(within(group(/Ready now/)).getByRole('link', { name: /Broccoli Rice/ })).toBeInTheDocument();
+    expect(
+      within(screen.getByRole('list', { name: 'On hand today' })).getByText('broccoli'),
+    ).toBeInTheDocument();
+    // The typed word is gone from the box.
+    expect(box()).toHaveValue('');
+  });
+
+  it('Enter moves the recognized foods to on-hand and clears the box', async () => {
+    const user = userEvent.setup();
+    renderMake(seed());
+    await user.type(box(), 'chicken and rice{Enter}');
+    const onHand = screen.getByRole('list', { name: 'On hand today' });
+    expect(within(onHand).getByText('chicken')).toBeInTheDocument();
+    expect(within(onHand).getByText('rice')).toBeInTheDocument();
+    expect(box()).toHaveValue('');
+    expect(screen.queryByRole('list', { name: 'Recognized foods' })).not.toBeInTheDocument();
+  });
+
+  it('"Add" does the same as Enter', async () => {
+    const user = userEvent.setup();
+    renderMake(seed());
+    await user.type(box(), 'lentils');
+    await user.click(screen.getByRole('button', { name: 'Add' }));
+    expect(
+      within(screen.getByRole('list', { name: 'On hand today' })).getByText('lentil'),
+    ).toBeInTheDocument();
+    expect(box()).toHaveValue('');
+  });
+
+  it('lists words it cannot place under "Not recognized"', async () => {
+    const user = userEvent.setup();
+    renderMake(seed());
+    await user.type(box(), 'rice and zorbleflax');
+    expect(await screen.findByText('Not recognized: zorbleflax')).toBeInTheDocument();
+  });
+
+  it('"something for breakfast" alone shows breakfast recipes, including More ideas', async () => {
+    const user = userEvent.setup();
+    renderMake(seed({ pantry: ['oat'] }));
+    await user.type(box(), 'something for breakfast');
+
+    expect(
+      await screen.findByRole('list', { name: 'Filters in use' }),
+    ).toHaveTextContent('Breakfast');
+    // Warm Porridge needs milk (one missing); Banana Pancakes needs three.
+    expect(within(group(/Missing one/)).getByRole('link', { name: /Warm Porridge/ })).toBeInTheDocument();
+    const more = group(/More ideas/);
+    expect(within(more).getByRole('link', { name: /Banana Pancakes/ })).toHaveAccessibleName(
+      /Missing: banana, flour and egg/,
+    );
+    expect(screen.queryByRole('link', { name: /Late Stew/ })).not.toBeInTheDocument();
+  });
+
+  it('"finger food" filters to finger-food recipes', async () => {
+    const user = userEvent.setup();
+    renderMake(seed({ pantry: ['pea', 'rice'] }));
+    expect(screen.getByRole('link', { name: /Pea Puree/ })).toBeInTheDocument();
+    await user.type(box(), 'finger food');
+    await waitFor(() => expect(screen.queryByRole('link', { name: /Pea Puree/ })).not.toBeInTheDocument());
+    expect(within(group(/Ready now/)).getByRole('link', { name: /Pea Bites/ })).toBeInTheDocument();
+  });
+
+  it('typing "iron rich" turns on "Iron-rich only"; removing the chip turns it off', async () => {
+    const user = userEvent.setup();
+    renderMake(seed({ pantry: ['lentil', 'rice', 'pea'] }));
+    const toggle = screen.getByRole('button', { name: 'Iron-rich only' });
+    expect(toggle).toHaveAttribute('aria-pressed', 'false');
+
+    await user.type(box(), 'iron rich');
+    await waitFor(() => expect(toggle).toHaveAttribute('aria-pressed', 'true'));
+    expect(screen.queryByRole('link', { name: /Pea Puree/ })).not.toBeInTheDocument();
+
+    const chips = screen.getByRole('list', { name: 'Filters in use' });
+    await user.click(within(chips).getByRole('button', { name: /Remove Iron-rich/ }));
+    expect(toggle).toHaveAttribute('aria-pressed', 'false');
+    // The phrase left the box too, so the filter does not come back.
+    expect(box()).toHaveValue('');
+    expect(screen.getByRole('link', { name: /Pea Puree/ })).toBeInTheDocument();
+  });
+
+  it('turning the toggle off also removes a typed "iron rich"', async () => {
+    const user = userEvent.setup();
+    renderMake(seed({ pantry: ['lentil', 'rice'] }));
+    await user.type(box(), 'iron rich');
+    const toggle = screen.getByRole('button', { name: 'Iron-rich only' });
+    await waitFor(() => expect(toggle).toHaveAttribute('aria-pressed', 'true'));
+    await user.click(toggle);
+    expect(toggle).toHaveAttribute('aria-pressed', 'false');
+    expect(box()).toHaveValue('');
+  });
+
+  it('a filter stays on as a removable chip after Add', async () => {
+    const user = userEvent.setup();
+    renderMake(seed({ pantry: ['oat'] }));
+    await user.type(box(), 'lunch with rice{Enter}');
+    const chips = screen.getByRole('list', { name: 'Filters in use' });
+    expect(chips).toHaveTextContent('Lunch');
+    await user.click(within(chips).getByRole('button', { name: /Remove Lunch/ }));
+    expect(screen.queryByRole('list', { name: 'Filters in use' })).not.toBeInTheDocument();
+  });
+
+  it('shows "Recipes named ..." with ghosted recipes as ghosts', async () => {
+    const user = userEvent.setup();
+    const honeyPancake = recipe('c-hp', 'Honey Pancake', ['honey', 'flour']);
+    renderMake(seed({ customRecipes: [PANCAKES, honeyPancake] }));
+    await user.type(box(), 'pancakes');
+    const named = await screen.findByRole('region', { name: /Recipes named/ });
+    expect(within(named).getByRole('link', { name: /Banana Pancakes/ })).toHaveAccessibleName(/Missing:/);
+    expect(
+      within(named).getByLabelText(/Honey Pancake\. Not yet: honey\. Available at 12 months\./),
+    ).toBeInTheDocument();
+  });
+});

@@ -159,3 +159,39 @@
   border-top: 1px solid var(--fm-color-border);
   padding-top: var(--space);
 }
+
+.serveAs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin: 0 0 16px;
+}
+
+.serveAsEditor {
+  margin: 0 0 16px;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+.serveAsEditor legend {
+  padding: 0;
+  margin: 0 0 8px;
+  font-weight: 600;
+}
+
+.serveAsList {
+  list-style: none;
+  margin: 0 0 8px;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+}
+
+.serveAsActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
