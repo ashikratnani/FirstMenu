@@ -183,7 +183,7 @@ function messageFor(issue: z.core.$ZodIssue, root: unknown): JsonIssue {
  */
 export function cleanString(s: string): string {
   return s
-    .replace(/[\t\n\v\f\r\u0085\u2028\u2029]+/g, ' ')
+    .replace(/[\t\n\v\f\r\u2028\u2029]+/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
 }

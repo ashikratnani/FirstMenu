@@ -394,32 +394,53 @@ function jsonFindings(reply: string): string[] {
 }
 
 const IGNORABLES: number[] = [];
+const IGNORABLE_RE = /^[\p{Default_Ignorable_Code_Point}\p{Cf}\p{Variation_Selector}\p{Cc}\p{Z}\p{Mn}\p{Me}]$/u;
 for (let cp = 0; cp <= 0x10ffff; cp++) {
-  if (/^[\p{Default_Ignorable_Code_Point}\p{Cf}\p{Variation_Selector}]$/u.test(String.fromCodePoint(cp))) IGNORABLES.push(cp);
+  if (cp >= 0xd800 && cp <= 0xdfff) continue;
+  const ch = String.fromCodePoint(cp);
+  if (!IGNORABLE_RE.test(ch)) continue;
+  // Every code point of the small categories; every 12th of the big, uniform ones (combining marks, unassigned ignorables).
+  const big = /^[\p{Mn}]$/u.test(ch) || (cp >= 0xe0100 && cp <= 0xe0fff) || (cp >= 0xe0000 && cp <= 0xe00ff) || (cp >= 0xfff0 && cp <= 0xfff8);
+  if (!big || cp % 12 === 0 || /^[\p{Variation_Selector}\p{Default_Ignorable_Code_Point}]$/u.test(ch) && cp < 0xe0000) IGNORABLES.push(cp);
 }
+// A sample of other code points: letters, digits, punctuation, symbols, private use, noncharacters.
+for (const cp of [0x41, 0x30, 0x2d, 0x2e, 0x24, 0xe000, 0xfffc, 0xfffe, 0xffff, 0x10ffff, 0x1f600, 0x3042, 0x0301]) IGNORABLES.push(cp);
 for (const cp of [0x0b, 0x0c, 0x85, 0x2028, 0x2029, 0x00ad, 0x034f, 0x2060, 0x3164, 0xffa0, 0x2800, 0x7f, 0x01]) IGNORABLES.push(cp);
+
+/** Plain-text findings with the raw string as the title. */
+function plainTitleFindings(raw: string): string[] {
+  const text = `${raw}\n\nIngredients\n- rice\n\nSteps\n1. Cook.\n`;
+  return findingsOf(toRecipe(parseRecipeText(text), text));
+}
 
 describe('invisible characters get the same findings as the plain-text path', () => {
   it('covers many code points', () => {
-    expect(IGNORABLES.length).toBeGreaterThan(100);
+    expect(IGNORABLES.length).toBeGreaterThan(300);
   });
 
   // JSON may be stricter than the plain-text path (never weaker), so the plain findings must be contained.
-  it.each(['sep', 'hide'] as const)('as a %s in every field', (mode) => {
+  it.each(['sep', 'hide', 'join'] as const)('as a %s in every field', (mode) => {
+    const wrap = (c: string) =>
+      mode === 'sep' ? `Stir in${c}honey.` : mode === 'hide' ? `Stir in ho${c}ney.` : `${c}honey${c}`;
     for (const cp of IGNORABLES) {
       const c = String.fromCodePoint(cp);
       const label = `U+${cp.toString(16)} ${mode}`;
-      const text = mode === 'sep' ? `Stir in${c}honey.` : `Stir in ho${c}ney.`;
+      const text = wrap(c);
       const stepRef = plainFindings(text, 'step');
-      expect(jsonFindings(obj({ steps: [text] })), `${label} step`).toEqual(expect.arrayContaining(stepRef));
-      expect(jsonFindings(obj({ notes: [text] })), `${label} note`).toEqual(expect.arrayContaining(stepRef));
-      expect(jsonFindings(obj({ extra: text })), `${label} extra`).toEqual(expect.arrayContaining(stepRef));
-      const unit = jsonFindings(obj({ ingredients: [{ name: 'rice', quantity: 1, unit: text }] }));
-      expect(unit, `${label} unit`).toEqual(jsonFindings(obj({ ingredients: [{ name: 'rice', quantity: 1, unit: text }] })));
+      const has = (got: string[], ref: string[], what: string) => {
+        const missing = ref.filter((f) => !got.includes(f));
+        if (missing.length) expect.soft(missing, `${label} ${what}`).toEqual([]);
+      };
+      has(jsonFindings(obj({ steps: [text] })), stepRef, 'step');
+      has(jsonFindings(obj({ notes: [text] })), stepRef, 'note');
+      has(jsonFindings(obj({ extra: text })), stepRef, 'extra value');
+      has(jsonFindings(obj({ ingredients: [{ name: 'rice', quantity: 1, unit: text }] })), stepRef, 'unit');
+      has(jsonFindings(obj({ [text]: 'x' })), plainFindings(`${text}: x`, 'step'), 'extra key');
+      has(jsonFindings(obj({ [text]: '' })), stepRef, 'empty-valued extra key');
+      has(jsonFindings(obj({ title: text })), plainTitleFindings(text), 'title');
 
-      const name = mode === 'sep' ? `raw${c}honey` : `ho${c}ney`;
-      const nameRef = plainFindings(name, 'ingredient');
-      expect(jsonFindings(obj({ ingredients: [{ name }] })), `${label} name`).toEqual(expect.arrayContaining(nameRef));
+      const name = mode === 'sep' ? `raw${c}honey` : mode === 'hide' ? `ho${c}ney` : `${c}honey${c}`;
+      has(jsonFindings(obj({ ingredients: [{ name }] })), plainFindings(name, 'ingredient'), 'name');
     }
   }, 120000);
 
@@ -441,6 +462,7 @@ describe('plain-text and JSON paths agree on hostile strings', () => {
     'Stir in\u000Bhoney.',
     'Stir in\u000Choney.',
     'Stir in\u0085honey.',
+    'Stir in ho\u0085ney.',
     'Stir in\u2028honey.',
     'Stir in\u3164honey.',
     'Stir in h\u17B4oney.',
