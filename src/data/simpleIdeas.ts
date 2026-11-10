@@ -9,7 +9,7 @@
 //     (pureed/mashed), 8 months (ground/finely chopped) and 10 months
 //     (chopped/small pieces of finger foods). The headings and the table are not in
 //     the PDF's text layer (the text extractor only finds some of the items), so
-//     each of the 14 items was checked by rendering page 2 to an image and reading it.
+//     each of the 13 items was checked by rendering page 2 to an image and reading it.
 //     Left column (6 months): bananas, sweet potatoes, oats, chicken. Middle column
 //     (8 months): peaches, carrots, rice, beef. Right column (10 months): green
 //     beans, cauliflower or broccoli, whole wheat bread, beans, mozzarella.
