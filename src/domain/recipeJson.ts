@@ -188,16 +188,38 @@ export function cleanString(s: string): string {
 
 class LimitError extends Error {}
 
+class DuplicateKeyError extends Error {
+  constructor(readonly path: string) {
+    super(path);
+  }
+}
+
+/** Key identity for the duplicate check: cleaned, then Unicode-normalised. */
+function keyId(k: string): string {
+  return cleanString(k).normalize('NFKC');
+}
+
+function duplicateIssue(path: string): JsonIssue {
+  return { path, message: `\`${path}\` appears twice, so it is not clear which one to use. Keep one.` };
+}
+
 /** Deep copy with every string cleaned (keys too). Throws when nesting passes the depth limit. */
-function cleanDeep(value: unknown, depth: number): unknown {
+function cleanDeep(value: unknown, depth: number, parts: Array<string | number> = []): unknown {
   if (typeof value === 'string') return cleanString(value);
   if (value === null || typeof value !== 'object') return value;
   if (depth >= MAX_DEPTH) throw new LimitError();
-  if (Array.isArray(value)) return value.map((v) => cleanDeep(v, depth + 1));
+  if (Array.isArray(value)) return value.map((v, i) => cleanDeep(v, depth + 1, [...parts, i]));
   const out: Record<string, unknown> = {};
+  const seen = new Set<string>();
   for (const [k, v] of Object.entries(value)) {
-    Object.defineProperty(out, cleanString(k), {
-      value: cleanDeep(v, depth + 1),
+    const id = keyId(k);
+    const cleaned = cleanString(k);
+    if (seen.has(id) || Object.prototype.hasOwnProperty.call(out, cleaned)) {
+      throw new DuplicateKeyError(pathText([...parts, cleaned]));
+    }
+    seen.add(id);
+    Object.defineProperty(out, cleaned, {
+      value: cleanDeep(v, depth + 1, [...parts, cleaned]),
       enumerable: true,
       writable: true,
       configurable: true,
@@ -226,6 +248,73 @@ function tryObject(text: string, start: number, end: number): Candidate | null {
     // not JSON: the caller tries the next candidate
   }
   return null;
+}
+
+/**
+ * Path of the first key that appears twice in one object of `json`, or null.
+ * JSON.parse hides repeated keys (the last wins), so this scans the raw text
+ * itself. `json` must already be valid JSON. Keys are compared after decoding
+ * escapes, cleaning and Unicode normalisation.
+ */
+function findDuplicateKey(json: string): string | null {
+  let i = 0;
+  const ws = (): void => {
+    while (i < json.length && /\s/.test(json[i])) i++;
+  };
+  const readString = (): string => {
+    const begin = i++;
+    while (json[i] !== '"') i += json[i] === '\\' ? 2 : 1;
+    i++;
+    return JSON.parse(json.slice(begin, i)) as string;
+  };
+  const value = (parts: Array<string | number>): string | null => {
+    ws();
+    const c = json[i];
+    if (c === '{') {
+      i++;
+      const seen = new Set<string>();
+      ws();
+      if (json[i] === '}') {
+        i++;
+        return null;
+      }
+      for (;;) {
+        ws();
+        const key = readString();
+        const here = [...parts, cleanString(key)];
+        const id = keyId(key);
+        if (seen.has(id)) return pathText(here);
+        seen.add(id);
+        ws();
+        i++; // :
+        const dup = value(here);
+        if (dup) return dup;
+        ws();
+        if (json[i++] === '}') return null;
+      }
+    }
+    if (c === '[') {
+      i++;
+      ws();
+      if (json[i] === ']') {
+        i++;
+        return null;
+      }
+      for (let n = 0; ; n++) {
+        const dup = value([...parts, n]);
+        if (dup) return dup;
+        ws();
+        if (json[i++] === ']') return null;
+      }
+    }
+    if (c === '"') {
+      readString();
+      return null;
+    }
+    while (i < json.length && !/[,\]}\s]/.test(json[i])) i++;
+    return null;
+  };
+  return value([]);
 }
 
 /** End index (exclusive) of the balanced object starting at `start`, string-aware; -1 if none. */
@@ -316,7 +405,19 @@ function collectExtras(root: Record<string, unknown>): Extras | null {
     if (tooMuch) return;
     if (isDefinedPath(parts)) return;
     if (typeof value === 'string') {
-      if (value === '') return;
+      if (value === '') {
+        // No text to read, but the key may name a food ("honey": ""): screen it.
+        const emptyPath = pathText(parts);
+        if (textMentionsBlockFood(emptyPath)) {
+          if (notes.length >= MAX_EXTRA_STRINGS) {
+            tooMuch = true;
+            return;
+          }
+          notes.push(`${emptyPath}: ""`);
+          paths.push(emptyPath);
+        }
+        return;
+      }
       if (value.length > MAX_EXTRA_STRING_CHARS || notes.length >= MAX_EXTRA_STRINGS) {
         tooMuch = true;
         return;
@@ -381,10 +482,14 @@ export function parseRecipeReply(text: string): JsonParseResult {
     return invalid({ path: '', message: UNREADABLE });
   }
 
+  const duplicate = findDuplicateKey(text.slice(found.start, found.end));
+  if (duplicate !== null) return invalid(duplicateIssue(duplicate));
+
   let data: Record<string, unknown>;
   try {
     data = cleanDeep(found.value, 0) as Record<string, unknown>;
-  } catch {
+  } catch (e) {
+    if (e instanceof DuplicateKeyError) return invalid(duplicateIssue(e.path));
     return invalid({ path: '', message: TOO_MUCH_EXTRA });
   }
 

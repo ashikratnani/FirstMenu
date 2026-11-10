@@ -382,6 +382,17 @@ describe('every string is screened or rejected (Requirement 18.9)', () => {
     expect(mentionIds(obj({ more: { honey: 1 } }))).toEqual(['honey']);
   });
 
+  it('screens a food key with an empty-string value, and ignores a harmless one', () => {
+    const r = recipeOf(obj({ honey: '' }));
+    expect(r.parsed.notes.map((n) => n.text)).toEqual(['honey: ""']);
+    expect(r.extras).toEqual(['honey']);
+    expect(mentionIds(obj({ honey: '' }))).toEqual(['honey']);
+    expect(mentionIds(obj({ more: { honey: '' } }))).toEqual(['honey']);
+    const ok = recipeOf(obj({ brand: '' }));
+    expect(ok.parsed.notes).toEqual([]);
+    expect(ok.extras).toEqual([]);
+  });
+
   it('ignores numbers, booleans and null in unknown places when the key is harmless', () => {
     const r = recipeOf(obj({ rating: 5, vegan: true, source: null, tags: [] }));
     expect(r.parsed.notes).toEqual([]);
@@ -555,5 +566,53 @@ describe('stray braces', () => {
     const cut = '{"firstmenu_recipe":1,"title":"T","ingredients":[{"name":"rice"}],"steps":["Cook';
     expect(messages(cut)[0]).toContain("couldn't be read");
     expect(messages('{"firstmenu_recipe":1,"ingredients":[{"name":"rice"},')[0]).toContain("couldn't be read");
+  });
+});
+
+describe('duplicate keys', () => {
+  const head = '{"firstmenu_recipe":1,"title":"T","ingredients":[{"name":"rice"}],"steps":["Cook."]';
+  const dupMessage = (json: string, path: string): void => {
+    const errs = invalidOf(json);
+    expect(errs).toHaveLength(1);
+    expect(errs[0].path).toBe(path);
+    expect(errs[0].message).toContain(`\`${path}\` appears twice`);
+  };
+
+  it('a repeated notes key', () => {
+    dupMessage(`${head},"notes":["add honey"],"notes":["ok"]}`, 'notes');
+  });
+  it('a repeated name inside an ingredient', () => {
+    dupMessage(
+      '{"firstmenu_recipe":1,"title":"T","ingredients":[{"name":"honey","name":"rice"}],"steps":["Cook."]}',
+      'ingredients[0].name',
+    );
+  });
+  it('a repeated unknown key', () => {
+    dupMessage(`${head},"x":"honey","x":"fine"}`, 'x');
+  });
+  it('a repeated key in a nested object or an array of objects', () => {
+    dupMessage(`${head},"a":{"b":{"c":"honey","c":"ok"}}}`, 'a.b.c');
+    dupMessage(`${head},"a":[1,{"k":"honey","k":2}]}`, 'a[1].k');
+  });
+  it('keys that collide after cleaning', () => {
+    dupMessage(`${head},"title":"Q","ti\u200btle":"R"}`.replace('"title":"T",', ''), 'title');
+    dupMessage('{"firstmenu_recipe":1,"title":"Q","ti\u200btle":"R","ingredients":[{"name":"rice"}],"steps":["Cook."]}', 'title');
+    dupMessage(`${head},"honey\u200b":"yes","honey":"no"}`, 'honey');
+    dupMessage(`${head},"honey":"yes","honey\u200b":"no"}`, 'honey');
+  });
+  it('keys that are equal only after escapes are decoded', () => {
+    dupMessage(`${head},"honey":"yes","ho\\u006eey":"no"}`, 'honey');
+  });
+  it('keys that collide after Unicode normalisation', () => {
+    dupMessage(`${head},"caf\u00e9":"a","cafe\u0301":"b"}`, 'cafe\u0301');
+    dupMessage(`${head},"honey":"a","\uff48oney":"b"}`, '\uff48oney');
+  });
+  it('the same key in different objects is fine', () => {
+    const r = recipeOf('{"firstmenu_recipe":1,"title":"T","ingredients":[{"name":"rice"},{"name":"beans"}],"steps":["Cook."]}');
+    expect(r.parsed.ingredients).toHaveLength(2);
+  });
+  it('a key repeated inside a string value is not a duplicate', () => {
+    const r = recipeOf(`${head},"notes":["\\"a\\":1,\\"a\\":2"]}`);
+    expect(r.parsed.notes).toHaveLength(1);
   });
 });
