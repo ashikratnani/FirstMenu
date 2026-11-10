@@ -131,18 +131,21 @@ function ServeAsLine({ recipe }: { recipe: Recipe }) {
 
 /**
  * "Add to plan" (Req 1.5): pick a day and meal, then add. A ghosted recipe
- * never gets this control (Req 5.2); the reducer-side guard stays in the slot
- * picker, and this page does not render it for a ghost.
+ * never gets this control (Req 5.2): the page does not render it for a ghost,
+ * and the Add handler re-derives the ghost state before dispatching, like the
+ * slot picker does. Only the meals switched on in the Plan page are offered.
  */
-function AddToPlan({ recipe }: { recipe: Recipe }) {
+export function AddToPlan({ recipe }: { recipe: Recipe }) {
   const { state, dispatch } = useApp();
-  const slots = MEAL_TYPES;
+  const slots = MEAL_TYPES.filter((m) => state.plan.activeSlots.includes(m));
   const [open, setOpen] = useState(false);
   const [day, setDay] = useState(0);
   const [meal, setMeal] = useState<MealType | ''>('');
   const [message, setMessage] = useState('');
-  const chosenMeal: MealType =
-    meal !== '' ? meal : (slots.find((m) => recipe.mealTypes.includes(m)) ?? slots[0]);
+  const chosenMeal: MealType | undefined =
+    meal !== '' && slots.includes(meal)
+      ? meal
+      : (slots.find((m) => recipe.mealTypes.includes(m)) ?? slots[0]);
 
   return (
     <div className={styles.planAction}>
@@ -151,6 +154,9 @@ function AddToPlan({ recipe }: { recipe: Recipe }) {
       ) : (
         <fieldset className={styles.serveAsEditor}>
           <legend>Add to plan</legend>
+          {chosenMeal === undefined ? (
+            <p>No meals are switched on. Choose your meals on the Plan page first.</p>
+          ) : (
           <div className={styles.planFields}>
             <label>
               Day{' '}
@@ -173,24 +179,21 @@ function AddToPlan({ recipe }: { recipe: Recipe }) {
               </select>
             </label>
           </div>
+          )}
           <div className={styles.serveAsActions}>
+            {chosenMeal !== undefined && (
             <Button
               label="Add"
               variant="secondary"
               onClick={() => {
-                // A meal switched off on the Plan page is switched on, so the
-                // recipe shows up there.
-                if (!state.plan.activeSlots.includes(chosenMeal)) {
-                  dispatch({
-                    type: 'setActiveSlots',
-                    activeSlots: [...state.plan.activeSlots, chosenMeal],
-                  });
-                }
+                // Req 5.2: never plan a ghost, even if this is called directly.
+                if (recipeView(recipe, state).isGhosted) return;
                 dispatch({ type: 'setSlot', slot: { day, meal: chosenMeal }, recipeId: recipe.id });
                 setMessage(`Added to ${dayLabel(day)}, ${mealTypeLabel(chosenMeal)}.`);
                 setOpen(false);
               }}
             />
+            )}
             <Button label="Cancel" onClick={() => setOpen(false)} />
           </div>
         </fieldset>

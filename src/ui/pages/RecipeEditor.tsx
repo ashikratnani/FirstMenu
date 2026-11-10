@@ -399,8 +399,6 @@ export default function RecipeEditor() {
       recipeId,
     );
 
-    // Run the real safety screen and show the findings; saving is not gated on
-    // them (a block simply ghosts the recipe later).
     // Keep what the form does not edit (a pasted recipe's original text,
     // notes, cleared mentions, kind, serve-as), so editing never drops it.
     if (editing) {
@@ -411,6 +409,8 @@ export default function RecipeEditor() {
       if (editing.serveAs) recipe.serveAs = editing.serveAs;
     }
 
+    // Run the real safety screen and show the findings; saving is not gated on
+    // them (a block simply ghosts the recipe later).
     const result = screenRecipe(recipe, selectAgeMonths(state) ?? 0);
     setScreen(result);
     setSavedId(recipeId);

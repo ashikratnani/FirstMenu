@@ -228,6 +228,13 @@ describe('Accessibility: axe on every main page (color-contrast disabled)', () =
       expect(
         screen.getByRole('heading', { level: 1, name: heading }),
       ).toBeInTheDocument();
+      if (path === '/recipes/custom-pasted-oats') {
+        // The text mention must actually be on screen, or axe checks nothing.
+        expect(screen.getByRole('heading', { name: 'Not yet' })).toBeInTheDocument();
+        expect(
+          screen.getByRole('button', { name: /Not used in this recipe/ }),
+        ).toBeInTheDocument();
+      }
       const results = await axe(container, AXE_OPTIONS);
       expect(results).toHaveNoViolations();
     },

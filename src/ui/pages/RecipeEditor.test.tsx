@@ -190,6 +190,10 @@ describe('RecipeEditor', () => {
     const pasted: Recipe = {
       ...CUSTOM_MASH,
       imported: { from: 'chatgpt', text: 'original', date: '2026-01-01' },
+      notes: ['Serve warm'],
+      clearedMentions: [{ ruleId: 'honey', sentence: 'Add a little honey.' }],
+      kind: 'simple-idea',
+      serveAs: ['mashed'],
     };
     const { getState } = renderApp(seedState(8, [pasted]), '/recipes/custom-mash/edit');
     const minutes = screen.getByLabelText('Total time in minutes (optional)') as HTMLInputElement;
@@ -199,6 +203,10 @@ describe('RecipeEditor', () => {
     const saved = getState().customRecipes[0];
     expect(saved.statedMinutes).toBe(25);
     expect(saved.imported?.text).toBe('original');
+    expect(saved.notes).toEqual(['Serve warm']);
+    expect(saved.clearedMentions).toEqual([{ ruleId: 'honey', sentence: 'Add a little honey.' }]);
+    expect(saved.kind).toBe('simple-idea');
+    expect(saved.serveAs).toEqual(['mashed']);
 
     await user.clear(minutes);
     await user.click(screen.getByRole('button', { name: 'Save recipe' }));
