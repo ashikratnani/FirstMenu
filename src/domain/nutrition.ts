@@ -5,10 +5,11 @@
 //
 // Task 4.1: every term below is named in at least one cited source, read on
 // 2026-11-09 (CDC archive copies are dated 2023-11-24 and 2024-04-01). A term
-// no source names is not kept, because a wrong tag is a wrong claim. The CDC pages were read from Internet Archive copies (CDC
-// returns HTTP 403 to the build sandbox; re-check against the live pages), and
-// the USDA PDF was read directly from its canonical fna.usda.gov URL (the old
-// fns.usda.gov URL redirects there).
+// no source names is not kept, because a wrong tag is a wrong claim. The CDC
+// pages were read from Internet Archive copies (CDC returns HTTP 403 to the
+// build sandbox; re-check against the live pages), and the USDA PDF was read
+// directly from its canonical fna.usda.gov URL (the old fns.usda.gov URL
+// redirects there).
 //
 //   CDC-iron (Apr 1, 2024). Heme iron: red meat "such as beef, pork, lamb,
 //     goat, or venison", "Seafood and fatty fish", "Poultry, such as chicken or
@@ -49,7 +50,7 @@
 // there). Also checked without success: AAP healthychildren.org Starting Solid
 // Foods, MyPlate infants/toddlers pages, WHO IYCF fact sheet, CDC solid-foods
 // page and the 2020-2025 Dietary Guidelines (no list of fat-rich foods for
-// babies). So it has no rule yet: see UNCONFIRMED_TAGS.
+// babies). So it has no rule yet: task 4.3 finds a source (see UNCONFIRMED_TAGS).
 
 import { matchesTerm } from './safety/normalize';
 import type { SourceId } from './safety/rules';
@@ -120,7 +121,8 @@ export const NUTRITION_RULES: NutritionRule[] = [
 ];
 
 // Tags the requirements name but that no cited source supports yet, so they
-// have no rule and are never assigned. Reviewer or maintainer decides.
+// have no rule and are never assigned. Healthy fat waits for task 4.3 (find a
+// sourced term list, add the rule, bump NUTRITION_VERSION).
 export const UNCONFIRMED_TAGS: NutritionTag[] = ['healthy-fat'];
 
 const TAG_ORDER: NutritionTag[] = NUTRITION_RULES.map((r) => r.tag);

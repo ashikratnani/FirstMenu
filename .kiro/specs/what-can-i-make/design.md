@@ -296,7 +296,7 @@ A recipe gets a tag when any required ingredient name matches. Draft term lists 
 | Dairy | yogurt, cheese, cottage cheese, ricotta, milk | breast, formula, peanut, almond, oat, soy, coconut, rice | CDC-encourage |
 | Healthy fat | avocado, olive oil, salmon, nut butter, peanut butter, almond butter, tahini, ground flaxseed, chia | | CDC-encourage |
 
-**Task 4.1 result:** the lists in `domain/nutrition.ts` replace the draft above. Only terms named in CDC-iron, CDC-encourage or USDA-FNS-iron were kept, with the quoted evidence in that file's header. Healthy fat has no supporting term in those sources, so it has no rule until a source is chosen (see `UNCONFIRMED_TAGS`).
+**Task 4.1 result:** the lists in `domain/nutrition.ts` replace the draft above. Only terms named in CDC-iron, CDC-encourage or USDA-FNS-iron were kept, with the quoted evidence in that file's header. Healthy fat has no supporting term in those sources, so it has no rule until task 4.3 finds a sourced term list (see `UNCONFIRMED_TAGS`). Six tags ship first; the maintainer chose this on issue #50.
 
 New sources added to the sources table (shared with safety rules):
 
