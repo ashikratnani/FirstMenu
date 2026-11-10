@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildPrompt, leaveOutFor, PROMPT_NOTICE } from './prompt';
+import { buildPrompt, leaveOutFor } from './prompt';
 import { STAGE_TEXTURE_HINTS } from './safety/rules';
 import { stageFor } from './age';
 import { defaultState } from './storage';
@@ -51,12 +51,6 @@ describe('buildPrompt content', () => {
       expect(promptFor(months, state)).toContain(`Texture: ${STAGE_TEXTURE_HINTS[stage].hint}.`);
     }
   });
-
-  it('keeps the helper notice wording', () => {
-    expect(PROMPT_NOTICE).toBe(
-      'AI recipes can be wrong. FirstMenu checks them against its fixed safety list, which can miss things. Check with your pediatrician.',
-    );
-  });
 });
 
 describe('leave-out list', () => {
@@ -100,7 +94,9 @@ describe('leave-out list', () => {
 
   it('has no duplicates', () => {
     const list = leaveOutFor(10, { honey: { status: 'reaction', date: '2026-01-10' } });
-    expect(new Set(list).size).toBe(list.length);
+    expect(new Set(list.map((l) => l.toLowerCase())).size).toBe(list.length);
+    expect(list).toContain('Honey');
+    expect(list).not.toContain('honey');
   });
 });
 

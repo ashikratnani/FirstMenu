@@ -17,14 +17,10 @@ export interface PromptInput {
   leaveOut: string[];
 }
 
-/** Helper notice (Requirement 8.9). */
-export const PROMPT_NOTICE =
-  'AI recipes can be wrong. FirstMenu checks them against its fixed safety list, which can miss things. Check with your pediatrician.';
-
 /**
  * Foods to leave out (Requirement 8.3): labels of block rules that apply at
  * `ageMonths` (no age limit, or a limit above the age), plus the label of each
- * food with a recorded reaction. Duplicates are removed.
+ * food with a recorded reaction. Duplicates are removed case-insensitively, keeping the first label.
  */
 export function leaveOutFor(
   ageMonths: number,
@@ -36,7 +32,13 @@ export function leaveOutFor(
   const reactions = Object.entries(foods)
     .filter(([, record]) => record.status === 'reaction')
     .map(([key]) => foodLabel(key));
-  return [...new Set([...labels, ...reactions])];
+  const seen = new Set<string>();
+  return [...labels, ...reactions].filter((label) => {
+    const key = label.toLowerCase();
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 }
 
 export function buildPrompt({ ageMonths, have, stage, leaveOut }: PromptInput): string {
