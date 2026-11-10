@@ -14,8 +14,8 @@ import { tokenize } from './normalize';
 const STRICT_AGE = 0;
 
 describe('rules metadata', () => {
-  it('exports a numeric RULESET_VERSION bumped to 3 (juice-limit reminder added)', () => {
-    expect(RULESET_VERSION).toBe(3);
+  it('exports a numeric RULESET_VERSION bumped to 4 (invisible characters stripped before matching)', () => {
+    expect(RULESET_VERSION).toBe(4);
   });
 
   it('has a non-empty rule list', () => {
