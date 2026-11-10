@@ -25,6 +25,7 @@ import type {
 import { BUILTIN_RECIPES } from '../data/recipes';
 import { computeNextWeekPlan } from '../domain/plan';
 import { foodKeyFromName } from '../domain/foods';
+import { addMadeEntry } from '../domain/suggest';
 import {
   createDebouncedSaver,
   exportState,
@@ -63,6 +64,10 @@ export type AppAction =
   | { type: 'addOnHand'; food: string; today: string }
   | { type: 'removeOnHand'; food: string; today: string }
   | { type: 'clearOnHand'; today: string }
+  | { type: 'markMade'; recipeId: string; today: string }
+  | { type: 'recordOnHandDay'; food: string; today: string }
+  | { type: 'dismissSuggestion'; id: string; at: string }
+  | { type: 'keepOnHand'; today: string }
   | { type: 'clearTextMention'; recipeId: string; mention: ClearedMention }
   | { type: 'replaceState'; state: AppState };
 
@@ -323,6 +328,44 @@ export function reducer(state: AppState, action: AppAction): AppState {
     case 'clearOnHand': {
       if (state.onHand.length === 0 || !isYmdDate(action.today)) return state;
       return { ...state, onHand: [], onHandUpdated: action.today };
+    }
+
+    case 'markMade': {
+      // Req 17.5: "I made this" records the day; one entry per recipe per day,
+      // newest first, capped at 100. Unknown recipes and bad dates are no-ops.
+      if (!isYmdDate(action.today)) return state;
+      if (!knownRecipeIds(state.customRecipes).has(action.recipeId)) return state;
+      const madeLog = addMadeEntry(state.madeLog, action.recipeId, action.today);
+      return madeLog === state.madeLog ? state : { ...state, madeLog };
+    }
+
+    case 'recordOnHandDay': {
+      // Req 17.6: count a day a food was on hand without changing the list
+      // (distinct dates, last 10). Empty key or bad date: no-op.
+      const key = foodKeyFromName(action.food);
+      if (key.length === 0 || !isYmdDate(action.today)) return state;
+      const days = state.onHandDays[key] ?? [];
+      if (days.includes(action.today)) return state;
+      return {
+        ...state,
+        onHandDays: {
+          ...state.onHandDays,
+          [key]: [...days, action.today].slice(-ON_HAND_DAYS_KEPT),
+        },
+      };
+    }
+
+    case 'dismissSuggestion': {
+      // Req 17.9: store when a suggestion was dismissed (ISO time). Whether it
+      // is still hidden is decided by suggest.ts isDismissed.
+      if (action.id.length === 0 || Number.isNaN(Date.parse(action.at))) return state;
+      return { ...state, dismissed: { ...state.dismissed, [action.id]: action.at } };
+    }
+
+    case 'keepOnHand': {
+      // Req 17.3 "Yes, keep": refresh the date, leave the list alone.
+      if (state.onHand.length === 0 || !isYmdDate(action.today)) return state;
+      return { ...state, onHandUpdated: action.today };
     }
 
     case 'clearTextMention': {

@@ -105,7 +105,8 @@ export function recipeMinutes(recipe: Recipe): RecipeTime | undefined {
   return { minutes: Math.ceil((5 + sum) / 5) * 5, kind: 'estimated' };
 }
 
-function isOptional(ing: Ingredient): boolean {
+/** True for an optional ingredient (flag or "(optional)" in the name). */
+export function isOptional(ing: Ingredient): boolean {
   return ing.optional === true || /\(\s*optional\s*\)/i.test(ing.name);
 }
 

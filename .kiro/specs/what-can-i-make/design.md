@@ -347,7 +347,7 @@ parseRecipeText(text: string): ParsedRecipe
 2. Strip markdown: `#` headers, `**bold**`, `__bold__`, `*italic*`, inline code ticks.
 3. Strip emoji and decorative symbols, but keep `½ ¼ ¾ ⅓ ⅔`.
 4. Drop lines made only of hashtags and @mentions, and remove trailing hashtag runs from other lines.
-5. Drop common caption filler lines: lines containing "save this", "follow for", "link in bio", "comment", "share with", "tag a".
+5. Drop common caption filler lines: lines containing "save this", "follow for", "link in bio", "comment", "share with", "tag a". A filler-worded line is kept (it then lands in the steps or notes like any other line) when any block rule fires on it, checked at every age, so the text-mention screen still sees it: "Stir in a spoon of honey, then share with family." stays. Only pure filler is dropped.
 
 ### Sections
 
@@ -622,7 +622,8 @@ interface AppState {
 ### "Try this" pick
 
 ```ts
-pickTryThis(results: MakeResult[], ctx: { now: Date; mealHint?: MealType; madeLog; foods }): MakeResult[]
+pickTryThis(results: MakeResult[], ctx: { now: Date; mealHint?: MealType; madeLog; foods; newFoodKey?: string; dismissed?; ironRich? }): TryThisPick[]
+// TryThisPick = { result: MakeResult; score: number; newFood?: string (the one untried food); reason: string }
 ```
 
 Candidates are Ready now results that are not ghosted, filtered by untried foods (maintainer's option b, PR #41):
@@ -641,7 +642,7 @@ Score the remaining candidates (higher is better) and sort; ties go to title ord
 | Time 15 minutes or less (stated or estimated) | +2 |
 | Effort Easy | +1 |
 | Has the Iron-rich tag | +1 |
-| Made in the last 2 days | −3 (variety) |
+| Made today, yesterday or the day before (age 0 to 2 days) | −3 (variety) |
 
 "Show another" walks down the sorted list and wraps. The reason line lists the rules that scored, for example "Ready now · 10 min · Breakfast · Iron-rich".
 

@@ -24,7 +24,7 @@ import {
   type SourceId,
 } from './safety/rules';
 import { foodKeyFor, foodLabel, foodStatus, isIgnoredFood } from './foods';
-import { screenRecipe } from './safety/screen';
+import { screenRecipe, screenTextMentions } from './safety/screen';
 
 // ---------------------------------------------------------------------------
 // Timezone-safe YYYY-MM-DD helpers (mirror AppProvider.shiftYmd / age.parseYMD)
@@ -156,7 +156,8 @@ function recipeById(recipes: Recipe[], id: string): Recipe | undefined {
 /**
  * Whether a planned recipe is GHOSTED for the current state, using the SAME
  * honest rule the recipe view uses (recipeView.ts): a recipe is ghosted when
- * the safety screen reports any block finding OR one of its ingredient foods
+ * the safety screen reports any block finding, a pasted recipe's text mentions
+ * a block-rule food (screenTextMentions), OR one of its ingredient foods
  * has a recorded 'reaction'. A ghosted recipe is not going to be served, so its
  * foods are not really being introduced — the spacing calc skips it. This is a
  * pure, domain-only check (no UI import), so plan.ts stays React-free.
@@ -171,6 +172,8 @@ export function isRecipeGhosted(
   ageMonths: number,
 ): boolean {
   if (screenRecipe(recipe, ageMonths).blocks.length > 0) return true;
+  // Pasted recipes: a block-rule food named in the title, steps or notes.
+  if (screenTextMentions(recipe, ageMonths).length > 0) return true;
   for (const ingredient of recipe.ingredients) {
     for (const key of foodKeyFor(ingredient)) {
       if (
