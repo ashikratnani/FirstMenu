@@ -1,7 +1,15 @@
 import { describe, expect, it } from 'vitest';
-import { makeResults, requiredKeys, suggestedChips } from './make';
+import {
+  MORE_IDEAS_LIMIT,
+  activeFilters,
+  makeResults,
+  recipeServeAs,
+  requiredKeys,
+  setIronRichFilter,
+  suggestedChips,
+} from './make';
 import { foodKeyFromName } from './foods';
-import type { AppState, Ingredient, Recipe, StageId } from './types';
+import type { AppState, Ingredient, Recipe, ServeAs, StageId } from './types';
 
 function ing(name: string, extra: Partial<Ingredient> = {}): Ingredient {
   return { name, category: 'other', ...extra };
@@ -48,7 +56,7 @@ describe('makeResults groups', () => {
   it('drops a recipe missing two or more foods', () => {
     const r = recipe('Rice and Peas', ['rice', 'peas']);
     const out = makeResults([r], have(), AGE_10, NO_FOODS);
-    expect(out).toEqual({ readyNow: [], missingOne: [], ghosted: [] });
+    expect(out).toEqual({ readyNow: [], missingOne: [], ghosted: [], moreIdeas: [] });
   });
 
   it('matches by plain key: "2 cups diced sweet potatoes" counts as sweet potato (Req 3.3)', () => {
@@ -259,5 +267,296 @@ describe('suggestedChips', () => {
   it('counts a food once per recipe', () => {
     const r = [recipe('D', ['egg', 'eggs', 'egg yolk']), recipe('E', ['egg yolk'])];
     expect(suggestedChips(r, [])).toEqual(['egg yolk', 'egg']);
+  });
+});
+
+describe('tags on results (Req 3.8)', () => {
+  it('carries nutrition tags from required ingredients only', () => {
+    const r = recipe('Beef Bowl', ['beef', 'rice', ing('banana', { optional: true })]);
+    const out = makeResults([r], have('beef', 'rice'), AGE_10, NO_FOODS);
+    expect(out.readyNow[0].tags).toContain('iron-rich');
+    expect(out.readyNow[0].tags).not.toContain('fruit');
+  });
+
+  it('gives an empty list when nothing matches', () => {
+    const r = recipe('Plain', ['rice']);
+    const out = makeResults([r], have('rice'), AGE_10, NO_FOODS);
+    expect(out.readyNow[0].tags).toEqual([]);
+  });
+});
+
+describe('recipeServeAs (Req 16.13)', () => {
+  const base = (extra: Partial<Recipe>) => recipe('Plain dish', ['rice'], { steps: ['Cook.'], texture: 'soft', ...extra });
+
+  it('uses serveAs as set and does not call it guessed', () => {
+    expect(recipeServeAs(base({ serveAs: ['pieces'], title: 'Smooth puree' }))).toEqual({
+      forms: ['pieces'],
+      guessed: false,
+    });
+  });
+
+  it.each([
+    ['finger-food', { title: 'Banana pancakes' }],
+    ['finger-food', { steps: ['Cut into strips.'] }],
+    ['finger-food', { texture: 'soft finger bites' }],
+    ['puree', { steps: ['Blend until smooth.'] }],
+    ['puree', { title: 'Pea purée' }],
+    ['mashed', { steps: ['Mash with a fork.'] }],
+    ['pieces', { steps: ['Chop the carrots.'] }],
+    ['pieces', { steps: ['Cut into small cubes.'] }],
+  ] as Array<[ServeAs, Partial<Recipe>]>)('derives %s from keywords', (form, extra) => {
+    const out = recipeServeAs(base(extra));
+    expect(out.forms).toContain(form);
+    expect(out.guessed).toBe(true);
+  });
+
+  it('matches whole words, plural-aware', () => {
+    expect(recipeServeAs(base({ steps: ['Shape into balls.'] })).forms).toContain('finger-food');
+    // whole words only: "basketball" is not "ball"
+    expect(recipeServeAs(base({ steps: ['Serve after basketball.'], stages: ['9-12'] })).forms).toEqual(['mashed']);
+  });
+
+  it('can derive several forms', () => {
+    const out = recipeServeAs(base({ steps: ['Blend until smooth.', 'Chop the pears.'] }));
+    expect(out.forms).toEqual(['puree', 'pieces']);
+  });
+
+  it.each([
+    [['6-8'], 'puree'],
+    [['9-12'], 'mashed'],
+    [['12-23'], 'pieces'],
+    [['24-36'], 'pieces'],
+    [['9-12', '12-23'], 'mashed'],
+    [['24-36', '12-23'], 'pieces'],
+    [['6-8', '9-12'], 'puree'],
+    [[], 'mashed'],
+  ] as const)('falls back to the youngest stage default for %j', (stages, form) => {
+    const out = recipeServeAs(base({ stages: [...stages] }));
+    expect(out).toEqual({ forms: [form], guessed: true });
+  });
+
+  it('treats an empty serveAs as unset', () => {
+    expect(recipeServeAs(base({ serveAs: [] })).guessed).toBe(true);
+  });
+});
+
+describe('filters (Req 16.9)', () => {
+  const quickEgg = recipe('Egg Toast', ['egg'], { mealTypes: ['breakfast'], statedMinutes: 10 });
+  const slowBeef = recipe('Beef Stew', ['beef'], {
+    mealTypes: ['dinner'],
+    statedMinutes: 60,
+    serveAs: ['mashed'],
+    storage: { freezerMonths: 3 },
+  });
+  const all = [quickEgg, slowBeef];
+  const stocked = have('egg', 'beef');
+  const run = (options = {}) => makeResults(all, stocked, AGE_10, NO_FOODS, options);
+
+  it('applies no filter by default', () => {
+    expect(titles(run().readyNow).sort()).toEqual(['Beef Stew', 'Egg Toast']);
+  });
+
+  it.each([
+    [['meal:breakfast'], ['Egg Toast']],
+    [['meal:dinner'], ['Beef Stew']],
+    [['form:finger-food'], ['Egg Toast']],
+    [['form:mashed'], ['Beef Stew']],
+    [['quick'], ['Egg Toast']],
+    [['freezer'], ['Beef Stew']],
+    [['tag:protein'], ['Beef Stew', 'Egg Toast']],
+    [['tag:fruit'], []],
+  ] as const)('filter %j keeps %j', (filters, expected) => {
+    const out = run({ filters: [...filters] });
+    expect(titles(out.readyNow).sort()).toEqual([...expected]);
+  });
+
+  it('keeps only easy recipes for the easy filter', () => {
+    const easy = recipe('Easy One', ['egg'], { statedMinutes: 5 });
+    const hard = recipe('Hard One', ['egg'], {
+      steps: Array.from({ length: 12 }, (_, i) => `Step ${i}.`),
+    });
+    const out = makeResults([easy, hard], have('egg'), AGE_10, NO_FOODS, { filters: ['easy'] });
+    expect(titles(out.readyNow)).toEqual(['Easy One']);
+  });
+
+  it('requires every filter (AND)', () => {
+    expect(titles(run({ filters: ['meal:breakfast', 'quick'] }).readyNow)).toEqual(['Egg Toast']);
+    expect(run({ filters: ['meal:breakfast', 'meal:dinner'] }).readyNow).toEqual([]);
+    expect(run({ filters: ['quick', 'freezer'] }).readyNow).toEqual([]);
+  });
+
+  it('applies to Missing one as well', () => {
+    const out = makeResults(all, have('egg'), AGE_10, NO_FOODS, { filters: ['meal:dinner'] });
+    expect(titles(out.missingOne)).toEqual(['Beef Stew']);
+    expect(out.readyNow).toEqual([]);
+  });
+
+  it('applies filters to the ghosted group: a ghosted recipe that does not match is dropped', () => {
+    const match = recipe('Honey Breakfast', ['honey'], { mealTypes: ['breakfast'] });
+    const other = recipe('Honey Dinner', ['honey'], { mealTypes: ['dinner'] });
+    const none = makeResults([match, other], have(), AGE_10, NO_FOODS);
+    expect(titles(none.ghosted).sort()).toEqual(['Honey Breakfast', 'Honey Dinner']);
+    const out = makeResults([match, other], have(), AGE_10, NO_FOODS, { filters: ['meal:breakfast'] });
+    expect(titles(out.ghosted)).toEqual(['Honey Breakfast']);
+  });
+
+  describe('quick', () => {
+    const quick = (r: Recipe) =>
+      titles(makeResults([r], have('egg'), AGE_10, NO_FOODS, { filters: ['quick'] }).readyNow);
+
+    it('excludes a recipe with no time', () => {
+      expect(quick(recipe('No time', ['egg']))).toEqual([]);
+    });
+
+    it('includes exactly 15 minutes and excludes 16', () => {
+      expect(quick(recipe('Fifteen', ['egg'], { statedMinutes: 15 }))).toEqual(['Fifteen']);
+      expect(quick(recipe('Sixteen', ['egg'], { statedMinutes: 16 }))).toEqual([]);
+    });
+
+    it('uses an estimated time', () => {
+      const fast = recipe('Est 15', ['egg'], { steps: ['Simmer 10 minutes.'] });
+      const slow = recipe('Est 20', ['egg'], { steps: ['Simmer 15 minutes.'] });
+      expect(makeResults([fast], have('egg'), AGE_10, NO_FOODS).readyNow[0]).toMatchObject({
+        minutes: 15,
+        minutesKind: 'estimated',
+      });
+      expect(quick(fast)).toEqual(['Est 15']);
+      expect(quick(slow)).toEqual([]);
+    });
+  });
+
+  describe('freezer', () => {
+    const freezer = (r: Recipe) =>
+      titles(makeResults([r], have('egg'), AGE_10, NO_FOODS, { filters: ['freezer'] }).readyNow);
+
+    it('excludes storage set without freezerMonths, and no storage', () => {
+      expect(freezer(recipe('Fridge only', ['egg'], { storage: { fridgeDays: 3 } }))).toEqual([]);
+      expect(freezer(recipe('No storage', ['egg']))).toEqual([]);
+    });
+
+    it('includes a recipe with freezerMonths', () => {
+      expect(freezer(recipe('Frozen', ['egg'], { storage: { freezerMonths: 2 } }))).toEqual(['Frozen']);
+    });
+  });
+
+  it('applies filters to results with no foods typed, using the pantry', () => {
+    const out = makeResults(all, have('egg'), AGE_10, NO_FOODS, { filters: ['meal:breakfast'] });
+    expect(titles(out.readyNow)).toEqual(['Egg Toast']);
+  });
+});
+
+describe('Iron-rich only (Req 3.9)', () => {
+  const beef = recipe('Beef Mash', ['beef']);
+  const apple = recipe('Apple Mash', ['apple']);
+  const run = (options = {}) =>
+    makeResults([beef, apple], have('beef', 'apple'), AGE_10, NO_FOODS, options);
+
+  it('keeps only Iron-rich recipes when the toggle is on', () => {
+    expect(titles(run({ ironRichOnly: true }).readyNow)).toEqual(['Beef Mash']);
+  });
+
+  it('is the same filter as the "iron rich" phrase', () => {
+    const viaToggle = run({ ironRichOnly: true });
+    const viaPhrase = run({ filters: ['tag:iron-rich'] });
+    expect(titles(viaToggle.readyNow)).toEqual(titles(viaPhrase.readyNow));
+    expect(activeFilters({ ironRichOnly: true, filters: ['tag:iron-rich'] })).toEqual(['tag:iron-rich']);
+  });
+
+  it('turning the toggle off removes the phrase filter; on adds it once', () => {
+    expect(setIronRichFilter(['meal:lunch', 'tag:iron-rich'], false)).toEqual(['meal:lunch']);
+    expect(setIronRichFilter(['meal:lunch'], true)).toEqual(['meal:lunch', 'tag:iron-rich']);
+    expect(setIronRichFilter(['tag:iron-rich'], true)).toEqual(['tag:iron-rich']);
+  });
+
+  it('combines with other filters by AND', () => {
+    const out = run({ ironRichOnly: true, filters: ['meal:breakfast'] });
+    expect(out.readyNow).toEqual([]);
+  });
+});
+
+describe('More ideas (Req 16.12)', () => {
+  const none = have();
+
+  it('is empty when no filter is active', () => {
+    const r = recipe('Far', ['a1', 'b1']);
+    expect(makeResults([r], none, AGE_10, NO_FOODS).moreIdeas).toEqual([]);
+  });
+
+  it('lists matching recipes missing two or more, fewest missing first, then time, effort, title', () => {
+    const three = recipe('Three', ['a', 'b', 'c'], { statedMinutes: 5 });
+    const twoSlow = recipe('Two slow', ['a', 'b'], { statedMinutes: 40 });
+    const twoFastB = recipe('Two fast B', ['a', 'b'], { statedMinutes: 10 });
+    const twoFastA = recipe('Two fast A', ['a', 'b'], { statedMinutes: 10 });
+    const out = makeResults([three, twoSlow, twoFastB, twoFastA], none, AGE_10, NO_FOODS, {
+      filters: ['meal:dinner'],
+    });
+    expect(titles(out.moreIdeas)).toEqual(['Two fast A', 'Two fast B', 'Two slow', 'Three']);
+    expect(out.moreIdeas[0].missing).toEqual(['a', 'b']);
+  });
+
+  it('only includes recipes that match every filter', () => {
+    const lunch = recipe('Lunch', ['a', 'b'], { mealTypes: ['lunch'] });
+    const dinner = recipe('Dinner', ['a', 'b'], { mealTypes: ['dinner'] });
+    const out = makeResults([lunch, dinner], none, AGE_10, NO_FOODS, { filters: ['meal:lunch'] });
+    expect(titles(out.moreIdeas)).toEqual(['Lunch']);
+  });
+
+  it('does not repeat Ready now or Missing one recipes', () => {
+    const ready = recipe('Ready', ['a']);
+    const one = recipe('One', ['a', 'b']);
+    const two = recipe('Two', ['a', 'b', 'c']);
+    const out = makeResults([ready, one, two], have('a'), AGE_10, NO_FOODS, { filters: ['meal:dinner'] });
+    expect(titles(out.readyNow)).toEqual(['Ready']);
+    expect(titles(out.missingOne)).toEqual(['One']);
+    expect(titles(out.moreIdeas)).toEqual(['Two']);
+  });
+
+  it(`caps the list at ${MORE_IDEAS_LIMIT}`, () => {
+    const many = Array.from({ length: 14 }, (_, i) =>
+      recipe(`Idea ${String(i).padStart(2, '0')}`, ['a', 'b']),
+    );
+    const out = makeResults(many, none, AGE_10, NO_FOODS, { filters: ['meal:dinner'] });
+    expect(out.moreIdeas).toHaveLength(MORE_IDEAS_LIMIT);
+    expect(titles(out.moreIdeas)[0]).toBe('Idea 00');
+  });
+
+  it('excludes ghosted recipes (they stay in ghosted)', () => {
+    const honey = recipe('Honey Oats', ['honey', 'oats', 'milk']);
+    const fine = recipe('Fine', ['oats', 'milk']);
+    const out = makeResults([honey, fine], none, AGE_10, NO_FOODS, { filters: ['meal:dinner'] });
+    expect(titles(out.moreIdeas)).toEqual(['Fine']);
+    expect(titles(out.ghosted)).toEqual(['Honey Oats']);
+  });
+
+  it('puts younger-stage recipes after the child stage for a toddler when missing counts tie, even if quicker', () => {
+    const ownTwo = recipe('Own two', ['a', 'b'], { stages: ['12-23'], statedMinutes: 60 });
+    const youngTwo = recipe('Young two', ['a', 'b'], { stages: ['9-12'], statedMinutes: 5 });
+    const ownThree = recipe('Own three', ['a', 'b', 'c'], { stages: ['12-23'], statedMinutes: 5 });
+    const out = makeResults([youngTwo, ownThree, ownTwo], none, 15, NO_FOODS, {
+      filters: ['meal:dinner'],
+    });
+    expect(titles(out.moreIdeas)).toEqual(['Own two', 'Young two', 'Own three']);
+    expect(out.moreIdeas.map((r) => r.youngerStage)).toEqual([false, true, false]);
+  });
+
+  it('respects the stage rule', () => {
+    const other = recipe('Other stage', ['a', 'b'], { stages: ['6-8'] });
+    const out = makeResults([other], none, AGE_10, NO_FOODS, { filters: ['meal:dinner'] });
+    expect(out.moreIdeas).toEqual([]);
+  });
+
+  it('appears with only the Iron-rich toggle on', () => {
+    const beefy = recipe('Beef Pot', ['beef', 'carrot']);
+    const apple = recipe('Apple Pot', ['apple', 'pear']);
+    const out = makeResults([beefy, apple], none, AGE_10, NO_FOODS, { ironRichOnly: true });
+    expect(titles(out.moreIdeas)).toEqual(['Beef Pot']);
+  });
+
+  it('works with filters and no foods typed (pantry only)', () => {
+    const r = recipe('Breakfast', ['oats', 'banana'], { mealTypes: ['breakfast'] });
+    const out = makeResults([r], have('oat'), AGE_10, NO_FOODS, { filters: ['meal:breakfast'] });
+    expect(titles(out.missingOne)).toEqual(['Breakfast']);
+    const empty = makeResults([r], have(), AGE_10, NO_FOODS, { filters: ['meal:breakfast'] });
+    expect(titles(empty.moreIdeas)).toEqual(['Breakfast']);
   });
 });
