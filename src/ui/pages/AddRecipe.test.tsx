@@ -8,6 +8,7 @@ import AddRecipe, {
   PASTE_FALLBACK,
   PLAIN_TEXT_NOTICE,
   REEL_ERROR,
+  REEL_LINK_KEPT,
 } from './AddRecipe';
 import validJson from '../../domain/__fixtures__/json/valid.json?raw';
 import fencedJson from '../../domain/__fixtures__/json/fenced-with-prose.txt?raw';
@@ -738,11 +739,96 @@ describe('Add recipe: Instagram reel prompt (Req 19.1 to 19.8, 6.9, 6.10)', () =
     network.expectNoNetwork();
   });
 
-  it('reads an invalid reply and a reply with no JSON like any other answer', async () => {
+  async function toReelPasteStep(user: ReturnType<typeof userEvent.setup>) {
+    mockClipboard(async () => '');
+    await openReel(user);
+    await user.click(screen.getByRole('textbox', { name: 'Reel link' }));
+    await user.paste(REEL);
+    await user.click(screen.getByRole('button', { name: 'Copy reel prompt' }));
+    await user.click(screen.getByRole('button', { name: 'Paste the answer' }));
+  }
+
+  it('shows the misread warning on the reel screen', async () => {
     const user = userEvent.setup();
     renderAdd();
-    await pasteAndRead(user, brokenJson);
-    expect(screen.getByText(/The JSON couldn't be read/)).toBeInTheDocument();
+    await openReel(user);
+    expect(screen.getByText('AI apps can misread a reel. Check the ingredients.')).toBeInTheDocument();
+  });
+
+  it('shows no paste step for an empty or invalid link, even after Open Meta AI', async () => {
+    const user = userEvent.setup();
+    renderAdd();
+    await openReel(user);
+    const meta = screen.getByRole('link', { name: 'Open Meta AI' });
+    meta.addEventListener('click', (event) => event.preventDefault());
+    await user.click(meta);
+    expect(screen.queryByRole('button', { name: 'Paste the answer' })).not.toBeInTheDocument();
+    await user.click(screen.getByRole('textbox', { name: 'Reel link' }));
+    await user.paste('http://www.instagram.com/reel/abc/');
+    await user.click(meta);
+    await user.click(screen.getByRole('button', { name: 'Copy reel prompt' }));
+    expect(screen.queryByRole('button', { name: 'Paste the answer' })).not.toBeInTheDocument();
+    expect(screen.getByRole('radio', { name: 'Instagram' })).not.toBeChecked();
+  });
+
+  it('shows the paste step after Open Meta AI with a valid link', async () => {
+    const user = userEvent.setup();
+    renderAdd();
+    await openReel(user);
+    await user.click(screen.getByRole('textbox', { name: 'Reel link' }));
+    await user.paste(REEL);
+    const meta = screen.getByRole('link', { name: 'Open Meta AI' });
+    meta.addEventListener('click', (event) => event.preventDefault());
+    await user.click(meta);
+    expect(screen.getByRole('button', { name: 'Paste the answer' })).toBeInTheDocument();
+  });
+
+  it('reel replies get the same intake and safety screen', async () => {
+    const user = userEvent.setup();
+    renderAdd();
+    await toReelPasteStep(user);
+    expect(screen.getByRole('radio', { name: 'Instagram' })).toBeChecked();
+
+    // Invalid reply: field-level errors, no preview.
+    await pasteAndRead(user, fractionJson);
+    expect(screen.getByText(/quantity must be a number such as 0\.5/)).toBeInTheDocument();
+    expect(screen.queryByRole('region', { name: 'Preview' })).not.toBeInTheDocument();
+
+    // No-JSON reply: plain-text fallback.
+    const box = screen.getByRole('textbox', { name: 'Recipe text' });
+    await user.clear(box);
+    await user.paste(REPLY);
+    await user.click(screen.getByRole('button', { name: 'Read recipe' }));
+    expect(screen.getByText(PLAIN_TEXT_NOTICE)).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Start over' }));
+
+    // Valid reply with honey in a step: ghosted until "Not used".
+    await pasteAndRead(user, jsonWith({ steps: ['Cook the oats.', 'Drizzle a little honey on top.'] }));
+    const preview = screen.getByRole('region', { name: 'Preview' });
+    expect(within(preview).getByText(/Honey is mentioned in the step/)).toBeInTheDocument();
+  });
+
+  it('keeps a link the user already typed and shows a note; replaces an earlier reel link', async () => {
+    const user = userEvent.setup();
+    renderAdd();
+    await user.type(screen.getByRole('textbox', { name: /Link/ }), 'https://example.com/mine');
+    await toReelPasteStep(user);
+    expect(screen.getByRole('textbox', { name: /Link/ })).toHaveValue('https://example.com/mine');
+    expect(screen.getByText(REEL_LINK_KEPT)).toBeInTheDocument();
+  });
+
+  it('replaces the link when it came from an earlier reel', async () => {
+    const user = userEvent.setup();
+    renderAdd();
+    await toReelPasteStep(user);
+    expect(screen.getByRole('textbox', { name: /Link/ })).toHaveValue(REEL);
+    const box = screen.getByRole('textbox', { name: 'Reel link' });
+    await user.clear(box);
+    await user.paste('https://www.instagram.com/reel/second/');
+    await user.click(screen.getByRole('button', { name: 'Copy reel prompt' }));
+    await user.click(screen.getByRole('button', { name: 'Paste the answer' }));
+    expect(screen.getByRole('textbox', { name: /Link/ })).toHaveValue('https://www.instagram.com/reel/second/');
+    expect(screen.queryByText(REEL_LINK_KEPT)).not.toBeInTheDocument();
   });
 
   it('has one filled primary button with the reel panel open, and none added by it', async () => {

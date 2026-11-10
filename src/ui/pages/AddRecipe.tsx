@@ -60,6 +60,9 @@ export const PLAIN_TEXT_NOTICE =
 
 export const PASTE_FALLBACK = 'Paste with your keyboard or long-press';
 
+export const REEL_LINK_KEPT =
+  'Your link was kept. The reel link was not added to the Link field.';
+
 export const INSTAGRAM_HELP =
   "FirstMenu can't open Instagram reels. Use \"From an Instagram reel\" below to get a prompt for Meta AI, or copy the caption instead. On a phone, you can also copy text from a screenshot by pressing and holding on it.";
 
@@ -174,6 +177,8 @@ export default function AddRecipe() {
   );
   const [url, setUrl] = useState('');
   const [text, setText] = useState('');
+  const [reelNote, setReelNote] = useState('');
+  const lastReelUrl = useRef('');
   const [message, setMessage] = useState('');
   const [problem, setProblem] = useState<
     { kind: 'invalid'; errors: JsonIssue[] } | { kind: 'ai-error'; message: string } | null
@@ -270,8 +275,16 @@ export default function AddRecipe() {
   // The reel URL becomes the recipe's link and is never opened (Req 19.6).
   function focusPasteBoxForReel(reelUrl: string) {
     setSource('instagram');
-    if (reelUrl !== '') setUrl(reelUrl);
     setMessage('');
+    setReelNote('');
+    if (reelUrl !== '') {
+      if (url.trim() === '' || url === lastReelUrl.current) {
+        setUrl(reelUrl);
+        lastReelUrl.current = reelUrl;
+      } else if (url !== reelUrl) {
+        setReelNote(REEL_LINK_KEPT);
+      }
+    }
     pasteBox.current?.focus();
   }
 
@@ -356,6 +369,11 @@ export default function AddRecipe() {
               autoComplete="off"
               placeholder="https://"
             />
+            {reelNote && (
+              <p className={styles.help} role="status">
+                {reelNote}
+              </p>
+            )}
           </section>
 
           <section className={styles.section} aria-label="Paste the recipe">
@@ -649,9 +667,6 @@ export default function AddRecipe() {
             <Button label="Save recipe" variant="primary" onClick={save} />
             <Button label="Start over" variant="ghost" onClick={startOver} />
           </div>
-          <section className={styles.section}>
-            <ReelPrompt onPasteAnswer={focusPasteBoxForReel} />
-          </section>
 
           <p className={styles.help}>
             <Link to="/recipes/new">Type a recipe instead</Link>
