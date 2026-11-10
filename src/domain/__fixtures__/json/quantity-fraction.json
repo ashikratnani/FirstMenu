@@ -1,0 +1,9 @@
+{
+  "firstmenu_recipe": 1,
+  "title": "Oat porridge",
+  "ingredients": [
+    { "quantity": 1, "unit": "cup", "name": "water" },
+    { "quantity": "1/2", "unit": "cup", "name": "rolled oats" }
+  ],
+  "steps": ["Simmer the oats in the water."]
+}

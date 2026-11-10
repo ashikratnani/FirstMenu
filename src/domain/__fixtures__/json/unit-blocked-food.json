@@ -1,0 +1,9 @@
+{
+  "firstmenu_recipe": 1,
+  "title": "Plain oats",
+  "ingredients": [
+    { "quantity": 1, "unit": "cup", "name": "rolled oats" },
+    { "quantity": 1, "unit": "tbsp honey", "name": "mashed banana" }
+  ],
+  "steps": ["Cook the oats.", "Stir in the banana."]
+}

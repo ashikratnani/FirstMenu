@@ -1,0 +1,6 @@
+{
+  "firstmenu_recipe": 2,
+  "title": "Future recipe",
+  "ingredients": [{ "name": "rice" }],
+  "steps": ["Cook the rice."]
+}
