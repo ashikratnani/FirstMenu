@@ -1,0 +1,7 @@
+Here you go:
+{
+  "firstmenu_recipe": 1,
+  "title": "Cut-off recipe",
+  "ingredients": [
+    { "quantity": 1, "unit": "cup", "name": "rice" },
+  "steps": ["Cook the rice.

@@ -1,0 +1,18 @@
+Sure! Here is a recipe for your little one. I hope they enjoy it.
+
+```json
+{
+  "firstmenu_recipe": 1,
+  "title": "Banana oat pancakes",
+  "total_minutes": 15,
+  "servings": 2,
+  "ingredients": [
+    { "quantity": 1, "unit": null, "name": "ripe banana", "optional": false },
+    { "quantity": 0.25, "unit": "cup", "name": "rolled oats", "optional": false }
+  ],
+  "steps": ["Mash the banana {really well}.", "Stir in the oats and cook in a pan."],
+  "notes": []
+}
+```
+
+Let me know if you want another idea! Tip: serve with a spoon of plain yogurt.

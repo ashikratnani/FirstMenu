@@ -1,0 +1,13 @@
+{
+  "firstmenu_recipe": 1,
+  "title": "Egg and rice bowl",
+  "total_minutes": 15,
+  "servings": 2,
+  "ingredients": [
+    { "quantity": 1, "unit": "cup", "name": "cooked rice", "optional": false },
+    { "quantity": 1, "unit": null, "name": "egg", "optional": false },
+    { "quantity": null, "unit": null, "name": "olive oil", "optional": true }
+  ],
+  "steps": ["Scramble the egg until fully cooked.", "Stir it into the rice."],
+  "notes": ["Keeps 2 days in the fridge."]
+}

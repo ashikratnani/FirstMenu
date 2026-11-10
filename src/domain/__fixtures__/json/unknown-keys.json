@@ -1,0 +1,11 @@
+{
+  "firstmenu_recipe": 1,
+  "title": "Pear and oat mash",
+  "ingredients": [
+    { "quantity": 1, "unit": "piece", "name": "ripe pear", "brand": "Nutella" },
+    { "name": "rolled oats", "quantity": 2, "unit": "tbsp" }
+  ],
+  "steps": ["Mash the pear.", "Stir in the oats."],
+  "source": { "site": "example blog", "tips": ["Add a spoon of honey"], "rating": 5 },
+  "calories": 120
+}
