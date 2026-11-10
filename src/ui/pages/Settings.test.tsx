@@ -273,6 +273,7 @@ describe('Settings', () => {
       note: 'rash',
     });
   });
+
   it('edits the pantry: tick a suggested food and type another (Req 2.1, 2.3)', async () => {
     const user = userEvent.setup();
     renderSettings(onboardedState('2026-01-15'));

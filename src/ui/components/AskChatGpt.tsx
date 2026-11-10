@@ -1,11 +1,12 @@
 // "Ask ChatGPT" prompt helper for the Make screen's empty state (Req 3.10,
 // 8.1, 8.6). Builds the question on the device and lets the user copy it or
-// open ChatGPT in a new tab. The app never calls an AI service itself. Task
-// 11.2 adds the "Paste the answer" step and the helper notice.
+// open ChatGPT in a new tab, with the Requirement 8.9 notice beside those
+// controls. The app never calls an AI service itself. Task 11.2 adds the
+// "Paste the answer" step.
 
 import { useState } from 'react';
 import { Button } from '@astryxdesign/core/Button';
-import { buildPrompt } from '../../domain/prompt';
+import { buildPrompt, PROMPT_NOTICE } from '../../domain/prompt';
 import type { StageId } from '../../domain/types';
 import styles from './AskChatGpt.module.css';
 
@@ -60,6 +61,7 @@ export default function AskChatGpt({ ageMonths, stage, have, leaveOut }: AskChat
             rows={8}
             value={prompt}
           />
+          <p className={styles.notice}>{PROMPT_NOTICE}</p>
           <div className={styles.row}>
             <Button
               label="Copy question"

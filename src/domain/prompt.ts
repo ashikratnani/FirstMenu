@@ -8,6 +8,13 @@ import { foodLabel } from './foods';
 import { blockRuleFoods, STAGE_TEXTURE_HINTS } from './safety/rules';
 import type { FoodRecord, StageId } from './types';
 
+/**
+ * Notice shown wherever the helper's Copy and Open ChatGPT controls appear
+ * (Requirement 8.9, design "Helper notice").
+ */
+export const PROMPT_NOTICE =
+  'AI recipes can be wrong. FirstMenu checks them against its fixed safety list, which can miss things. Check with your pediatrician.';
+
 export interface PromptInput {
   ageMonths: number;
   /** Human-readable on-hand and pantry food labels. */

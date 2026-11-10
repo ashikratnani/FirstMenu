@@ -1,10 +1,11 @@
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import Make from './Make';
 import { AppProvider } from '../../state/AppProvider';
 import { STORAGE_KEY, defaultState } from '../../domain/storage';
+import { PROMPT_NOTICE } from '../../domain/prompt';
 import type { AppState, Ingredient, Recipe } from '../../domain/types';
 
 // The built-in recipes would add dozens of unrelated results. Every test here
@@ -337,6 +338,22 @@ describe('Make screen empty state (Req 3.10)', () => {
     // The question never carries the child's name (Req 8.5).
     expect(question.value).not.toMatch(/Baby\b.*Baby/);
     expect(screen.getByRole('link', { name: 'Open ChatGPT' })).toHaveAttribute('target', '_blank');
+  });
+
+  it('shows the Requirement 8.9 notice with the Copy and Open ChatGPT controls', async () => {
+    const user = userEvent.setup();
+    renderMake(seedState({ pantry: [], customRecipes: [TWO_MISSING] }));
+    expect(screen.queryByText(PROMPT_NOTICE)).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Ask ChatGPT' }));
+    expect(screen.getByText(PROMPT_NOTICE)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Copy question' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Open ChatGPT' })).toBeInTheDocument();
+  });
+
+  it('shows the prompt helper only when nothing fits', () => {
+    renderMake(seedState());
+    expect(screen.queryByRole('button', { name: 'Ask ChatGPT' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('region', { name: 'Nothing fits?' })).not.toBeInTheDocument();
   });
 
   it('does not show the empty state when something is ready', () => {
@@ -869,5 +886,34 @@ describe('Make screen smart suggestions (Req 17)', () => {
       }
       expect(document.querySelectorAll('[data-variant="primary"]')).toHaveLength(1);
     });
+  });
+});
+
+describe('Make screen clock (day rollover)', () => {
+  it('records on-hand foods under the day of the tap, not of the page load', async () => {
+    vi.setSystemTime(new Date(2026, 2, 11, 23, 59, 30));
+    const storage = makeStorage(seedState());
+    renderMake(undefined, storage);
+    // The tab stays open past midnight with no re-render in between.
+    vi.setSystemTime(new Date(2026, 2, 12, 0, 30));
+    fireEvent.click(screen.getByRole('button', { name: 'zonk' }));
+    // Saving is debounced, so wait for the stored copy to show the new day.
+    await waitFor(() => {
+      const saved = JSON.parse(storage.getItem(STORAGE_KEY) ?? '{}') as AppState;
+      expect(saved.onHandDays.zonk).toEqual(['2026-03-12']);
+      expect(saved.onHandUpdated).toBe('2026-03-12');
+    });
+  });
+
+  it('moves the meal hint on as time passes without any tap', () => {
+    vi.useFakeTimers({ toFake: ['Date', 'setInterval', 'clearInterval'] });
+    vi.setSystemTime(new Date(2026, 2, 11, 10, 29));
+    renderMake(seedState());
+    expect(screen.getByText('Suggested: Breakfast')).toBeInTheDocument();
+    act(() => {
+      vi.advanceTimersByTime(2 * 60_000);
+    });
+    expect(screen.getByText('Suggested: Lunch')).toBeInTheDocument();
+    expect(screen.queryByText('Suggested: Breakfast')).not.toBeInTheDocument();
   });
 });

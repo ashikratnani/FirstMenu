@@ -49,3 +49,9 @@
   margin: 0;
   font-size: 0.875rem;
 }
+
+.notice {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}

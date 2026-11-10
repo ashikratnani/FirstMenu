@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildPrompt, leaveOutFor } from './prompt';
+import { buildPrompt, leaveOutFor, PROMPT_NOTICE } from './prompt';
 import { STAGE_TEXTURE_HINTS } from './safety/rules';
 import { stageFor } from './age';
 import { defaultState } from './storage';
@@ -139,5 +139,13 @@ describe('privacy', () => {
     expect(text).not.toContain('zucchini');
     expect(text).not.toContain('2026-01-1');
     expect(text).toBe(promptFor(10, state));
+  });
+});
+
+describe('PROMPT_NOTICE (Requirement 8.9)', () => {
+  it('is the exact design text', () => {
+    expect(PROMPT_NOTICE).toBe(
+      'AI recipes can be wrong. FirstMenu checks them against its fixed safety list, which can miss things. Check with your pediatrician.',
+    );
   });
 });

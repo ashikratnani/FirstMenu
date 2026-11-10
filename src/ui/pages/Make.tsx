@@ -3,8 +3,9 @@
 // she has today, and sees recipes she can make now, quickest and easiest first.
 //
 // Matching, grouping and sorting live in domain/make.ts and the suggestion
-// rules in domain/suggest.ts (Requirement 17); this page only shows them. Ghosted recipes never appear in the two groups; their count is shown
-// and they expand as ghosts with their reasons (Req 3.5).
+// rules in domain/suggest.ts (Requirement 17); this page only shows them.
+// Ghosted recipes never appear in the two groups; their count is shown and
+// they expand as ghosts with their reasons (Req 3.5).
 
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -64,6 +65,11 @@ const SUGGESTED_LIMIT = 16;
 const IRON_FILTER: SearchFilter = 'tag:iron-rich';
 /** Typing is parsed after this pause (design "Screen behavior"). */
 const SEARCH_DEBOUNCE_MS = 150;
+/** How often the screen re-reads the time for the meal hint and suggestions. */
+const CLOCK_TICK_MS = 60_000;
+
+/** Today's local date, read at the moment of an action. */
+const todayNow = () => localYmd(new Date());
 
 function setFilterOff(list: SearchFilter[], filter: SearchFilter): SearchFilter[] {
   return filter === IRON_FILTER ? setIronRichFilter(list, false) : list.filter((f) => f !== filter);
@@ -71,8 +77,14 @@ function setFilterOff(list: SearchFilter[], filter: SearchFilter): SearchFilter[
 
 export default function Make() {
   const { state, dispatch } = useApp();
-  const [now] = useState(() => new Date());
-  const today = localYmd(now);
+  // `now` only drives what is shown (meal hint, suggestions) and is refreshed
+  // every minute. Actions read the clock when they run (see `todayNow`), so a
+  // tab left open past midnight still records under the right day.
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const timer = setInterval(() => setNow(new Date()), CLOCK_TICK_MS);
+    return () => clearInterval(timer);
+  }, []);
 
   const ageMonths = selectAgeMonths(state) ?? 0;
   const recipes = selectAllRecipes(state);
@@ -233,7 +245,7 @@ export default function Make() {
     return map;
   }, [groups, named, state, ageMonths]);
 
-  const addOnHand = (food: string) => dispatch({ type: 'addOnHand', food, today });
+  const addOnHand = (food: string) => dispatch({ type: 'addOnHand', food, today: todayNow() });
   const ironRichOnly = filters.includes(IRON_FILTER);
 
   /** Change the box text and re-parse right away (not after the pause). */
@@ -317,7 +329,7 @@ export default function Make() {
             <Button
               label={state.pantry.length > 0 ? 'Done' : 'Skip for now'}
               onClick={() => {
-                dispatch({ type: 'dismissSuggestion', id: PANTRY_SETUP_ID, at: now.toISOString() });
+                dispatch({ type: 'dismissSuggestion', id: PANTRY_SETUP_ID, at: new Date().toISOString() });
                 setSetupOpen(false);
               }}
             />
@@ -474,8 +486,14 @@ export default function Make() {
               onDismiss={() => dismiss(STALE_ON_HAND_ID)}
               actions={
                 <>
-                  <Button label="Yes, keep" onClick={() => dispatch({ type: 'keepOnHand', today })} />
-                  <Button label="Clear" onClick={() => dispatch({ type: 'clearOnHand', today })} />
+                  <Button
+                    label="Yes, keep"
+                    onClick={() => dispatch({ type: 'keepOnHand', today: todayNow() })}
+                  />
+                  <Button
+                    label="Clear"
+                    onClick={() => dispatch({ type: 'clearOnHand', today: todayNow() })}
+                  />
                 </>
               }
             >
@@ -523,7 +541,7 @@ export default function Make() {
                     label={foodLabel(food)}
                     color="green"
                     description={`Remove ${foodLabel(food)} from what you have today`}
-                    onRemove={() => dispatch({ type: 'removeOnHand', food, today })}
+                    onRemove={() => dispatch({ type: 'removeOnHand', food, today: todayNow() })}
                   />
                 </li>
               ))}
@@ -531,7 +549,7 @@ export default function Make() {
             <Button
               label="Clear"
               size="sm"
-              onClick={() => dispatch({ type: 'clearOnHand', today })}
+              onClick={() => dispatch({ type: 'clearOnHand', today: todayNow() })}
             />
           </div>
         )}
@@ -631,6 +649,12 @@ export default function Make() {
             a few more foods above, or ask ChatGPT for an idea.{' '}
             <Link to="/recipes">Browse all recipes</Link>
           </p>
+          <AskChatGpt
+            ageMonths={ageMonths}
+            stage={stage}
+            have={[...have].map(foodLabel)}
+            leaveOut={leaveOutFor(ageMonths, state.foods)}
+          />
         </section>
       )}
 
@@ -686,15 +710,6 @@ export default function Make() {
           )}
         </section>
       )}
-
-      <section className={styles.group} aria-label="Nothing fits?">
-        <AskChatGpt
-          ageMonths={ageMonths}
-          stage={stage}
-          have={[...have].map(foodLabel)}
-          leaveOut={leaveOutFor(ageMonths, state.foods)}
-        />
-      </section>
     </>
   );
 }
