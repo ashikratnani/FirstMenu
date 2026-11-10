@@ -1537,4 +1537,93 @@ export const BATCH_5_RECIPES: Recipe[] = [
     ],
     texture: 'soft beans and ground turkey in a thick pumpkin tomato chili',
     servings: 10,
+  },
+  {
+    // Strawberries blended smooth; the apple juice is left out (juice is blocked under 12 months).
+    id: 'b-fh-strawberry-swirl',
+    origin: 'builtin',
+    source: {
+      title: 'Strawberry Swirl',
+      publisher: FH_PUBLISHER,
+      url: 'https://foodhero.org/recipes/strawberry-swirl',
+      retrieved: RETRIEVED,
+      adaptations: [
+        'Serving count is an estimate (source gives no servings): the page makes 2 cups with the juice, so about 1 cup without it, divided by a 1/2 cup portion.',
+        'Left out 1 cup (8 ounces) 100% apple juice',
+      ],
+    },
+    title: 'Strawberry Swirl',
+    stages: ['6-8', '9-12'],
+    serveAs: ['puree'],
+    mealTypes: ['snack', 'breakfast'],
+    ingredients: [
+      { name: 'strawberries (fresh or frozen and thawed)', food: 'strawberry', quantity: 1, unit: 'cup', category: 'produce' },
+    ],
+    steps: [
+      'Put the strawberries in a blender and process until smooth.',
+      'Serve, or freeze for 1 to 2 hours to make a slushy. Refrigerate leftovers within 2 hours.',
+    ],
+    texture: 'smooth strawberry puree',
+    servings: 2,
+  },
+  {
+    // Cantaloupe and yogurt blended smooth; the orange juice is left out.
+    id: 'b-fh-melon-cooler',
+    origin: 'builtin',
+    source: {
+      title: 'Melon Cooler',
+      publisher: FH_PUBLISHER,
+      url: 'https://foodhero.org/recipes/melon-cooler',
+      retrieved: RETRIEVED,
+      adaptations: [
+        'Serving count is an estimate (source gives no servings): the page makes 3 cups with the juice, so about 2 cups without it, divided by a 1/2 cup portion.',
+        'Left out 1 cup orange juice',
+      ],
+    },
+    title: 'Melon Cooler',
+    stages: ['6-8', '9-12'],
+    serveAs: ['puree'],
+    mealTypes: ['snack', 'breakfast'],
+    ingredients: [
+      { name: 'cubed cantaloupe', food: 'cantaloupe', quantity: 2, unit: 'cup', category: 'produce' },
+      { name: 'low-fat lemon yogurt', food: 'yogurt', quantity: 1, unit: 'cup', category: 'dairy-eggs' },
+    ],
+    steps: [
+      'Put the cantaloupe and yogurt in a blender.',
+      'Blend until smooth. The page says this tastes best chilled. Refrigerate leftovers within 2 hours.',
+    ],
+    texture: 'smooth cantaloupe yogurt puree',
+    servings: 4,
+  },
+  {
+    // Oven-baked winter squash that mashes easily; brown sugar and salt are left out.
+    id: 'b-fh-glazed-squash',
+    origin: 'builtin',
+    source: {
+      title: 'Glazed Squash',
+      publisher: FH_PUBLISHER,
+      url: 'https://foodhero.org/recipes/glazed-squash',
+      retrieved: RETRIEVED,
+      adaptations: [
+        'Serving count is an estimate (source gives no servings): total yield of 3 cups divided by a 1/2 cup portion.',
+        'Left out 3 tablespoons brown sugar',
+        'Left out 1/4 teaspoon salt',
+      ],
+    },
+    title: 'Baked Winter Squash',
+    stages: ['6-8', '9-12', '12-23', '24-36'],
+    serveAs: ['mashed', 'pieces'],
+    mealTypes: ['dinner', 'lunch'],
+    ingredients: [
+      { name: 'winter squash (try acorn, butternut, delicata or others)', food: 'squash', quantity: 2, unit: 'lb', category: 'produce' },
+      { name: 'black pepper', food: 'black pepper', quantity: 0.25, unit: 'tsp', category: 'pantry' },
+    ],
+    steps: [
+      'Heat the oven to 400°F and line a rimmed baking sheet with foil. Lightly grease the foil.',
+      'Cut the squash in half, scoop out the seeds, cut it into 1-inch thick slices and lay them on the baking sheet. Sprinkle with the pepper.',
+      'Bake for about 4 to 6 minutes, then turn the slices over and return them to the oven.',
+      'Bake until the squash is tender, about 15 to 20 minutes more. Serve warm. Refrigerate leftovers within 2 hours.',
+    ],
+    texture: 'tender baked squash that mashes easily',
+    servings: 6,
   },];
