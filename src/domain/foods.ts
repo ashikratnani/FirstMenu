@@ -88,7 +88,7 @@ export const DESCRIPTOR_WORDS: readonly string[] = [
  * note. Kept separate from DESCRIPTOR_WORDS (which is the produce-descriptor
  * list its own test enumerates one-by-one).
  */
-const PREP_WORDS: readonly string[] = [
+export const PREP_WORDS: readonly string[] = [
   'infant',
   'prepared',
   'cubed',
