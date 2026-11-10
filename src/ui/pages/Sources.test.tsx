@@ -207,7 +207,8 @@ describe('Sources page', () => {
         for (const url of sourceUrls(SOURCES[id])) expect(hrefs).toContain(url);
       }
     });
-    expect(items[items.length - 1].textContent).toMatch(/Healthy fat.*No food list yet/);
+    expect(items[items.length - 1].textContent).toMatch(/Healthy fat.*seafood, nut, seed, oil/);
+    expect(list?.textContent).not.toContain('No food list yet');
   });
 
   it('has a "New food spacing" entry that lists every spacing source with its URL', () => {

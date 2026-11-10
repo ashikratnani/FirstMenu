@@ -61,12 +61,12 @@ Branch names use the `v2/` prefix (for example `v2/6-paste-parser`) so they don'
   - [x] 3.1 Implement `domain/effort.ts` (`recipeMinutes`, `recipeEffort`) per the design, with tests from the built-in recipes' steps and the listed edge cases.
     - _Requirements: 4.1 – 4.4, 10.3_
 
-- [ ] 4. Nutrition tags
-  - [ ] 4.1 Confirm each tag's term list against CDC-iron, CDC-encourage and USDA-FNS-iron. Drop terms the sources don't support. Add the sources to the sources table. Six tags confirmed; healthy fat pending 4.3.
+- [x] 4. Nutrition tags
+  - [x] 4.1 Confirm each tag's term list against CDC-iron, CDC-encourage and USDA-FNS-iron. Drop terms the sources don't support. Add the sources to the sources table. Six tags confirmed; healthy fat confirmed in 4.3.
     - _Requirements: 5.2, 5.3_
-  - [ ] 4.2 Implement `domain/nutrition.ts` with `NUTRITION_VERSION`, using the safety matcher. Tests: term format, sources, each tag fires, `except` cases, optional ingredients ignored. Six tags implemented; healthy fat pending 4.3.
+  - [x] 4.2 Implement `domain/nutrition.ts` with `NUTRITION_VERSION`, using the safety matcher. Tests: term format, sources, each tag fires, `except` cases, optional ingredients ignored. Six tags implemented; healthy fat added in 4.3.
     - _Requirements: 5.1, 5.3, 5.5, 5.6, 10.3_
-  - [ ] 4.3 Follow-up for issue #50: find a sourced Healthy fat term list (an AAP, USDA MyPlate, WHO or CDC page, with a URL, that names fat-rich foods for babies and toddlers). Add the tag rule, the source to the sources table, and tests, then bump `NUTRITION_VERSION` and remove `healthy-fat` from `UNCONFIRMED_TAGS`. Tick 4.1, 4.2 and 4 when this lands.
+  - [x] 4.3 Follow-up for issue #50: find a sourced Healthy fat term list (an AAP, USDA MyPlate, WHO or CDC page, with a URL, that names fat-rich foods for babies and toddlers). Add the tag rule, the source to the sources table, and tests, then bump `NUTRITION_VERSION` and remove `healthy-fat` from `UNCONFIRMED_TAGS`. Tick 4.1, 4.2 and 4 when this lands.
     - _Requirements: 5.2_
 
 - [x] 5. Grocery category guess

@@ -41,12 +41,12 @@ describe('rule format', () => {
     expect(SOURCES['CDC-encourage'].note).toContain('web.archive.org');
   });
 
-  it('gives every rule a CDC or USDA source that exists with a URL', () => {
+  it('gives every rule a CDC or USDA/HHS source that exists with a URL', () => {
     for (const rule of NUTRITION_RULES) {
       expect(rule.sources.length).toBeGreaterThan(0);
       for (const id of rule.sources) {
         expect(SOURCES[id], `${rule.tag} cites unknown ${id}`).toBeDefined();
-        expect(SOURCES[id].url).toMatch(/^https:\/\/www\.(cdc\.gov|fna\.usda\.gov)\//);
+        expect(SOURCES[id].url).toMatch(/^https:\/\/www\.(cdc\.gov|fna\.usda\.gov|dietaryguidelines\.gov)\//);
       }
     }
   });
@@ -68,7 +68,19 @@ describe('rule format', () => {
       expect(has || UNCONFIRMED_TAGS.includes(tag), tag).toBe(true);
       expect(has && UNCONFIRMED_TAGS.includes(tag), tag).toBe(false);
     }
-    expect(nutritionTerms('healthy-fat').terms).toEqual([]);
+    expect(UNCONFIRMED_TAGS).toEqual([]);
+    expect(nutritionTerms('healthy-fat').terms).toEqual(['seafood', 'nut', 'seed', 'oil']);
+  });
+
+  it('versions the healthy fat rule and cites the Dietary Guidelines', () => {
+    expect(NUTRITION_VERSION).toBe(2);
+    const rule = NUTRITION_RULES.find((r) => r.tag === 'healthy-fat');
+    expect(rule?.sources).toEqual(['DGA-2020-2025']);
+    expect(SOURCES['DGA-2020-2025'].url).toBe(
+      'https://www.dietaryguidelines.gov/sites/default/files/2021-03/Dietary_Guidelines_for_Americans-2020-2025.pdf',
+    );
+    expect(SOURCES['DGA-2020-2025'].retrieved).toBe('2026-11-10');
+    expect(SOURCES['DGA-2020-2025'].note).toContain('page 60');
   });
 });
 
@@ -80,6 +92,10 @@ describe('each tag fires', () => {
     ['fruit', 'ripe banana'],
     ['whole-grain', 'whole grain bread'],
     ['dairy', 'plain yogurt'],
+    ['healthy-fat', 'olive oil'],
+    ['healthy-fat', 'chopped nuts'],
+    ['healthy-fat', 'chia seeds'],
+    ['healthy-fat', 'seafood mix'],
   ];
   it.each(fixtures)('%s on "%s"', (tag, name) => {
     expect(tags(name)).toContain(tag);
@@ -144,6 +160,15 @@ describe('except and matching cases', () => {
     expect(tags('sweet potato')).toContain('vegetable');
     expect(tags('orange juice')).not.toContain('fruit');
     expect(tags('orange')).toContain('fruit');
+  });
+  it('nut-free and oil-free names are not healthy fat', () => {
+    expect(tags('nut free granola')).not.toContain('healthy-fat');
+    expect(tags('oil free dressing')).not.toContain('healthy-fat');
+  });
+  it('healthy fat does not fire on look-alike words or unnamed foods', () => {
+    for (const n of ['walnut', 'peanut', 'nutmeg', 'butternut squash', 'coconut', 'seedless grapes', 'avocado', 'salmon', 'butter']) {
+      expect(tags(n), n).not.toContain('healthy-fat');
+    }
   });
   it('matches whole tokens only', () => {
     expect(tags('eggplant')).toEqual([]);

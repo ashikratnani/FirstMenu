@@ -45,12 +45,20 @@
 // zucchini, cauliflower, potato, corn, kale, plain bell pepper (only "red
 // peppers" is named, so only `red pepper` is kept); fruit apple, peach,
 // mango, blueberry, raspberry, plum, prune, applesauce; whole grain oat,
-// oatmeal, brown rice, quinoa, barley, whole wheat; dairy ricotta. Healthy fat
-// has no supporting term in any of the three sources (avocado is a fruit
-// there). Also checked without success: AAP healthychildren.org Starting Solid
-// Foods, MyPlate infants/toddlers pages, WHO IYCF fact sheet, CDC solid-foods
-// page and the 2020-2025 Dietary Guidelines (no list of fat-rich foods for
-// babies). So it has no rule yet: task 4.3 finds a source (see UNCONFIRMED_TAGS).
+// oatmeal, brown rice, quinoa, barley, whole wheat; dairy ricotta.
+//
+// Task 4.3, healthy fat. None of the three sources above names fat-rich foods
+// (avocado is a fruit there). AAP healthychildren.org Starting Solid Foods,
+// MyPlate, the WHO IYCF fact sheet and the CDC solid-foods page also had no
+// list. The one page found is DGA-2020-2025 (Dietary Guidelines for Americans
+// 2020-2025, Chapter 2: Infants and Toddlers, printed page 60), read directly
+// from the PDF on 2026-11-10: "The long-chain polyunsaturated fatty acids,
+// specifically the essential omega-3 and omega-6 fatty acids supplied through
+// seafood, nuts, seeds, and oils, influence the infant's fatty acid status ..."
+// (diet of age 6 through 23 months). So the rule has exactly four terms:
+// seafood, nut, seed, oil. Salmon, avocado, nut butter and olive oil are not
+// named there as fat sources; olive oil still matches through "oil", and nut
+// butter through "nut" only when the name has the token "nut".
 
 import { matchesTerm } from './safety/normalize';
 import type { SourceId } from './safety/rules';
@@ -73,7 +81,7 @@ export interface NutritionRule {
 }
 
 // Bump when a tag list changes.
-export const NUTRITION_VERSION = 1;
+export const NUTRITION_VERSION = 2;
 
 const BEAN_EXCEPTIONS = ['green bean', 'jelly bean', 'vanilla bean', 'coffee bean', 'cocoa bean'];
 
@@ -118,12 +126,17 @@ export const NUTRITION_RULES: NutritionRule[] = [
     except: ['breast', 'formula', 'peanut', 'almond', 'oat', 'coconut', 'rice', 'soy milk', 'milk chocolate'],
     sources: ['CDC-encourage'],
   },
+  {
+    tag: 'healthy-fat',
+    terms: ['seafood', 'nut', 'seed', 'oil'],
+    except: ['nut free', 'oil free'],
+    sources: ['DGA-2020-2025'],
+  },
 ];
 
-// Tags the requirements name but that no cited source supports yet, so they
-// have no rule and are never assigned. Healthy fat waits for task 4.3 (find a
-// sourced term list, add the rule, bump NUTRITION_VERSION).
-export const UNCONFIRMED_TAGS: NutritionTag[] = ['healthy-fat'];
+// Tags the requirements name but that no cited source supports, so they have
+// no rule and are never assigned. Empty since task 4.3 added healthy fat.
+export const UNCONFIRMED_TAGS: NutritionTag[] = [];
 
 const TAG_ORDER: NutritionTag[] = NUTRITION_RULES.map((r) => r.tag);
 
