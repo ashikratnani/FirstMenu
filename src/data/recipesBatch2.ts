@@ -63,7 +63,7 @@ export const BATCH_2_RECIPES: Recipe[] = [
     ],
     steps: [
       'Stir the yogurt and peanut butter together in a small bowl until smooth. Mix in the cinnamon if you like.',
-      'Serve with slices of fruit or vegetables. Offer the dip thinly spread, never by the spoonful.',
+      'Serve with soft or cooked slices of fruit or vegetables. Offer the dip thinly spread, never by the spoonful.',
     ],
     texture: 'soft, smooth dip for soft finger foods',
     servings: 3,
@@ -451,7 +451,7 @@ export const BATCH_2_RECIPES: Recipe[] = [
       { name: 'low-sodium chicken broth', quantity: 0.5, unit: 'cup', category: 'pantry' },
       { name: 'salt', quantity: 0.25, unit: 'tsp', category: 'pantry' },
       { name: 'black pepper', quantity: 0.25, unit: 'tsp', category: 'pantry' },
-      { name: 'broth from preparing the filling (for the sauce)', food: 'chicken broth', quantity: 1, unit: 'cup', category: 'other' },
+      { name: 'broth from preparing the filling (for the sauce)', food: 'chicken broth', quantity: 1, unit: 'cup', category: 'other', optional: true },
       { name: 'lite soy sauce', quantity: 1, unit: 'tbsp', category: 'pantry' },
       { name: 'brown sugar', quantity: 1, unit: 'tbsp', category: 'pantry' },
       { name: 'garlic cloves, minced (for the sauce)', food: 'garlic', quantity: 3, unit: 'clove', category: 'produce' },
