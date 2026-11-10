@@ -182,7 +182,7 @@ function messageFor(issue: z.core.$ZodIssue, root: unknown): JsonIssue {
 export function cleanString(s: string): string {
   return s
     .replace(/[\t\r\n\u2028\u2029]+/g, ' ')
-    .replace(/[\p{Cc}\p{Cf}\u3164\uFFA0\u115F\u1160\u2800]/gu, '')
+    .replace(/[\p{Cc}\p{Cf}\p{Default_Ignorable_Code_Point}\u3164\uFFA0\u115F\u1160\u2800]/gu, '')
     .replace(/\p{Variation_Selector}/gu, '')
     .replace(/\s+/g, ' ')
     .trim();
@@ -536,6 +536,8 @@ function parseRecipeReplyUnsafe(text: string): JsonParseResult {
       const q = Math.round(ing.quantity * 1000) / 1000;
       if (!Number.isFinite(q) || q > MAX_QUANTITY) {
         quantityIssue = { path: `ingredients[${i}].quantity`, message: `ingredients[${i}].quantity must be at most ${MAX_QUANTITY}` };
+      } else if (q <= 0) {
+        quantityIssue = { path: `ingredients[${i}].quantity`, message: `ingredients[${i}].quantity must be at least 0.001` };
       } else out.quantity = q;
     }
     const unit = ing.unit ?? '';

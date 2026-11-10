@@ -319,6 +319,9 @@ describe('validation rules (Requirement 18.5)', () => {
     expect(recipeOf(q(null)).parsed.ingredients[0].quantity).toBeUndefined();
     expect(messages(q(0))[0]).toBe('ingredients[0].quantity must be more than 0, not 0');
     expect(messages(q(-1))[0]).toContain('more than 0');
+    expect(messages(q(0.0004))).toEqual(['ingredients[0].quantity must be at least 0.001']);
+    expect(messages(q(1e-9))).toEqual(['ingredients[0].quantity must be at least 0.001']);
+    expect(recipeOf(q(0.001)).parsed.ingredients[0].quantity).toBe(0.001);
     expect(messages(q('1/2'))[0]).toContain('not "1/2"');
     expect(messages(q(true))[0]).toContain('must be a number such as 0.5');
   });
@@ -359,6 +362,29 @@ describe('cleaning', () => {
   it('a hidden character cannot hide a blocked food from the text screen', () => {
     expect(mentionIds(obj({ steps: ['Stir in ho\u200bney.'] }))).toEqual(['honey']);
     expect(mentionIds(obj({ steps: ['No\nhoney please.'] }))).toEqual(['honey']);
+  });
+
+  it.each(['\u17b4', '\u17b5'])('invisible Khmer vowel %j cannot hide honey', (c) => {
+    expect(mentionIds(obj({ steps: [`Stir in ho${c}ney.`] }))).toEqual(['honey']);
+    expect(mentionIds(obj({ notes: [`Add ho${c}ney`] }))).toEqual(['honey']);
+    expect(mentionIds(obj({ extra: `Add ho${c}ney` }))).toEqual(['honey']);
+    const named = obj({ ingredients: [{ name: `ho${c}ney` }] });
+    const rec = toRecipe(recipeOf(named).parsed, named);
+    expect(rec.ingredients[0].name).toBe('honey');
+    expect(screenRecipe(rec, AGE).blocks.length).toBeGreaterThan(0);
+  });
+
+  it('no default-ignorable code point can hide honey', () => {
+    const di = /^\p{Default_Ignorable_Code_Point}$/u;
+    let count = 0;
+    for (let cp = 0; cp <= 0x10ffff; cp++) {
+      const c = String.fromCodePoint(cp);
+      if (!di.test(c)) continue;
+      count++;
+      const ids = mentionIds(obj({ steps: [`Stir in ho${c}ney.`] }));
+      expect(ids, `U+${cp.toString(16)}`).toEqual(['honey']);
+    }
+    expect(count).toBeGreaterThan(100);
   });
 });
 
