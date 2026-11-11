@@ -874,7 +874,7 @@ export const BATCH_6_RECIPES: Recipe[] = [
     servings: 2,
   },
   {
-    // Canned pumpkin, ricotta and warm spices stirred smooth, for dipping fruit. The sugar is left out. The serving suggestion is the page wording (apple slices, bananas or grapes). Raw apple slices and whole grapes are choking hazards for young children and the Make screen reads ingredient names, not steps, so it would not warn; tagged 24-36 only.
+    // Canned pumpkin, ricotta and warm spices stirred smooth, for dipping fruit. The sugar is kept (the screen does not block it at 24 months), added a little at a time as the page says. The serving suggestion is the page wording (apple slices, bananas or grapes). Raw apple slices and whole grapes are choking hazards for young children and the Make screen reads ingredient names, not steps, so it would not warn; tagged 24-36 only.
     id: 'b-fh-pumpkin-fruit-dip',
     origin: 'builtin',
     source: {
@@ -885,7 +885,6 @@ export const BATCH_6_RECIPES: Recipe[] = [
       adaptations: [
         ESTIMATE_QUARTER_CUP,
         'Used the ricotta cheese option from "ricotta cheese, plain yogurt or cream cheese".',
-        'Left out 3/4 cup sugar',
       ],
     },
     title: 'Pumpkin Fruit Dip',
@@ -895,11 +894,12 @@ export const BATCH_6_RECIPES: Recipe[] = [
     ingredients: [
       { name: 'can pumpkin (15 ounce can, about 1 3/4 cups cooked pumpkin)', food: 'pumpkin', quantity: 1, unit: 'can', category: 'produce' },
       { name: 'low-fat ricotta cheese', food: 'ricotta', quantity: 1, unit: 'cup', category: 'dairy-eggs' },
+      { name: 'sugar', food: 'sugar', quantity: 0.75, unit: 'cup', category: 'pantry' },
       { name: 'cinnamon', food: 'cinnamon', quantity: 1.5, unit: 'tsp', category: 'pantry' },
       { name: 'nutmeg', food: 'nutmeg', quantity: 0.5, unit: 'tsp', category: 'pantry' },
     ],
     steps: [
-      'In a large bowl, stir the pumpkin, ricotta, cinnamon and nutmeg together until smooth.',
+      'In a large bowl, combine the pumpkin, ricotta, cinnamon and nutmeg. Add the sugar a little at a time to reach the sweetness you want. Stir until smooth.',
       'Serve with apple slices, bananas or grapes. Refrigerate leftovers within 2 hours.',
     ],
     texture: 'smooth spiced pumpkin dip',

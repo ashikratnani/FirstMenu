@@ -1454,7 +1454,6 @@ const BATCH_6_LEFT_OUT: Record<string, { adaptation: string; absent: RegExp }[]>
   'b-icn-italian-vegetable-medley': [{ adaptation: 'Left out 1/4 teaspoon table salt', absent: /\bsalt\b/i }],
   'b-fh-fruit-yogurt-popsicles': [{ adaptation: 'Left out 1 to 3 tablespoons sugar (optional)', absent: /sugar/i }],
   'b-fh-pumpkin-smoothie-cup': [{ adaptation: 'Left out 2 teaspoons brown sugar', absent: /sugar/i }],
-  'b-fh-pumpkin-fruit-dip': [{ adaptation: 'Left out 3/4 cup sugar', absent: /sugar/i }],
   'b-fh-skillet-braised-chicken': [{ adaptation: 'Left out salt and seasoning salt from the page\'s list of seasoning examples', absent: /\bsalt\b/i }],
   'b-fh-blueberry-tofu-smoothie': [{ adaptation: 'Left out 1/2 cup orange juice (juice from 1 orange)', absent: /orange\sjuice/i }],
   'b-fh-chicken-and-black-bean-salsa-burritos': [{ adaptation: 'Left out 1/2 teaspoon salt, divided', absent: /\bsalt\b/i }],
@@ -1475,6 +1474,7 @@ const BATCH_6_KEEPS_BLOCKED_AT_24 = [
   'b-fh-superhero-shepherds-pie',
   'b-icn-toasted-pita-wedges-and-fruit-dip',
   'b-fh-bell-pepper-salad',
+  'b-fh-pumpkin-fruit-dip',
 ];
 
 /** Pages (or ICN versions) that state their own serving count (no estimate needed). */
@@ -1776,7 +1776,7 @@ const GOAL: Counts = {
  * still under their hard minimum (12-23 Easy 29 of 45, 24-36 Easy 54 of 70,
  * 9-12 More 13 of 15, 12-23 More 29 of 30, 6-8 Medium 8 of 10) are the gaps the
  * next batches fill. Batch 6 closed the hard minimum for 6-8 Easy (20 of 20),
- * 24-36 Medium (78 of 70), 24-36 More (61 of 60) and soy (30 of 30). 6-8
+ * 24-36 Medium (79 of 70), 24-36 More (61 of 60) and soy (30 of 30). 6-8
  * Medium stays at 8 of 10: no fetched page whose own directions describe
  * mashing or pureeing has enough steps or ingredients to count as Medium.
  */
