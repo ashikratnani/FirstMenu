@@ -11,6 +11,7 @@ import { describe, expect, it } from 'vitest';
 import App from '../App';
 import { AppProvider } from '../state/AppProvider';
 import { STORAGE_KEY, defaultState } from '../domain/storage';
+import { encodeRecipeShare } from '../domain/recipeShare';
 import type { AppState, Recipe } from '../domain/types';
 
 function makeStorage(seed: AppState): Storage {
@@ -105,6 +106,25 @@ describe('exactly one filled primary button per screen (Req 17.10)', () => {
     renderAt('/settings', seed());
     expect(primaries()).toEqual(['Save']);
     expect(shellAddRecipe()).toHaveAttribute('data-variant', 'secondary');
+  });
+
+  it('a recipe page: Share recipe is secondary and the shell button is the only primary', () => {
+    renderAt('/recipes/custom-blorp', seed());
+    expect(screen.getByRole('button', { name: 'Share recipe' })).toHaveAttribute(
+      'data-variant',
+      'secondary',
+    );
+    expect(primaries()).toEqual(['Add recipe']);
+  });
+
+  it('a shared recipe link: Add to my recipes is the only primary', () => {
+    renderAt(`/r/${encodeRecipeShare(SNACK).encoded}`, seed());
+    expect(primaries()).toEqual(['Add to my recipes']);
+  });
+
+  it('an unreadable recipe link has no primary button', () => {
+    renderAt('/r/garbage', seed());
+    expect(primaries()).toEqual([]);
   });
 
   it('Print: Print is primary', () => {

@@ -19,6 +19,7 @@ export const Prep = lazy(() => import('./Prep'));
 export const Grocery = lazy(() => import('./Grocery'));
 export const Share = lazy(() => import('./Share'));
 export const SharedView = lazy(() => import('./SharedView'));
+export const SharedRecipeView = lazy(() => import('./SharedRecipeView'));
 export const Print = lazy(() => import('./Print'));
 export const Settings = lazy(() => import('./Settings'));
 export const Onboarding = lazy(() => import('./Onboarding'));

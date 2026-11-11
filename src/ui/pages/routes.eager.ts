@@ -12,6 +12,7 @@ export { default as Prep } from './Prep';
 export { default as Grocery } from './Grocery';
 export { default as Share } from './Share';
 export { default as SharedView } from './SharedView';
+export { default as SharedRecipeView } from './SharedRecipeView';
 export { default as Print } from './Print';
 export { default as Settings } from './Settings';
 export { default as Onboarding } from './Onboarding';

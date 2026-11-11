@@ -28,6 +28,7 @@ import type { Ingredient, MealType, Recipe, ServeAs } from '../../domain/types';
 import { MEAL_TYPES, dayLabel, ghostReason, mealTypeLabel, recipeView } from './recipeView';
 import { FIXED_LIST_NOTE, TAG_EXPLAINER, effortLabel, tagLabel, timeLabel } from './makeView';
 import Disclaimer from '../components/Disclaimer';
+import ShareRecipe from '../components/ShareRecipe';
 import styles from './RecipeDetail.module.css';
 
 /** "1 cup carrots" style quantity label; omits parts that are absent. */
@@ -472,6 +473,7 @@ export default function RecipeDetail() {
       <section aria-label="Plan and history" className={styles.historyActions}>
         {!view.isGhosted && <AddToPlan recipe={recipe} />}
         <MadeThis recipe={recipe} />
+        <ShareRecipe recipe={recipe} />
       </section>
 
       {recipe.origin === 'custom' && (
