@@ -62,13 +62,22 @@ export interface RecipeSharePayload {
   recipe: SharedRecipe;
 }
 
+/** Ingredient fields a link carries. `food` (a local override) is left out. */
+function shareIngredient(i: Ingredient): Ingredient {
+  const out: Ingredient = { name: i.name, category: i.category };
+  if (i.quantity !== undefined) out.quantity = i.quantity;
+  if (i.unit !== undefined) out.unit = i.unit;
+  if (i.optional !== undefined) out.optional = i.optional;
+  return out;
+}
+
 /** Copy only the allow-listed fields (and only those that are set). */
 export function buildRecipeSharePayload(recipe: Recipe): RecipeSharePayload {
   const shared: SharedRecipe = {
     title: recipe.title,
     stages: [...recipe.stages],
     mealTypes: [...recipe.mealTypes],
-    ingredients: recipe.ingredients.map((i) => ({ ...i })),
+    ingredients: recipe.ingredients.map(shareIngredient),
     steps: [...recipe.steps],
     texture: recipe.texture,
     servings: recipe.servings,

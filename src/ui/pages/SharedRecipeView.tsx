@@ -13,7 +13,7 @@ import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Button } from '@astryxdesign/core/Button';
 import { decodeRecipeShare, recipeFromShare } from '../../domain/recipeShare';
-import { screenRecipe } from '../../domain/safety/screen';
+import { screenRecipe, screenTextMentions } from '../../domain/safety/screen';
 import { localYmd } from '../../domain/suggest';
 import type { Ingredient } from '../../domain/types';
 import { useApp } from '../../state/AppProvider';
@@ -58,10 +58,13 @@ export default function SharedRecipeView() {
   }
 
   const shared = result.payload.recipe;
-  // Reminders for the recipient's child. Blocks are shown on the recipe page
-  // after adding, where the user can act on them.
+  // The viewer's own safety screen, as the recipe page will run it once the
+  // recipe is saved (pasted, so text mentions count). Clearing a mention is
+  // only offered on the recipe page after adding.
   const recipe = recipeFromShare(shared, recipeId, localYmd(new Date()));
-  const reminders = screenRecipe(recipe, selectAgeMonths(state) ?? 0).reminders;
+  const ageMonths = selectAgeMonths(state) ?? 0;
+  const { blocks, reminders } = screenRecipe(recipe, ageMonths);
+  const textMentions = screenTextMentions(recipe, ageMonths);
 
   const add = () => {
     dispatch({ type: 'saveCustomRecipe', recipe });
@@ -74,6 +77,34 @@ export default function SharedRecipeView() {
       <p className={styles.intro}>
         Someone shared this recipe with you. Adding it checks it for your child.
       </p>
+      {(blocks.length > 0 || textMentions.length > 0) && (
+        <section className={styles.ghost} role="note" aria-labelledby="shared-recipe-not-yet">
+          <h2 id="shared-recipe-not-yet" className={styles.ghostHeading}>
+            Not yet
+          </h2>
+          <ul className={styles.blockList}>
+            {blocks.map((block, i) => (
+              <li key={`${block.ruleId}-${block.ingredientIndex}-${i}`}>
+                <span className={styles.blockLabel}>{block.label}:</span> {block.message}
+                {block.availableAtMonths !== undefined && (
+                  <span className={styles.availableAt}>
+                    {' '}
+                    Available at {block.availableAtMonths} months.
+                  </span>
+                )}
+              </li>
+            ))}
+            {textMentions.map((mention) => (
+              <li key={`${mention.ruleId}-${mention.sentence}`}>
+                <span className={styles.blockLabel}>{mention.label}</span> is mentioned in the{' '}
+                {mention.where === 'title' ? 'title' : mention.where}: <q>{mention.sentence}</q>{' '}
+                {mention.message}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
       <p className={styles.meta}>
         <span>Texture: {shared.texture}</span>
         <span>

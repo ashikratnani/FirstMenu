@@ -70,6 +70,34 @@ describe('recipeShare payload and link (Req 9.4, 9.5)', () => {
     expect(payload.recipe.title).toBe(builtin.title);
   });
 
+  it('round-trips every built-in recipe', () => {
+    const failed = BUILTIN_RECIPES.filter(
+      (r) => !decodeRecipeShare(encodeRecipeShare(r).encoded).ok,
+    ).map((r) => r.id);
+    expect(failed).toEqual([]);
+  });
+
+  it('drops the `food` override (and unknown fields) from a custom recipe, still decodes', () => {
+    const recipe = pasted({
+      ingredients: [
+        { name: 'rolled oats', food: 'oats', quantity: 1, unit: 'cup', category: 'pantry' },
+        { name: 'x', category: 'other', extra: 'zzz' } as unknown as Recipe['ingredients'][number],
+      ],
+    });
+    const { encoded } = encodeRecipeShare(recipe);
+    const payload = decodeOk(encoded);
+    expect(payload.recipe.ingredients).toEqual([
+      { name: 'rolled oats', quantity: 1, unit: 'cup', category: 'pantry' },
+      { name: 'x', category: 'other' },
+    ]);
+    expect(JSON.stringify(buildRecipeSharePayload(recipe))).not.toMatch(/"food"|zzz/);
+    // The decoder still rejects a link that carries `food`.
+    const withFood = compressToEncodedURIComponent(
+      JSON.stringify({ v: 1, recipe: { ...buildRecipeSharePayload(recipe).recipe, ingredients: [{ name: 'a', food: 'oats', category: 'other' }] } }),
+    );
+    expect(decodeRecipeShare(withFood)).toEqual({ ok: false });
+  });
+
   it('round-trips unicode, emoji and quotes', () => {
     const recipe = pasted({
       title: 'Crème brûlée 🍮 "doux"',

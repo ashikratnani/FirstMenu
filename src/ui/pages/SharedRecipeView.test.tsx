@@ -85,6 +85,35 @@ describe('Shared recipe view (/r/:data)', () => {
     expect(screen.getByText(/not medical advice/i)).toBeInTheDocument();
   });
 
+  it('shows the viewer\'s block and text-mention findings before Add, and saves nothing', () => {
+    const storage = makeStorage(seed());
+    const setItem = vi.spyOn(storage, 'setItem');
+    const blocked: Recipe = {
+      ...SENDER_RECIPE,
+      ingredients: [...SENDER_RECIPE.ingredients, { name: 'honey', quantity: 1, unit: 'tsp', category: 'pantry' }],
+    };
+    renderAt(`/r/${encodeRecipeShare(blocked).encoded}`, storage);
+    const notYet = screen.getByRole('heading', { name: 'Not yet' }).closest('section')!;
+    expect(within(notYet).getByText(/^honey:/i)).toBeInTheDocument();
+    expect(within(notYet).queryByRole('button')).not.toBeInTheDocument();
+    expect(screen.getAllByRole('button')).toHaveLength(1);
+    expect(setItem.mock.calls.filter(([key]) => key === STORAGE_KEY)).toEqual([]);
+    expect(storage.raw().customRecipes).toEqual([]);
+  });
+
+  it('shows a text mention in the steps as the recipe page will', () => {
+    renderAt(`/r/${encodeRecipeShare(SENDER_RECIPE).encoded}`, makeStorage(seed()));
+    const notYet = screen.getByRole('heading', { name: 'Not yet' }).closest('section')!;
+    expect(within(notYet).getByText(/Add a little honey on top\./)).toBeInTheDocument();
+    expect(within(notYet).queryByRole('button')).not.toBeInTheDocument();
+  });
+
+  it('shows no findings panel when nothing is blocked', () => {
+    const clean: Recipe = { ...SENDER_RECIPE, steps: ['Cook the oats.'] };
+    renderAt(`/r/${encodeRecipeShare(clean).encoded}`, makeStorage(seed()));
+    expect(screen.queryByRole('heading', { name: 'Not yet' })).not.toBeInTheDocument();
+  });
+
   it('saves nothing until Add is tapped', () => {
     const storage = makeStorage(seed());
     const setItem = vi.spyOn(storage, 'setItem');
