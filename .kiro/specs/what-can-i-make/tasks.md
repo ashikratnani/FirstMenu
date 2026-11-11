@@ -111,7 +111,7 @@ Branch names use the `v2/` prefix (for example `v2/6-paste-parser`) so they don'
   - [x] 10.4 Add the suggestions to the Make screen in the order in the design: suggested meal chip (with the search filter chips), Try this card (the screen's one primary button when shown, with "Show another" and "Why this?"), new-food suggestion, stale on-hand prompt, pantry suggestion, Make again row; at most two banners at once; every suggestion dismissible. Replace Layout's `addRecipeVariant` with `PrimaryActionProvider` / `usePagePrimaryAction` per the design, and move Settings, Print and edit pages onto it. Component tests: Try this opens the right recipe; dismissing hides it; the meal chip doesn't filter results until tapped and doesn't come back within 4 hours after ✕; each suggestion shows its reason; exactly one filled primary button on Make, Settings, Print, edit and Add recipe; with no allowed Try this pick the card is hidden and the shell's "Add recipe" is primary; rewrite the trial's pathname-based Layout tests so placeholder pages report through `usePagePrimaryAction`; all suggestion buttons are secondary.
     - _Requirements: 17.1 – 17.6, 17.8 – 17.10_
 
-- [ ] 11. Add recipe and prompt helper (Astryx) (11.1 to 11.4 done; 11.5 to 11.7 added November 10, 2026)
+- [x] 11. Add recipe and prompt helper (Astryx) (11.5 to 11.7 added November 10, 2026)
   - [x] 11.1 Build `ui/pages/AddRecipe.tsx` at `/add`: source picker and link, paste box, preview with line editing and moving, "mark lines as ingredients" mode, safety results with text mentions and "Not used in this recipe", Save. Link to the typed editor. Include the Instagram and screenshot help text and the fixed-list disclaimer.
     - _Requirements: 6.1, 6.4 – 6.11, 7.3 – 7.5, 11.2_
   - [x] 11.2 Build the prompt helper UI on Make and Add recipe: copy, open ChatGPT, "Paste the answer", notice.
@@ -124,7 +124,7 @@ Branch names use the `v2/` prefix (for example `v2/6-paste-parser`) so they don'
     - _Requirements: 18.2, 18.4 – 18.6, 18.8 – 18.11, 19.3, 19.4, 8.2 – 8.5_
   - [x] 11.6 Ask ChatGPT question flow and Add recipe JSON intake. Question box (pre-filled from on-hand foods), copy, Open ChatGPT, "Paste the answer"; Add recipe calls `parseRecipeReply` with the invalid, no-JSON fallback and fix-up states; extras notice; raw reply kept as original text. Update `AskChatGpt.tsx` and `AddRecipe.tsx`, and the Make empty state. Component tests per the design, a spy that no network API is called, `npm run check:external`, `vitest-axe`, size report.
     - _Requirements: 18.1 – 18.12, 6.1, 8.1, 8.6 – 8.9, 17.10_
-  - [ ] 11.7 Instagram reel prompt flow. Reel URL box with validation, `buildReelPrompt`, copy, Open Meta AI, error-object handling, source preset to Instagram, URL saved only as `link`; reword the Instagram help text. Component tests: URL validation, no child data in the prompt, no fetch.
+  - [x] 11.7 Instagram reel prompt flow. Reel URL box with validation, `buildReelPrompt`, copy, Open Meta AI, error-object handling, source preset to Instagram, URL saved only as `link`; reword the Instagram help text. Component tests: URL validation, no child data in the prompt, no fetch.
     - _Requirements: 19.1 – 19.8, 6.9, 6.10_
 
 - [x] 12. Recipe page and library

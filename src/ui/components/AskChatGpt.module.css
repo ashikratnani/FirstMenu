@@ -62,3 +62,9 @@
   align-items: flex-start;
   gap: 8px;
 }
+
+.warning {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}
