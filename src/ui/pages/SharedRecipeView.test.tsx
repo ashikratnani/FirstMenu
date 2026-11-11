@@ -95,6 +95,7 @@ describe('Shared recipe view (/r/:data)', () => {
     renderAt(`/r/${encodeRecipeShare(blocked).encoded}`, storage);
     const notYet = screen.getByRole('heading', { name: 'Not yet' }).closest('section')!;
     expect(within(notYet).getByText(/^honey:/i)).toBeInTheDocument();
+    expect(within(notYet).getByText(/Available at 12 months\./)).toBeInTheDocument();
     expect(within(notYet).queryByRole('button')).not.toBeInTheDocument();
     expect(screen.getAllByRole('button')).toHaveLength(1);
     expect(setItem.mock.calls.filter(([key]) => key === STORAGE_KEY)).toEqual([]);
@@ -112,6 +113,21 @@ describe('Shared recipe view (/r/:data)', () => {
     const clean: Recipe = { ...SENDER_RECIPE, steps: ['Cook the oats.'] };
     renderAt(`/r/${encodeRecipeShare(clean).encoded}`, makeStorage(seed()));
     expect(screen.queryByRole('heading', { name: 'Not yet' })).not.toBeInTheDocument();
+  });
+
+  it('with no child shows no findings, a set-up line, and saves nothing', () => {
+    const storage = makeStorage({ ...seed(), child: undefined });
+    const setItem = vi.spyOn(storage, 'setItem');
+    const blocked: Recipe = {
+      ...SENDER_RECIPE,
+      ingredients: [...SENDER_RECIPE.ingredients, { name: 'honey', quantity: 1, unit: 'tsp', category: 'pantry' }],
+    };
+    renderAt(`/r/${encodeRecipeShare(blocked).encoded}`, storage);
+    expect(screen.queryByRole('heading', { name: 'Not yet' })).not.toBeInTheDocument();
+    expect(screen.queryByText(/Available at/)).not.toBeInTheDocument();
+    expect(screen.getByText('Set up your child to check this recipe.')).toBeInTheDocument();
+    expect(setItem.mock.calls.filter(([key]) => key === STORAGE_KEY)).toEqual([]);
+    expect(storage.raw().customRecipes).toEqual([]);
   });
 
   it('saves nothing until Add is tapped', () => {

@@ -62,9 +62,11 @@ export default function SharedRecipeView() {
   // recipe is saved (pasted, so text mentions count). Clearing a mention is
   // only offered on the recipe page after adding.
   const recipe = recipeFromShare(shared, recipeId, localYmd(new Date()));
-  const ageMonths = selectAgeMonths(state) ?? 0;
-  const { blocks, reminders } = screenRecipe(recipe, ageMonths);
-  const textMentions = screenTextMentions(recipe, ageMonths);
+  // With no child there is no age to screen for, so nothing is screened.
+  const ageMonths = selectAgeMonths(state);
+  const { blocks, reminders } =
+    ageMonths === null ? { blocks: [], reminders: [] } : screenRecipe(recipe, ageMonths);
+  const textMentions = ageMonths === null ? [] : screenTextMentions(recipe, ageMonths);
 
   const add = () => {
     dispatch({ type: 'saveCustomRecipe', recipe });
@@ -77,6 +79,7 @@ export default function SharedRecipeView() {
       <p className={styles.intro}>
         Someone shared this recipe with you. Adding it checks it for your child.
       </p>
+      {ageMonths === null && <p className={styles.intro}>Set up your child to check this recipe.</p>}
       {(blocks.length > 0 || textMentions.length > 0) && (
         <section className={styles.ghost} role="note" aria-labelledby="shared-recipe-not-yet">
           <h2 id="shared-recipe-not-yet" className={styles.ghostHeading}>
