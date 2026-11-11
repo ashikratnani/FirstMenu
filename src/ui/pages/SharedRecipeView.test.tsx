@@ -116,7 +116,9 @@ describe('Shared recipe view (/r/:data)', () => {
     const saved = storage.raw().customRecipes[0];
     expect(saved.origin).toBe('custom');
     expect(saved.id).not.toBe('custom-sender-id');
-    expect(saved.imported).toMatchObject({ from: 'shared', text: '' });
+    expect(saved.imported).toMatchObject({ from: 'shared' });
+    expect(saved.imported?.text).toContain('Oat Bowl');
+    expect(saved.source).toBeUndefined();
     expect(saved.clearedMentions ?? []).toEqual([]);
     expect(JSON.stringify(saved)).not.toContain('ORIGINAL-PASTE-MARKER');
 

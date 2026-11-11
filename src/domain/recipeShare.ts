@@ -78,7 +78,7 @@ export function buildRecipeSharePayload(recipe: Recipe): RecipeSharePayload {
   if (recipe.statedMinutes !== undefined) shared.statedMinutes = recipe.statedMinutes;
   if (recipe.kind !== undefined) shared.kind = recipe.kind;
   if (recipe.serveAs) shared.serveAs = [...recipe.serveAs];
-  if (recipe.source) {
+  if (recipe.origin === 'builtin' && recipe.source) {
     shared.source = { ...recipe.source, adaptations: [...recipe.source.adaptations] };
   }
   return { v: 1, recipe: shared };
@@ -103,11 +103,14 @@ const base = recipeSchema.shape;
 
 const sharedRecipeSchema = z
   .object({
-    title: text(200),
-    stages: base.stages.max(4),
+    title: text(200).refine((t) => t.trim().length > 0),
+    stages: base.stages.min(1).max(4),
     mealTypes: base.mealTypes.max(4),
-    ingredients: z.array(base.ingredients.element.extend({ name: text(200) }).strict()).max(60),
-    steps: z.array(text(2000)).max(60),
+    ingredients: z
+      .array(base.ingredients.element.omit({ food: true }).extend({ name: text(200) }).strict())
+      .min(1)
+      .max(60),
+    steps: z.array(text(2000)).min(1).max(60),
     texture: text(200),
     servings: z.number().min(0).max(1000),
     storage: z
@@ -121,17 +124,9 @@ const sharedRecipeSchema = z
     statedMinutes: z.number().min(0).max(100000).optional(),
     kind: base.kind,
     serveAs: base.serveAs.unwrap().max(4).optional(),
-    source: z
-      .object({
-        title: text(300),
-        publisher: text(300),
-        url: text(500),
-        retrieved: text(20),
-        adaptations: z.array(text(500)).max(20),
-        storageSource: text(500).optional(),
-      })
-      .strict()
-      .optional(),
+    // Accepted so links from built-in recipes still open, but never kept:
+    // decodeRecipeShare drops it, so a link cannot show a publisher or URL.
+    source: z.unknown().optional(),
   })
   .strict();
 
@@ -169,22 +164,29 @@ export function decodeRecipeShare(fragment: string): DecodeRecipeShareResult {
 
   const result = recipeSharePayloadSchema.safeParse(parsed);
   if (!result.success) return { ok: false };
-  return { ok: true, payload: result.data as RecipeSharePayload };
+  const { source: _dropped, ...recipe } = result.data.recipe;
+  void _dropped;
+  return { ok: true, payload: { v: 1, recipe: recipe as SharedRecipe } };
 }
 
 /**
- * The recipe a recipient saves. It is a custom recipe marked as pasted
- * (`imported`, from 'shared', with no original text), so the screen reads its
+ * The recipe a recipient saves. It is a custom recipe (never a source or
+ * publisher) marked as pasted (`imported`, from 'shared', original text = the
+ * share text), so the screen reads its
  * title, steps and notes for the recipient's child and the user must clear any
  * mention with a tap (Req 9.6).
  */
 export function recipeFromShare(shared: SharedRecipe, id: string, today: string): Recipe {
-  return {
-    ...shared,
+  const { source: _source, ...rest } = shared;
+  void _source;
+  const recipe: Recipe = {
+    ...rest,
     id,
     origin: 'custom',
     imported: { from: 'shared', text: '', date: today },
   };
+  recipe.imported = { from: 'shared', text: recipeShareText(recipe), date: today };
+  return recipe;
 }
 
 function ingredientLine(ingredient: Ingredient): string {

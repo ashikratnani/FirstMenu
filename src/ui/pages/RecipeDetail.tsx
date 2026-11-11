@@ -131,6 +131,11 @@ function ServeAsLine({ recipe }: { recipe: Recipe }) {
   );
 }
 
+/** Only http(s) links are rendered as hrefs. */
+function isHttpUrl(url: string): boolean {
+  return /^https?:\/\//i.test(url);
+}
+
 /**
  * "Add to plan" (Req 1.5): pick a day and meal, then add. A ghosted recipe
  * never gets this control (Req 5.2): the page does not render it for a ghost,
@@ -411,9 +416,13 @@ export default function RecipeDetail() {
         <section aria-labelledby="recipe-source" className={styles.source}>
           <h2 id="recipe-source">Source</h2>
           <p>
-            <ExternalLink href={source.url} target="_blank" rel="noopener noreferrer">
-              {source.title}
-            </ExternalLink>{' '}
+            {isHttpUrl(source.url) ? (
+              <ExternalLink href={source.url} target="_blank" rel="noopener noreferrer">
+                {source.title}
+              </ExternalLink>
+            ) : (
+              source.title
+            )}{' '}
             &mdash; {source.publisher}
           </p>
           <p className={styles.retrieved}>Retrieved {source.retrieved}</p>
@@ -430,13 +439,17 @@ export default function RecipeDetail() {
           {source.storageSource && (
             <p className={styles.storageSource}>
               Storage times:{' '}
-              <ExternalLink
-                href={source.storageSource}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {source.publisher}
-              </ExternalLink>
+              {isHttpUrl(source.storageSource) ? (
+                <ExternalLink
+                  href={source.storageSource}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {source.publisher}
+                </ExternalLink>
+              ) : (
+                source.publisher
+              )}
             </p>
           )}
         </section>

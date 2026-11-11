@@ -62,10 +62,11 @@ describe('recipeShare payload and link (Req 9.4, 9.5)', () => {
     expect(payload.recipe.steps).toEqual(recipe.steps);
   });
 
-  it('round-trips a built-in recipe with its source', () => {
+  it('round-trips a built-in recipe, dropping its source on decode', () => {
     const builtin = BUILTIN_RECIPES[0];
     const payload = decodeOk(encodeRecipeShare(builtin).encoded);
-    expect(payload.recipe.source).toEqual(builtin.source);
+    expect(payload.recipe.source).toBeUndefined();
+    expect(JSON.parse(JSON.stringify(buildRecipeSharePayload(builtin))).recipe.source).toEqual(builtin.source);
     expect(payload.recipe.title).toBe(builtin.title);
   });
 
@@ -154,6 +155,53 @@ describe('decodeRecipeShare rejects bad links (Req 9.4)', () => {
     ).toEqual({ ok: false });
   });
 
+  it('rejects extra keys that would pre-clear mentions or add notes', () => {
+    for (const key of ['clearedMentions', 'notes', 'imported', 'id']) {
+      expect(decodeRecipeShare(withRecipe((r) => (r[key] = key === 'id' ? 'x' : [])))).toEqual({
+        ok: false,
+      });
+    }
+    expect(
+      decodeRecipeShare(
+        withRecipe((r) => (r.clearedMentions = [{ ruleId: 'honey', sentence: 'Add honey.' }])),
+      ),
+    ).toEqual({ ok: false });
+  });
+
+  it('drops a crafted source (javascript:, data:, vbscript:, fake publisher)', () => {
+    for (const url of ['javascript:alert(1)', 'data:text/html,x', 'vbscript:x']) {
+      const fragment = withRecipe(
+        (r) =>
+          (r.source = {
+            title: 'Official',
+            publisher: 'CDC',
+            url,
+            retrieved: '2026-01-01',
+            adaptations: [],
+            storageSource: url,
+          }),
+      );
+      const shared = decodeOk(fragment).recipe;
+      expect(shared.source).toBeUndefined();
+      expect(JSON.stringify(recipeFromShare(shared, 'n', '2026-01-01'))).not.toContain('CDC');
+    }
+  });
+
+  it('rejects a food override on an ingredient', () => {
+    expect(
+      decodeRecipeShare(
+        withRecipe((r) => (r.ingredients = [{ name: 'a', category: 'other', food: 'zzz' }])),
+      ),
+    ).toEqual({ ok: false });
+  });
+
+  it('rejects an empty title, stages, ingredients or steps', () => {
+    expect(decodeRecipeShare(withRecipe((r) => (r.title = '  ')))).toEqual({ ok: false });
+    expect(decodeRecipeShare(withRecipe((r) => (r.stages = [])))).toEqual({ ok: false });
+    expect(decodeRecipeShare(withRecipe((r) => (r.ingredients = [])))).toEqual({ ok: false });
+    expect(decodeRecipeShare(withRecipe((r) => (r.steps = [])))).toEqual({ ok: false });
+  });
+
   it('rejects wrong shapes', () => {
     expect(decodeRecipeShare(withRecipe((r) => (r.title = 5)))).toEqual({ ok: false });
     expect(decodeRecipeShare(withRecipe((r) => (r.stages = ['1-2'])))).toEqual({ ok: false });
@@ -230,13 +278,23 @@ describe('recipeShareText (Req 9.3, 9.5)', () => {
 });
 
 describe('recipeFromShare (Req 9.6)', () => {
-  it('makes a custom recipe marked imported with no original text', () => {
+  it('makes a custom recipe marked imported, with the share text as original text, and no source', () => {
     const shared = decodeOk(encodeRecipeShare(pasted()).encoded).recipe;
     const recipe = recipeFromShare(shared, 'new-id', '2026-02-03');
     expect(recipe.id).toBe('new-id');
     expect(recipe.origin).toBe('custom');
-    expect(recipe.imported).toEqual({ from: 'shared', text: '', date: '2026-02-03' });
+    expect(recipe.imported?.from).toBe('shared');
+    expect(recipe.imported?.text).toContain('Oat Mash');
+    expect(recipe.imported?.text).toContain(RECIPE_SHARE_FOOTER);
+    expect(recipe.imported?.text).not.toContain('ORIGINAL-PASTE-MARKER');
     expect(recipe.clearedMentions).toBeUndefined();
+  });
+
+  it('never carries a source, even from a built-in link', () => {
+    const builtin = BUILTIN_RECIPES[0];
+    const shared = decodeOk(encodeRecipeShare(builtin).encoded).recipe;
+    expect(shared.source).toBeUndefined();
+    expect(recipeFromShare(shared, 'new-id', '2026-02-03').source).toBeUndefined();
   });
 
   it('is screened for text mentions, which are not pre-cleared', () => {

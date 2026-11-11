@@ -12,7 +12,6 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Button } from '@astryxdesign/core/Button';
-import { Link as ExternalLink } from '@astryxdesign/core/Link';
 import { decodeRecipeShare, recipeFromShare } from '../../domain/recipeShare';
 import { screenRecipe } from '../../domain/safety/screen';
 import { localYmd } from '../../domain/suggest';
@@ -63,8 +62,6 @@ export default function SharedRecipeView() {
   // after adding, where the user can act on them.
   const recipe = recipeFromShare(shared, recipeId, localYmd(new Date()));
   const reminders = screenRecipe(recipe, selectAgeMonths(state) ?? 0).reminders;
-  const source = shared.source;
-  const sourceLink = source && /^https?:\/\//i.test(source.url) ? source.url : undefined;
 
   const add = () => {
     dispatch({ type: 'saveCustomRecipe', recipe });
@@ -112,22 +109,6 @@ export default function SharedRecipeView() {
           ))}
         </ol>
       </section>
-
-      {source && (
-        <section aria-labelledby="shared-recipe-source">
-          <h2 id="shared-recipe-source">Source</h2>
-          <p>
-            {sourceLink ? (
-              <ExternalLink href={sourceLink} target="_blank" rel="noopener noreferrer">
-                {source.title}
-              </ExternalLink>
-            ) : (
-              source.title
-            )}{' '}
-            &mdash; {source.publisher}
-          </p>
-        </section>
-      )}
 
       <section aria-label="Add this recipe" className={styles.actions}>
         <Button label="Add to my recipes" variant="primary" onClick={add} />
