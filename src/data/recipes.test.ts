@@ -7,6 +7,7 @@ import { BUILTIN_RECIPES, INFANT_PORTION_OZ, RECIPES, estimateServings } from '.
 import { BATCH_2_RECIPES } from './recipesBatch2';
 import { BATCH_3_RECIPES } from './recipesBatch3';
 import { BATCH_4_RECIPES } from './recipesBatch4';
+import { BATCH_5_RECIPES } from './recipesBatch5';
 import { SIMPLE_IDEAS } from './simpleIdeas';
 import sourcesDoc from '../../docs/recipe-sources.md?raw';
 
@@ -236,7 +237,8 @@ describe('BUILTIN_RECIPES - coverage', () => {
         SIMPLE_IDEAS.length +
         BATCH_2_RECIPES.length +
         BATCH_3_RECIPES.length +
-        BATCH_4_RECIPES.length,
+        BATCH_4_RECIPES.length +
+        BATCH_5_RECIPES.length,
     );
   });
 
@@ -416,7 +418,7 @@ const BATCH_2_EXPECTED: Record<string, Batch2Expectation> = {
 };
 
 /** Hosts a batch 2 source URL may come from. */
-const ALLOWED_HOSTS = ['foodhero.org', 'theicn.org', 'www.nhlbi.nih.gov'];
+const ALLOWED_HOSTS = ['foodhero.org', 'theicn.org', 'www.nhlbi.nih.gov', 'seagrant.oregonstate.edu'];
 
 /** Ingredients the sources list but that were left out; the adaptation must say so. */
 const LEFT_OUT: Record<string, { adaptation: string; absent: RegExp }[]> = {
@@ -811,7 +813,9 @@ describe('BUILTIN_RECIPES - batch 3', () => {
 
   it('no two built-ins share a source URL or a title (duplicate check)', () => {
     // Simple ideas share a few feeding-guide pages, and the WIC recipes share two.
-    const urls = [...BATCH_2_RECIPES, ...BATCH_3_RECIPES, ...BATCH_4_RECIPES].map((r) => r.source?.url);
+    const urls = [...BATCH_2_RECIPES, ...BATCH_3_RECIPES, ...BATCH_4_RECIPES, ...BATCH_5_RECIPES].map(
+      (r) => r.source?.url,
+    );
     expect(new Set(urls).size, 'source URLs are unique').toBe(urls.length);
     const titles = BUILTIN_RECIPES.map((r) => r.title.trim().toLowerCase());
     expect(new Set(titles).size, 'titles are unique').toBe(titles.length);
@@ -1089,7 +1093,304 @@ describe('BUILTIN_RECIPES - batch 4', () => {
 });
 
 // ---------------------------------------------------------------------------
-// Count table (task 14.3, batch 4; design "How the distribution is measured")
+// Batch 5 (task 14.3): Easy recipes for 12-23 and 24-36, soy, shellfish (Oregon
+// Sea Grant), then 24-36 More, 12-23 More and the 6-8 cells
+// ---------------------------------------------------------------------------
+const OSU = 'Oregon Sea Grant, Oregon State University';
+const ESTIMATE_ONE_CUP =
+  'Serving count is an estimate (source gives no servings): total yield divided by a 1 cup portion.';
+
+const BATCH_5_EXPECTED: Record<string, Batch3Expectation> = {
+  'b-fh-creamy-fruit-salad': { publisher: FH, stages: ['24-36'], serveAs: ['pieces'], allergens: ['dairy'], servings: 8, estimateNote: ESTIMATE_HALF_CUP },
+  'b-fh-fruit-pizza': { publisher: FH, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: ['dairy'], servings: 2 },
+  'b-fh-banana-bobs': { publisher: FH, stages: ['24-36'], serveAs: ['pieces'], allergens: ['dairy'], servings: 2 },
+  'b-fh-super-sundae': { publisher: FH, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: ['dairy'], servings: 2, estimateNote: 'Serving count is an estimate (source gives no servings): the directions make 2 sundaes, 1 sundae per serving.' },
+  'b-fh-yogurt-fruit-dip': { publisher: FH, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: ['dairy'], servings: 4, estimateNote: ESTIMATE_QUARTER_CUP },
+  'b-fh-raspberry-fruit-dip': { publisher: FH, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: ['dairy'], servings: 8 },
+  'b-fh-carrot-raisin-salad': { publisher: FH, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: ['dairy'], servings: 5, estimateNote: ESTIMATE_HALF_CUP },
+  'b-fh-melon-and-mint': { publisher: FH, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: [], servings: 12, estimateNote: ESTIMATE_HALF_CUP },
+  'b-fh-watermelon-lime-chili': { publisher: FH, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: [], servings: 4, estimateNote: ESTIMATE_HALF_CUP },
+  'b-fh-pear-quesadillas': { publisher: FH, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: ['dairy', 'wheat'], servings: 8 },
+  'b-fh-turkey-cranberry-quesadilla': { publisher: FH, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: ['dairy', 'wheat'], servings: 1, estimateNote: 'Serving count is an estimate (source gives no servings): the recipe makes 1 quesadilla, 1 quesadilla per serving.' },
+  'b-fh-sauteed-cabbage': { publisher: FH, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: ['dairy'], servings: 10, estimateNote: ESTIMATE_HALF_CUP },
+  'b-fh-summer-cucumbers': { publisher: FH, stages: ['24-36'], serveAs: ['pieces'], allergens: [], servings: 8, estimateNote: ESTIMATE_HALF_CUP },
+  'b-fh-salmon-salad-mix': { publisher: FH, stages: ['24-36'], serveAs: ['pieces'], allergens: ['dairy', 'fish'], servings: 6, estimateNote: ESTIMATE_QUARTER_CUP },
+  'b-fh-beet-and-carrot-salad': { publisher: FH, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: ['dairy'], servings: 6, estimateNote: ESTIMATE_HALF_CUP },
+  'b-fh-cucumber-and-tomato-salad': { publisher: FH, stages: ['24-36'], serveAs: ['pieces'], allergens: ['dairy'], servings: 8, estimateNote: ESTIMATE_HALF_CUP },
+  'b-fh-braised-radishes': { publisher: FH, stages: ['24-36'], serveAs: ['pieces'], allergens: [], servings: 6, estimateNote: ESTIMATE_HALF_CUP },
+  'b-fh-hoppin-pear-salad': { publisher: FH, stages: ['24-36'], serveAs: ['pieces'], allergens: ['dairy', 'tree nuts'], servings: 4 },
+  'b-fh-rice-bowl-breakfast-fruit-nuts': { publisher: FH, stages: ['24-36'], serveAs: ['pieces'], allergens: ['dairy', 'tree nuts'], servings: 2, estimateNote: 'Serving count is an estimate (source gives no servings): the directions divide the rice between 2 bowls, 1 bowl per serving.' },
+  'b-fh-green-salad-with-peas': { publisher: FH, stages: ['24-36'], serveAs: ['pieces'], allergens: ['dairy'], servings: 12, estimateNote: ESTIMATE_HALF_CUP },
+  'b-fh-ants-on-a-log': { publisher: FH, stages: ['24-36'], serveAs: ['finger-food'], allergens: ['peanut'], servings: 4 },
+  'b-fh-cranberry-orange-relish': { publisher: FH, stages: ['24-36'], serveAs: ['pieces'], allergens: [], servings: 10, estimateNote: ESTIMATE_QUARTER_CUP },
+  'b-fh-baked-apple-and-cranberries': { publisher: FH, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: ['dairy'], servings: 1, estimateNote: 'Serving count is an estimate (source gives no servings): the recipe makes 1 apple, 1 apple per serving.' },
+  'b-fh-roasted-cauliflower': { publisher: FH, stages: ['9-12', '12-23', '24-36'], serveAs: ['pieces'], allergens: ['dairy'], servings: 8, estimateNote: ESTIMATE_HALF_CUP },
+  'b-fh-fried-rice-with-pork': { publisher: FH, stages: ['24-36'], serveAs: ['pieces'], allergens: ['soy'], servings: 8, estimateNote: ESTIMATE_HALF_CUP },
+  'b-fh-green-and-orange-chicken-salad': { publisher: FH, stages: ['24-36'], serveAs: ['pieces'], allergens: ['sesame', 'soy'], servings: 12, estimateNote: ESTIMATE_ONE_CUP },
+  'b-icn-teriyaki-chicken-and-cabbage': { publisher: ICN, stages: ['24-36'], serveAs: ['pieces'], allergens: ['soy'], servings: 6 },
+  'b-icn-corn-and-edamame-blend': { publisher: ICN, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: ['sesame', 'soy'], servings: 6 },
+  'b-icn-stir-fried-green-rice-eggs-and-ham': { publisher: ICN, stages: ['24-36'], serveAs: ['pieces'], allergens: ['egg', 'sesame', 'soy'], servings: 6 },
+  'b-icn-stir-fry-pork': { publisher: ICN, stages: ['24-36'], serveAs: ['pieces'], allergens: ['soy'], servings: 6 },
+  'b-osu-sg-shrimp-cucumber-and-seaweed-salad': { publisher: OSU, stages: ['24-36'], serveAs: ['pieces'], allergens: ['sesame', 'shellfish', 'soy'], servings: 4 },
+  'b-osu-sg-meridian-dungeness-crab-cakes': { publisher: OSU, stages: ['24-36'], serveAs: ['pieces'], allergens: ['dairy', 'egg', 'shellfish', 'wheat'], servings: 8, estimateNote: 'Serving count is an estimate (source gives no servings): 2 pounds of crab meat divided by a 4 ounce portion.' },
+  'b-fh-minestrone-soup': { publisher: FH, stages: ['24-36'], serveAs: ['pieces'], allergens: ['wheat'], servings: 10, estimateNote: ESTIMATE_ONE_CUP },
+  'b-fh-vegetarian-chili': { publisher: FH, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: ['dairy'], servings: 8, estimateNote: ESTIMATE_ONE_CUP },
+  'b-fh-stuffed-peppers-turkey-vegetables': { publisher: FH, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: [], servings: 6, estimateNote: 'Serving count is an estimate (source gives no servings): 6 pepper halves, 1 half per serving.' },
+  'b-fh-turkey-stroganoff': { publisher: FH, stages: ['24-36'], serveAs: ['pieces'], allergens: ['dairy', 'wheat'], servings: 8, estimateNote: ESTIMATE_ONE_CUP },
+  'b-fh-white-chicken-chili': { publisher: FH, stages: ['24-36'], serveAs: ['pieces'], allergens: ['dairy'], servings: 8, estimateNote: ESTIMATE_ONE_CUP },
+  'b-fh-turkey-pumpkin-chili': { publisher: FH, stages: ['24-36'], serveAs: ['pieces'], allergens: [], servings: 10, estimateNote: ESTIMATE_ONE_CUP },
+  'b-fh-peach-yogurt-smoothie': { publisher: FH, stages: ['6-8', '9-12'], serveAs: ['puree'], allergens: ['dairy'], servings: 4, estimateNote: 'Serving count is an estimate (source gives no servings): the page makes 3 cups with the juice, so about 2 cups without it, divided by a 1/2 cup portion.' },
+  'b-fh-banana-berry-smoothie': { publisher: FH, stages: ['6-8', '9-12'], serveAs: ['puree'], allergens: ['dairy'], servings: 6, estimateNote: 'Serving count is an estimate (source gives no servings): the page makes 4 cups with the juice, so about 3 cups without it, divided by a 1/2 cup portion.' },
+  'b-fh-bell-pepper-nachos': { publisher: FH, stages: ['24-36'], serveAs: ['pieces'], allergens: ['dairy', 'soy'], servings: 8, estimateNote: ESTIMATE_ONE_CUP },
+  'b-fh-strawberry-swirl': { publisher: FH, stages: ['6-8', '9-12'], serveAs: ['puree'], allergens: [], servings: 2, estimateNote: 'Serving count is an estimate (source gives no servings): the page makes 2 cups with the juice, so about 1 cup without it, divided by a 1/2 cup portion.' },
+  'b-fh-glazed-squash': { publisher: FH, stages: ['9-12', '12-23', '24-36'], serveAs: ['pieces'], allergens: [], servings: 6, estimateNote: 'Serving count is an estimate (source gives no servings): total yield of 3 cups divided by a 1/2 cup portion.' },
+  'b-fh-red-potato-and-cabbage-colcannon': { publisher: FH, stages: ['6-8', '9-12', '12-23', '24-36'], serveAs: ['mashed', 'pieces'], allergens: ['dairy'], servings: 12, estimateNote: ESTIMATE_HALF_CUP },
+  'b-icn-easy-chicken-and-egg-noodle-soup': { publisher: ICN, stages: ['24-36'], serveAs: ['pieces'], allergens: ['egg', 'sesame', 'soy', 'wheat'], servings: 6 },
+  'b-icn-asian-tuna-burger': { publisher: ICN, stages: ['24-36'], serveAs: ['pieces'], allergens: ['egg', 'fish', 'sesame', 'soy', 'wheat'], servings: 6 },
+  'b-icn-bok-choy-wrappers': { publisher: ICN, stages: ['24-36'], serveAs: ['pieces'], allergens: ['soy'], servings: 6 },
+};
+
+/** Ingredients the sources list but that were left out; the adaptation must say so. */
+const BATCH_5_LEFT_OUT: Record<string, { adaptation: string; absent: RegExp }[]> = {
+  'b-fh-yogurt-fruit-dip': [{ adaptation: 'Left out 1 teaspoon brown sugar', absent: /sugar/i }],
+  'b-fh-raspberry-fruit-dip': [{ adaptation: 'Left out 1 tablespoon sugar', absent: /sugar/i }],
+  'b-fh-peach-yogurt-smoothie': [{ adaptation: 'Left out 3/4 cup orange juice', absent: /orange juice/i }],
+  'b-fh-banana-berry-smoothie': [{ adaptation: 'Left out 1 cup orange juice', absent: /orange juice/i }],
+  'b-fh-melon-and-mint': [{ adaptation: 'Left out 2 tablespoons packed brown sugar', absent: /sugar/i }],
+  'b-fh-watermelon-lime-chili': [{ adaptation: 'Left out 1/4 teaspoon salt (optional)', absent: /\bsalt\b/i }],
+  'b-fh-sauteed-cabbage': [{ adaptation: 'Left out 1/2 teaspoon salt', absent: /\bsalt\b/i }],
+  'b-fh-beet-and-carrot-salad': [{ adaptation: 'Left out 1/4 teaspoon salt', absent: /\bsalt\b/i }],
+  'b-fh-baked-apple-and-cranberries': [{ adaptation: 'Left out 1 teaspoon packed brown sugar', absent: /sugar/i }],
+  'b-fh-roasted-cauliflower': [{ adaptation: 'Left out 1/2 teaspoon salt', absent: /\bsalt\b/i }],
+  'b-icn-corn-and-edamame-blend': [{ adaptation: 'Left out 1/4 teaspoon salt', absent: /\bsalt\b/i }],
+  'b-fh-stuffed-peppers-turkey-vegetables': [{ adaptation: 'Left out 1/4 teaspoon salt', absent: /\bsalt\b/i }],
+  'b-fh-strawberry-swirl': [{ adaptation: 'Left out 1 cup (8 ounces) 100% apple juice', absent: /apple juice/i }],
+  'b-fh-glazed-squash': [{ adaptation: 'Left out 3 tablespoons brown sugar', absent: /sugar/i }, { adaptation: 'Left out 1/4 teaspoon salt', absent: /\bsalt\b/i }],
+  'b-fh-red-potato-and-cabbage-colcannon': [{ adaptation: 'Left out 1 teaspoon salt', absent: /\bsalt\b/i }],
+};
+
+/** Batch 5 recipes that keep salt, sugar or soy sauce because they are tagged 24-36 only (the screen does not block them at that age). */
+const BATCH_5_KEEPS_BLOCKED_AT_24 = [
+  'b-fh-summer-cucumbers',
+  'b-fh-braised-radishes',
+  'b-fh-cranberry-orange-relish',
+  'b-fh-fried-rice-with-pork',
+  'b-fh-green-and-orange-chicken-salad',
+  'b-icn-teriyaki-chicken-and-cabbage',
+  'b-icn-stir-fried-green-rice-eggs-and-ham',
+  'b-icn-stir-fry-pork',
+  'b-osu-sg-shrimp-cucumber-and-seaweed-salad',
+  'b-fh-minestrone-soup',
+  'b-fh-turkey-pumpkin-chili',
+  'b-icn-easy-chicken-and-egg-noodle-soup',
+  'b-icn-asian-tuna-burger',
+  'b-icn-bok-choy-wrappers',
+];
+
+/** Pages (or ICN versions) that state their own serving count (no estimate needed). */
+const BATCH_5_SOURCE_SERVINGS = [
+  'b-fh-fruit-pizza',
+  'b-fh-banana-bobs',
+  'b-fh-raspberry-fruit-dip',
+  'b-fh-hoppin-pear-salad',
+  'b-fh-ants-on-a-log',
+  'b-fh-pear-quesadillas',
+  'b-icn-teriyaki-chicken-and-cabbage',
+  'b-icn-corn-and-edamame-blend',
+  'b-icn-stir-fried-green-rice-eggs-and-ham',
+  'b-icn-stir-fry-pork',
+  'b-osu-sg-shrimp-cucumber-and-seaweed-salad',
+  'b-icn-easy-chicken-and-egg-noodle-soup',
+  'b-icn-asian-tuna-burger',
+  'b-icn-bok-choy-wrappers',
+];
+
+describe('BUILTIN_RECIPES - batch 5', () => {
+  it('has a pinned expectation for exactly the batch 5 recipes', () => {
+    expect(BATCH_5_RECIPES.map((r) => r.id).sort()).toEqual(Object.keys(BATCH_5_EXPECTED).sort());
+    expect(BATCH_5_RECIPES.length).toBeGreaterThanOrEqual(45);
+    expect(BATCH_5_RECIPES.length).toBeLessThanOrEqual(55);
+  });
+
+  it('every batch 5 recipe is a full recipe with serveAs and at least one quantity', () => {
+    for (const recipe of BATCH_5_RECIPES) {
+      expect(recipe.origin, recipe.id).toBe('builtin');
+      expect(recipe.kind, recipe.id).not.toBe('simple-idea');
+      expect(recipe.serveAs?.length ?? 0, `${recipe.id} serveAs`).toBeGreaterThan(0);
+      expect(
+        recipe.ingredients.some((i) => i.quantity !== undefined),
+        `${recipe.id} has a quantity`,
+      ).toBe(true);
+      expect(recipe.storage, `${recipe.id} sets no unsourced storage`).toBeUndefined();
+    }
+  });
+
+  it('every batch 5 source is an https page on an allowed host and a listed publisher', () => {
+    for (const recipe of BATCH_5_RECIPES) {
+      const source = recipe.source;
+      expect(source, recipe.id).toBeDefined();
+      if (!source) continue;
+      const url = new URL(source.url);
+      expect(url.protocol, recipe.id).toBe('https:');
+      expect(ALLOWED_HOSTS, `${recipe.id} host ${url.hostname}`).toContain(url.hostname);
+      expect(sourcesDoc, `${recipe.id} publisher is in docs/recipe-sources.md`).toContain(source.publisher);
+      expect(source.retrieved, recipe.id).toBe('2026-11-10');
+      expect(source.title.trim().length, recipe.id).toBeGreaterThan(0);
+    }
+  });
+
+  it('Oregon Sea Grant is a new publisher listed in docs/recipe-sources.md', () => {
+    const row = sourcesDoc.split('\n').find((line) => line.includes(OSU));
+    expect(row, 'Oregon Sea Grant row').toBeDefined();
+    expect(row).toContain('seagrant.oregonstate.edu');
+    expect(row).toMatch(/Pending pr-reviewer|Approved by pr-reviewer \(PR #\d+\)/);
+    const osu = BATCH_5_RECIPES.filter((r) => r.source?.publisher === OSU);
+    expect(osu.length).toBeGreaterThanOrEqual(2);
+    for (const recipe of osu) {
+      expect(new URL(recipe.source?.url ?? '').hostname, recipe.id).toBe('seagrant.oregonstate.edu');
+    }
+  });
+
+  it('pins publisher, stages, serveAs and servings for each recipe', () => {
+    for (const recipe of BATCH_5_RECIPES) {
+      const expected = BATCH_5_EXPECTED[recipe.id];
+      expect(recipe.source?.publisher, `${recipe.id} publisher`).toBe(expected.publisher);
+      expect(recipe.stages, `${recipe.id} stages`).toEqual(expected.stages);
+      expect(recipe.serveAs, `${recipe.id} serveAs`).toEqual(expected.serveAs);
+      expect(recipe.servings, `${recipe.id} servings`).toBe(expected.servings);
+    }
+  });
+
+  it('ICN recipes use the source serving count and estimates are disclosed', () => {
+    for (const recipe of BATCH_5_RECIPES) {
+      const expected = BATCH_5_EXPECTED[recipe.id];
+      const adaptations = recipe.source?.adaptations ?? [];
+      const estimates = adaptations.filter((a) => a.startsWith('Serving count is an estimate'));
+      if (expected.estimateNote) expect(estimates, recipe.id).toEqual([expected.estimateNote]);
+      else expect(estimates, recipe.id).toEqual([]);
+      if (expected.publisher === ICN) expect(recipe.servings, recipe.id).toBe(6);
+      else if (!expected.estimateNote) expect(BATCH_5_SOURCE_SERVINGS, recipe.id).toContain(recipe.id);
+    }
+  });
+
+  it('pins the allergen groups of each recipe from the real screen', () => {
+    for (const recipe of BATCH_5_RECIPES) {
+      const groups = [...new Set(screenRecipe(recipe, 12).allergens.map((f) => f.label))].sort();
+      expect(groups, `${recipe.id} allergen groups`).toEqual(BATCH_5_EXPECTED[recipe.id].allergens);
+    }
+  });
+
+  it('no batch 5 recipe has a block at 24 months; blocked-at-12 ones are tagged 24-36 only', () => {
+    for (const recipe of BATCH_5_RECIPES) {
+      expect(screenRecipe(recipe, 24).blocks, `${recipe.id} is safe at 24 months`).toEqual([]);
+      if (screenRecipe(recipe, 12).blocks.length > 0) {
+        expect(recipe.stages, recipe.id).toEqual(['24-36']);
+        expect(BATCH_5_KEEPS_BLOCKED_AT_24, recipe.id).toContain(recipe.id);
+      }
+    }
+  });
+
+  it('no batch 5 recipe has a block at the youngest age of any stage it is tagged for', () => {
+    for (const recipe of BATCH_5_RECIPES) {
+      for (const stage of recipe.stages) {
+        expect(
+          screenRecipe(recipe, STAGE_MIN_MONTHS[stage]).blocks,
+          `${recipe.id} at ${stage}`,
+        ).toEqual([]);
+      }
+    }
+  });
+
+  it('tagged stages younger than 24 months contain no salt, sugar, soy sauce, honey or bouillon', () => {
+    for (const recipe of BATCH_5_RECIPES) {
+      if (!recipe.stages.some((s) => s !== '24-36')) continue;
+      const text = [...recipe.ingredients.map((i) => i.name), ...recipe.steps].join(' ');
+      expect(text, `${recipe.id} text`).not.toMatch(/\b(salt|sugar|soy sauce|honey|bouillon)\b/i);
+    }
+  });
+
+  it('recipes tagged 6-8 or 9-12 contain no juice other than lemon or lime', () => {
+    for (const recipe of BATCH_5_RECIPES) {
+      if (!recipe.stages.some((s) => s === '6-8' || s === '9-12')) continue;
+      for (const ingredient of recipe.ingredients) {
+        const name = ingredient.name.toLowerCase().replace(/\b(lemon|lime) juice\b/g, '');
+        expect(name, `${recipe.id} ingredient`).not.toMatch(/juice/);
+      }
+    }
+  });
+
+  it('every "Left out" adaptation matches an absent ingredient, and none is missing', () => {
+    for (const recipe of BATCH_5_RECIPES) {
+      const adaptations = recipe.source?.adaptations ?? [];
+      const leftOut = adaptations.filter((a) => a.startsWith('Left out'));
+      const expected = BATCH_5_LEFT_OUT[recipe.id] ?? [];
+      expect(leftOut.length, `${recipe.id} Left out adaptations`).toBe(expected.length);
+      for (const item of expected) {
+        expect(
+          adaptations.some((a) => a.startsWith(item.adaptation)),
+          `${recipe.id}: ${item.adaptation}`,
+        ).toBe(true);
+        for (const ingredient of recipe.ingredients) {
+          expect(ingredient.name, `${recipe.id} must not contain the left-out item`).not.toMatch(
+            item.absent,
+          );
+        }
+      }
+    }
+  });
+
+  it('recipes that keep salt, sugar or soy sauce are exactly the 24-36 only ones listed', () => {
+    for (const recipe of BATCH_5_RECIPES) {
+      const keeps = recipe.ingredients.some((i) => /\b(salt|sugar|soy sauce)\b/i.test(i.name));
+      expect(keeps, recipe.id).toBe(BATCH_5_KEEPS_BLOCKED_AT_24.includes(recipe.id));
+    }
+  });
+
+  it('recipes with nut pieces are tagged 24-36 only', () => {
+    const nutPieces = /\b(chopped|sliced|slivered|crushed|toasted|pieces)\b.*\b(nuts?|almonds?|walnuts?|pecans?|peanuts?|cashews?|pistachios?)\b|\b(nuts?|almonds?|walnuts?|pecans?|peanuts?|cashews?|pistachios?)\b.*\b(chopped|sliced|slivered|crushed|pieces)\b/i;
+    for (const recipe of BATCH_5_RECIPES) {
+      if (!recipe.ingredients.some((i) => nutPieces.test(i.name))) continue;
+      expect(recipe.stages, recipe.id).toEqual(['24-36']);
+    }
+  });
+
+  it('puree or mash only recipes are not tagged for toddler stages', () => {
+    for (const recipe of BATCH_5_RECIPES) {
+      const softPieces = recipe.serveAs?.some((s) => s === 'pieces' || s === 'finger-food');
+      if (!softPieces) {
+        expect(recipe.stages.includes('12-23') || recipe.stages.includes('24-36'), recipe.id).toBe(false);
+      }
+    }
+  });
+
+  it('no 6-8 recipe is served as pieces or finger food only', () => {
+    for (const recipe of BATCH_5_RECIPES) {
+      if (!recipe.stages.includes('6-8')) continue;
+      expect(
+        recipe.serveAs?.some((s) => s === 'puree' || s === 'mashed'),
+        `${recipe.id} 6-8 needs a puree or mashed form`,
+      ).toBe(true);
+    }
+  });
+
+  it('batch 5 adds recipes to the Easy cells, soy and shellfish gaps', () => {
+    const cellCount = (stage: StageId, effort: Effort) =>
+      BATCH_5_RECIPES.filter((r) => r.stages.includes(stage) && recipeEffort(r) === effort).length;
+    expect(cellCount('12-23', 'easy')).toBeGreaterThanOrEqual(12);
+    expect(cellCount('24-36', 'easy')).toBeGreaterThanOrEqual(23);
+    expect(cellCount('6-8', 'easy')).toBeGreaterThanOrEqual(2);
+    expect(cellCount('6-8', 'medium')).toBeGreaterThanOrEqual(1);
+    expect(cellCount('24-36', 'more')).toBeGreaterThanOrEqual(15);
+    expect(cellCount('12-23', 'more')).toBeGreaterThanOrEqual(3);
+    const groupCount = (group: string) =>
+      BATCH_5_RECIPES.filter((r) => BATCH_5_EXPECTED[r.id].allergens.includes(group)).length;
+    expect(groupCount('soy')).toBeGreaterThanOrEqual(11);
+    expect(groupCount('shellfish')).toBeGreaterThanOrEqual(2);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Count table (task 14.3, batch 5; design "How the distribution is measured")
 // ---------------------------------------------------------------------------
 // HARD_MINIMUM and GOAL are the Requirement 14.1 and 14.6 tables. CHECKPOINT is
 // the floor for the current batch: it follows the plan line in tasks.md and is
@@ -1132,23 +1433,26 @@ const GOAL: Counts = {
 };
 
 /**
- * Floors for this batch (batch 4). The total follows the plan line (about 125
- * after batch 4; the set has 142). Cells and allergens are what the set reaches
- * after batch 4, capped at HARD_MINIMUM, and are raised by each batch. Cells
- * and groups still under their hard minimum (for example 12-23 Easy 14 of 45,
- * 24-36 Easy 16 of 70, soy 18 of 30 and shellfish 2 of 3) are the gaps the next
- * batches fill.
+ * Floors for this batch (batch 5). The total follows the plan line (about 165
+ * after batch 5; the set has 189). Cells and allergens are what the set reaches
+ * after batch 5, capped at HARD_MINIMUM, and are raised by each batch. Cells
+ * and groups still under their hard minimum (12-23 Easy 26 of 45 and More 23 of
+ * 30, 24-36 Easy 39 of 70, Medium 69 of 70 and More 45 of 60, 9-12 More 12 of
+ * 15, soy 29 of 30) are the gaps the next batches fill. Shellfish reached its
+ * hard minimum in this batch. 6-8 Easy (19 of 20) and Medium (8 of 10) stay just
+ * under theirs: Roasted Cauliflower, Baked Winter Squash and Baked Apple and
+ * Cranberries are not tagged 6-8 because their pages do not describe mashing.
  */
 const CHECKPOINT: Counts = {
-  total: 125,
+  total: 165,
   simpleIdeasMax: 40,
   stages: {
-    '6-8': cell(16, 7, 0),
+    '6-8': cell(19, 8, 0),
     '9-12': cell(30, 25, 12),
-    '12-23': cell(14, 45, 20),
-    '24-36': cell(16, 63, 30),
+    '12-23': cell(26, 45, 23),
+    '24-36': cell(39, 69, 45),
   },
-  allergens: { dairy: 30, egg: 30, wheat: 30, soy: 18, peanut: 8, 'tree nuts': 8, fish: 8, sesame: 4, shellfish: 2 },
+  allergens: { dairy: 30, egg: 30, wheat: 30, soy: 29, peanut: 8, 'tree nuts': 8, fish: 8, sesame: 4, shellfish: 3 },
 };
 
 const EFFORTS: Effort[] = ['easy', 'medium', 'more'];
