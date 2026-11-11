@@ -1086,7 +1086,7 @@ describe('BUILTIN_RECIPES - batch 4', () => {
       BATCH_4_RECIPES.filter((r) => r.stages.includes(stage) && recipeEffort(r) === effort).length;
     expect(cellCount('12-23', 'easy')).toBeGreaterThanOrEqual(2);
     expect(cellCount('12-23', 'medium')).toBeGreaterThanOrEqual(13);
-    expect(cellCount('6-8', 'easy')).toBeGreaterThanOrEqual(1);
+    expect(cellCount('6-8', 'easy')).toBeGreaterThanOrEqual(3);
     expect(cellCount('6-8', 'medium')).toBeGreaterThanOrEqual(2);
     const groupCount = (group: string) =>
       BATCH_4_RECIPES.filter((r) => BATCH_4_EXPECTED[r.id].allergens.includes(group)).length;
@@ -1402,7 +1402,7 @@ describe('BUILTIN_RECIPES - batch 5', () => {
 const BATCH_6_EXPECTED: Record<string, Batch3Expectation> = {
   'b-icn-cottage-cheese-and-fruit-bowls': { publisher: ICN, stages: ['24-36'], serveAs: ['pieces'], allergens: ['dairy'], servings: 6 },
   'b-icn-fruit-and-yogurt-roll-ups': { publisher: ICN, stages: ['24-36'], serveAs: ['pieces'], allergens: ['dairy', 'wheat'], servings: 6 },
-  'b-icn-chicken-and-cheese-snack-cup-with-grapes': { publisher: ICN, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: ['dairy'], servings: 6 },
+  'b-icn-chicken-and-cheese-snack-cup-with-grapes': { publisher: ICN, stages: ['24-36'], serveAs: ['pieces'], allergens: ['dairy'], servings: 6 },
   'b-icn-deli-bento-box': { publisher: ICN, stages: ['24-36'], serveAs: ['pieces'], allergens: ['dairy', 'wheat'], servings: 6 },
   'b-icn-mini-egg-salad-sandwiches': { publisher: ICN, stages: ['24-36'], serveAs: ['pieces'], allergens: ['egg'], servings: 6 },
   'b-icn-easy-overnight-oats-and-berries': { publisher: ICN, stages: ['24-36'], serveAs: ['pieces'], allergens: ['dairy'], servings: 6 },
@@ -1424,7 +1424,7 @@ const BATCH_6_EXPECTED: Record<string, Batch3Expectation> = {
   'b-icn-herb-bagel-bites': { publisher: ICN, stages: ['24-36'], serveAs: ['pieces'], allergens: ['wheat'], servings: 6 },
   'b-fh-fruit-yogurt-popsicles': { publisher: FH, stages: ['12-23', '24-36'], serveAs: ['finger-food'], allergens: ['dairy'], servings: 9, estimateNote: 'Serving count is an estimate (source gives no servings): 9 popsicles, 1 popsicle per serving.' },
   'b-fh-pumpkin-smoothie-cup': { publisher: FH, stages: ['9-12'], serveAs: ['puree'], allergens: ['dairy'], servings: 2, estimateNote: ESTIMATE_HALF_CUP },
-  'b-fh-pumpkin-fruit-dip': { publisher: FH, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: ['dairy'], servings: 12, estimateNote: ESTIMATE_QUARTER_CUP },
+  'b-fh-pumpkin-fruit-dip': { publisher: FH, stages: ['24-36'], serveAs: ['pieces'], allergens: ['dairy'], servings: 12, estimateNote: ESTIMATE_QUARTER_CUP },
   'b-fh-cherry-salad': { publisher: FH, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: [], servings: 6, estimateNote: ESTIMATE_HALF_CUP },
   'b-fh-corn-and-tomato-salad': { publisher: FH, stages: ['24-36'], serveAs: ['pieces'], allergens: [], servings: 6, estimateNote: ESTIMATE_HALF_CUP },
   'b-fh-summer-vegetable-and-pasta-salad': { publisher: FH, stages: ['24-36'], serveAs: ['pieces'], allergens: ['wheat'], servings: 6, estimateNote: ESTIMATE_ONE_CUP },
@@ -1449,7 +1449,6 @@ const BATCH_6_EXPECTED: Record<string, Batch3Expectation> = {
 
 /** Ingredients the sources list but that were left out; the adaptation must say so. */
 const BATCH_6_LEFT_OUT: Record<string, { adaptation: string; absent: RegExp }[]> = {
-  'b-icn-easy-overnight-oats-and-berries': [{ adaptation: 'Left out 2 teaspoons pasteurized honey', absent: /honey/i }],
   'b-icn-whipped-sweet-potatoes': [{ adaptation: 'Left out 1/4 teaspoon table salt', absent: /\bsalt\b/i }],
   'b-icn-veggie-mash-up': [{ adaptation: 'Left out 1/4 teaspoon table salt', absent: /\bsalt\b/i }],
   'b-icn-italian-vegetable-medley': [{ adaptation: 'Left out 1/4 teaspoon table salt', absent: /\bsalt\b/i }],
@@ -1699,18 +1698,28 @@ describe('BUILTIN_RECIPES - batch 6', () => {
     expect(cheese?.ingredients.some((i) => /shredded/i.test(i.name))).toBe(true);
     expect(cheese?.ingredients.map((i) => i.name).join(' ')).not.toMatch(/diced cheese|cheese, 1\/4 inch/i);
     expect(find('b-fh-pumpkin-fruit-dip')?.steps.join(' ')).toContain('Serve with apple slices, bananas or grapes.');
+    for (const id of ['b-icn-marinated-black-bean-salad', 'b-icn-black-beans-with-plantains']) {
+      expect(find(id)?.source?.adaptations, id).toContain('Used the canned black beans option.');
+    }
+    const names = (id: string) => find(id)?.ingredients.map((i) => i.name) ?? [];
+    expect(names('b-fh-barley-bean-and-corn-salad')).toContain('kidney beans, drained and rinsed (1 can, 15 ounces)');
+    expect(names('b-fh-chicken-and-black-bean-salsa-burritos')).toContain('black beans, drained and rinsed (1 can, 15 ounces)');
+    expect(names('b-fh-garden-sloppy-joes')).toEqual(
+      expect.arrayContaining(['tomato sauce (1 can, 8 ounces)', 'whole tomatoes, crushed (1 can, 15 ounces)']),
+    );
+    expect(names('b-icn-easy-overnight-oats-and-berries')).toContain('honey, pasteurized');
   });
 
   it('batch 6 adds recipes to the gap cells and to soy', () => {
     const cellCount = (stage: StageId, effort: Effort) =>
       BATCH_6_RECIPES.filter((r) => r.stages.includes(stage) && recipeEffort(r) === effort).length;
-    expect(cellCount('24-36', 'easy')).toBeGreaterThanOrEqual(16);
-    expect(cellCount('12-23', 'easy')).toBeGreaterThanOrEqual(5);
+    expect(cellCount('24-36', 'easy')).toBeGreaterThanOrEqual(15);
+    expect(cellCount('12-23', 'easy')).toBeGreaterThanOrEqual(3);
     expect(cellCount('6-8', 'easy')).toBeGreaterThanOrEqual(1);
     expect(cellCount('24-36', 'more')).toBeGreaterThanOrEqual(16);
     expect(cellCount('12-23', 'more')).toBeGreaterThanOrEqual(6);
     expect(cellCount('9-12', 'more')).toBeGreaterThanOrEqual(1);
-    expect(cellCount('24-36', 'medium')).toBeGreaterThanOrEqual(9);
+    expect(cellCount('24-36', 'medium')).toBeGreaterThanOrEqual(10);
     const groupCount = (group: string) =>
       BATCH_6_RECIPES.filter((r) => BATCH_6_EXPECTED[r.id].allergens.includes(group)).length;
     expect(groupCount('soy')).toBeGreaterThanOrEqual(1);
@@ -1764,7 +1773,7 @@ const GOAL: Counts = {
  * Floors for this batch (batch 6). The total follows the plan line (about 205
  * after batch 6; the set has 234). Cells and allergens are what the set reaches
  * after batch 6, capped at HARD_MINIMUM, and are raised by each batch. Cells
- * still under their hard minimum (12-23 Easy 31 of 45, 24-36 Easy 55 of 70,
+ * still under their hard minimum (12-23 Easy 29 of 45, 24-36 Easy 54 of 70,
  * 9-12 More 13 of 15, 12-23 More 29 of 30, 6-8 Medium 8 of 10) are the gaps the
  * next batches fill. Batch 6 closed the hard minimum for 6-8 Easy (20 of 20),
  * 24-36 Medium (78 of 70), 24-36 More (61 of 60) and soy (30 of 30). 6-8
@@ -1777,8 +1786,8 @@ const CHECKPOINT: Counts = {
   stages: {
     '6-8': cell(20, 8, 0),
     '9-12': cell(30, 25, 13),
-    '12-23': cell(31, 45, 29),
-    '24-36': cell(55, 70, 60),
+    '12-23': cell(29, 45, 29),
+    '24-36': cell(54, 70, 60),
   },
   allergens: { dairy: 30, egg: 30, wheat: 30, soy: 30, peanut: 8, 'tree nuts': 8, fish: 8, sesame: 4, shellfish: 3 },
 };

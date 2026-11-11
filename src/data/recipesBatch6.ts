@@ -120,7 +120,7 @@ export const BATCH_6_RECIPES: Recipe[] = [
     servings: 6,
   },
   {
-    // Diced chicken and shredded cheese layered with halved grapes. The page lists 1/4 inch diced cheese but its choking tip says to use shredded cheese for children under 4, so shredded is used. Grapes are cut as the page says.
+    // Diced chicken and shredded cheese layered with halved grapes. The page lists 1/4 inch diced cheese but its choking tip says to use shredded cheese for children under 4, so shredded is used. Grapes are cut as the page says. Tagged 24-36 only: the page is written for ages 3-5 and says to halve the grapes, while the app's Grapes reminder says to quarter them for younger children.
     id: 'b-icn-chicken-and-cheese-snack-cup-with-grapes',
     origin: 'builtin',
     source: {
@@ -131,7 +131,7 @@ export const BATCH_6_RECIPES: Recipe[] = [
       adaptations: ['Used shredded Colby cheese, as the source choking tip says, in place of 1/4 inch diced cheese.'],
     },
     title: 'Chicken and Cheese Snack Cup With Grapes',
-    stages: ['12-23', '24-36'],
+    stages: ['24-36'],
     serveAs: ['pieces'],
     mealTypes: ['snack', 'lunch'],
     ingredients: [
@@ -217,7 +217,7 @@ export const BATCH_6_RECIPES: Recipe[] = [
     servings: 6,
   },
   {
-    // No-cook oats soaked overnight with yogurt and frozen berries. The honey is left out. Tagged 24-36 only: the page offers only non-fat vanilla Greek yogurt, a sweetened product, and the app says no added sugar before 2 years.
+    // No-cook oats soaked overnight with yogurt and frozen berries. The honey is kept (the screen blocks honey only under 12 months). Tagged 24-36 only: the page offers only non-fat vanilla Greek yogurt, a sweetened product, and the app says no added sugar before 2 years.
     id: 'b-icn-easy-overnight-oats-and-berries',
     origin: 'builtin',
     source: {
@@ -225,7 +225,7 @@ export const BATCH_6_RECIPES: Recipe[] = [
       publisher: ICN_PUBLISHER,
       url: 'https://theicn.org/cnrb/ages-3-5/age-3-5-6-servings/easy-overnight-oats-and-berries-usda-recipe-for-family-child-care-centers/',
       retrieved: RETRIEVED,
-      adaptations: ['Left out 2 teaspoons pasteurized honey'],
+      adaptations: [],
     },
     title: 'Easy Overnight Oats and Berries',
     stages: ['24-36'],
@@ -234,12 +234,13 @@ export const BATCH_6_RECIPES: Recipe[] = [
     ingredients: [
       { name: 'non-fat (1%) milk', food: 'milk', quantity: 0.25, unit: 'cup', category: 'dairy-eggs' },
       { name: 'non-fat vanilla Greek yogurt', food: 'yogurt', quantity: 0.75, unit: 'cup', category: 'dairy-eggs' },
+      { name: 'honey, pasteurized', food: 'honey', quantity: 2, unit: 'tsp', category: 'pantry' },
       { name: 'vanilla extract', food: 'vanilla', quantity: 0.25, unit: 'tsp', category: 'pantry' },
       { name: 'quick oats', food: 'oat', quantity: 1, unit: 'cup', category: 'grains' },
       { name: 'blueberries, blackberries and raspberries, whole, frozen, unsweetened (13 1/2 ounces)', food: 'berry', quantity: 3, unit: 'cup', category: 'frozen' },
     ],
     steps: [
-      'Stir the milk, yogurt and vanilla together in a medium bowl.',
+      'Stir the milk, yogurt, honey and vanilla together in a medium bowl.',
       'Mix in the oats, then stir in the berries.',
       'Cover and refrigerate for 8 to 12 hours at 40°F or lower.',
       'Stir, then serve 1/2 cup. Serve right away, or keep cold at 40°F or lower.',
@@ -419,7 +420,10 @@ export const BATCH_6_RECIPES: Recipe[] = [
       publisher: ICN_PUBLISHER,
       url: 'https://theicn.org/cnrb/recipes-for-homes/recipes-for-homes-salads/marinated-black-bean-salad-usda-recipe-for-family-child-care/',
       retrieved: RETRIEVED,
-      adaptations: ['Used the ancho chili powder option (the page also allows a Mexican seasoning mix).'],
+      adaptations: [
+        'Used the ancho chili powder option (the page also allows a Mexican seasoning mix).',
+        'Used the canned black beans option.',
+      ],
     },
     title: 'Marinated Black Bean Salad',
     stages: ['24-36'],
@@ -655,7 +659,7 @@ export const BATCH_6_RECIPES: Recipe[] = [
       publisher: ICN_PUBLISHER,
       url: 'https://theicn.org/cnrb/recipes-for-homes/recipes-for-homes-vegetables/black-beans-with-plantains-usda-recipe-for-family-child-cares/',
       retrieved: RETRIEVED,
-      adaptations: [],
+      adaptations: ['Used the canned black beans option.'],
     },
     title: 'Black Beans With Plantains',
     stages: ['24-36'],
@@ -870,7 +874,7 @@ export const BATCH_6_RECIPES: Recipe[] = [
     servings: 2,
   },
   {
-    // Canned pumpkin, ricotta and warm spices stirred smooth, for dipping fruit. The sugar is left out. The serving suggestion is the page wording; whole grapes are a choking hazard under 4 and the grapes reminder on the Make screen will fire.
+    // Canned pumpkin, ricotta and warm spices stirred smooth, for dipping fruit. The sugar is left out. The serving suggestion is the page wording (apple slices, bananas or grapes). Raw apple slices and whole grapes are choking hazards for young children and the Make screen reads ingredient names, not steps, so it would not warn; tagged 24-36 only.
     id: 'b-fh-pumpkin-fruit-dip',
     origin: 'builtin',
     source: {
@@ -885,7 +889,7 @@ export const BATCH_6_RECIPES: Recipe[] = [
       ],
     },
     title: 'Pumpkin Fruit Dip',
-    stages: ['12-23', '24-36'],
+    stages: ['24-36'],
     serveAs: ['pieces'],
     mealTypes: ['snack'],
     ingredients: [
@@ -1154,7 +1158,7 @@ export const BATCH_6_RECIPES: Recipe[] = [
     mealTypes: ['lunch', 'dinner'],
     ingredients: [
       { name: 'cooked barley', food: 'barley', quantity: 2, unit: 'cup', category: 'grains' },
-      { name: 'kidney beans, drained and rinsed', food: 'kidney bean', quantity: 1, unit: 'can', category: 'produce' },
+      { name: 'kidney beans, drained and rinsed (1 can, 15 ounces)', food: 'kidney bean', quantity: 1, unit: 'can', category: 'produce' },
       { name: 'corn (cooked from fresh or frozen, or canned, drained and rinsed)', food: 'corn', quantity: 1, unit: 'cup', category: 'produce' },
       { name: 'large red bell pepper, finely chopped', food: 'bell pepper', quantity: 1, unit: 'piece', category: 'produce' },
       { name: 'sliced celery', food: 'celery', quantity: 0.5, unit: 'cup', category: 'produce' },
@@ -1192,7 +1196,7 @@ export const BATCH_6_RECIPES: Recipe[] = [
     serveAs: ['pieces'],
     mealTypes: ['lunch', 'dinner'],
     ingredients: [
-      { name: 'black beans, drained and rinsed', food: 'black bean', quantity: 1, unit: 'can', category: 'produce' },
+      { name: 'black beans, drained and rinsed (1 can, 15 ounces)', food: 'black bean', quantity: 1, unit: 'can', category: 'produce' },
       { name: 'green onions, chopped', food: 'green onion', quantity: 2, unit: 'piece', category: 'produce' },
       { name: 'lemon juice', food: 'lemon juice', quantity: 1, unit: 'tbsp', category: 'produce' },
       { name: 'ground cumin', food: 'cumin', quantity: 0.25, unit: 'tsp', category: 'pantry' },
@@ -1233,8 +1237,8 @@ export const BATCH_6_RECIPES: Recipe[] = [
       { name: 'carrot, chopped or shredded', food: 'carrot', quantity: 1, unit: 'piece', category: 'produce' },
       { name: 'green bell pepper, chopped', food: 'bell pepper', quantity: 1, unit: 'piece', category: 'produce' },
       { name: 'lean ground meat (15% fat turkey, chicken or beef)', food: 'ground beef', quantity: 1, unit: 'lb', category: 'protein' },
-      { name: 'tomato sauce', food: 'tomato sauce', quantity: 1, unit: 'can', category: 'pantry' },
-      { name: 'whole tomatoes, crushed', food: 'tomato', quantity: 1, unit: 'can', category: 'pantry' },
+      { name: 'tomato sauce (1 can, 8 ounces)', food: 'tomato sauce', quantity: 1, unit: 'can', category: 'pantry' },
+      { name: 'whole tomatoes, crushed (1 can, 15 ounces)', food: 'tomato', quantity: 1, unit: 'can', category: 'pantry' },
       { name: 'mushrooms (8 ounce can, or 1/2 pound chopped fresh mushrooms)', food: 'mushroom', quantity: 1, unit: 'can', category: 'produce' },
       { name: 'barbecue sauce', food: 'barbecue sauce', quantity: 0.25, unit: 'cup', category: 'pantry' },
       { name: 'whole wheat buns, split in half to make 12', food: 'roll', quantity: 6, unit: 'piece', category: 'grains' },
