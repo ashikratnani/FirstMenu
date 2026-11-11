@@ -521,6 +521,9 @@ describe('built-in recipes derive clean food keys (Item 3)', () => {
       'green chile',
       'taco seasoning',
       'cantaloupe',
+      'avocado',
+      'roll',
+      'sweet sour sauce',
     ]);
   });
 

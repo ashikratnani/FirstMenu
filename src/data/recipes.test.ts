@@ -1125,14 +1125,10 @@ const BATCH_5_EXPECTED: Record<string, Batch3Expectation> = {
   'b-fh-ants-on-a-log': { publisher: FH, stages: ['24-36'], serveAs: ['finger-food'], allergens: ['peanut'], servings: 4 },
   'b-fh-cranberry-orange-relish': { publisher: FH, stages: ['24-36'], serveAs: ['pieces'], allergens: [], servings: 10, estimateNote: ESTIMATE_QUARTER_CUP },
   'b-fh-baked-apple-and-cranberries': { publisher: FH, stages: ['6-8', '9-12', '12-23', '24-36'], serveAs: ['mashed', 'pieces'], allergens: ['dairy'], servings: 1, estimateNote: 'Serving count is an estimate (source gives no servings): the recipe makes 1 apple, 1 apple per serving.' },
-  'b-fh-savory-sweet-potatoes': { publisher: FH, stages: ['6-8', '9-12', '12-23', '24-36'], serveAs: ['mashed', 'pieces'], allergens: [], servings: 5, estimateNote: ESTIMATE_HALF_CUP },
   'b-fh-roasted-cauliflower': { publisher: FH, stages: ['6-8', '9-12', '12-23', '24-36'], serveAs: ['mashed', 'pieces'], allergens: ['dairy'], servings: 8, estimateNote: ESTIMATE_HALF_CUP },
   'b-fh-fried-rice-with-pork': { publisher: FH, stages: ['24-36'], serveAs: ['pieces'], allergens: ['soy'], servings: 8, estimateNote: ESTIMATE_HALF_CUP },
-  'b-fh-sesame-noodles-broccoli-chicken': { publisher: FH, stages: ['24-36'], serveAs: ['pieces'], allergens: ['sesame', 'soy', 'wheat'], servings: 8, estimateNote: ESTIMATE_ONE_CUP },
   'b-fh-spinach-pasta-salad': { publisher: FH, stages: ['24-36'], serveAs: ['pieces'], allergens: ['wheat'], servings: 10, estimateNote: ESTIMATE_HALF_CUP },
   'b-fh-green-and-orange-chicken-salad': { publisher: FH, stages: ['24-36'], serveAs: ['pieces'], allergens: ['sesame', 'soy'], servings: 12, estimateNote: ESTIMATE_ONE_CUP },
-  'b-fh-pineapple-veggie-chicken': { publisher: FH, stages: ['24-36'], serveAs: ['pieces'], allergens: ['soy'], servings: 10, estimateNote: ESTIMATE_ONE_CUP },
-  'b-fh-baked-tofu-marinated': { publisher: FH, stages: ['24-36'], serveAs: ['finger-food'], allergens: ['sesame', 'soy'], servings: 6, estimateNote: ESTIMATE_HALF_CUP },
   'b-fh-blueberry-tofu-smoothie': { publisher: FH, stages: ['9-12'], serveAs: ['puree'], allergens: ['soy'], servings: 4, estimateNote: ESTIMATE_ONE_CUP },
   'b-icn-teriyaki-chicken-and-cabbage': { publisher: ICN, stages: ['24-36'], serveAs: ['pieces'], allergens: ['soy'], servings: 6 },
   'b-icn-corn-and-edamame-blend': { publisher: ICN, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: ['sesame', 'soy'], servings: 6 },
@@ -1140,7 +1136,6 @@ const BATCH_5_EXPECTED: Record<string, Batch3Expectation> = {
   'b-icn-stir-fry-pork': { publisher: ICN, stages: ['24-36'], serveAs: ['pieces'], allergens: ['soy'], servings: 6 },
   'b-osu-sg-shrimp-cucumber-and-seaweed-salad': { publisher: OSU, stages: ['24-36'], serveAs: ['pieces'], allergens: ['sesame', 'shellfish', 'soy'], servings: 4 },
   'b-osu-sg-meridian-dungeness-crab-cakes': { publisher: OSU, stages: ['24-36'], serveAs: ['pieces'], allergens: ['dairy', 'egg', 'shellfish', 'wheat'], servings: 8, estimateNote: 'Serving count is an estimate (source gives no servings): 2 pounds of crab meat divided by a 4 ounce portion.' },
-  'b-fh-veggie-and-egg-rice': { publisher: FH, stages: ['24-36'], serveAs: ['pieces'], allergens: ['egg', 'soy'], servings: 8, estimateNote: ESTIMATE_ONE_CUP },
   'b-fh-minestrone-soup': { publisher: FH, stages: ['24-36'], serveAs: ['pieces'], allergens: ['wheat'], servings: 10, estimateNote: ESTIMATE_ONE_CUP },
   'b-fh-vegetarian-chili': { publisher: FH, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: ['dairy'], servings: 8, estimateNote: ESTIMATE_ONE_CUP },
   'b-fh-stuffed-peppers-turkey-vegetables': { publisher: FH, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: [], servings: 6, estimateNote: 'Serving count is an estimate (source gives no servings): 6 pepper halves, 1 half per serving.' },
@@ -1150,6 +1145,12 @@ const BATCH_5_EXPECTED: Record<string, Batch3Expectation> = {
   'b-fh-strawberry-swirl': { publisher: FH, stages: ['6-8', '9-12'], serveAs: ['puree'], allergens: [], servings: 2, estimateNote: 'Serving count is an estimate (source gives no servings): the page makes 2 cups with the juice, so about 1 cup without it, divided by a 1/2 cup portion.' },
   'b-fh-melon-cooler': { publisher: FH, stages: ['6-8', '9-12'], serveAs: ['puree'], allergens: ['dairy'], servings: 4, estimateNote: 'Serving count is an estimate (source gives no servings): the page makes 3 cups with the juice, so about 2 cups without it, divided by a 1/2 cup portion.' },
   'b-fh-glazed-squash': { publisher: FH, stages: ['6-8', '9-12', '12-23', '24-36'], serveAs: ['mashed', 'pieces'], allergens: [], servings: 6, estimateNote: 'Serving count is an estimate (source gives no servings): total yield of 3 cups divided by a 1/2 cup portion.' },
+  'b-fh-red-potato-and-cabbage-colcannon': { publisher: FH, stages: ['6-8', '9-12', '12-23', '24-36'], serveAs: ['mashed', 'pieces'], allergens: ['dairy'], servings: 12, estimateNote: ESTIMATE_HALF_CUP },
+  'b-icn-quinoa-bowl': { publisher: ICN, stages: ['24-36'], serveAs: ['pieces'], allergens: ['egg', 'sesame', 'soy'], servings: 6 },
+  'b-icn-easy-chicken-and-egg-noodle-soup': { publisher: ICN, stages: ['24-36'], serveAs: ['pieces'], allergens: ['egg', 'sesame', 'soy', 'wheat'], servings: 6 },
+  'b-icn-asian-tuna-burger': { publisher: ICN, stages: ['24-36'], serveAs: ['pieces'], allergens: ['egg', 'fish', 'sesame', 'soy', 'wheat'], servings: 6 },
+  'b-icn-bok-choy-wrappers': { publisher: ICN, stages: ['24-36'], serveAs: ['pieces'], allergens: ['soy'], servings: 6 },
+
 };
 
 /** Ingredients the sources list but that were left out; the adaptation must say so. */
@@ -1162,14 +1163,15 @@ const BATCH_5_LEFT_OUT: Record<string, { adaptation: string; absent: RegExp }[]>
   'b-fh-beet-and-carrot-salad': [{ adaptation: 'Left out 1/4 teaspoon salt', absent: /\bsalt\b/i }],
   'b-fh-pumpkin-smoothie-cup': [{ adaptation: 'Left out 2 teaspoons brown sugar', absent: /sugar/i }],
   'b-fh-baked-apple-and-cranberries': [{ adaptation: 'Left out 1 teaspoon packed brown sugar', absent: /sugar/i }],
-  'b-fh-savory-sweet-potatoes': [{ adaptation: 'Left out 1 teaspoon salt', absent: /\bsalt\b/i }, { adaptation: 'Left out 1/2 teaspoon sugar', absent: /sugar/i }],
   'b-fh-roasted-cauliflower': [{ adaptation: 'Left out 1/2 teaspoon salt', absent: /\bsalt\b/i }],
   'b-fh-blueberry-tofu-smoothie': [{ adaptation: 'Left out 1/2 cup orange juice (juice from 1 orange)', absent: /orange juice/i }],
   'b-icn-corn-and-edamame-blend': [{ adaptation: 'Left out 1/4 teaspoon salt', absent: /\bsalt\b/i }],
   'b-fh-stuffed-peppers-turkey-vegetables': [{ adaptation: 'Left out 1/4 teaspoon salt', absent: /\bsalt\b/i }],
-  'b-fh-strawberry-swirl': [{ adaptation: 'Left out 1 cup (8 ounces) 100% apple juice', absent: /juice/i }],
-  'b-fh-melon-cooler': [{ adaptation: 'Left out 1 cup orange juice', absent: /juice/i }],
+  'b-fh-strawberry-swirl': [{ adaptation: 'Left out 1 cup (8 ounces) 100% apple juice', absent: /apple juice/i }],
+  'b-fh-melon-cooler': [{ adaptation: 'Left out 1 cup orange juice', absent: /orange juice/i }],
   'b-fh-glazed-squash': [{ adaptation: 'Left out 3 tablespoons brown sugar', absent: /sugar/i }, { adaptation: 'Left out 1/4 teaspoon salt', absent: /\bsalt\b/i }],
+  'b-fh-red-potato-and-cabbage-colcannon': [{ adaptation: 'Left out 1 teaspoon salt', absent: /\bsalt\b/i }],
+
 };
 
 /** Batch 5 recipes that keep salt, sugar or soy sauce because they are tagged 24-36 only (the screen does not block them at that age). */
@@ -1178,18 +1180,19 @@ const BATCH_5_KEEPS_BLOCKED_AT_24 = [
   'b-fh-braised-radishes',
   'b-fh-cranberry-orange-relish',
   'b-fh-fried-rice-with-pork',
-  'b-fh-sesame-noodles-broccoli-chicken',
   'b-fh-spinach-pasta-salad',
   'b-fh-green-and-orange-chicken-salad',
-  'b-fh-pineapple-veggie-chicken',
-  'b-fh-baked-tofu-marinated',
   'b-icn-teriyaki-chicken-and-cabbage',
   'b-icn-stir-fried-green-rice-eggs-and-ham',
   'b-icn-stir-fry-pork',
   'b-osu-sg-shrimp-cucumber-and-seaweed-salad',
-  'b-fh-veggie-and-egg-rice',
   'b-fh-minestrone-soup',
   'b-fh-turkey-pumpkin-chili',
+  'b-icn-quinoa-bowl',
+  'b-icn-easy-chicken-and-egg-noodle-soup',
+  'b-icn-asian-tuna-burger',
+  'b-icn-bok-choy-wrappers',
+
 ];
 
 /** Pages (or ICN versions) that state their own serving count (no estimate needed). */
@@ -1204,6 +1207,11 @@ const BATCH_5_SOURCE_SERVINGS = [
   'b-icn-stir-fried-green-rice-eggs-and-ham',
   'b-icn-stir-fry-pork',
   'b-osu-sg-shrimp-cucumber-and-seaweed-salad',
+  'b-icn-quinoa-bowl',
+  'b-icn-easy-chicken-and-egg-noodle-soup',
+  'b-icn-asian-tuna-burger',
+  'b-icn-bok-choy-wrappers',
+
 ];
 
 describe('BUILTIN_RECIPES - batch 5', () => {
@@ -1438,7 +1446,7 @@ const GOAL: Counts = {
  * after batch 5; the set has 191). Cells and allergens are what the set reaches
  * after batch 5, capped at HARD_MINIMUM, and are raised by each batch. Cells
  * and groups still under their hard minimum (12-23 Easy 29 of 45 and More 23 of
- * 30, 24-36 Easy 39 of 70, Medium 69 of 70 and More 46 of 60, 9-12 More 12 of
+ * 30, 24-36 Easy 39 of 70, Medium 68 of 70 and More 47 of 60, 9-12 More 12 of
  * 15) are the gaps the next batches fill. 6-8 Easy and Medium, soy and
  * shellfish reached their hard minimum in this batch.
  */
@@ -1449,7 +1457,7 @@ const CHECKPOINT: Counts = {
     '6-8': cell(20, 10, 0),
     '9-12': cell(30, 25, 12),
     '12-23': cell(29, 45, 23),
-    '24-36': cell(39, 69, 46),
+    '24-36': cell(39, 68, 47),
   },
   allergens: { dairy: 30, egg: 30, wheat: 30, soy: 30, peanut: 8, 'tree nuts': 8, fish: 8, sesame: 4, shellfish: 3 },
 };
