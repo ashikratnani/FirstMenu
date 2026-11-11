@@ -15,6 +15,7 @@
 // (issue #36).
 
 import { useMemo, useRef, useState, type FormEvent } from 'react';
+import { Link } from 'react-router-dom';
 import { Button } from '@astryxdesign/core/Button';
 import { CheckboxInput } from '@astryxdesign/core/CheckboxInput';
 import { TextInput } from '@astryxdesign/core/TextInput';
@@ -180,6 +181,10 @@ export default function Settings() {
   return (
     <>
       <h1>Settings</h1>
+
+      <p className={styles.hint}>
+        New here? <Link to="/onboarding/tour">Quick tour</Link>
+      </p>
 
       {/* Pantry (Req 2.3): foods usually at home. Edits save as you go, so it
           sits outside the profile form below. */}

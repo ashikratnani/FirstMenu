@@ -22,4 +22,5 @@ export const SharedView = lazy(() => import('./SharedView'));
 export const Print = lazy(() => import('./Print'));
 export const Settings = lazy(() => import('./Settings'));
 export const Onboarding = lazy(() => import('./Onboarding'));
+export const OnboardingTour = lazy(() => import('./OnboardingTour'));
 export const Sources = lazy(() => import('./Sources'));

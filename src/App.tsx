@@ -10,6 +10,7 @@ import {
   Grocery,
   Make,
   Onboarding,
+  OnboardingTour,
   Plan,
   Prep,
   Print,
@@ -90,6 +91,7 @@ export default function App() {
             <Route path="/print" element={<Print />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/onboarding" element={<Onboarding />} />
+            <Route path="/onboarding/tour" element={<OnboardingTour />} />
             <Route path="/sources" element={<Sources />} />
           </Route>
         </Route>

@@ -15,4 +15,5 @@ export { default as SharedView } from './SharedView';
 export { default as Print } from './Print';
 export { default as Settings } from './Settings';
 export { default as Onboarding } from './Onboarding';
+export { default as OnboardingTour } from './OnboardingTour';
 export { default as Sources } from './Sources';

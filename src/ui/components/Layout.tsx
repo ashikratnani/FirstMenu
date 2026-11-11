@@ -65,7 +65,7 @@ const NAV_ITEMS: ReadonlyArray<{
 function hidesAddRecipe(pathname: string): boolean {
   // Hidden on the new-recipe editor and Add recipe (you are already there)
   // and on onboarding (every route redirects there until setup is done).
-  return pathname === '/recipes/new' || pathname === '/add' || pathname === '/onboarding';
+  return pathname === '/recipes/new' || pathname === '/add' || pathname === '/onboarding' || pathname === '/onboarding/tour';
 }
 
 /** Intercept fragment links (the AppShell skip link) so HashRouter never sees them. */
