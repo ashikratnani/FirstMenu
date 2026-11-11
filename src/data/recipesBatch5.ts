@@ -31,7 +31,7 @@
 //    directions make), disclosed in source.adaptations and pinned in
 //    recipes.test.ts.
 //  - Stage tags follow texture (design rule 4). A recipe is tagged 6-8 only when
-//    it is smooth or soft enough to mash, and then serveAs lists puree or mashed.
+//    it is smooth, or the page itself says to mash or chop it, and then serveAs lists puree or mashed.
 //  - Hand washing and produce rinsing lines on the source pages are not
 //    repeated. The refrigerate-within-2-hours line is kept in the last step.
 //  - No `storage` is set: none of these pages gives fridge or freezer days.
@@ -699,8 +699,8 @@ export const BATCH_5_RECIPES: Recipe[] = [
       adaptations: ['Serving count is an estimate (source gives no servings): the recipe makes 1 apple, 1 apple per serving.', 'Left out 1 teaspoon packed brown sugar'],
     },
     title: 'Baked Apple and Cranberries',
-    stages: ['6-8', '9-12', '12-23', '24-36'],
-    serveAs: ['mashed', 'pieces'],
+    stages: ['12-23', '24-36'],
+    serveAs: ['pieces'],
     mealTypes: ['snack', 'breakfast'],
     ingredients: [
       { name: 'baking apple (Golden Delicious, Granny Smith, Jonathan or Braeburn)', food: 'apple', quantity: 1, unit: 'piece', category: 'produce' },
@@ -729,8 +729,8 @@ export const BATCH_5_RECIPES: Recipe[] = [
       adaptations: [ESTIMATE_HALF_CUP, 'Left out 1/2 teaspoon salt'],
     },
     title: 'Roasted Cauliflower',
-    stages: ['6-8', '9-12', '12-23', '24-36'],
-    serveAs: ['mashed', 'pieces'],
+    stages: ['9-12', '12-23', '24-36'],
+    serveAs: ['pieces'],
     mealTypes: ['dinner'],
     ingredients: [
       { name: 'head of cauliflower (medium), cut into florets', food: 'cauliflower', quantity: 1, unit: 'piece', category: 'produce' },
@@ -1316,8 +1316,8 @@ export const BATCH_5_RECIPES: Recipe[] = [
       ],
     },
     title: 'Baked Winter Squash',
-    stages: ['6-8', '9-12', '12-23', '24-36'],
-    serveAs: ['mashed', 'pieces'],
+    stages: ['9-12', '12-23', '24-36'],
+    serveAs: ['pieces'],
     mealTypes: ['dinner', 'lunch'],
     ingredients: [
       { name: 'winter squash (try acorn, butternut, delicata or others)', food: 'squash', quantity: 2, unit: 'lb', category: 'produce' },
@@ -1587,7 +1587,7 @@ export const BATCH_5_RECIPES: Recipe[] = [
     servings: 6,
   },
   {
-    // Bell pepper pieces baked with salsa, tofu (one of the page's protein options) and cheese.
+    // Bell pepper pieces baked with salsa, tofu (one of the page's protein options) and cheese. The page says only "heated through", so 24-36 only.
     id: 'b-fh-bell-pepper-nachos',
     origin: 'builtin',
     source: {
@@ -1601,7 +1601,7 @@ export const BATCH_5_RECIPES: Recipe[] = [
       ],
     },
     title: 'Bell Pepper Nachos',
-    stages: ['12-23', '24-36'],
+    stages: ['24-36'],
     serveAs: ['pieces'],
     mealTypes: ['snack', 'lunch'],
     ingredients: [
