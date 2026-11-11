@@ -84,6 +84,7 @@ export const BATCH_6_RECIPES: Recipe[] = [
       'Put the kiwi, blueberries and strawberries in a small bowl and toss them together.',
       'Spoon 1/2 cup of the fruit into each bowl and top with 2 tablespoons of cottage cheese and, if you like, 1 tablespoon of granola.',
       'Serve right away, or keep cold at 40°F or lower.',
+      'Choking risk: granola and whole blueberries can be a choking risk for children under the age of 4.',
     ],
     texture: 'fruit with cottage cheese',
     servings: 6,
@@ -113,12 +114,13 @@ export const BATCH_6_RECIPES: Recipe[] = [
       'Spread 1/4 cup of yogurt over each tortilla.',
       'Top each tortilla with 1/2 cup of diced strawberries and, if you like, 1 tablespoon of granola.',
       'Roll each tortilla up like a burrito and cut it in half at an angle. Serve right away, or keep cold at 40°F or lower.',
+      'Choking risk: granola may be a choking risk for children under the age of 4.',
     ],
     texture: 'tortilla roll with yogurt and strawberries',
     servings: 6,
   },
   {
-    // Diced chicken and cheese layered with halved grapes. Grapes are cut as the page says.
+    // Diced chicken and shredded cheese layered with halved grapes. The page lists 1/4 inch diced cheese but its choking tip says to use shredded cheese for children under 4, so shredded is used. Grapes are cut as the page says.
     id: 'b-icn-chicken-and-cheese-snack-cup-with-grapes',
     origin: 'builtin',
     source: {
@@ -126,7 +128,7 @@ export const BATCH_6_RECIPES: Recipe[] = [
       publisher: ICN_PUBLISHER,
       url: 'https://theicn.org/cnrb/ages-3-5/age-3-5-6-servings/chicken-and-cheese-snack-cup-with-grapes-cacfp-snack-menu-planner-family-recipes-ages-3-5/',
       retrieved: RETRIEVED,
-      adaptations: [],
+      adaptations: ['Used shredded Colby cheese, as the source choking tip says, in place of 1/4 inch diced cheese.'],
     },
     title: 'Chicken and Cheese Snack Cup With Grapes',
     stages: ['12-23', '24-36'],
@@ -134,11 +136,11 @@ export const BATCH_6_RECIPES: Recipe[] = [
     mealTypes: ['snack', 'lunch'],
     ingredients: [
       { name: 'cooked skinless rotisserie chicken breast, 1/4 inch diced (3 ounces)', food: 'chicken', quantity: 0.75, unit: 'cup', category: 'protein' },
-      { name: 'Colby cheese, 1/4 inch diced', food: 'cheese', quantity: 0.375, unit: 'cup', category: 'dairy-eggs' },
+      { name: 'Colby cheese, shredded', food: 'cheese', quantity: 0.375, unit: 'cup', category: 'dairy-eggs' },
       { name: 'red seedless grapes, fresh, halved', food: 'grape', quantity: 3, unit: 'cup', category: 'produce' },
     ],
     steps: [
-      'Cut the grapes in half lengthwise, and into smaller pieces no larger than 1/2 inch if needed.',
+      'Choking risk: large chunks of cheese cubes can be a choking risk for children under the age of 4, so use shredded cheese. Whole grapes are a choking risk for the same age, so cut the grapes in half lengthwise, and into smaller pieces no larger than 1/2 inch if needed.',
       'Layer 1 tablespoon of chicken and 1 tablespoon of cheese in each 6 fluid ounce clear cup, then top each cup with 1/2 cup of grapes.',
       'Serve right away, or cover and keep cold at 40°F or lower.',
     ],
@@ -215,7 +217,7 @@ export const BATCH_6_RECIPES: Recipe[] = [
     servings: 6,
   },
   {
-    // No-cook oats soaked overnight with yogurt and frozen berries. The honey is left out (honey is blocked under 12 months and this is tagged from 12 months).
+    // No-cook oats soaked overnight with yogurt and frozen berries. The honey is left out. Tagged 24-36 only: the page offers only non-fat vanilla Greek yogurt, a sweetened product, and the app says no added sugar before 2 years.
     id: 'b-icn-easy-overnight-oats-and-berries',
     origin: 'builtin',
     source: {
@@ -226,7 +228,7 @@ export const BATCH_6_RECIPES: Recipe[] = [
       adaptations: ['Left out 2 teaspoons pasteurized honey'],
     },
     title: 'Easy Overnight Oats and Berries',
-    stages: ['12-23', '24-36'],
+    stages: ['24-36'],
     serveAs: ['pieces'],
     mealTypes: ['breakfast'],
     ingredients: [
@@ -270,8 +272,9 @@ export const BATCH_6_RECIPES: Recipe[] = [
     steps: [
       'Put all of the ingredients in a medium bowl.',
       'Toss to mix and serve 2/3 cup.',
+      'Choking risk: dried fruit can be a choking risk for children under the age of 4. To make the mix without dried fruit, combine the cereals in a bowl, toss, and serve 1/2 cup.',
     ],
-    texture: 'crunchy cereal with dried fruit',
+    texture: 'cereal with dried fruit',
     servings: 6,
   },
   {
@@ -299,13 +302,13 @@ export const BATCH_6_RECIPES: Recipe[] = [
       'Gather 12 sticks for the kebabs.',
       'Whisk the yogurt and maple syrup together in a small bowl and keep it cold at 40°F or lower.',
       'Lightly toast the waffles for 3 to 4 minutes and cut each one into 4 triangles.',
-      'Thread 3 strawberries and 1 waffle triangle onto each stick. Serve 2 kebabs with 2 tablespoons of the dip.',
+      'Thread 3 strawberries and 1 waffle triangle onto each stick. For children under the age of 4, you may want to cut whole strawberries in half. Serve 2 kebabs with 2 tablespoons of the dip.',
     ],
     texture: 'strawberries and waffle triangles with a yogurt dip',
     servings: 6,
   },
   {
-    // Boiled sweet potatoes beaten smooth with milk and margarine. Salt is left out.
+    // Boiled sweet potatoes beaten with an electric mixer until smooth and fluffy, with milk and margarine. Salt is left out. Tagged 9-12 only: the page never says mash or puree, so it is not tagged 6-8.
     id: 'b-icn-whipped-sweet-potatoes',
     origin: 'builtin',
     source: {
@@ -316,7 +319,7 @@ export const BATCH_6_RECIPES: Recipe[] = [
       adaptations: ['Left out 1/4 teaspoon table salt'],
     },
     title: 'Whipped Sweet Potatoes',
-    stages: ['6-8', '9-12'],
+    stages: ['9-12'],
     serveAs: ['mashed'],
     mealTypes: ['dinner'],
     ingredients: [
@@ -330,11 +333,11 @@ export const BATCH_6_RECIPES: Recipe[] = [
       'While they are still hot, put the sweet potatoes, milk, margarine and pepper in a medium bowl.',
       'Beat with an electric mixer on medium speed until smooth and fluffy. Serve 1/4 cup.',
     ],
-    texture: 'smooth and fluffy mash',
+    texture: 'smooth and fluffy',
     servings: 6,
   },
   {
-    // Mashed potatoes and peas with sauteed Swiss chard and corn stirred in. Salt is left out.
+    // Mashed potatoes and peas with sauteed Swiss chard and corn stirred in. Salt is left out. Not tagged 9-12: only the potatoes and peas are mashed; the whole corn kernels and chard strips are stirred in.
     id: 'b-icn-veggie-mash-up',
     origin: 'builtin',
     source: {
@@ -345,7 +348,7 @@ export const BATCH_6_RECIPES: Recipe[] = [
       adaptations: ['Left out 1/4 teaspoon table salt'],
     },
     title: 'Veggie Mash-Up',
-    stages: ['9-12', '12-23', '24-36'],
+    stages: ['12-23', '24-36'],
     serveAs: ['mashed', 'pieces'],
     mealTypes: ['dinner', 'lunch'],
     ingredients: [
@@ -747,7 +750,7 @@ export const BATCH_6_RECIPES: Recipe[] = [
     servings: 6,
   },
   {
-    // Corn tortillas topped with refried beans and cheese and baked until the cheese melts.
+    // Corn tortillas topped with refried beans and cheese and baked until the cheese melts. Tagged 24-36 only: a corn tortilla baked 7 minutes on a bare sheet is crisp and the page does not describe it as soft.
     id: 'b-icn-cheesy-bean-tostada',
     origin: 'builtin',
     source: {
@@ -758,7 +761,7 @@ export const BATCH_6_RECIPES: Recipe[] = [
       adaptations: [],
     },
     title: 'Cheesy Bean Tostada',
-    stages: ['12-23', '24-36'],
+    stages: ['24-36'],
     serveAs: ['pieces'],
     mealTypes: ['snack', 'lunch'],
     ingredients: [
@@ -836,7 +839,7 @@ export const BATCH_6_RECIPES: Recipe[] = [
     servings: 9,
   },
   {
-    // Vanilla yogurt mixed smooth with canned pumpkin and cinnamon. The brown sugar is left out.
+    // Vanilla yogurt mixed smooth with canned pumpkin and cinnamon. The brown sugar is left out. Tagged 9-12 only: the only yogurt is sweetened vanilla yogurt and the page says mix until smooth, not mash or puree.
     id: 'b-fh-pumpkin-smoothie-cup',
     origin: 'builtin',
     source: {
@@ -850,7 +853,7 @@ export const BATCH_6_RECIPES: Recipe[] = [
       ],
     },
     title: 'Pumpkin Smoothie in a Cup',
-    stages: ['6-8', '9-12'],
+    stages: ['9-12'],
     serveAs: ['puree'],
     mealTypes: ['snack', 'breakfast'],
     ingredients: [
@@ -867,7 +870,7 @@ export const BATCH_6_RECIPES: Recipe[] = [
     servings: 2,
   },
   {
-    // Canned pumpkin, ricotta and warm spices stirred smooth, for dipping fruit. The sugar is left out.
+    // Canned pumpkin, ricotta and warm spices stirred smooth, for dipping fruit. The sugar is left out. The serving suggestion is the page wording; whole grapes are a choking hazard under 4 and the grapes reminder on the Make screen will fire.
     id: 'b-fh-pumpkin-fruit-dip',
     origin: 'builtin',
     source: {
@@ -893,7 +896,7 @@ export const BATCH_6_RECIPES: Recipe[] = [
     ],
     steps: [
       'In a large bowl, stir the pumpkin, ricotta, cinnamon and nutmeg together until smooth.',
-      'Serve as a dip for soft fruit such as banana slices. Refrigerate leftovers within 2 hours.',
+      'Serve with apple slices, bananas or grapes. Refrigerate leftovers within 2 hours.',
     ],
     texture: 'smooth spiced pumpkin dip',
     servings: 12,
@@ -1131,7 +1134,7 @@ export const BATCH_6_RECIPES: Recipe[] = [
       'Put all of the ingredients in a blender.',
       'Puree until completely smooth and serve right away. Refrigerate leftovers within 2 hours.',
     ],
-    texture: 'smooth puree',
+    texture: 'smooth',
     servings: 7,
   },
   {
@@ -1394,7 +1397,7 @@ export const BATCH_6_RECIPES: Recipe[] = [
       'Cut each whole pita round into 8 wedges and the half pita into 4 wedges. Spray the wedges with nonstick cooking spray and sprinkle with the cinnamon.',
       'Spread the wedges on an ungreased baking sheet and toast them in the oven for 5 minutes. Serve 2 tablespoons of fruit dip with 2 wedges, right away or kept warm at 140°F or higher.',
     ],
-    texture: 'cooked apricot dip with toasted pita wedges',
+    texture: 'apricot dip with toasted pita wedges',
     servings: 6,
   },
   {
@@ -1437,6 +1440,7 @@ export const BATCH_6_RECIPES: Recipe[] = [
       retrieved: RETRIEVED,
       adaptations: [
         'Serving count is an estimate (source gives no servings): the page makes 4 cups with the juice, so about 3 cups without it, divided by a 1/2 cup portion.',
+        'Source offers plain or vanilla yogurt; plain used.',
         'Left out 1 cup pineapple juice',
       ],
     },
@@ -1445,7 +1449,7 @@ export const BATCH_6_RECIPES: Recipe[] = [
     serveAs: ['puree'],
     mealTypes: ['snack', 'breakfast'],
     ingredients: [
-      { name: 'low-fat plain or vanilla yogurt', food: 'yogurt', quantity: 1, unit: 'cup', category: 'dairy-eggs' },
+      { name: 'low-fat plain yogurt', food: 'yogurt', quantity: 1, unit: 'cup', category: 'dairy-eggs' },
       { name: 'fresh or frozen berries (any type)', food: 'berry', quantity: 1.5, unit: 'cup', category: 'produce' },
       { name: 'beets (cooked from fresh or canned and drained)', food: 'beet', quantity: 0.5, unit: 'cup', category: 'produce' },
       { name: 'small frozen banana (optional)', food: 'banana', quantity: 1, unit: 'piece', category: 'produce', optional: true },
@@ -1454,7 +1458,7 @@ export const BATCH_6_RECIPES: Recipe[] = [
       'Put the yogurt, berries, beets and the banana, if using, in a blender.',
       'Blend until smooth, then serve immediately. Refrigerate or freeze leftovers within 2 hours.',
     ],
-    texture: 'smooth puree',
+    texture: 'smooth',
     servings: 6,
   },
   {

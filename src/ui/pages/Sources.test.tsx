@@ -181,10 +181,16 @@ describe('Sources page', () => {
     // One <li> per distinct recipe-source URL (de-duplicated).
     expect(items.length).toBe(expectedUrls.length);
 
+    // Query the links once and group them by href (one pass, not one query per URL).
+    const linksByHref = new Map<string, HTMLElement[]>();
+    for (const a of screen.getAllByRole('link')) {
+      const href = a.getAttribute('href');
+      if (href === null) continue;
+      linksByHref.set(href, [...(linksByHref.get(href) ?? []), a]);
+    }
+
     for (const url of expectedUrls) {
-      const links = screen
-        .getAllByRole('link')
-        .filter((a) => a.getAttribute('href') === url);
+      const links = linksByHref.get(url) ?? [];
       expect(links.length).toBeGreaterThan(0);
       expect(links[0]).toHaveAttribute('rel', 'noopener noreferrer');
       expect(links[0]).toHaveAttribute('target', '_blank');

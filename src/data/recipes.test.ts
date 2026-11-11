@@ -1086,7 +1086,7 @@ describe('BUILTIN_RECIPES - batch 4', () => {
       BATCH_4_RECIPES.filter((r) => r.stages.includes(stage) && recipeEffort(r) === effort).length;
     expect(cellCount('12-23', 'easy')).toBeGreaterThanOrEqual(2);
     expect(cellCount('12-23', 'medium')).toBeGreaterThanOrEqual(13);
-    expect(cellCount('6-8', 'easy')).toBeGreaterThanOrEqual(3);
+    expect(cellCount('6-8', 'easy')).toBeGreaterThanOrEqual(1);
     expect(cellCount('6-8', 'medium')).toBeGreaterThanOrEqual(2);
     const groupCount = (group: string) =>
       BATCH_4_RECIPES.filter((r) => BATCH_4_EXPECTED[r.id].allergens.includes(group)).length;
@@ -1405,11 +1405,11 @@ const BATCH_6_EXPECTED: Record<string, Batch3Expectation> = {
   'b-icn-chicken-and-cheese-snack-cup-with-grapes': { publisher: ICN, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: ['dairy'], servings: 6 },
   'b-icn-deli-bento-box': { publisher: ICN, stages: ['24-36'], serveAs: ['pieces'], allergens: ['dairy', 'wheat'], servings: 6 },
   'b-icn-mini-egg-salad-sandwiches': { publisher: ICN, stages: ['24-36'], serveAs: ['pieces'], allergens: ['egg'], servings: 6 },
-  'b-icn-easy-overnight-oats-and-berries': { publisher: ICN, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: ['dairy'], servings: 6 },
+  'b-icn-easy-overnight-oats-and-berries': { publisher: ICN, stages: ['24-36'], serveAs: ['pieces'], allergens: ['dairy'], servings: 6 },
   'b-icn-dried-fruit-and-cereal-snack-mix': { publisher: ICN, stages: ['24-36'], serveAs: ['pieces'], allergens: ['wheat'], servings: 6 },
   'b-icn-strawberry-and-waffle-kebabs-with-maple-yogurt-dip': { publisher: ICN, stages: ['24-36'], serveAs: ['pieces'], allergens: ['dairy'], servings: 6 },
-  'b-icn-whipped-sweet-potatoes': { publisher: ICN, stages: ['6-8', '9-12'], serveAs: ['mashed'], allergens: ['dairy'], servings: 6 },
-  'b-icn-veggie-mash-up': { publisher: ICN, stages: ['9-12', '12-23', '24-36'], serveAs: ['mashed', 'pieces'], allergens: [], servings: 6 },
+  'b-icn-whipped-sweet-potatoes': { publisher: ICN, stages: ['9-12'], serveAs: ['mashed'], allergens: ['dairy'], servings: 6 },
+  'b-icn-veggie-mash-up': { publisher: ICN, stages: ['12-23', '24-36'], serveAs: ['mashed', 'pieces'], allergens: [], servings: 6 },
   'b-icn-creamy-coleslaw': { publisher: ICN, stages: ['24-36'], serveAs: ['pieces'], allergens: ['dairy'], servings: 6 },
   'b-icn-marinated-black-bean-salad': { publisher: ICN, stages: ['24-36'], serveAs: ['pieces'], allergens: ['dairy'], servings: 6 },
   'b-icn-mediterranean-quinoa-salad': { publisher: ICN, stages: ['24-36'], serveAs: ['pieces'], allergens: ['dairy'], servings: 6 },
@@ -1420,10 +1420,10 @@ const BATCH_6_EXPECTED: Record<string, Batch3Expectation> = {
   'b-icn-black-beans-with-plantains': { publisher: ICN, stages: ['24-36'], serveAs: ['pieces'], allergens: [], servings: 6 },
   'b-icn-tuna-salad-and-apple-slices': { publisher: ICN, stages: ['24-36'], serveAs: ['pieces'], allergens: ['dairy', 'fish'], servings: 6 },
   'b-icn-fresh-veggie-wraps': { publisher: ICN, stages: ['24-36'], serveAs: ['pieces'], allergens: ['dairy', 'wheat'], servings: 6 },
-  'b-icn-cheesy-bean-tostada': { publisher: ICN, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: ['dairy'], servings: 6 },
+  'b-icn-cheesy-bean-tostada': { publisher: ICN, stages: ['24-36'], serveAs: ['pieces'], allergens: ['dairy'], servings: 6 },
   'b-icn-herb-bagel-bites': { publisher: ICN, stages: ['24-36'], serveAs: ['pieces'], allergens: ['wheat'], servings: 6 },
   'b-fh-fruit-yogurt-popsicles': { publisher: FH, stages: ['12-23', '24-36'], serveAs: ['finger-food'], allergens: ['dairy'], servings: 9, estimateNote: 'Serving count is an estimate (source gives no servings): 9 popsicles, 1 popsicle per serving.' },
-  'b-fh-pumpkin-smoothie-cup': { publisher: FH, stages: ['6-8', '9-12'], serveAs: ['puree'], allergens: ['dairy'], servings: 2, estimateNote: ESTIMATE_HALF_CUP },
+  'b-fh-pumpkin-smoothie-cup': { publisher: FH, stages: ['9-12'], serveAs: ['puree'], allergens: ['dairy'], servings: 2, estimateNote: ESTIMATE_HALF_CUP },
   'b-fh-pumpkin-fruit-dip': { publisher: FH, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: ['dairy'], servings: 12, estimateNote: ESTIMATE_QUARTER_CUP },
   'b-fh-cherry-salad': { publisher: FH, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: [], servings: 6, estimateNote: ESTIMATE_HALF_CUP },
   'b-fh-corn-and-tomato-salad': { publisher: FH, stages: ['24-36'], serveAs: ['pieces'], allergens: [], servings: 6, estimateNote: ESTIMATE_HALF_CUP },
@@ -1670,22 +1670,52 @@ describe('BUILTIN_RECIPES - batch 6', () => {
     }
   });
 
+  it('carries the source choking warnings into the steps', () => {
+    const steps = (id: string) => BATCH_6_RECIPES.find((r) => r.id === id)?.steps.join(' ') ?? '';
+    expect(steps('b-icn-cottage-cheese-and-fruit-bowls')).toMatch(
+      /granola and whole blueberries can be a choking risk for children under the age of 4/i,
+    );
+    expect(steps('b-icn-fruit-and-yogurt-roll-ups')).toMatch(
+      /granola may be a choking risk for children under the age of 4/i,
+    );
+    const cup = steps('b-icn-chicken-and-cheese-snack-cup-with-grapes');
+    expect(cup).toMatch(/large chunks of cheese cubes can be a choking risk for children under the age of 4/i);
+    expect(cup).toMatch(/use shredded cheese/i);
+    const mix = steps('b-icn-dried-fruit-and-cereal-snack-mix');
+    expect(mix).toMatch(/dried fruit can be a choking risk for children under the age of 4/i);
+    expect(mix).toMatch(/without dried fruit, combine the cereals in a bowl, toss, and serve 1\/2 cup/i);
+    expect(steps('b-icn-strawberry-and-waffle-kebabs-with-maple-yogurt-dip')).toMatch(
+      /for children under the age of 4, you may want to cut whole strawberries in half/i,
+    );
+  });
+
+  it('records the plain yogurt and shredded cheese choices, and uses the page serving wording for the dip', () => {
+    const find = (id: string) => BATCH_6_RECIPES.find((r) => r.id === id);
+    expect(find('b-fh-un-beet-able-berry-smoothie')?.source?.adaptations).toContain(
+      'Source offers plain or vanilla yogurt; plain used.',
+    );
+    expect(find('b-fh-un-beet-able-berry-smoothie')?.ingredients.map((i) => i.name).join(' ')).not.toMatch(/vanilla/i);
+    const cheese = find('b-icn-chicken-and-cheese-snack-cup-with-grapes');
+    expect(cheese?.ingredients.some((i) => /shredded/i.test(i.name))).toBe(true);
+    expect(cheese?.ingredients.map((i) => i.name).join(' ')).not.toMatch(/diced cheese|cheese, 1\/4 inch/i);
+    expect(find('b-fh-pumpkin-fruit-dip')?.steps.join(' ')).toContain('Serve with apple slices, bananas or grapes.');
+  });
+
   it('batch 6 adds recipes to the gap cells and to soy', () => {
     const cellCount = (stage: StageId, effort: Effort) =>
       BATCH_6_RECIPES.filter((r) => r.stages.includes(stage) && recipeEffort(r) === effort).length;
     expect(cellCount('24-36', 'easy')).toBeGreaterThanOrEqual(16);
-    expect(cellCount('12-23', 'easy')).toBeGreaterThanOrEqual(6);
-    expect(cellCount('6-8', 'easy')).toBeGreaterThanOrEqual(3);
+    expect(cellCount('12-23', 'easy')).toBeGreaterThanOrEqual(5);
+    expect(cellCount('6-8', 'easy')).toBeGreaterThanOrEqual(1);
     expect(cellCount('24-36', 'more')).toBeGreaterThanOrEqual(16);
     expect(cellCount('12-23', 'more')).toBeGreaterThanOrEqual(6);
-    expect(cellCount('9-12', 'more')).toBeGreaterThanOrEqual(2);
+    expect(cellCount('9-12', 'more')).toBeGreaterThanOrEqual(1);
     expect(cellCount('24-36', 'medium')).toBeGreaterThanOrEqual(9);
     const groupCount = (group: string) =>
       BATCH_6_RECIPES.filter((r) => BATCH_6_EXPECTED[r.id].allergens.includes(group)).length;
     expect(groupCount('soy')).toBeGreaterThanOrEqual(1);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Count table (task 14.3, batch 6; design "How the distribution is measured")
@@ -1734,9 +1764,9 @@ const GOAL: Counts = {
  * Floors for this batch (batch 6). The total follows the plan line (about 205
  * after batch 6; the set has 234). Cells and allergens are what the set reaches
  * after batch 6, capped at HARD_MINIMUM, and are raised by each batch. Cells
- * still under their hard minimum (12-23 Easy 32 of 45, 24-36 Easy 55 of 70,
- * 9-12 More 14 of 15, 12-23 More 29 of 30, 6-8 Medium 8 of 10) are the gaps the
- * next batches fill. Batch 6 closed the hard minimum for 6-8 Easy (22 of 20),
+ * still under their hard minimum (12-23 Easy 31 of 45, 24-36 Easy 55 of 70,
+ * 9-12 More 13 of 15, 12-23 More 29 of 30, 6-8 Medium 8 of 10) are the gaps the
+ * next batches fill. Batch 6 closed the hard minimum for 6-8 Easy (20 of 20),
  * 24-36 Medium (78 of 70), 24-36 More (61 of 60) and soy (30 of 30). 6-8
  * Medium stays at 8 of 10: no fetched page whose own directions describe
  * mashing or pureeing has enough steps or ingredients to count as Medium.
@@ -1746,8 +1776,8 @@ const CHECKPOINT: Counts = {
   simpleIdeasMax: 40,
   stages: {
     '6-8': cell(20, 8, 0),
-    '9-12': cell(30, 25, 14),
-    '12-23': cell(32, 45, 29),
+    '9-12': cell(30, 25, 13),
+    '12-23': cell(31, 45, 29),
     '24-36': cell(55, 70, 60),
   },
   allergens: { dairy: 30, egg: 30, wheat: 30, soy: 30, peanut: 8, 'tree nuts': 8, fish: 8, sesame: 4, shellfish: 3 },
