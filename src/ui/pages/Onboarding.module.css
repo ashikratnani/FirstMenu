@@ -85,3 +85,72 @@
   display: flex;
   align-items: center;
 }
+
+.tried {
+  border: 1px solid var(--fm-color-border);
+  border-radius: var(--radius);
+  padding: var(--space);
+}
+
+.summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--fm-color-heading);
+}
+
+.problems,
+.solve,
+.done {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space);
+  max-width: 32rem;
+}
+
+.chips {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--space) * 0.5);
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: calc(var(--space) * 0.5);
+}
+
+.list {
+  margin: 0;
+  padding-left: 1.2rem;
+}
+
+.results {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: calc(var(--space) * 0.5);
+}
+
+.card {
+  padding: var(--space);
+  border: 1px solid var(--fm-color-border);
+  border-radius: var(--radius);
+  background: var(--fm-color-surface);
+}
+
+.disclaimers p {
+  margin: 0 0 calc(var(--space) * 0.25);
+  font-size: 0.85rem;
+  color: var(--fm-color-muted);
+}
+
+.boxes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: var(--space);
+}

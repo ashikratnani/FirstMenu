@@ -11,7 +11,6 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@astryxdesign/core/Button';
 import { Dialog, DialogHeader } from '@astryxdesign/core/Dialog';
-import { TextInput } from '@astryxdesign/core/TextInput';
 import { ToggleButton } from '@astryxdesign/core/ToggleButton';
 import { Token } from '@astryxdesign/core/Token';
 import { FILTER_LABELS, type SearchFilter } from '../../data/searchPhrases';
@@ -50,6 +49,7 @@ import { stageFor } from '../../domain/age';
 import { useApp } from '../../state/AppProvider';
 import { selectAgeMonths, selectAllRecipes } from '../../state/selectors';
 import AskChatGpt from '../components/AskChatGpt';
+import FoodSearchBox from '../components/FoodSearchBox';
 import GhostCard from '../components/GhostCard';
 import PantryEditor from '../components/PantryEditor';
 import { usePagePrimaryAction } from '../components/primaryActionContext';
@@ -358,22 +358,14 @@ export default function Make() {
         <h2 id="make-search" className={styles.subheading}>
           What do you have?
         </h2>
-        <div className={styles.searchRow}>
-          <TextInput
-            label="What do you have?"
-            isLabelHidden
-            value={text}
-            onChange={(value) => {
-              setText(value);
-              if (value === '') setIgnored([]);
-            }}
-            onEnter={commit}
-            placeholder="e.g. leftover chicken, rice and peas · something for breakfast"
-            autoComplete="off"
-            enterKeyHint="done"
-          />
-          <Button label="Add" onClick={commit} isDisabled={text.trim() === ''} />
-        </div>
+        <FoodSearchBox
+          value={text}
+          onChange={(value) => {
+            setText(value);
+            if (value === '') setIgnored([]);
+          }}
+          onCommit={commit}
+        />
 
         {typedFoods.length > 0 && (
           <ul className={styles.chips} aria-label="Recognized foods">

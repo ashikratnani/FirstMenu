@@ -166,8 +166,10 @@ describe('Onboarding', () => {
 
     await user.click(screen.getByRole('button', { name: /start planning/i }));
 
-    // Navigated to the home stub.
-    expect(screen.getByText('Home stub')).toBeInTheDocument();
+    // The profile step is followed by the problems step (Req 20.1).
+    expect(
+      await screen.findByRole('heading', { name: /what would you like help with/i }),
+    ).toBeInTheDocument();
 
     expect(captured).not.toBeNull();
     expect(captured!.onboarded).toBe(true);
@@ -179,6 +181,13 @@ describe('Onboarding', () => {
     expect(captured!.foods[peanutKey]?.date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
     // An unchecked allergen is not recorded.
     expect(captured!.foods[allergenFoodKey('egg')]).toBeUndefined();
+  });
+
+  it('collapses the tried-foods checklist under "Foods already tried (optional)"', () => {
+    renderOnboarding();
+    const summary = screen.getByText('Foods already tried (optional)');
+    expect(summary.tagName).toBe('SUMMARY');
+    expect(summary.closest('details')).not.toHaveAttribute('open');
   });
 
   it('omits the name when left blank', async () => {

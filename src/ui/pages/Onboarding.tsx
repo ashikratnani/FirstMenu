@@ -1,15 +1,16 @@
 // First-run onboarding (Task 7.1, Req 1.1, 1.4, 1.5, 7.2). Collects the
 // child's birth date (required) and an optional first name, shows the under-6
 // / over-36 age notices live as the date is entered, and offers a tried-foods
-// checklist with the nine allergen groups listed FIRST (Req 7.2). Completing
-// it dispatches `setChild` (which also sets onboarded:true) and one
-// `setFoodRecord` per checked food, then navigates to the week home.
+// checklist with the nine allergen groups listed FIRST (Req 7.2), collapsed
+// under "Foods already tried (optional)" (Req 20.6). Completing it dispatches
+// `setChild` (which also sets onboarded:true) and one `setFoodRecord` per
+// checked food, then shows the problem-first steps (Req 20), which are
+// lazy-loaded so first paint only pays for this screen.
 //
 // The birth date uses a native <input type="date">, so it only ever produces a
 // valid YYYY-MM-DD that round-trips through storage's ymdDateSchema.
 
-import { useMemo, useState, type FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { lazy, Suspense, useMemo, useState, type FormEvent } from 'react';
 import { Button } from '@astryxdesign/core/Button';
 import { CheckboxInput } from '@astryxdesign/core/CheckboxInput';
 import { TextInput } from '@astryxdesign/core/TextInput';
@@ -27,14 +28,16 @@ import {
   type ChecklistItem,
 } from './childProfile';
 
+const OnboardingFlow = lazy(() => import('./OnboardingFlow'));
+
 export default function Onboarding() {
   const { state, dispatch } = useApp();
-  const navigate = useNavigate();
   usePagePrimaryAction(true);
 
   const [name, setName] = useState('');
   const [birthDate, setBirthDate] = useState('');
   const [checked, setChecked] = useState<Record<string, boolean>>({});
+  const [profileDone, setProfileDone] = useState(false);
 
   // Allergen items first, each keyed `allergen:<group>`; then common foods.
   const allergenItems: ChecklistItem[] = useMemo(
@@ -74,7 +77,15 @@ export default function Onboarding() {
       }
     }
 
-    navigate('/');
+    setProfileDone(true);
+  }
+
+  if (profileDone) {
+    return (
+      <Suspense fallback={<p role="status">Loading…</p>}>
+        <OnboardingFlow />
+      </Suspense>
+    );
   }
 
   return (
@@ -112,8 +123,8 @@ export default function Onboarding() {
           </p>
         )}
 
-        <fieldset className={styles.fieldset}>
-          <legend className={styles.legend}>Foods already tried</legend>
+        <details className={styles.tried}>
+          <summary className={styles.summary}>Foods already tried (optional)</summary>
           <p className={styles.hint}>
             Check anything your child has already tried with no reaction. You can
             change this later in Settings.
@@ -144,7 +155,7 @@ export default function Onboarding() {
               </li>
             ))}
           </ul>
-        </fieldset>
+        </details>
 
         <div className={styles.actions}>
           <Button label="Start planning" type="submit" variant="primary" size="lg" isDisabled={!birthDate} />
