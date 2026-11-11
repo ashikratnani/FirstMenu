@@ -1101,7 +1101,7 @@ const ESTIMATE_ONE_CUP =
   'Serving count is an estimate (source gives no servings): total yield divided by a 1 cup portion.';
 
 const BATCH_5_EXPECTED: Record<string, Batch3Expectation> = {
-  'b-fh-creamy-fruit-salad': { publisher: FH, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: ['dairy'], servings: 8, estimateNote: ESTIMATE_HALF_CUP },
+  'b-fh-creamy-fruit-salad': { publisher: FH, stages: ['24-36'], serveAs: ['pieces'], allergens: ['dairy'], servings: 8, estimateNote: ESTIMATE_HALF_CUP },
   'b-fh-fruit-pizza': { publisher: FH, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: ['dairy'], servings: 2 },
   'b-fh-banana-bobs': { publisher: FH, stages: ['24-36'], serveAs: ['pieces'], allergens: ['dairy'], servings: 2 },
   'b-fh-super-sundae': { publisher: FH, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: ['dairy'], servings: 2, estimateNote: 'Serving count is an estimate (source gives no servings): the directions make 2 sundaes, 1 sundae per serving.' },
@@ -1110,26 +1110,23 @@ const BATCH_5_EXPECTED: Record<string, Batch3Expectation> = {
   'b-fh-carrot-raisin-salad': { publisher: FH, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: ['dairy'], servings: 5, estimateNote: ESTIMATE_HALF_CUP },
   'b-fh-melon-and-mint': { publisher: FH, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: [], servings: 12, estimateNote: ESTIMATE_HALF_CUP },
   'b-fh-watermelon-lime-chili': { publisher: FH, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: [], servings: 4, estimateNote: ESTIMATE_HALF_CUP },
-  'b-fh-pear-quesadillas': { publisher: FH, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: ['dairy', 'wheat'], servings: 8, estimateNote: 'Serving count is an estimate (source gives no servings): 8 wedges, 1 wedge per serving.' },
+  'b-fh-pear-quesadillas': { publisher: FH, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: ['dairy', 'wheat'], servings: 8 },
   'b-fh-turkey-cranberry-quesadilla': { publisher: FH, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: ['dairy', 'wheat'], servings: 1, estimateNote: 'Serving count is an estimate (source gives no servings): the recipe makes 1 quesadilla, 1 quesadilla per serving.' },
   'b-fh-sauteed-cabbage': { publisher: FH, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: ['dairy'], servings: 10, estimateNote: ESTIMATE_HALF_CUP },
   'b-fh-summer-cucumbers': { publisher: FH, stages: ['24-36'], serveAs: ['pieces'], allergens: [], servings: 8, estimateNote: ESTIMATE_HALF_CUP },
-  'b-fh-salmon-salad-mix': { publisher: FH, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: ['dairy', 'fish'], servings: 6, estimateNote: ESTIMATE_QUARTER_CUP },
+  'b-fh-salmon-salad-mix': { publisher: FH, stages: ['24-36'], serveAs: ['pieces'], allergens: ['dairy', 'fish'], servings: 6, estimateNote: ESTIMATE_QUARTER_CUP },
   'b-fh-beet-and-carrot-salad': { publisher: FH, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: ['dairy'], servings: 6, estimateNote: ESTIMATE_HALF_CUP },
-  'b-fh-cucumber-and-tomato-salad': { publisher: FH, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: ['dairy'], servings: 8, estimateNote: ESTIMATE_HALF_CUP },
+  'b-fh-cucumber-and-tomato-salad': { publisher: FH, stages: ['24-36'], serveAs: ['pieces'], allergens: ['dairy'], servings: 8, estimateNote: ESTIMATE_HALF_CUP },
   'b-fh-braised-radishes': { publisher: FH, stages: ['24-36'], serveAs: ['pieces'], allergens: [], servings: 6, estimateNote: ESTIMATE_HALF_CUP },
   'b-fh-hoppin-pear-salad': { publisher: FH, stages: ['24-36'], serveAs: ['pieces'], allergens: ['dairy', 'tree nuts'], servings: 4 },
   'b-fh-rice-bowl-breakfast-fruit-nuts': { publisher: FH, stages: ['24-36'], serveAs: ['pieces'], allergens: ['dairy', 'tree nuts'], servings: 2, estimateNote: 'Serving count is an estimate (source gives no servings): the directions divide the rice between 2 bowls, 1 bowl per serving.' },
   'b-fh-green-salad-with-peas': { publisher: FH, stages: ['24-36'], serveAs: ['pieces'], allergens: ['dairy'], servings: 12, estimateNote: ESTIMATE_HALF_CUP },
-  'b-fh-pumpkin-smoothie-cup': { publisher: FH, stages: ['6-8', '9-12'], serveAs: ['puree', 'mashed'], allergens: ['dairy'], servings: 1, estimateNote: 'Serving count is an estimate (source gives no servings): the recipe makes 1 cup, 1 cup per serving.' },
   'b-fh-ants-on-a-log': { publisher: FH, stages: ['24-36'], serveAs: ['finger-food'], allergens: ['peanut'], servings: 4 },
   'b-fh-cranberry-orange-relish': { publisher: FH, stages: ['24-36'], serveAs: ['pieces'], allergens: [], servings: 10, estimateNote: ESTIMATE_QUARTER_CUP },
   'b-fh-baked-apple-and-cranberries': { publisher: FH, stages: ['6-8', '9-12', '12-23', '24-36'], serveAs: ['mashed', 'pieces'], allergens: ['dairy'], servings: 1, estimateNote: 'Serving count is an estimate (source gives no servings): the recipe makes 1 apple, 1 apple per serving.' },
   'b-fh-roasted-cauliflower': { publisher: FH, stages: ['6-8', '9-12', '12-23', '24-36'], serveAs: ['mashed', 'pieces'], allergens: ['dairy'], servings: 8, estimateNote: ESTIMATE_HALF_CUP },
   'b-fh-fried-rice-with-pork': { publisher: FH, stages: ['24-36'], serveAs: ['pieces'], allergens: ['soy'], servings: 8, estimateNote: ESTIMATE_HALF_CUP },
-  'b-fh-spinach-pasta-salad': { publisher: FH, stages: ['24-36'], serveAs: ['pieces'], allergens: ['wheat'], servings: 10, estimateNote: ESTIMATE_HALF_CUP },
   'b-fh-green-and-orange-chicken-salad': { publisher: FH, stages: ['24-36'], serveAs: ['pieces'], allergens: ['sesame', 'soy'], servings: 12, estimateNote: ESTIMATE_ONE_CUP },
-  'b-fh-blueberry-tofu-smoothie': { publisher: FH, stages: ['9-12'], serveAs: ['puree'], allergens: ['soy'], servings: 4, estimateNote: ESTIMATE_ONE_CUP },
   'b-icn-teriyaki-chicken-and-cabbage': { publisher: ICN, stages: ['24-36'], serveAs: ['pieces'], allergens: ['soy'], servings: 6 },
   'b-icn-corn-and-edamame-blend': { publisher: ICN, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: ['sesame', 'soy'], servings: 6 },
   'b-icn-stir-fried-green-rice-eggs-and-ham': { publisher: ICN, stages: ['24-36'], serveAs: ['pieces'], allergens: ['egg', 'sesame', 'soy'], servings: 6 },
@@ -1142,8 +1139,10 @@ const BATCH_5_EXPECTED: Record<string, Batch3Expectation> = {
   'b-fh-turkey-stroganoff': { publisher: FH, stages: ['24-36'], serveAs: ['pieces'], allergens: ['dairy', 'wheat'], servings: 8, estimateNote: ESTIMATE_ONE_CUP },
   'b-fh-white-chicken-chili': { publisher: FH, stages: ['24-36'], serveAs: ['pieces'], allergens: ['dairy'], servings: 8, estimateNote: ESTIMATE_ONE_CUP },
   'b-fh-turkey-pumpkin-chili': { publisher: FH, stages: ['24-36'], serveAs: ['pieces'], allergens: [], servings: 10, estimateNote: ESTIMATE_ONE_CUP },
+  'b-fh-peach-yogurt-smoothie': { publisher: FH, stages: ['6-8', '9-12'], serveAs: ['puree'], allergens: ['dairy'], servings: 4, estimateNote: 'Serving count is an estimate (source gives no servings): the page makes 3 cups with the juice, so about 2 cups without it, divided by a 1/2 cup portion.' },
+  'b-fh-banana-berry-smoothie': { publisher: FH, stages: ['6-8', '9-12'], serveAs: ['puree'], allergens: ['dairy'], servings: 6, estimateNote: 'Serving count is an estimate (source gives no servings): the page makes 4 cups with the juice, so about 3 cups without it, divided by a 1/2 cup portion.' },
+  'b-fh-bell-pepper-nachos': { publisher: FH, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: ['dairy', 'soy'], servings: 8, estimateNote: ESTIMATE_ONE_CUP },
   'b-fh-strawberry-swirl': { publisher: FH, stages: ['6-8', '9-12'], serveAs: ['puree'], allergens: [], servings: 2, estimateNote: 'Serving count is an estimate (source gives no servings): the page makes 2 cups with the juice, so about 1 cup without it, divided by a 1/2 cup portion.' },
-  'b-fh-melon-cooler': { publisher: FH, stages: ['6-8', '9-12'], serveAs: ['puree'], allergens: ['dairy'], servings: 4, estimateNote: 'Serving count is an estimate (source gives no servings): the page makes 3 cups with the juice, so about 2 cups without it, divided by a 1/2 cup portion.' },
   'b-fh-glazed-squash': { publisher: FH, stages: ['6-8', '9-12', '12-23', '24-36'], serveAs: ['mashed', 'pieces'], allergens: [], servings: 6, estimateNote: 'Serving count is an estimate (source gives no servings): total yield of 3 cups divided by a 1/2 cup portion.' },
   'b-fh-red-potato-and-cabbage-colcannon': { publisher: FH, stages: ['6-8', '9-12', '12-23', '24-36'], serveAs: ['mashed', 'pieces'], allergens: ['dairy'], servings: 12, estimateNote: ESTIMATE_HALF_CUP },
   'b-icn-quinoa-bowl': { publisher: ICN, stages: ['24-36'], serveAs: ['pieces'], allergens: ['egg', 'sesame', 'soy'], servings: 6 },
@@ -1157,18 +1156,17 @@ const BATCH_5_EXPECTED: Record<string, Batch3Expectation> = {
 const BATCH_5_LEFT_OUT: Record<string, { adaptation: string; absent: RegExp }[]> = {
   'b-fh-yogurt-fruit-dip': [{ adaptation: 'Left out 1 teaspoon brown sugar', absent: /sugar/i }],
   'b-fh-raspberry-fruit-dip': [{ adaptation: 'Left out 1 tablespoon sugar', absent: /sugar/i }],
+  'b-fh-peach-yogurt-smoothie': [{ adaptation: 'Left out 3/4 cup orange juice', absent: /orange juice/i }],
+  'b-fh-banana-berry-smoothie': [{ adaptation: 'Left out 1 cup orange juice', absent: /orange juice/i }],
   'b-fh-melon-and-mint': [{ adaptation: 'Left out 2 tablespoons packed brown sugar', absent: /sugar/i }],
   'b-fh-watermelon-lime-chili': [{ adaptation: 'Left out 1/4 teaspoon salt (optional)', absent: /\bsalt\b/i }],
   'b-fh-sauteed-cabbage': [{ adaptation: 'Left out 1/2 teaspoon salt', absent: /\bsalt\b/i }],
   'b-fh-beet-and-carrot-salad': [{ adaptation: 'Left out 1/4 teaspoon salt', absent: /\bsalt\b/i }],
-  'b-fh-pumpkin-smoothie-cup': [{ adaptation: 'Left out 2 teaspoons brown sugar', absent: /sugar/i }],
   'b-fh-baked-apple-and-cranberries': [{ adaptation: 'Left out 1 teaspoon packed brown sugar', absent: /sugar/i }],
   'b-fh-roasted-cauliflower': [{ adaptation: 'Left out 1/2 teaspoon salt', absent: /\bsalt\b/i }],
-  'b-fh-blueberry-tofu-smoothie': [{ adaptation: 'Left out 1/2 cup orange juice (juice from 1 orange)', absent: /orange juice/i }],
   'b-icn-corn-and-edamame-blend': [{ adaptation: 'Left out 1/4 teaspoon salt', absent: /\bsalt\b/i }],
   'b-fh-stuffed-peppers-turkey-vegetables': [{ adaptation: 'Left out 1/4 teaspoon salt', absent: /\bsalt\b/i }],
   'b-fh-strawberry-swirl': [{ adaptation: 'Left out 1 cup (8 ounces) 100% apple juice', absent: /apple juice/i }],
-  'b-fh-melon-cooler': [{ adaptation: 'Left out 1 cup orange juice', absent: /orange juice/i }],
   'b-fh-glazed-squash': [{ adaptation: 'Left out 3 tablespoons brown sugar', absent: /sugar/i }, { adaptation: 'Left out 1/4 teaspoon salt', absent: /\bsalt\b/i }],
   'b-fh-red-potato-and-cabbage-colcannon': [{ adaptation: 'Left out 1 teaspoon salt', absent: /\bsalt\b/i }],
 
@@ -1180,7 +1178,6 @@ const BATCH_5_KEEPS_BLOCKED_AT_24 = [
   'b-fh-braised-radishes',
   'b-fh-cranberry-orange-relish',
   'b-fh-fried-rice-with-pork',
-  'b-fh-spinach-pasta-salad',
   'b-fh-green-and-orange-chicken-salad',
   'b-icn-teriyaki-chicken-and-cabbage',
   'b-icn-stir-fried-green-rice-eggs-and-ham',
@@ -1202,6 +1199,7 @@ const BATCH_5_SOURCE_SERVINGS = [
   'b-fh-raspberry-fruit-dip',
   'b-fh-hoppin-pear-salad',
   'b-fh-ants-on-a-log',
+  'b-fh-pear-quesadillas',
   'b-icn-teriyaki-chicken-and-cabbage',
   'b-icn-corn-and-edamame-blend',
   'b-icn-stir-fried-green-rice-eggs-and-ham',
@@ -1385,7 +1383,7 @@ describe('BUILTIN_RECIPES - batch 5', () => {
   it('batch 5 adds recipes to the Easy cells, soy and shellfish gaps', () => {
     const cellCount = (stage: StageId, effort: Effort) =>
       BATCH_5_RECIPES.filter((r) => r.stages.includes(stage) && recipeEffort(r) === effort).length;
-    expect(cellCount('12-23', 'easy')).toBeGreaterThanOrEqual(15);
+    expect(cellCount('12-23', 'easy')).toBeGreaterThanOrEqual(12);
     expect(cellCount('24-36', 'easy')).toBeGreaterThanOrEqual(23);
     expect(cellCount('6-8', 'easy')).toBeGreaterThanOrEqual(2);
     expect(cellCount('6-8', 'medium')).toBeGreaterThanOrEqual(2);
@@ -1456,8 +1454,8 @@ const CHECKPOINT: Counts = {
   stages: {
     '6-8': cell(20, 10, 0),
     '9-12': cell(30, 25, 12),
-    '12-23': cell(29, 45, 23),
-    '24-36': cell(39, 68, 47),
+    '12-23': cell(26, 45, 23),
+    '24-36': cell(39, 68, 46),
   },
   allergens: { dairy: 30, egg: 30, wheat: 30, soy: 30, peanut: 8, 'tree nuts': 8, fish: 8, sesame: 4, shellfish: 3 },
 };

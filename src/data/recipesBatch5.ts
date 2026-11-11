@@ -57,7 +57,7 @@ const ESTIMATE_ONE_CUP =
 
 export const BATCH_5_RECIPES: Recipe[] = [
   {
-    // Pineapple, apple, banana and orange coated in flavored yogurt.
+    // Pineapple, apple, banana and orange coated in flavored yogurt. Tagged 24-36 only: the page gives no plain option.
     id: 'b-fh-creamy-fruit-salad',
     origin: 'builtin',
     source: {
@@ -68,7 +68,7 @@ export const BATCH_5_RECIPES: Recipe[] = [
       adaptations: [ESTIMATE_HALF_CUP],
     },
     title: 'Creamy Fruit Salad',
-    stages: ['12-23', '24-36'],
+    stages: ['24-36'],
     serveAs: ['pieces'],
     mealTypes: ['snack', 'breakfast'],
     ingredients: [
@@ -249,7 +249,7 @@ export const BATCH_5_RECIPES: Recipe[] = [
       'Combine the carrots and raisins in a serving bowl.',
       'Mix the mayonnaise with the yogurt or orange juice, pour it over the carrots and raisins, and chill until serving time. Refrigerate leftovers within 2 hours.',
     ],
-    texture: 'soft shredded carrots with raisins',
+    texture: 'shredded carrots and raisins in a creamy dressing',
     servings: 5,
   },
   {
@@ -316,7 +316,7 @@ export const BATCH_5_RECIPES: Recipe[] = [
       publisher: FH_PUBLISHER,
       url: 'https://foodhero.org/recipes/pear-quesadillas',
       retrieved: RETRIEVED,
-      adaptations: ['Serving count is an estimate (source gives no servings): 8 wedges, 1 wedge per serving.'],
+      adaptations: [],
     },
     title: 'Pear Quesadillas',
     stages: ['12-23', '24-36'],
@@ -335,7 +335,7 @@ export const BATCH_5_RECIPES: Recipe[] = [
       'Gently turn the quesadillas over with a large spatula and cook the other side for 2 to 4 minutes, until a little brown.',
       'Move to a plate and repeat with the rest. Cut each quesadilla in half and serve. Refrigerate leftovers within 2 hours.',
     ],
-    texture: 'soft folded quesadilla wedges with melted cheese and pear',
+    texture: 'soft folded quesadilla halves with melted cheese and pear',
     servings: 8,
   },
   {
@@ -393,7 +393,7 @@ export const BATCH_5_RECIPES: Recipe[] = [
       'Heat the margarine or butter in a large skillet over medium-high heat. Add the cabbage and carrots and saute for about 4 to 6 minutes, until tender but still crisp.',
       'Add the pepper and serve warm. Refrigerate leftovers within 2 hours.',
     ],
-    texture: 'soft sauteed cabbage and carrots',
+    texture: 'sauteed cabbage and carrots, tender but still crisp',
     servings: 10,
   },
   {
@@ -421,11 +421,12 @@ export const BATCH_5_RECIPES: Recipe[] = [
     steps: [
       'In a large bowl, combine the cucumbers, onion, salt, pepper and vinegar. Refrigerate leftovers within 2 hours.',
     ],
-    texture: 'crisp cucumber and onion slices',
+    texture: 'cucumber and onion slices in a vinegar dressing',
     servings: 8,
   },
   {
     // Canned salmon mashed with yogurt, mayonnaise, relish and lemon juice; the page says the soft canned bones can be mashed in.
+    // Tagged 24-36 only: pickle relish is a salty product the screen has no term for, kept as written.
     id: 'b-fh-salmon-salad-mix',
     origin: 'builtin',
     source: {
@@ -436,7 +437,7 @@ export const BATCH_5_RECIPES: Recipe[] = [
       adaptations: [ESTIMATE_QUARTER_CUP],
     },
     title: 'Salmon Salad Mix',
-    stages: ['12-23', '24-36'],
+    stages: ['24-36'],
     serveAs: ['pieces'],
     mealTypes: ['lunch'],
     ingredients: [
@@ -451,7 +452,7 @@ export const BATCH_5_RECIPES: Recipe[] = [
       'Add the relish, yogurt, mayonnaise and lemon juice and mix until well combined.',
       'Chill before serving. Serve on a bed of salad greens or use as a sandwich filling. Refrigerate leftovers within 2 hours.',
     ],
-    texture: 'soft flaked salmon salad',
+    texture: 'flaked salmon salad with mashed soft bones',
     servings: 6,
   },
   {
@@ -481,11 +482,11 @@ export const BATCH_5_RECIPES: Recipe[] = [
       'Cook the sliced carrots until just tender if you like, by microwaving or steaming.',
       'In a medium bowl, combine the onion, mayonnaise and pepper, and the cilantro if using. Add the beets and carrots and stir. Serve warm or cold. Refrigerate leftovers within 2 hours.',
     ],
-    texture: 'soft diced beets and carrots',
+    texture: 'diced beets and carrots in a light dressing',
     servings: 6,
   },
   {
-    // Chopped cucumber and tomato in a creamy dill dressing.
+    // Chopped cucumber and tomato in a creamy dill dressing. Tagged 24-36 only: the raw cucumber pieces are firm.
     id: 'b-fh-cucumber-and-tomato-salad',
     origin: 'builtin',
     source: {
@@ -496,7 +497,7 @@ export const BATCH_5_RECIPES: Recipe[] = [
       adaptations: [ESTIMATE_HALF_CUP],
     },
     title: 'Cucumber and Tomato Salad',
-    stages: ['12-23', '24-36'],
+    stages: ['24-36'],
     serveAs: ['pieces'],
     mealTypes: ['lunch', 'dinner'],
     ingredients: [
@@ -627,36 +628,8 @@ export const BATCH_5_RECIPES: Recipe[] = [
       'In a large serving bowl, combine the peas, salad greens and cucumber.',
       'Add the dressing just before serving and toss to mix well. Sprinkle with the feta cheese. Refrigerate leftovers within 2 hours.',
     ],
-    texture: 'crisp salad greens with peas and feta',
+    texture: 'salad greens with peas, cucumber and feta',
     servings: 12,
-  },
-  {
-    // Smooth pumpkin yogurt; brown sugar left out.
-    id: 'b-fh-pumpkin-smoothie-cup',
-    origin: 'builtin',
-    source: {
-      title: 'Pumpkin Smoothie in a Cup',
-      publisher: FH_PUBLISHER,
-      url: 'https://foodhero.org/recipes/pumpkin-smoothie-cup',
-      retrieved: RETRIEVED,
-      adaptations: ['Serving count is an estimate (source gives no servings): the recipe makes 1 cup, 1 cup per serving.', 'Left out 2 teaspoons brown sugar'],
-    },
-    title: 'Pumpkin Smoothie in a Cup',
-    stages: ['6-8', '9-12'],
-    serveAs: ['puree', 'mashed'],
-    mealTypes: ['snack', 'breakfast'],
-    ingredients: [
-      { name: 'low-fat vanilla yogurt (or 1 container, 6 ounces)', food: 'yogurt', quantity: 0.75, unit: 'cup', category: 'dairy-eggs' },
-      { name: 'canned pumpkin', food: 'pumpkin', quantity: 0.25, unit: 'cup', category: 'pantry' },
-      { name: 'cinnamon', food: 'cinnamon', quantity: 0.25, unit: 'tsp', category: 'pantry' },
-      { name: 'nutmeg', food: 'nutmeg', quantity: 0.125, unit: 'tsp', category: 'pantry', optional: true },
-    ],
-    steps: [
-      'Combine the yogurt, pumpkin, cinnamon and nutmeg (if using) in a bowl or blender.',
-      'Mix until smooth and serve. Refrigerate leftovers within 2 hours.',
-    ],
-    texture: 'smooth spoonable pumpkin yogurt',
-    servings: 1,
   },
   {
     // Tagged 24-36 only: raw celery pieces are firm.
@@ -682,7 +655,7 @@ export const BATCH_5_RECIPES: Recipe[] = [
       'Remove the outer strings of the celery with a vegetable peeler if you like, and cut each stalk into 3 pieces.',
       'Spread peanut butter on the inside of the celery and place raisins on top. Refrigerate leftovers within 2 hours.',
     ],
-    texture: 'crisp celery with peanut butter and raisins',
+    texture: 'celery with peanut butter and raisins',
     servings: 4,
   },
   {
@@ -741,7 +714,7 @@ export const BATCH_5_RECIPES: Recipe[] = [
       'Fill the center with the cranberries, pressing down if needed, and top with the margarine or butter.',
       'Cover loosely with wax paper and microwave on high for about 2 1/2 minutes, until the apple is soft when poked through the center hole with a fork. Cool slightly. Refrigerate leftovers within 2 hours.',
     ],
-    texture: 'soft baked apple that mashes easily',
+    texture: 'baked apple, soft when poked with a fork',
     servings: 1,
   },
   {
@@ -772,7 +745,7 @@ export const BATCH_5_RECIPES: Recipe[] = [
       'Spread the florets on a large baking sheet with space between the pieces.',
       'Roast for 30 minutes, until the cauliflower is tender when pierced with a fork. Sprinkle with the cheese before serving. Refrigerate leftovers within 2 hours.',
     ],
-    texture: 'tender roasted cauliflower that mashes easily',
+    texture: 'roasted cauliflower, tender when pierced with a fork',
     servings: 8,
   },
   {
@@ -811,43 +784,6 @@ export const BATCH_5_RECIPES: Recipe[] = [
     servings: 8,
   },
   {
-    // Teriyaki sauce, salt and sugar are in the dressing, so 24-36 only.
-    id: 'b-fh-spinach-pasta-salad',
-    origin: 'builtin',
-    source: {
-      title: 'Spinach Pasta Salad',
-      publisher: FH_PUBLISHER,
-      url: 'https://foodhero.org/recipes/spinach-pasta-salad',
-      retrieved: RETRIEVED,
-      adaptations: [ESTIMATE_HALF_CUP],
-    },
-    title: 'Spinach Pasta Salad',
-    stages: ['24-36'],
-    serveAs: ['pieces'],
-    mealTypes: ['lunch', 'dinner'],
-    ingredients: [
-      { name: 'teriyaki sauce (dressing)', food: 'teriyaki sauce', quantity: 2, unit: 'tbsp', category: 'pantry' },
-      { name: 'vinegar (white, rice or cider) (dressing)', food: 'vinegar', quantity: 2, unit: 'tbsp', category: 'pantry' },
-      { name: 'garlic powder (dressing)', food: 'garlic powder', quantity: 0.25, unit: 'tsp', category: 'pantry' },
-      { name: 'salt (dressing)', food: 'salt', quantity: 0.125, unit: 'tsp', category: 'pantry' },
-      { name: 'black pepper (dressing)', food: 'black pepper', quantity: 0.125, unit: 'tsp', category: 'pantry' },
-      { name: 'sugar (dressing)', food: 'sugar', quantity: 1.5, unit: 'tsp', category: 'pantry' },
-      { name: 'vegetable oil (dressing)', food: 'vegetable oil', quantity: 1, unit: 'tbsp', category: 'pantry' },
-      { name: 'cooked pasta (whole wheat shells, bow ties, macaroni or other small shapes)', food: 'pasta', quantity: 2, unit: 'cup', category: 'grains' },
-      { name: 'fresh spinach', food: 'spinach', quantity: 4, unit: 'cup', category: 'produce' },
-      { name: 'dried cranberries', food: 'cranberry', quantity: 0.25, unit: 'cup', category: 'pantry' },
-      { name: 'sunflower seed kernels', food: 'sunflower seed', quantity: 2, unit: 'tbsp', category: 'pantry' },
-      { name: 'mandarin oranges, drained (1 can, 15 ounces)', food: 'mandarin orange', quantity: 1, unit: 'can', category: 'pantry' },
-      { name: 'chopped cilantro or parsley', food: 'cilantro', quantity: 2, unit: 'tbsp', category: 'produce' },
-    ],
-    steps: [
-      'In a large bowl, mix the dressing ingredients.',
-      'Add the salad ingredients and mix well. Cover and chill until ready to serve. Refrigerate leftovers within 2 hours.',
-    ],
-    texture: 'soft pasta with spinach and mandarin oranges',
-    servings: 10,
-  },
-  {
     // Soy sauce, sugar and sesame oil are in the dressing, so 24-36 only.
     id: 'b-fh-green-and-orange-chicken-salad',
     origin: 'builtin',
@@ -883,37 +819,8 @@ export const BATCH_5_RECIPES: Recipe[] = [
       'Pour the dressing over the vegetables and toss to mix.',
       'Add the mandarin oranges, snow peas, chicken and water chestnuts (if using) and mix lightly. Refrigerate until served. Refrigerate leftovers within 2 hours.',
     ],
-    texture: 'crisp greens with chicken and mandarin oranges',
+    texture: 'salad greens with chicken and mandarin oranges',
     servings: 12,
-  },
-  {
-    // Smoothie with tofu and soy milk. Orange juice left out because the screen blocks juice under 12 months.
-    id: 'b-fh-blueberry-tofu-smoothie',
-    origin: 'builtin',
-    source: {
-      title: 'Blueberry Tofu Smoothie',
-      publisher: FH_PUBLISHER,
-      url: 'https://foodhero.org/recipes/blueberry-tofu-smoothie',
-      retrieved: RETRIEVED,
-      adaptations: [ESTIMATE_ONE_CUP, 'Left out 1/2 cup orange juice (juice from 1 orange)'],
-    },
-    title: 'Blueberry Tofu Smoothie',
-    stages: ['9-12'],
-    serveAs: ['puree'],
-    mealTypes: ['breakfast', 'snack'],
-    ingredients: [
-      { name: 'frozen blueberries', food: 'blueberry', quantity: 0.75, unit: 'cup', category: 'frozen' },
-      { name: 'ripe banana', food: 'banana', quantity: 1, unit: 'piece', category: 'produce' },
-      { name: 'vanilla soy milk', food: 'soy milk', quantity: 1, unit: 'cup', category: 'dairy-eggs' },
-      { name: 'silken tofu', food: 'tofu', quantity: 3, unit: 'oz', category: 'protein' },
-      { name: 'lime juice', food: 'lime juice', quantity: 1, unit: 'tsp', category: 'produce' },
-    ],
-    steps: [
-      'Combine all the ingredients in a blender and puree until completely smooth.',
-      'Serve right away. Refrigerate leftovers within 2 hours.',
-    ],
-    texture: 'smooth blended fruit and tofu',
-    servings: 4,
   },
   {
     // Soy sauce marinade, so 24-36 only.
@@ -1394,36 +1301,7 @@ export const BATCH_5_RECIPES: Recipe[] = [
     servings: 2,
   },
   {
-    // Cantaloupe and yogurt blended smooth; the orange juice is left out.
-    id: 'b-fh-melon-cooler',
-    origin: 'builtin',
-    source: {
-      title: 'Melon Cooler',
-      publisher: FH_PUBLISHER,
-      url: 'https://foodhero.org/recipes/melon-cooler',
-      retrieved: RETRIEVED,
-      adaptations: [
-        'Serving count is an estimate (source gives no servings): the page makes 3 cups with the juice, so about 2 cups without it, divided by a 1/2 cup portion.',
-        'Left out 1 cup orange juice',
-      ],
-    },
-    title: 'Melon Cooler',
-    stages: ['6-8', '9-12'],
-    serveAs: ['puree'],
-    mealTypes: ['snack', 'breakfast'],
-    ingredients: [
-      { name: 'cubed cantaloupe', food: 'cantaloupe', quantity: 2, unit: 'cup', category: 'produce' },
-      { name: 'low-fat lemon yogurt', food: 'yogurt', quantity: 1, unit: 'cup', category: 'dairy-eggs' },
-    ],
-    steps: [
-      'Put the cantaloupe and yogurt in a blender.',
-      'Blend until smooth. The page says this tastes best chilled. Refrigerate leftovers within 2 hours.',
-    ],
-    texture: 'smooth cantaloupe yogurt puree',
-    servings: 4,
-  },
-  {
-    // Oven-baked winter squash that mashes easily; brown sugar and salt are left out.
+    // Oven-baked winter squash, tender when pierced with a fork; brown sugar and salt are left out.
     id: 'b-fh-glazed-squash',
     origin: 'builtin',
     source: {
@@ -1451,7 +1329,7 @@ export const BATCH_5_RECIPES: Recipe[] = [
       'Bake for about 4 to 6 minutes, then turn the slices over and return them to the oven.',
       'Bake until the squash is tender, about 15 to 20 minutes more. Serve warm. Refrigerate leftovers within 2 hours.',
     ],
-    texture: 'tender baked squash that mashes easily',
+    texture: 'baked squash, tender when pierced with a fork',
     servings: 6,
   },  {
     // Mashed potato and cabbage; the salt is left out. Mashes to the texture wanted, so 6-8 as well.
@@ -1495,7 +1373,9 @@ export const BATCH_5_RECIPES: Recipe[] = [
       publisher: ICN_PUBLISHER,
       url: 'https://theicn.org/cnrb/recipes-for-homes/quinoa-bowl-usda-recipe-for-family-child-care-homes/',
       retrieved: RETRIEVED,
-      adaptations: [],
+      adaptations: [
+        'The page lists 1 lb dry quinoa with 2 cups water, which cannot cook together (the page puts 1 cup of cooked quinoa in each of the 6 bowls); the amounts are copied as printed, so check the package directions for the water ratio.',
+      ],
     },
     title: 'Quinoa Bowl',
     stages: ['24-36'],
@@ -1643,5 +1523,100 @@ export const BATCH_5_RECIPES: Recipe[] = [
     ],
     texture: 'soft rice, chicken and bok choy rolled in lettuce leaves',
     servings: 6,
+  },
+  {
+    // Frozen peaches blended with yogurt, dry milk and banana; the orange juice is left out (juice is blocked under 12 months).
+    id: 'b-fh-peach-yogurt-smoothie',
+    origin: 'builtin',
+    source: {
+      title: 'Peach Yogurt Smoothie',
+      publisher: FH_PUBLISHER,
+      url: 'https://foodhero.org/recipes/peach-yogurt-smoothie',
+      retrieved: RETRIEVED,
+      adaptations: [
+        'Serving count is an estimate (source gives no servings): the page makes 3 cups with the juice, so about 2 cups without it, divided by a 1/2 cup portion.',
+        'Left out 3/4 cup orange juice',
+        'Plain yogurt, the first option the page gives (it also allows any flavor)',
+      ],
+    },
+    title: 'Peach Yogurt Smoothie',
+    stages: ['6-8', '9-12'],
+    serveAs: ['puree'],
+    mealTypes: ['snack', 'breakfast'],
+    ingredients: [
+      { name: 'low-fat plain yogurt', food: 'yogurt', quantity: 1, unit: 'cup', category: 'dairy-eggs' },
+      { name: 'nonfat dry milk', food: 'milk', quantity: 0.333, unit: 'cup', category: 'dairy-eggs' },
+      { name: 'banana', food: 'banana', quantity: 0.5, unit: 'piece', category: 'produce' },
+      { name: 'frozen peaches', food: 'peach', quantity: 0.5, unit: 'cup', category: 'frozen' },
+    ],
+    steps: [
+      'Put the yogurt, dry milk, banana and peaches in a blender.',
+      'Blend until smooth. Refrigerate leftovers within 2 hours.',
+    ],
+    texture: 'smooth peach yogurt puree',
+    servings: 4,
+  },
+  {
+    // Banana and berries blended with milk; the orange juice is left out (juice is blocked under 12 months).
+    id: 'b-fh-banana-berry-smoothie',
+    origin: 'builtin',
+    source: {
+      title: 'Banana Berry Smoothie',
+      publisher: FH_PUBLISHER,
+      url: 'https://foodhero.org/recipes/banana-berry-smoothie',
+      retrieved: RETRIEVED,
+      adaptations: [
+        'Serving count is an estimate (source gives no servings): the page makes 4 cups with the juice, so about 3 cups without it, divided by a 1/2 cup portion.',
+        'Left out 1 cup orange juice',
+      ],
+    },
+    title: 'Banana Berry Smoothie',
+    stages: ['6-8', '9-12'],
+    serveAs: ['puree'],
+    mealTypes: ['snack', 'breakfast'],
+    ingredients: [
+      { name: 'sliced banana', food: 'banana', quantity: 1, unit: 'cup', category: 'produce' },
+      { name: 'unsweetened frozen berries', food: 'berry', quantity: 1, unit: 'cup', category: 'frozen' },
+      { name: '1% or nonfat milk', food: 'milk', quantity: 1, unit: 'cup', category: 'dairy-eggs' },
+    ],
+    steps: [
+      'Put the banana, berries and milk in a blender with the lid on tightly.',
+      'Blend until smooth. If it is too thick, add 1/2 cup cold water and blend again. Refrigerate leftovers within 2 hours.',
+    ],
+    texture: 'smooth banana berry puree',
+    servings: 6,
+  },
+  {
+    // Bell pepper pieces baked with salsa, tofu (one of the page's protein options) and cheese.
+    id: 'b-fh-bell-pepper-nachos',
+    origin: 'builtin',
+    source: {
+      title: 'Bell Pepper Nachos',
+      publisher: FH_PUBLISHER,
+      url: 'https://foodhero.org/recipes/bell-pepper-nachos',
+      retrieved: RETRIEVED,
+      adaptations: [
+        ESTIMATE_ONE_CUP,
+        'Tofu chosen from the page\'s protein options (beans, tofu, or chopped or shredded meat or chicken)',
+      ],
+    },
+    title: 'Bell Pepper Nachos',
+    stages: ['12-23', '24-36'],
+    serveAs: ['pieces'],
+    mealTypes: ['snack', 'lunch'],
+    ingredients: [
+      { name: 'bell peppers', food: 'bell pepper', quantity: 4, unit: 'piece', category: 'produce' },
+      { name: 'salsa', food: 'salsa', quantity: 1, unit: 'cup', category: 'pantry' },
+      { name: 'seasoning (a mix of chili powder, garlic powder, ground cumin and black pepper)', food: 'chili powder', quantity: 2, unit: 'tsp', category: 'pantry' },
+      { name: 'cooked tofu', food: 'tofu', quantity: 2, unit: 'cup', category: 'protein' },
+      { name: 'shredded or crumbled cheese', food: 'cheese', quantity: 0.75, unit: 'cup', category: 'dairy-eggs' },
+    ],
+    steps: [
+      'Heat the oven to 350°F. Remove the seeds from the peppers, cut them into bite-sized pieces and arrange them close together in a single layer on a large foil-lined baking sheet.',
+      'In a medium bowl, mix the salsa, seasoning and tofu. Spoon the mixture evenly over the pepper pieces and top with the cheese.',
+      'Bake for 15 minutes, until the peppers are heated through and the cheese is melted. Serve warm. Refrigerate leftovers within 2 hours.',
+    ],
+    texture: 'baked bell pepper pieces topped with salsa, tofu and melted cheese',
+    servings: 8,
   },
 ];
