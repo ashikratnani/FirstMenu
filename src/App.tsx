@@ -19,6 +19,7 @@ import {
   Recipes,
   Settings,
   Share,
+  SharedRecipeView,
   SharedView,
   Sources,
 } from './ui/pages/routes';
@@ -71,6 +72,14 @@ export default function App() {
         element={
           <Suspense fallback={<PageLoading />}>
             <SharedView />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/r/:data"
+        element={
+          <Suspense fallback={<PageLoading />}>
+            <SharedRecipeView />
           </Suspense>
         }
       />

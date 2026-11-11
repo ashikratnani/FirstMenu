@@ -28,6 +28,7 @@ import type { Ingredient, MealType, Recipe, ServeAs } from '../../domain/types';
 import { MEAL_TYPES, dayLabel, ghostReason, mealTypeLabel, recipeView } from './recipeView';
 import { FIXED_LIST_NOTE, TAG_EXPLAINER, effortLabel, tagLabel, timeLabel } from './makeView';
 import Disclaimer from '../components/Disclaimer';
+import ShareRecipe from '../components/ShareRecipe';
 import styles from './RecipeDetail.module.css';
 
 /** "1 cup carrots" style quantity label; omits parts that are absent. */
@@ -128,6 +129,11 @@ function ServeAsLine({ recipe }: { recipe: Recipe }) {
       </div>
     </fieldset>
   );
+}
+
+/** Only http(s) links are rendered as hrefs. */
+function isHttpUrl(url: string): boolean {
+  return /^https?:\/\//i.test(url);
 }
 
 /**
@@ -410,9 +416,13 @@ export default function RecipeDetail() {
         <section aria-labelledby="recipe-source" className={styles.source}>
           <h2 id="recipe-source">Source</h2>
           <p>
-            <ExternalLink href={source.url} target="_blank" rel="noopener noreferrer">
-              {source.title}
-            </ExternalLink>{' '}
+            {isHttpUrl(source.url) ? (
+              <ExternalLink href={source.url} target="_blank" rel="noopener noreferrer">
+                {source.title}
+              </ExternalLink>
+            ) : (
+              source.title
+            )}{' '}
             &mdash; {source.publisher}
           </p>
           <p className={styles.retrieved}>Retrieved {source.retrieved}</p>
@@ -429,13 +439,17 @@ export default function RecipeDetail() {
           {source.storageSource && (
             <p className={styles.storageSource}>
               Storage times:{' '}
-              <ExternalLink
-                href={source.storageSource}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {source.publisher}
-              </ExternalLink>
+              {isHttpUrl(source.storageSource) ? (
+                <ExternalLink
+                  href={source.storageSource}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {source.publisher}
+                </ExternalLink>
+              ) : (
+                source.publisher
+              )}
             </p>
           )}
         </section>
@@ -472,6 +486,7 @@ export default function RecipeDetail() {
       <section aria-label="Plan and history" className={styles.historyActions}>
         {!view.isGhosted && <AddToPlan recipe={recipe} />}
         <MadeThis recipe={recipe} />
+        <ShareRecipe recipe={recipe} />
       </section>
 
       {recipe.origin === 'custom' && (

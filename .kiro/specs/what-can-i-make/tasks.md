@@ -147,10 +147,10 @@ Branch names use the `v2/` prefix (for example `v2/6-paste-parser`) so they don'
   - [ ] 14.4 Ships with the final batch PR. Set `CHECKPOINT = HARD_MINIMUM` in the invariant tests (Requirement 14.1 and 14.6 tables, where the `6-8` More minimum is 0, approved by the maintainer on #68: total, simple ideas, each stage, each stage by effort, each allergen group). If short of any hard minimum, open `Decision needed: recipe shortfall` with the numbers and don't ship short without an answer. Comment on issue #7 with the final numbers.
     - _Requirements: 14.1, 14.6, 14.7_
 
-- [ ] 15. Share a recipe (first to cut)
-  - [ ] 15.1 Implement `domain/recipeShare.ts` (payload, encode, decode, share text), with tests that the payload and text carry no child data or pasted text.
+- [x] 15. Share a recipe (first to cut)
+  - [x] 15.1 Implement `domain/recipeShare.ts` (payload, encode, decode, share text), with tests that the payload and text carry no child data or pasted text.
     - _Requirements: 9.3, 9.5_
-  - [ ] 15.2 Add "Share recipe" (share sheet or copy) and the read-only `#/r/<data>` view with "Add to my recipes", which screens as a pasted recipe.
+  - [x] 15.2 Add "Share recipe" (share sheet or copy) and the read-only `#/r/<data>` view with "Add to my recipes", which screens as a pasted recipe.
     - _Requirements: 9.1, 9.2, 9.4, 9.6, 9.7_
 
 - [ ] 16. Verify

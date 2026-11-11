@@ -1,0 +1,87 @@
+/*
+ * Read-only shared recipe (Requirement 9.4). Rendered OUTSIDE the app Layout,
+ * so this module provides its own page padding via a <main> shell. Usable at
+ * 360px width.
+ */
+
+.shell {
+  display: block;
+  max-width: 700px;
+  margin: 0 auto;
+  padding: var(--space);
+}
+
+.intro {
+  margin: 0 0 var(--space);
+  color: var(--fm-color-muted);
+}
+
+.error {
+  margin: var(--space) 0;
+  padding: var(--space);
+  border: 1px solid var(--fm-color-border);
+  border-radius: var(--radius);
+  background: var(--fm-color-surface);
+  color: var(--fm-color-text);
+  font-weight: 600;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space);
+  margin: 0 0 var(--space);
+  color: var(--fm-color-muted);
+}
+
+.list {
+  margin: 0;
+  padding-left: calc(var(--space) * 1.5);
+}
+
+.prep {
+  display: block;
+  color: var(--fm-color-muted);
+}
+
+.actions {
+  margin: calc(var(--space) * 1.5) 0;
+}
+
+.footer {
+  margin-top: calc(var(--space) * 2);
+  border-top: 1px solid var(--fm-color-border);
+  padding-top: var(--space);
+}
+
+.ghost {
+  background: var(--fm-color-surface);
+  border: 2px solid var(--fm-color-border);
+  border-radius: var(--radius);
+  padding: var(--space);
+  margin: var(--space) 0 calc(var(--space) * 1.5);
+}
+
+.ghostHeading {
+  margin: 0 0 calc(var(--space) * 0.5);
+  font-size: 1.1rem;
+  color: var(--fm-color-heading);
+}
+
+.blockList {
+  margin: 0;
+  padding-left: calc(var(--space) * 1.25);
+}
+
+.blockList li {
+  margin-bottom: calc(var(--space) * 0.25);
+}
+
+.blockLabel {
+  font-weight: 600;
+  color: var(--fm-color-heading);
+}
+
+.availableAt {
+  color: var(--fm-color-muted);
+}

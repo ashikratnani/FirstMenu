@@ -42,6 +42,7 @@ import SharedView from './pages/SharedView';
 import { AppProvider } from '../state/AppProvider';
 import { STORAGE_KEY, defaultState } from '../domain/storage';
 import { encodeSharePayload } from '../domain/share';
+import { encodeRecipeShare } from '../domain/recipeShare';
 import type { AppState, Recipe } from '../domain/types';
 
 expect.extend({ toHaveNoViolations });
@@ -239,6 +240,22 @@ describe('Accessibility: axe on every main page (color-contrast disabled)', () =
       expect(results).toHaveNoViolations();
     },
   );
+
+  it('shared recipe view (#/r/) has no axe violations', async () => {
+    const { encoded } = encodeRecipeShare(peaRecipe());
+    const { container } = renderApp(`/r/${encoded}`, seededState());
+    expect(
+      screen.getByRole('heading', { level: 1, name: /^sweet pea mash$/i }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Add to my recipes' })).toBeInTheDocument();
+    expect(await axe(container, AXE_OPTIONS)).toHaveNoViolations();
+  });
+
+  it('shared recipe view with an unreadable link has no axe violations', async () => {
+    const { container } = renderApp('/r/garbage', seededState());
+    expect(screen.getByRole('alert')).toHaveTextContent(/can.t be read/i);
+    expect(await axe(container, AXE_OPTIONS)).toHaveNoViolations();
+  });
 
   describe('Make with a populated pantry and on-hand foods (Req 15.5)', () => {
     /** A local YYYY-MM-DD `days` days before today. */
