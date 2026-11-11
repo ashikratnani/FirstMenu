@@ -521,6 +521,22 @@ describe('built-in recipes derive clean food keys (Item 3)', () => {
       'taco seasoning',
       'roll',
       'sweet sour sauce',
+      'kiwi',
+      'grape',
+      'dried apple',
+      'dried cherry',
+      'oat cereal',
+      'multigrain cereal',
+      'maple syrup',
+      'waffle',
+      'swiss chard',
+      'sage',
+      'olive',
+      'okra',
+      'eggplant',
+      'plantain',
+      'coconut',
+      'apricot',
     ]);
   });
 
