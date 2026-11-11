@@ -28,7 +28,7 @@ export const PROBLEMS: readonly ProblemChoice[] = [
     path: '/plan',
     linkLabel: 'Plan the week and make a grocery list',
   },
-  { id: 'safe', label: "What's safe for my child", path: '/foods', linkLabel: 'Foods to leave out for now' },
+  { id: 'safe', label: "What's safe for my child", path: '/foods', linkLabel: 'Open Foods' },
   { id: 'looking', label: 'Just looking', path: '/', linkLabel: '' },
 ];
 

@@ -246,7 +246,7 @@ describe('quick solve: what is safe for my child', () => {
     const user = userEvent.setup();
     renderApp('/onboarding/tour', onboardedState(8));
     await chooseAndShow(user, /what's safe for my child/i);
-    await screen.findByRole('heading', { name: 'Foods to leave out for now' });
+    await screen.findByRole('heading', { name: 'Foods to leave out' });
     const list = screen.getByRole('list', { name: /leave out/i });
     expect(within(list).getByText('Honey')).toBeInTheDocument();
     expect(within(list).getAllByRole('link').length).toBeGreaterThan(0);
@@ -301,7 +301,7 @@ describe('end screen', () => {
     await screen.findByRole('heading', { name: /all set/i });
     const links = screen.getByRole('list', { name: /other things/i });
     expect(within(links).getAllByRole('link')).toHaveLength(1);
-    expect(within(links).getByRole('link', { name: /foods to leave out/i })).toHaveAttribute('href', '/foods');
+    expect(within(links).getByRole('link', { name: /open foods/i })).toHaveAttribute('href', '/foods');
     expect(primaries()).toEqual(['Go to Make']);
     await expectNoViolations();
     await user.click(screen.getByRole('button', { name: 'Go to Make' }));

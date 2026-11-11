@@ -13,13 +13,12 @@ import { buildVocabulary, searchHave } from '../../domain/foodSearch';
 import { makeResults } from '../../domain/make';
 import { computeGroceryList, type GroceryGroup } from '../../domain/grocery';
 import { leaveOutFor } from '../../domain/prompt';
-import { defaultSlots } from '../../domain/age';
 import { recipeEffort, recipeMinutes } from '../../domain/effort';
 import { parseRecipeReply } from '../../domain/recipeJson';
 import { RULES, SOURCES, type SourceId } from '../../domain/safety/rules';
 import { screenIngredient, screenRecipe, screenTextMentions } from '../../domain/safety/screen';
 import { localYmd } from '../../domain/suggest';
-import type { AppState, MealType, Recipe, WeekPlan } from '../../domain/types';
+import type { MealType, Recipe } from '../../domain/types';
 import { useApp } from '../../state/AppProvider';
 import { selectAgeMonths, selectAllRecipes, selectStage } from '../../state/selectors';
 import AskChatGpt from '../components/AskChatGpt';
@@ -31,7 +30,8 @@ import ResultCard from '../components/ResultCard';
 import { buildRecipe, draftFromParsed } from './addRecipeDraft';
 import { effortLabel } from './makeView';
 import type { ProblemId } from './onboardingProblems';
-import { slotCandidates } from './weekView';
+import { draftWeek } from './draftWeek';
+import { dayLabel } from './recipeView';
 import styles from './Onboarding.module.css';
 
 /** The sample reply "Try an example" reads. It is parsed, never saved. */
@@ -288,32 +288,6 @@ const MEAL_LABELS: Record<MealType, string> = {
   snack: 'Snack',
 };
 
-/**
- * A draft week: the current plan with each empty active slot filled from the
- * recipes the slot picker would offer (not ghosted, foods already tried first).
- * Nothing is stored until "Keep this plan".
- */
-function draftWeek(state: AppState, recipes: Recipe[]): { plan: WeekPlan; added: Array<{ day: number; meal: MealType; recipeId: string }> } {
-  const stage = selectStage(state);
-  // A new plan has no active slots yet; use the stage's defaults, as Plan does.
-  const slots = state.plan.activeSlots.length > 0 ? state.plan.activeSlots : defaultSlots(stage ?? '6-8');
-  const days = state.plan.days.map((day) => ({ ...day }));
-  const added: Array<{ day: number; meal: MealType; recipeId: string }> = [];
-  let turn = 0;
-  for (let day = 0; day < days.length; day++) {
-    for (const meal of slots) {
-      if (days[day][meal] !== undefined) continue;
-      const eligible = slotCandidates(recipes, state, meal, stage).filter((v) => !v.isGhosted);
-      const ordered = [...eligible.filter((v) => !v.usesUntriedFood), ...eligible.filter((v) => v.usesUntriedFood)];
-      if (ordered.length === 0) continue;
-      const recipeId = ordered[turn++ % ordered.length].recipe.id;
-      days[day][meal] = recipeId;
-      added.push({ day, meal, recipeId });
-    }
-  }
-  return { plan: { ...state.plan, activeSlots: slots, days }, added };
-}
-
 function SolvePlan({ onDone, onSkip }: DoneProps) {
   const { state, dispatch } = useApp();
   const ageMonths = selectAgeMonths(state) ?? 0;
@@ -348,7 +322,7 @@ function SolvePlan({ onDone, onSkip }: DoneProps) {
           if (meals.length === 0) return null;
           return (
             <li key={index}>
-              Day {index + 1}: {meals.map((meal) => `${MEAL_LABELS[meal]} ${title(day[meal]!)}`).join(', ')}
+              {dayLabel(index)}: {meals.map((meal) => `${MEAL_LABELS[meal]} ${title(day[meal]!)}`).join(', ')}
             </li>
           );
         })}
@@ -416,7 +390,7 @@ function SolveSafe({ onDone, onSkip }: DoneProps) {
   };
 
   return (
-    <Frame id="solve-safe" title="Foods to leave out for now">
+    <Frame id="solve-safe" title="Foods to leave out">
       <p>These are the foods on FirstMenu&apos;s list for your child&apos;s age.</p>
       <ul className={styles.list} aria-label="Leave out for your child's age">
         {leaveOut.map((label) => {
