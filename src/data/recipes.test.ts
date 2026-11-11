@@ -1417,7 +1417,7 @@ const BATCH_6_EXPECTED: Record<string, Batch3Expectation> = {
   'b-icn-orange-glazed-carrots': { publisher: ICN, stages: ['24-36'], serveAs: ['pieces'], allergens: [], servings: 6 },
   'b-icn-italian-vegetable-medley': { publisher: ICN, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: ['dairy'], servings: 6 },
   'b-icn-fiesta-wrap': { publisher: ICN, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: ['dairy', 'wheat'], servings: 6 },
-  'b-icn-black-beans-with-plantains': { publisher: ICN, stages: ['9-12', '12-23', '24-36'], serveAs: ['pieces'], allergens: [], servings: 6 },
+  'b-icn-black-beans-with-plantains': { publisher: ICN, stages: ['24-36'], serveAs: ['pieces'], allergens: [], servings: 6 },
   'b-icn-tuna-salad-and-apple-slices': { publisher: ICN, stages: ['24-36'], serveAs: ['pieces'], allergens: ['dairy', 'fish'], servings: 6 },
   'b-icn-fresh-veggie-wraps': { publisher: ICN, stages: ['24-36'], serveAs: ['pieces'], allergens: ['dairy', 'wheat'], servings: 6 },
   'b-icn-cheesy-bean-tostada': { publisher: ICN, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: ['dairy'], servings: 6 },
@@ -1431,8 +1431,8 @@ const BATCH_6_EXPECTED: Record<string, Batch3Expectation> = {
   'b-fh-glazed-carrots-and-snow-peas': { publisher: FH, stages: ['24-36'], serveAs: ['pieces'], allergens: ['dairy'], servings: 6, estimateNote: ESTIMATE_HALF_CUP },
   'b-fh-honey-mustard-green-beans': { publisher: FH, stages: ['24-36'], serveAs: ['pieces'], allergens: [], servings: 8, estimateNote: ESTIMATE_HALF_CUP },
   'b-fh-skillet-braised-chicken': { publisher: FH, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: [], servings: 2 },
-  'b-fh-southwestern-stuffed-potatoes': { publisher: FH, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: ['dairy'], servings: 4, estimateNote: 'Serving count is an estimate (source gives no servings): 4 potato halves, 1 potato half per serving.' },
-  'b-fh-blueberry-tofu-smoothie': { publisher: FH, stages: ['6-8', '9-12'], serveAs: ['puree'], allergens: ['soy'], servings: 7, estimateNote: 'Serving count is an estimate (source gives no servings): the page makes 4 cups with the juice, so about 3 1/2 cups without it, divided by a 1/2 cup portion.' },
+  'b-fh-southwestern-stuffed-potatoes': { publisher: FH, stages: ['24-36'], serveAs: ['pieces'], allergens: ['dairy'], servings: 4, estimateNote: 'Serving count is an estimate (source gives no servings): 4 potato halves, 1 potato half per serving.' },
+  'b-fh-blueberry-tofu-smoothie': { publisher: FH, stages: ['9-12'], serveAs: ['puree'], allergens: ['soy'], servings: 7, estimateNote: 'Serving count is an estimate (source gives no servings): the page makes 4 cups with the juice, so about 3 1/2 cups without it, divided by a 1/2 cup portion.' },
   'b-fh-barley-bean-and-corn-salad': { publisher: FH, stages: ['24-36'], serveAs: ['pieces'], allergens: [], servings: 6, estimateNote: ESTIMATE_ONE_CUP },
   'b-fh-chicken-and-black-bean-salsa-burritos': { publisher: FH, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: ['dairy', 'wheat'], servings: 4, estimateNote: 'Serving count is an estimate (source gives no servings): 4 burritos, 1 burrito per serving.' },
   'b-fh-garden-sloppy-joes': { publisher: FH, stages: ['24-36'], serveAs: ['pieces'], allergens: ['wheat'], servings: 6, estimateNote: 'Serving count is an estimate (source gives no servings): 6 sandwiches, 1 sandwich per serving.' },
@@ -1674,11 +1674,11 @@ describe('BUILTIN_RECIPES - batch 6', () => {
     const cellCount = (stage: StageId, effort: Effort) =>
       BATCH_6_RECIPES.filter((r) => r.stages.includes(stage) && recipeEffort(r) === effort).length;
     expect(cellCount('24-36', 'easy')).toBeGreaterThanOrEqual(16);
-    expect(cellCount('12-23', 'easy')).toBeGreaterThanOrEqual(7);
-    expect(cellCount('6-8', 'easy')).toBeGreaterThanOrEqual(4);
+    expect(cellCount('12-23', 'easy')).toBeGreaterThanOrEqual(6);
+    expect(cellCount('6-8', 'easy')).toBeGreaterThanOrEqual(3);
     expect(cellCount('24-36', 'more')).toBeGreaterThanOrEqual(16);
-    expect(cellCount('12-23', 'more')).toBeGreaterThanOrEqual(7);
-    expect(cellCount('9-12', 'more')).toBeGreaterThanOrEqual(3);
+    expect(cellCount('12-23', 'more')).toBeGreaterThanOrEqual(6);
+    expect(cellCount('9-12', 'more')).toBeGreaterThanOrEqual(2);
     expect(cellCount('24-36', 'medium')).toBeGreaterThanOrEqual(9);
     const groupCount = (group: string) =>
       BATCH_6_RECIPES.filter((r) => BATCH_6_EXPECTED[r.id].allergens.includes(group)).length;
@@ -1734,10 +1734,10 @@ const GOAL: Counts = {
  * Floors for this batch (batch 6). The total follows the plan line (about 205
  * after batch 6; the set has 234). Cells and allergens are what the set reaches
  * after batch 6, capped at HARD_MINIMUM, and are raised by each batch. Cells
- * still under their hard minimum (12-23 Easy 33 of 45, 24-36 Easy 55 of 70,
- * 6-8 Medium 8 of 10) are the gaps the next batches fill. Batch 6 closed the
- * hard minimum for 6-8 Easy (23 of 20), 9-12 More (15 of 15), 12-23 More (30 of
- * 30), 24-36 Medium (78 of 70), 24-36 More (61 of 60) and soy (30 of 30). 6-8
+ * still under their hard minimum (12-23 Easy 32 of 45, 24-36 Easy 55 of 70,
+ * 9-12 More 14 of 15, 12-23 More 29 of 30, 6-8 Medium 8 of 10) are the gaps the
+ * next batches fill. Batch 6 closed the hard minimum for 6-8 Easy (22 of 20),
+ * 24-36 Medium (78 of 70), 24-36 More (61 of 60) and soy (30 of 30). 6-8
  * Medium stays at 8 of 10: no fetched page whose own directions describe
  * mashing or pureeing has enough steps or ingredients to count as Medium.
  */
@@ -1746,8 +1746,8 @@ const CHECKPOINT: Counts = {
   simpleIdeasMax: 40,
   stages: {
     '6-8': cell(20, 8, 0),
-    '9-12': cell(30, 25, 15),
-    '12-23': cell(33, 45, 30),
+    '9-12': cell(30, 25, 14),
+    '12-23': cell(32, 45, 29),
     '24-36': cell(55, 70, 60),
   },
   allergens: { dairy: 30, egg: 30, wheat: 30, soy: 30, peanut: 8, 'tree nuts': 8, fish: 8, sesame: 4, shellfish: 3 },

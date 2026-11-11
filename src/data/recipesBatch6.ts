@@ -486,7 +486,7 @@ export const BATCH_6_RECIPES: Recipe[] = [
       'Rinse the quinoa in a fine mesh strainer until the water runs clear. Cook it with the chicken broth in a covered small pot: bring to a boil, then simmer on low 10 to 15 minutes until the broth is absorbed. Fluff with a fork, then cover and refrigerate.',
       'Whisk the lemon juice, vinegar, garlic, olive oil, salt and white pepper together in a small bowl to make the dressing.',
       'In a large bowl, mix the red peppers, green onions, red onions, tomatoes and olives, then stir in the dressing and the cooled quinoa.',
-      'Fold in the feta and parsley, cover and refrigerate for about 2 hours. Serve chilled.',
+      'Fold in the feta and parsley. Cover the bowl and chill it for roughly 2 hours before serving cold.',
     ],
     texture: 'quinoa salad with vegetables and feta',
     servings: 6,
@@ -644,7 +644,7 @@ export const BATCH_6_RECIPES: Recipe[] = [
     servings: 6,
   },
   {
-    // Black beans, brown rice and diced ripe plantain simmered in tomato sauce.
+    // Black beans, brown rice and diced ripe plantain simmered in tomato sauce. The optional salsa topping is salty and the screen does not block it, so it is kept and the recipe is 24-36 only.
     id: 'b-icn-black-beans-with-plantains',
     origin: 'builtin',
     source: {
@@ -655,7 +655,7 @@ export const BATCH_6_RECIPES: Recipe[] = [
       adaptations: [],
     },
     title: 'Black Beans With Plantains',
-    stages: ['9-12', '12-23', '24-36'],
+    stages: ['24-36'],
     serveAs: ['pieces'],
     mealTypes: ['dinner', 'lunch'],
     ingredients: [
@@ -951,7 +951,7 @@ export const BATCH_6_RECIPES: Recipe[] = [
     ],
     steps: [
       'Mix the corn, tomatoes, dressing and basil in a medium bowl.',
-      'Serve at room temperature or chilled. Refrigerate leftovers within 2 hours.',
+      'Serve the salad chilled or at room temperature. Put any leftovers in the refrigerator within 2 hours.',
     ],
     texture: 'corn and tomato salad',
     servings: 6,
@@ -1037,7 +1037,7 @@ export const BATCH_6_RECIPES: Recipe[] = [
       { name: 'green beans (cooked from fresh, frozen, or canned, drained and rinsed)', food: 'green bean', quantity: 4, unit: 'cup', category: 'produce' },
     ],
     steps: [
-      'In a medium saucepan or skillet over medium-low heat, stir the mustard, honey and vinegar together. Cook about 10 minutes, until the sauce boils and thickens.',
+      'Stir the mustard, honey and vinegar together in a medium saucepan or skillet set over medium-low heat. Cook about 10 minutes, until the sauce boils and thickens.',
       'Add the green beans and stir to coat. Cook until the beans are heated through and serve warm. Refrigerate leftovers within 2 hours.',
     ],
     texture: 'green beans in a thick honey mustard sauce',
@@ -1064,16 +1064,16 @@ export const BATCH_6_RECIPES: Recipe[] = [
       { name: 'seasoning (such as black pepper, onion powder or garlic powder)', food: 'seasoning', category: 'pantry' },
     ],
     steps: [
-      'Season the chicken. Cook it in a lightly oiled skillet over medium-high heat for 1 minute on each side, until lightly browned.',
+      'Season the chicken. Brown it for 1 minute on each side in a skillet with a little oil over medium-high heat.',
       'Cover the skillet with a tight-fitting lid, turn the heat to low and cook for 10 minutes without lifting the lid.',
       'Turn off the heat and let the chicken rest, still covered, for 10 minutes.',
-      'Check the thickest part with a food thermometer: it should read at least 165°F. If not, cover and cook on low for 3 to 5 more minutes. Refrigerate leftovers within 2 hours, or freeze for longer storage.',
+      'Check the thickest part with a food thermometer: it should read at least 165°F. If not, cover and cook on low for 3 to 5 more minutes. Put leftovers in the refrigerator within 2 hours, or freeze them to keep longer.',
     ],
     texture: 'braised chicken breast',
     servings: 2,
   },
   {
-    // Microwaved potato halves topped with black beans, salsa, corn and cheese.
+    // Microwaved potato halves topped with black beans, salsa, corn and cheese. Salsa is salty, so 24-36 only.
     id: 'b-fh-southwestern-stuffed-potatoes',
     origin: 'builtin',
     source: {
@@ -1084,7 +1084,7 @@ export const BATCH_6_RECIPES: Recipe[] = [
       adaptations: ['Serving count is an estimate (source gives no servings): 4 potato halves, 1 potato half per serving.'],
     },
     title: 'Southwestern Stuffed Potatoes',
-    stages: ['12-23', '24-36'],
+    stages: ['24-36'],
     serveAs: ['pieces'],
     mealTypes: ['lunch', 'dinner'],
     ingredients: [
@@ -1103,7 +1103,7 @@ export const BATCH_6_RECIPES: Recipe[] = [
     servings: 4,
   },
   {
-    // Blueberries, banana, soy milk and silken tofu pureed smooth. The orange juice is left out (juice is blocked under 12 months).
+    // Blueberries, banana, soy milk and silken tofu pureed smooth. The orange juice is left out (juice is blocked under 12 months). The page calls for vanilla (sweetened) soy milk and offers no plain option, so it is not tagged 6-8.
     id: 'b-fh-blueberry-tofu-smoothie',
     origin: 'builtin',
     source: {
@@ -1117,7 +1117,7 @@ export const BATCH_6_RECIPES: Recipe[] = [
       ],
     },
     title: 'Blueberry Tofu Smoothie',
-    stages: ['6-8', '9-12'],
+    stages: ['9-12'],
     serveAs: ['puree'],
     mealTypes: ['breakfast', 'snack'],
     ingredients: [
@@ -1516,7 +1516,7 @@ export const BATCH_6_RECIPES: Recipe[] = [
     ],
     steps: [
       'Put the split peas and water in a small saucepan and bring to a boil. Turn the heat down and simmer about 20 minutes, until the peas are just tender but still hold their shape. Drain if needed and let them cool.',
-      'In a bowl, mix the cooked split peas with the onion, tomato and parsley, then add the dressing and toss lightly. Refrigerate leftovers within 2 hours.',
+      'In a bowl, mix the cooked split peas with the onion, tomato and parsley. Pour on the dressing and toss gently. Put any leftovers in the refrigerator within 2 hours.',
     ],
     texture: 'split pea and tomato salad',
     servings: 4,
