@@ -519,7 +519,6 @@ describe('built-in recipes derive clean food keys (Item 3)', () => {
       'corn flakes',
       'green chile',
       'taco seasoning',
-      'avocado',
       'roll',
       'sweet sour sauce',
     ]);

@@ -82,7 +82,7 @@ export const BATCH_5_RECIPES: Recipe[] = [
       'Put the pineapple chunks in a medium mixing bowl and add the apple, banana and orange.',
       'Add the yogurt and mix gently with a spoon until the fruit is well coated. Refrigerate leftovers within 2 hours.',
     ],
-    texture: 'soft fruit pieces in yogurt',
+    texture: 'fruit pieces in yogurt',
     servings: 8,
   },
   {
@@ -112,7 +112,7 @@ export const BATCH_5_RECIPES: Recipe[] = [
       'Spread the cream cheese on both halves.',
       'Divide the fruit between the two halves and arrange it on top of the cream cheese. These are best served right away. Refrigerate leftovers within 2 hours.',
     ],
-    texture: 'toasted muffin halves with cream cheese and soft fruit',
+    texture: 'toasted muffin halves with cream cheese and fruit',
     servings: 2,
   },
   {
@@ -139,7 +139,7 @@ export const BATCH_5_RECIPES: Recipe[] = [
       'Divide the banana slices between two plates. Put 2 tablespoons of yogurt and 1 tablespoon of granola cereal on each plate.',
       'Use a fork to pick up a banana slice, dip it into the yogurt and then into the cereal. Refrigerate leftovers within 2 hours.',
     ],
-    texture: 'soft banana slices with yogurt and cereal',
+    texture: 'banana slices with yogurt and cereal',
     servings: 2,
   },
   {
@@ -167,7 +167,7 @@ export const BATCH_5_RECIPES: Recipe[] = [
       'Divide the yogurt between 2 clear glasses or dishes.',
       'Spoon half of the peaches and blueberries on top of the yogurt in each glass and sprinkle each sundae with the granola. Refrigerate leftovers within 2 hours.',
     ],
-    texture: 'yogurt with soft fruit and granola',
+    texture: 'yogurt with fruit and granola',
     servings: 2,
   },
   {
@@ -277,7 +277,7 @@ export const BATCH_5_RECIPES: Recipe[] = [
       'Blend the lime juice and mint leaves together in a small food processor.',
       'Put the melon cubes in a bowl, drizzle the mint dressing over them and toss gently. Refrigerate leftovers within 2 hours.',
     ],
-    texture: 'soft melon cubes',
+    texture: 'melon cubes',
     servings: 12,
   },
   {
@@ -304,7 +304,7 @@ export const BATCH_5_RECIPES: Recipe[] = [
       'Put the watermelon cubes in a serving bowl and squeeze the lime juice over them.',
       'Sprinkle with the chili powder, stir gently and serve right away. Refrigerate leftovers within 2 hours.',
     ],
-    texture: 'soft watermelon cubes',
+    texture: 'watermelon cubes',
     servings: 4,
   },
   {
@@ -335,7 +335,7 @@ export const BATCH_5_RECIPES: Recipe[] = [
       'Gently turn the quesadillas over with a large spatula and cook the other side for 2 to 4 minutes, until a little brown.',
       'Move to a plate and repeat with the rest. Cut each quesadilla in half and serve. Refrigerate leftovers within 2 hours.',
     ],
-    texture: 'soft folded quesadilla halves with melted cheese and pear',
+    texture: 'folded quesadilla halves with melted cheese and pear',
     servings: 8,
   },
   {
@@ -365,7 +365,7 @@ export const BATCH_5_RECIPES: Recipe[] = [
       'Sprinkle the cheese over one half of the tortilla, add the cranberry sauce, turkey and spinach, and fold the empty half over the filling.',
       'Cover and cook for 2 to 3 minutes on each side, until the outside is golden brown and the inside is heated through. Refrigerate leftovers within 2 hours.',
     ],
-    texture: 'soft folded quesadilla with melted cheese and turkey',
+    texture: 'folded quesadilla with melted cheese and turkey',
     servings: 1,
   },
   {
@@ -448,11 +448,11 @@ export const BATCH_5_RECIPES: Recipe[] = [
       { name: 'lemon juice (about 1/2 lemon)', food: 'lemon juice', quantity: 2, unit: 'tbsp', category: 'produce' },
     ],
     steps: [
-      'In a medium bowl, break up the salmon and skin and mash the small bones with a fork.',
+      'In a medium bowl, flake the salmon, skin included, and mash the small bones in with a fork.',
       'Add the relish, yogurt, mayonnaise and lemon juice and mix until well combined.',
-      'Chill before serving. Serve on a bed of salad greens or use as a sandwich filling. Refrigerate leftovers within 2 hours.',
+      'Chill, then serve over salad greens or as a sandwich filling. Refrigerate leftovers within 2 hours.',
     ],
-    texture: 'flaked salmon salad with mashed soft bones',
+    texture: 'flaked salmon salad with mashed canned bones',
     servings: 6,
   },
   {
@@ -523,7 +523,10 @@ export const BATCH_5_RECIPES: Recipe[] = [
       publisher: FH_PUBLISHER,
       url: 'https://foodhero.org/recipes/braised-radishes',
       retrieved: RETRIEVED,
-      adaptations: [ESTIMATE_HALF_CUP],
+      adaptations: [
+        ESTIMATE_HALF_CUP,
+        'Source gives 30 to 36 radishes; 30 used.',
+      ],
     },
     title: 'Braised Radishes',
     stages: ['24-36'],
@@ -533,14 +536,14 @@ export const BATCH_5_RECIPES: Recipe[] = [
       { name: 'water', food: 'water', quantity: 0.5, unit: 'cup', category: 'other' },
       { name: 'sugar', food: 'sugar', quantity: 2, unit: 'tbsp', category: 'pantry' },
       { name: 'salt', food: 'salt', quantity: 0.5, unit: 'tsp', category: 'pantry' },
-      { name: 'radishes, cut in halves or quarters (30 to 36 radishes, about 4 bunches)', food: 'radish', quantity: 33, unit: 'piece', category: 'produce' },
+      { name: 'radishes, cut in halves or quarters (30 radishes, about 4 bunches)', food: 'radish', quantity: 30, unit: 'piece', category: 'produce' },
     ],
     steps: [
       'In a medium saucepan or skillet, bring the water, sugar and salt to a boil.',
       'Add the radishes and reduce the heat to a simmer. Cover and cook for about 5 to 7 minutes, until the radishes can be pierced with a fork.',
       'Uncover and cook until the liquid reduces to a shiny glaze. Serve warm. Refrigerate leftovers within 2 hours.',
     ],
-    texture: 'tender glazed radishes',
+    texture: 'glazed radishes',
     servings: 6,
   },
   {
@@ -570,7 +573,7 @@ export const BATCH_5_RECIPES: Recipe[] = [
       'On the narrow end of each pear, make a rabbit face: poke two pieces of sliced almond in for ears and arrange two raisins for eyes and one for the nose.',
       'Put 2 tablespoons of cottage cheese at the other end of each pear half to make a tail.',
     ],
-    texture: 'soft pear halves with cottage cheese',
+    texture: 'pear halves with cottage cheese',
     servings: 4,
   },
   {
@@ -599,7 +602,7 @@ export const BATCH_5_RECIPES: Recipe[] = [
       'Combine the cooked rice, milk and cinnamon in a microwave-safe bowl. Microwave on high for 45 seconds, stir, then heat for another 45 to 60 seconds, until heated through.',
       'Divide the rice mixture between two bowls and top with the fruit and nuts. Serve warm. Refrigerate leftovers within 2 hours.',
     ],
-    texture: 'warm soft rice with fruit and chopped nuts',
+    texture: 'rice heated through with fruit and chopped nuts',
     servings: 2,
   },
   {
@@ -742,7 +745,7 @@ export const BATCH_5_RECIPES: Recipe[] = [
     ],
     steps: [
       'Heat the oven to 400°F. Put the cauliflower florets, all about the same size, in a large bowl and stir in the oil, garlic powder, onion powder and pepper to coat.',
-      'Spread the florets on a large baking sheet with space between the pieces.',
+      'Arrange the florets on a large baking sheet, leaving space between the pieces.',
       'Roast for 30 minutes, until the cauliflower is tender when pierced with a fork. Sprinkle with the cheese before serving. Refrigerate leftovers within 2 hours.',
     ],
     texture: 'roasted cauliflower, tender when pierced with a fork',
@@ -780,7 +783,7 @@ export const BATCH_5_RECIPES: Recipe[] = [
       'Add the carrot, onion and chosen vegetables and saute, stirring often, until tender.',
       'Stir in the rice and the soy sauce mixture, breaking up any clumps of rice, and keep heating and stirring until heated through. Refrigerate leftovers within 2 hours.',
     ],
-    texture: 'soft rice with small pieces of pork and vegetables',
+    texture: 'rice with small pieces of pork and vegetables',
     servings: 8,
   },
   {
@@ -852,7 +855,7 @@ export const BATCH_5_RECIPES: Recipe[] = [
       'Heat the oven to 400°F. Spread the cabbage in a clean 9 x 13 inch baking dish, take the chicken out of the marinade (throw away what is left in that dish) and set it on top of the cabbage, then pour the reserved marinade over the chicken.',
       'Bake for 25 minutes, until the chicken reaches 165°F or higher for at least 15 seconds. Serve 1 1/2 chicken thighs with 1/4 cup of cooked cabbage, right away or kept warm at 140°F or higher.',
     ],
-    texture: 'tender baked chicken thighs on soft cabbage',
+    texture: 'baked chicken thighs on cabbage',
     servings: 6,
   },
   {
@@ -887,7 +890,7 @@ export const BATCH_5_RECIPES: Recipe[] = [
       'Add the carrots, coriander, sesame seeds and cilantro and saute uncovered over high heat for 3 minutes, stirring often, until heated to 140°F or higher for at least 15 seconds.',
       'Serve 1/2 cup, or keep warm at 140°F or higher.',
     ],
-    texture: 'soft sauteed corn, edamame and carrots',
+    texture: 'sauteed corn, edamame and carrots',
     servings: 6,
   },
   {
@@ -922,7 +925,7 @@ export const BATCH_5_RECIPES: Recipe[] = [
       'Heat the vegetable oil in a wok or large nonstick skillet over high heat, add the ham and cook for 2 minutes, until it begins to brown. Reduce the heat to medium, add the rice and toss, add the remaining eggs and stir for 5 minutes, until the egg is fully cooked.',
       'Add the green onions, spinach, chopped egg, sesame oil and soy sauce, stir well and cook until thoroughly heated. Serve hot.',
     ],
-    texture: 'soft rice with egg, spinach and ham',
+    texture: 'rice with egg, spinach and ham',
     servings: 6,
   },
   {
@@ -964,7 +967,7 @@ export const BATCH_5_RECIPES: Recipe[] = [
       'Season the pork with the salt and pepper. Coat the skillet with cooking spray, set it over medium-high heat and brown the pork for 10 to 15 minutes, stirring often, until it reaches 155°F or higher for at least 15 seconds.',
       'Add the vegetables and the sauce to the skillet and cook for 2 to 3 minutes, stirring often, until heated to 140°F or higher for at least 15 seconds. Serve 1/2 cup of stir-fry over 1/4 cup of rice and keep hot at 140°F or higher.',
     ],
-    texture: 'tender pork and vegetables in a thickened sauce over rice',
+    texture: 'pork and vegetables in a thickened sauce over rice',
     servings: 6,
   },
   {
@@ -994,10 +997,10 @@ export const BATCH_5_RECIPES: Recipe[] = [
       { name: 'sesame seeds', food: 'sesame seed', quantity: 1, unit: 'tsp', category: 'pantry' },
     ],
     steps: [
-      'Set the frozen shrimp aside in a small bowl to thaw on the counter.',
-      'Rehydrate dried seaweed, or soak fresh seaweed, in cold tap water for 10 minutes. Drain it, squeeze out as much water as possible, chop it into bite-sized pieces and put it in a medium bowl.',
+      'Put the frozen shrimp in a small bowl and let them thaw on the counter.',
+      'Soak the dried seaweed (or fresh seaweed) in cold tap water for 10 minutes. Drain, press out the extra water, cut it into bite-sized pieces and place it in a medium bowl.',
       'While the seaweed soaks, slice the cucumber as thin as you can, sprinkle with the salt and let it sit in a small bowl for 5 minutes. Squeeze the water out of the cucumber and add it to the seaweed.',
-      'In a small bowl, mix the rice vinegar, sugar, soy sauce and sesame oil until the sugar dissolves, then add it to the vegetables and mix well. Add the shrimp and sesame seeds to a serving bowl and mix lightly, refrigerate for about 10 minutes to blend the flavors, and serve in individual bowls.',
+      'Stir the rice vinegar, sugar, soy sauce and sesame oil together in a small bowl until the sugar dissolves. Pour it over the vegetables and mix well. Gently fold in the shrimp and sesame seeds, chill for about 10 minutes, and serve in individual bowls.',
     ],
     texture: 'thin cucumber slices and seaweed with small shrimp',
     servings: 4,
@@ -1039,7 +1042,7 @@ export const BATCH_5_RECIPES: Recipe[] = [
       'Fold in the crab meat gently so it does not break into small pieces, leaving big chunks. If the mixture seems a bit wet, wait at least 5 minutes for the cracker meal to absorb the moisture. If it still seems loose, dust the top with flour and carefully fold it in instead of adding more cracker meal.',
       'Shape into cakes and fry in butter over moderate heat until golden brown on each side.',
     ],
-    texture: 'tender crab cakes with big chunks of crab',
+    texture: 'crab cakes with big chunks of crab',
     servings: 8,
   },
   {
@@ -1078,7 +1081,7 @@ export const BATCH_5_RECIPES: Recipe[] = [
       'Add the macaroni and zucchini and simmer for another 15 minutes.',
       'Taste and adjust the seasoning with salt and pepper. Refrigerate leftovers within 2 hours.',
     ],
-    texture: 'soft vegetables, beans and pasta in broth',
+    texture: 'vegetables, beans and pasta in broth',
     servings: 10,
   },
   {
@@ -1118,7 +1121,7 @@ export const BATCH_5_RECIPES: Recipe[] = [
       'Add everything except the cheese, then reduce the heat to low, cover the skillet and cook for 10 to 15 minutes, until the bulgur is soft.',
       'Sprinkle with the grated cheese and serve. Refrigerate leftovers within 2 hours.',
     ],
-    texture: 'soft beans, vegetables and bulgur in tomato',
+    texture: 'beans, vegetables and bulgur in tomato, cooked until the bulgur is soft',
     servings: 8,
   },
   {
@@ -1154,7 +1157,7 @@ export const BATCH_5_RECIPES: Recipe[] = [
       'In a large skillet over medium heat (300°F in an electric skillet), cook the turkey until no longer pink, adding the seasonings in the last few minutes. Add the onion, mushrooms and zucchini (with a little water or oil if needed to keep it from sticking) and cook and stir until the vegetables are tender. Mix in the tomatoes and rice and take off the heat.',
       'Fill the pepper halves with the skillet mixture, cover the dish with foil and bake for 40 to 50 minutes, until the peppers are tender when poked with a fork. Refrigerate leftovers within 2 hours.',
     ],
-    texture: 'soft turkey and vegetable filling in tender pepper halves',
+    texture: 'turkey and vegetable filling in pepper halves, tender when poked with a fork',
     servings: 6,
   },
   {
@@ -1193,7 +1196,7 @@ export const BATCH_5_RECIPES: Recipe[] = [
       'Cover, reduce the heat to low (225°F in an electric skillet) and cook for 10 to 15 minutes, stirring now and then, until the pasta is tender. While it cooks, crush the corn flakes in a small bowl and mix in the garlic powder.',
       'Just before serving, stir in the sour cream and top with the crushed corn flakes. Refrigerate leftovers within 2 hours.',
     ],
-    texture: 'creamy soft pasta with turkey and peas',
+    texture: 'creamy pasta with turkey and peas, cooked until tender',
     servings: 8,
   },
   {
@@ -1231,7 +1234,7 @@ export const BATCH_5_RECIPES: Recipe[] = [
       'Add the beans, broth, chiles and seasonings, bring to a boil, then reduce the heat and simmer uncovered for 30 minutes.',
       'Take off the heat and let cool for about a minute, then stir in the sour cream and milk. Refrigerate leftovers within 2 hours.',
     ],
-    texture: 'tender chicken and soft white beans in a creamy broth',
+    texture: 'chicken and white beans in a creamy broth',
     servings: 8,
   },
   {
@@ -1269,7 +1272,7 @@ export const BATCH_5_RECIPES: Recipe[] = [
       'Stir in the beans, pumpkin, tomatoes, broth, water, brown sugar (if using) and taco seasoning.',
       'Bring to a boil, then reduce the heat, cover and simmer for 1 hour. Refrigerate leftovers within 2 hours.',
     ],
-    texture: 'soft beans and ground turkey in a thick pumpkin tomato chili',
+    texture: 'beans and ground turkey in a thick pumpkin tomato chili',
     servings: 10,
   },
   {
@@ -1295,7 +1298,7 @@ export const BATCH_5_RECIPES: Recipe[] = [
     ],
     steps: [
       'Put the strawberries in a blender and process until smooth.',
-      'Serve, or freeze for 1 to 2 hours to make a slushy. Refrigerate leftovers within 2 hours.',
+      'Eat it as is, or freeze it for 1 to 2 hours for a slushy texture. Refrigerate leftovers within 2 hours.',
     ],
     texture: 'smooth strawberry puree',
     servings: 2,
@@ -1329,9 +1332,10 @@ export const BATCH_5_RECIPES: Recipe[] = [
       'Bake for about 4 to 6 minutes, then turn the slices over and return them to the oven.',
       'Bake until the squash is tender, about 15 to 20 minutes more. Serve warm. Refrigerate leftovers within 2 hours.',
     ],
-    texture: 'baked squash, tender when pierced with a fork',
+    texture: 'baked squash, cooked until tender',
     servings: 6,
-  },  {
+  },
+  {
     // Mashed potato and cabbage; the salt is left out. Mashes to the texture wanted, so 6-8 as well.
     id: 'b-fh-red-potato-and-cabbage-colcannon',
     origin: 'builtin',
@@ -1361,52 +1365,8 @@ export const BATCH_5_RECIPES: Recipe[] = [
       'Reduce the heat to low, add the milk and pepper, cover and cook until the cabbage is tender, about 6 to 8 minutes.',
       'Drain the potatoes and add the cabbage mixture. Mash with a potato masher or large fork to the texture you want and serve warm. Refrigerate leftovers within 2 hours.',
     ],
-    texture: 'soft mashed potato with tender cabbage',
+    texture: 'mashed potato with cabbage, cooked until tender',
     servings: 12,
-  },
-  {
-    // Soy sauce and salt, so 24-36 only. Soy, sesame and egg.
-    id: 'b-icn-quinoa-bowl',
-    origin: 'builtin',
-    source: {
-      title: 'Quinoa Bowl USDA Recipe for Family Child Care Homes',
-      publisher: ICN_PUBLISHER,
-      url: 'https://theicn.org/cnrb/recipes-for-homes/quinoa-bowl-usda-recipe-for-family-child-care-homes/',
-      retrieved: RETRIEVED,
-      adaptations: [
-        'The page lists 1 lb dry quinoa with 2 cups water, which cannot cook together (the page puts 1 cup of cooked quinoa in each of the 6 bowls); the amounts are copied as printed, so check the package directions for the water ratio.',
-      ],
-    },
-    title: 'Quinoa Bowl',
-    stages: ['24-36'],
-    serveAs: ['pieces'],
-    mealTypes: ['lunch', 'dinner'],
-    ingredients: [
-      { name: 'quinoa, dry', food: 'quinoa', quantity: 1, unit: 'lb', category: 'grains' },
-      { name: 'water', food: 'water', quantity: 2, unit: 'cup', category: 'other' },
-      { name: 'salt', food: 'salt', quantity: 0.25, unit: 'tsp', category: 'pantry' },
-      { name: 'fresh lime juice', food: 'lime juice', quantity: 0.333, unit: 'cup', category: 'produce' },
-      { name: 'unseasoned rice vinegar', food: 'vinegar', quantity: 2, unit: 'tbsp', category: 'pantry' },
-      { name: 'sesame oil', food: 'sesame oil', quantity: 2, unit: 'tbsp', category: 'pantry' },
-      { name: 'olive oil', food: 'olive oil', quantity: 2, unit: 'tbsp', category: 'pantry' },
-      { name: 'low-sodium soy sauce', food: 'soy sauce', quantity: 2, unit: 'tsp', category: 'pantry' },
-      { name: 'fresh ginger, finely minced', food: 'ginger', quantity: 1, unit: 'tbsp', category: 'produce' },
-      { name: 'canned low-sodium black beans, rinsed and drained', food: 'black bean', quantity: 1, unit: 'cup', category: 'pantry' },
-      { name: 'small diced fresh red bell pepper', food: 'bell pepper', quantity: 1, unit: 'cup', category: 'produce' },
-      { name: 'fresh cilantro, stems removed, finely minced', food: 'cilantro', quantity: 0.25, unit: 'cup', category: 'produce' },
-      { name: 'sliced fresh green onion, tops and bottom', food: 'green onion', quantity: 0.125, unit: 'cup', category: 'produce' },
-      { name: 'mashed avocado', food: 'avocado', quantity: 0.75, unit: 'cup', category: 'produce' },
-      { name: 'large hard-boiled eggs, halved', food: 'egg', quantity: 6, unit: 'piece', category: 'dairy-eggs' },
-    ],
-    steps: [
-      'Rinse the quinoa in a mesh strainer until the water runs clear, not cloudy.',
-      'Bring the water to a boil in a medium saucepan, add the quinoa and salt and return to a boil. Reduce the heat to low and simmer uncovered for 10 to 15 minutes, until the water is completely absorbed. The quinoa is done when it is soft and a white ring pops out of the kernel. Move it to a shallow pan and refrigerate to cool to 41°F or lower within 4 hours.',
-      'Whisk the lime juice, rice vinegar, sesame oil, olive oil, soy sauce and ginger together. In a medium bowl combine the black beans, bell pepper, cilantro and green onions, add the dressing, mix well and let it marinate for 1 hour.',
-      'Take the quinoa out of the refrigerator and put 1 cup of the chilled quinoa in each bowl. Top each with 1/2 cup of the black bean mixture.',
-      'Just before serving, top each bowl with a scoop (about 1 ounce) of the avocado and 1 hard-boiled egg cut in half. Serve immediately, 1 bowl per person.',
-    ],
-    texture: 'soft quinoa with black beans, avocado and egg',
-    servings: 6,
   },
   {
     // Soy sauce, salt and canned broth, so 24-36 only. Soy, sesame, egg and wheat.
@@ -1446,7 +1406,7 @@ export const BATCH_5_RECIPES: Recipe[] = [
       'Stir in the noodles and cabbage and cook for 4 minutes, until the noodles are soft and heated to 140°F or higher for at least 15 seconds.',
       'Stir in the spinach, green onions and sesame oil and take off the heat. The page suggests chopping the spinach when serving younger children. Serve 1 1/4 cups and keep hot at 140°F or higher.',
     ],
-    texture: 'soft noodles, chicken and vegetables in broth',
+    texture: 'noodles, chicken and vegetables in broth',
     servings: 6,
   },
   {
@@ -1487,7 +1447,7 @@ export const BATCH_5_RECIPES: Recipe[] = [
       'Bake for 10 minutes at 400°F (8 minutes at 375°F in a convection oven), until heated to 165°F or higher for at least 15 seconds.',
       'Slice the rolls open and put a piece of lettuce on the bottom half of each, then a tomato slice, then a tuna burger, and cover with the top of the roll. Serve 1 burger, hot at 140°F or higher.',
     ],
-    texture: 'soft baked tuna patty on a roll',
+    texture: 'baked tuna patty on a roll',
     servings: 6,
   },
   {
@@ -1521,7 +1481,7 @@ export const BATCH_5_RECIPES: Recipe[] = [
       'Move the mixture to an 8 x 8 inch baking pan coated with nonstick cooking spray and bake at 350°F for 30 minutes, until it reaches 165°F or higher for at least 15 seconds when checked with a food thermometer.',
       'Put two lettuce leaves on a plate and top each with 3/4 cup of the filling. Optionally garnish with diced red peppers. Fold the sides of the lettuce in toward the center and roll up like a burrito, seam side down. Serve warm.',
     ],
-    texture: 'soft rice, chicken and bok choy rolled in lettuce leaves',
+    texture: 'rice, chicken and bok choy rolled in lettuce leaves',
     servings: 6,
   },
   {

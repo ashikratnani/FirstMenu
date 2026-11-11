@@ -1145,11 +1145,9 @@ const BATCH_5_EXPECTED: Record<string, Batch3Expectation> = {
   'b-fh-strawberry-swirl': { publisher: FH, stages: ['6-8', '9-12'], serveAs: ['puree'], allergens: [], servings: 2, estimateNote: 'Serving count is an estimate (source gives no servings): the page makes 2 cups with the juice, so about 1 cup without it, divided by a 1/2 cup portion.' },
   'b-fh-glazed-squash': { publisher: FH, stages: ['9-12', '12-23', '24-36'], serveAs: ['pieces'], allergens: [], servings: 6, estimateNote: 'Serving count is an estimate (source gives no servings): total yield of 3 cups divided by a 1/2 cup portion.' },
   'b-fh-red-potato-and-cabbage-colcannon': { publisher: FH, stages: ['6-8', '9-12', '12-23', '24-36'], serveAs: ['mashed', 'pieces'], allergens: ['dairy'], servings: 12, estimateNote: ESTIMATE_HALF_CUP },
-  'b-icn-quinoa-bowl': { publisher: ICN, stages: ['24-36'], serveAs: ['pieces'], allergens: ['egg', 'sesame', 'soy'], servings: 6 },
   'b-icn-easy-chicken-and-egg-noodle-soup': { publisher: ICN, stages: ['24-36'], serveAs: ['pieces'], allergens: ['egg', 'sesame', 'soy', 'wheat'], servings: 6 },
   'b-icn-asian-tuna-burger': { publisher: ICN, stages: ['24-36'], serveAs: ['pieces'], allergens: ['egg', 'fish', 'sesame', 'soy', 'wheat'], servings: 6 },
   'b-icn-bok-choy-wrappers': { publisher: ICN, stages: ['24-36'], serveAs: ['pieces'], allergens: ['soy'], servings: 6 },
-
 };
 
 /** Ingredients the sources list but that were left out; the adaptation must say so. */
@@ -1169,7 +1167,6 @@ const BATCH_5_LEFT_OUT: Record<string, { adaptation: string; absent: RegExp }[]>
   'b-fh-strawberry-swirl': [{ adaptation: 'Left out 1 cup (8 ounces) 100% apple juice', absent: /apple juice/i }],
   'b-fh-glazed-squash': [{ adaptation: 'Left out 3 tablespoons brown sugar', absent: /sugar/i }, { adaptation: 'Left out 1/4 teaspoon salt', absent: /\bsalt\b/i }],
   'b-fh-red-potato-and-cabbage-colcannon': [{ adaptation: 'Left out 1 teaspoon salt', absent: /\bsalt\b/i }],
-
 };
 
 /** Batch 5 recipes that keep salt, sugar or soy sauce because they are tagged 24-36 only (the screen does not block them at that age). */
@@ -1185,11 +1182,9 @@ const BATCH_5_KEEPS_BLOCKED_AT_24 = [
   'b-osu-sg-shrimp-cucumber-and-seaweed-salad',
   'b-fh-minestrone-soup',
   'b-fh-turkey-pumpkin-chili',
-  'b-icn-quinoa-bowl',
   'b-icn-easy-chicken-and-egg-noodle-soup',
   'b-icn-asian-tuna-burger',
   'b-icn-bok-choy-wrappers',
-
 ];
 
 /** Pages (or ICN versions) that state their own serving count (no estimate needed). */
@@ -1205,11 +1200,9 @@ const BATCH_5_SOURCE_SERVINGS = [
   'b-icn-stir-fried-green-rice-eggs-and-ham',
   'b-icn-stir-fry-pork',
   'b-osu-sg-shrimp-cucumber-and-seaweed-salad',
-  'b-icn-quinoa-bowl',
   'b-icn-easy-chicken-and-egg-noodle-soup',
   'b-icn-asian-tuna-burger',
   'b-icn-bok-choy-wrappers',
-
 ];
 
 describe('BUILTIN_RECIPES - batch 5', () => {
@@ -1246,11 +1239,11 @@ describe('BUILTIN_RECIPES - batch 5', () => {
     }
   });
 
-  it('Oregon Sea Grant is a new publisher pending pr-reviewer in docs/recipe-sources.md', () => {
+  it('Oregon Sea Grant is a new publisher listed in docs/recipe-sources.md', () => {
     const row = sourcesDoc.split('\n').find((line) => line.includes(OSU));
     expect(row, 'Oregon Sea Grant row').toBeDefined();
     expect(row).toContain('seagrant.oregonstate.edu');
-    expect(row).toContain('Pending pr-reviewer');
+    expect(row).toMatch(/Pending pr-reviewer|Approved by pr-reviewer \(PR #\d+\)/);
     const osu = BATCH_5_RECIPES.filter((r) => r.source?.publisher === OSU);
     expect(osu.length).toBeGreaterThanOrEqual(2);
     for (const recipe of osu) {
@@ -1387,11 +1380,11 @@ describe('BUILTIN_RECIPES - batch 5', () => {
     expect(cellCount('24-36', 'easy')).toBeGreaterThanOrEqual(23);
     expect(cellCount('6-8', 'easy')).toBeGreaterThanOrEqual(2);
     expect(cellCount('6-8', 'medium')).toBeGreaterThanOrEqual(1);
-    expect(cellCount('24-36', 'more')).toBeGreaterThanOrEqual(16);
+    expect(cellCount('24-36', 'more')).toBeGreaterThanOrEqual(15);
     expect(cellCount('12-23', 'more')).toBeGreaterThanOrEqual(3);
     const groupCount = (group: string) =>
       BATCH_5_RECIPES.filter((r) => BATCH_5_EXPECTED[r.id].allergens.includes(group)).length;
-    expect(groupCount('soy')).toBeGreaterThanOrEqual(12);
+    expect(groupCount('soy')).toBeGreaterThanOrEqual(11);
     expect(groupCount('shellfish')).toBeGreaterThanOrEqual(2);
   });
 });
@@ -1441,11 +1434,11 @@ const GOAL: Counts = {
 
 /**
  * Floors for this batch (batch 5). The total follows the plan line (about 165
- * after batch 5; the set has 191). Cells and allergens are what the set reaches
+ * after batch 5; the set has 189). Cells and allergens are what the set reaches
  * after batch 5, capped at HARD_MINIMUM, and are raised by each batch. Cells
- * and groups still under their hard minimum (12-23 Easy 29 of 45 and More 23 of
- * 30, 24-36 Easy 39 of 70, Medium 68 of 70 and More 47 of 60, 9-12 More 12 of
- * 15) are the gaps the next batches fill. Soy and shellfish reached their
+ * and groups still under their hard minimum (12-23 Easy 26 of 45 and More 23 of
+ * 30, 24-36 Easy 39 of 70, Medium 69 of 70 and More 45 of 60, 9-12 More 12 of
+ * 15, soy 29 of 30) are the gaps the next batches fill. Shellfish reached its
  * hard minimum in this batch. 6-8 Easy (19 of 20) and Medium (8 of 10) stay just
  * under theirs: Roasted Cauliflower, Baked Winter Squash and Baked Apple and
  * Cranberries are not tagged 6-8 because their pages do not describe mashing.
@@ -1457,9 +1450,9 @@ const CHECKPOINT: Counts = {
     '6-8': cell(19, 8, 0),
     '9-12': cell(30, 25, 12),
     '12-23': cell(26, 45, 23),
-    '24-36': cell(39, 68, 46),
+    '24-36': cell(39, 69, 45),
   },
-  allergens: { dairy: 30, egg: 30, wheat: 30, soy: 30, peanut: 8, 'tree nuts': 8, fish: 8, sesame: 4, shellfish: 3 },
+  allergens: { dairy: 30, egg: 30, wheat: 30, soy: 29, peanut: 8, 'tree nuts': 8, fish: 8, sesame: 4, shellfish: 3 },
 };
 
 const EFFORTS: Effort[] = ['easy', 'medium', 'more'];
