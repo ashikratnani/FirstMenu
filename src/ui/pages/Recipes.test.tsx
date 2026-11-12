@@ -2,11 +2,25 @@ import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, expect, it } from 'vitest';
+import { axe } from 'vitest-axe';
+import * as axeMatchers from 'vitest-axe/matchers';
 import Recipes from './Recipes';
 import { AppProvider } from '../../state/AppProvider';
 import { STORAGE_KEY, defaultState } from '../../domain/storage';
 import { BUILTIN_RECIPES } from '../../data/recipes';
 import type { AppState, Recipe } from '../../domain/types';
+
+type AxeMatcherFn = (results: unknown) => { pass: boolean; message: () => string };
+expect.extend({
+  toHaveNoViolations: (axeMatchers as unknown as { toHaveNoViolations: AxeMatcherFn })
+    .toHaveNoViolations,
+});
+declare module 'vitest' {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  interface Assertion<T = any> {
+    toHaveNoViolations(): T;
+  }
+}
 
 /** An in-memory Storage so tests never touch real localStorage. */
 function makeStorage(seed?: AppState): Storage {
@@ -124,10 +138,10 @@ describe('Recipes library page', () => {
   it('defaults the stage filter to the child\'s current stage', () => {
     // 8 months -> stage '6-8'.
     renderRecipes(seedState(8));
-    const stage = screen.getByRole('radiogroup', { name: 'Stage' });
+    const stage = screen.getByRole('group', { name: 'Stage' });
     expect(
-      within(stage).getByRole('radio', { name: '6–8 months' }),
-    ).toBeChecked();
+      within(stage).getByRole('button', { name: '6–8 months' }),
+    ).toHaveAttribute('aria-pressed', 'true');
     // A 9-12-only recipe (Cereal Pancakes) is hidden at the 6-8 default.
     expect(
       screen.queryByRole('link', { name: /Cereal Pancakes/ }),
@@ -138,7 +152,7 @@ describe('Recipes library page', () => {
     const user = userEvent.setup();
     renderRecipes(seedState(8));
 
-    await user.click(within(screen.getByRole('radiogroup', { name: 'Stage' })).getByRole('radio', { name: 'All' }));
+    await user.click(within(screen.getByRole('group', { name: 'Stage' })).getByRole('button', { name: 'All' }));
     // Pages of 50: keep tapping "Show more" until the whole library is listed.
     while (screen.queryByRole('button', { name: 'Show more' })) {
       await user.click(screen.getByRole('button', { name: 'Show more' }));
@@ -153,7 +167,7 @@ describe('Recipes library page', () => {
     const user = userEvent.setup();
     renderRecipes(seedState(8));
 
-    await user.click(screen.getByRole('radio', { name: '9–11 months' }));
+    await user.click(screen.getByRole('button', { name: '9–11 months' }));
     // Cereal Pancakes is tagged 9-12 only, so it now shows.
     expect(
       screen.getByRole('link', { name: /Cereal Pancakes/ }),
@@ -164,8 +178,8 @@ describe('Recipes library page', () => {
     const user = userEvent.setup();
     renderRecipes(seedState(8, [], {}));
 
-    await user.click(within(screen.getByRole('radiogroup', { name: 'Stage' })).getByRole('radio', { name: 'All' }));
-    await user.click(screen.getByRole('radio', { name: 'Breakfast' }));
+    await user.click(within(screen.getByRole('group', { name: 'Stage' })).getByRole('button', { name: 'All' }));
+    await user.click(screen.getByRole('button', { name: 'Breakfast' }));
 
     // Breakfast recipe shows; a lunch/dinner-only puree does not.
     expect(
@@ -297,7 +311,9 @@ describe('Recipes library page', () => {
     renderRecipes(seedState(10, [timed]));
     await showAllCards();
     const card = cardFor(/Timed Egg/);
-    expect(within(card).getByText('12 min · Easy · Iron-rich · Protein')).toBeInTheDocument();
+    for (const fact of ['12 min', 'Easy', 'Iron-rich', '+1 more']) {
+      expect(within(card).getByText(fact)).toBeInTheDocument();
+    }
     expect(screen.getByRole('link', { name: /Timed Egg.*12 min · Easy/ })).toBeInTheDocument();
   });
 
@@ -378,8 +394,78 @@ describe('Recipes library paging (Requirement 14.9)', () => {
     await user.click(screen.getByRole('button', { name: 'Show more' }));
     expect(cards()).toHaveLength(100);
 
-    await user.click(screen.getByRole('radio', { name: 'Lunch' }));
+    await user.click(screen.getByRole('button', { name: 'Lunch' }));
     expect(cards()).toHaveLength(50);
     expect(screen.getByRole('button', { name: 'Show more' })).toBeInTheDocument();
+  });
+});
+
+describe('Recipes list design (task 19.2)', () => {
+  const stageGroup = () => screen.getByRole('group', { name: 'Stage' });
+  const mealGroup = () => screen.getByRole('group', { name: 'Meal type' });
+  const cards = () => within(screen.getByRole('list', { name: 'Recipes' })).queryAllByRole('listitem');
+  const expectNoViolations = async (container: HTMLElement) =>
+    expect(await axe(container, { rules: { 'color-contrast': { enabled: false } } })).toHaveNoViolations();
+
+  it('searches by title or ingredient and tells how many match', async () => {
+    const user = userEvent.setup();
+    renderRecipes(seedState(8, [HONEY_RECIPE]));
+    await user.type(screen.getByRole('searchbox', { name: 'Search recipes' }), 'oats');
+    expect(screen.getByRole('link', { name: /Honey Oat Mash/ })).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /Carrots and Apples/ })).not.toBeInTheDocument();
+    expect(screen.getByText(`Showing ${cards().length} of ${cards().length} recipes`)).toBeInTheDocument();
+  });
+
+  it('goes back to the first page when the search changes', async () => {
+    const user = userEvent.setup();
+    renderRecipes(seedState(8, manyCustomRecipes(120)));
+    await user.click(screen.getByRole('button', { name: 'Show more' }));
+    expect(cards()).toHaveLength(100);
+    await user.type(screen.getByRole('searchbox', { name: 'Search recipes' }), 'Pager');
+    expect(cards()).toHaveLength(50);
+  });
+
+  it('shows the chosen filters as pressed chips', async () => {
+    const user = userEvent.setup();
+    renderRecipes(seedState(8));
+    await user.click(within(mealGroup()).getByRole('button', { name: 'Lunch' }));
+    expect(within(mealGroup()).getByRole('button', { name: 'Lunch' })).toHaveAttribute('aria-pressed', 'true');
+    expect(within(mealGroup()).getByRole('button', { name: 'All' })).toHaveAttribute('aria-pressed', 'false');
+    expect(within(stageGroup()).getByRole('button', { name: '6–8 months' })).toHaveClass('fm-toggle');
+  });
+
+  it('offers a way back from an empty result that clears search and filters', async () => {
+    const user = userEvent.setup();
+    renderRecipes(seedState(8));
+    await user.type(screen.getByRole('searchbox', { name: 'Search recipes' }), 'zzzqq');
+    expect(screen.getByText('No recipes match these filters.')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Show all recipes' }));
+    expect(screen.getByRole('searchbox', { name: 'Search recipes' })).toHaveValue('');
+    expect(within(stageGroup()).getByRole('button', { name: 'All' })).toHaveAttribute('aria-pressed', 'true');
+    expect(cards().length).toBeGreaterThan(0);
+  });
+
+  it('shows one tag on the card, counts the rest, and keeps all in the accessible name', () => {
+    renderRecipes(seedState(8));
+    const label = screen.getByRole('link', { name: /Beef, Peas and Potatoes/ }).getAttribute('aria-label') ?? '';
+    expect(label).toContain('Iron-rich · Protein · Vegetable');
+    const card = cardFor(/Beef, Peas and Potatoes/);
+    expect(within(card).getByText('+2 more')).toBeInTheDocument();
+    expect(within(card).queryByText('Protein')).not.toBeInTheDocument();
+  });
+
+  it('has no axe violations in the default, filtered, ghosted, paged and empty states', async () => {
+    const user = userEvent.setup();
+    const { container } = renderRecipes(seedState(8, [HONEY_RECIPE, ...manyCustomRecipes(60)]));
+    await expectNoViolations(container);
+    expect(screen.getByRole('link', { name: /Not yet: honey/ })).toBeInTheDocument();
+    await user.click(within(mealGroup()).getByRole('button', { name: 'Lunch' }));
+    await expectNoViolations(container);
+    await user.click(within(mealGroup()).getByRole('button', { name: 'All' }));
+    await user.click(screen.getByRole('button', { name: 'Show more' }));
+    await expectNoViolations(container);
+    await user.type(screen.getByRole('searchbox', { name: 'Search recipes' }), 'zzzqq');
+    expect(screen.getByRole('button', { name: 'Show all recipes' })).toBeInTheDocument();
+    await expectNoViolations(container);
   });
 });
