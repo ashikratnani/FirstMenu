@@ -62,7 +62,7 @@ export const BATCH_7_RECIPES: Recipe[] = [
       publisher: TX_PUBLISHER,
       url: 'https://texaswic.org/recipes/savory-carrot-squash-baby-food',
       retrieved: RETRIEVED,
-      adaptations: [],
+      adaptations: ['The page lists the breastmilk, formula or cooking water only in the steps; it is listed as an ingredient here.'],
     },
     title: 'Savory Carrot Squash Baby Food',
     stages: ['6-8', '9-12'],
@@ -95,7 +95,10 @@ export const BATCH_7_RECIPES: Recipe[] = [
       publisher: TX_PUBLISHER,
       url: 'https://texaswic.org/recipes/spiced-apple-pear-baby-food',
       retrieved: RETRIEVED,
-      adaptations: ['The page lists 1 large apple and 1 medium pear but uses 1/2 cup chopped apple and 1/3 cup chopped pear in the dish.'],
+      adaptations: [
+        'The page lists 1 large apple and 1 medium pear but uses 1/2 cup chopped apple and 1/3 cup chopped pear in the dish.',
+        'The page lists the breastmilk, formula or cooking water only in the steps; it is listed as an ingredient here.',
+      ],
     },
     title: 'Spiced Apple Pear Baby Food',
     stages: ['6-8', '9-12'],
@@ -305,7 +308,7 @@ export const BATCH_7_RECIPES: Recipe[] = [
     servings: 4,
   },
   {
-    // Zucchini rounds microwaved with melted cheese and optional bell pepper.
+    // Zucchini rounds microwaved with melted cheese and optional bell pepper. The zucchini is microwaved only 30 to 60 seconds and stays firm, so 24-36 only.
     id: 'b-tx-zucchinibini-snack-bites',
     origin: 'builtin',
     source: {
@@ -316,7 +319,7 @@ export const BATCH_7_RECIPES: Recipe[] = [
       adaptations: [],
     },
     title: 'Zucchinibini Snack Bites',
-    stages: ['12-23', '24-36'],
+    stages: ['24-36'],
     serveAs: ['finger-food'],
     mealTypes: ['snack', 'lunch'],
     ingredients: [
@@ -367,7 +370,7 @@ export const BATCH_7_RECIPES: Recipe[] = [
     servings: 4,
   },
   {
-    // Brown rice simmered with onion, tomatoes, cumin and garlic. The page offers chicken broth or water (water used) and tips to omit the salt for a baby, so the salt is left out.
+    // Brown rice simmered with onion, tomatoes, tomato sauce, cumin and garlic. The page offers chicken broth or water (water used). Bottled tomato sauce is salty (the same reason Mini Pizzas is 24-36 only), so 24-36 only and the source salt is kept.
     id: 'b-tx-tex-mex-brown-rice',
     origin: 'builtin',
     source: {
@@ -378,11 +381,10 @@ export const BATCH_7_RECIPES: Recipe[] = [
       adaptations: [
         'Used the water option instead of chicken broth.',
         'The page lists 1-2 cloves of garlic; the low end (1 clove) is used.',
-        'Left out 1/2 teaspoon salt',
       ],
     },
     title: 'Tex-Mex Brown Rice',
-    stages: ['9-12', '12-23', '24-36'],
+    stages: ['24-36'],
     serveAs: ['pieces'],
     mealTypes: ['lunch', 'dinner'],
     ingredients: [
@@ -394,11 +396,12 @@ export const BATCH_7_RECIPES: Recipe[] = [
       { name: 'garlic cloves, chopped', food: 'garlic', quantity: 1, unit: 'clove', category: 'produce' },
       { name: 'tomatoes, diced', food: 'tomato', quantity: 1, unit: 'cup', category: 'produce' },
       { name: 'tomato sauce', food: 'tomato sauce', quantity: 0.25, unit: 'cup', category: 'pantry' },
+      { name: 'salt', food: 'salt', quantity: 0.5, unit: 'tsp', category: 'pantry' },
     ],
     steps: [
       'Heat the oil in a pan over medium heat.',
       'Add the rice and onion and cook, stirring, until the onion is soft.',
-      'Add the water, cumin, garlic, tomatoes and tomato sauce.',
+      'Add the water, cumin, garlic, tomatoes, tomato sauce and salt.',
       'Cover with a tight-fitting lid and bring to a boil, then turn the heat to a low simmer and cook about 45 minutes, until the rice is tender and the liquid is absorbed.',
       'Take the pan off the heat, leave it covered for 5 minutes, then fluff the rice with a fork.',
     ],
@@ -406,7 +409,7 @@ export const BATCH_7_RECIPES: Recipe[] = [
     servings: 6,
   },
   {
-    // Steamed broccoli, carrots and zucchini with whole-wheat pasta in a milk, butter and flour sauce with Parmesan.
+    // Steamed broccoli, carrots and zucchini with whole-wheat pasta in a milk, butter and flour sauce with Parmesan. The carrots are steamed only 2 minutes and stay firm, so 12-23 and up.
     id: 'b-tx-creamy-pasta-primavera',
     origin: 'builtin',
     source: {
@@ -417,7 +420,7 @@ export const BATCH_7_RECIPES: Recipe[] = [
       adaptations: [],
     },
     title: 'Creamy Pasta Primavera',
-    stages: ['9-12', '12-23', '24-36'],
+    stages: ['12-23', '24-36'],
     serveAs: ['pieces'],
     mealTypes: ['lunch', 'dinner'],
     ingredients: [
@@ -580,7 +583,7 @@ export const BATCH_7_RECIPES: Recipe[] = [
     servings: 4,
   },
   {
-    // Chicken pieces coated in yogurt and crushed cornflakes with thyme and pepper, baked.
+    // Chicken pieces coated in yogurt and crushed cornflakes with thyme and pepper, baked. The page tip for babies (crush the cornflakes to a powder and cut the nuggets into strips) is in the last step.
     id: 'b-tx-homemade-chicken-nuggets',
     origin: 'builtin',
     source: {
@@ -607,12 +610,13 @@ export const BATCH_7_RECIPES: Recipe[] = [
       'Mix the crushed cornflakes, thyme and pepper in another bowl.',
       'Coat each chicken piece in the cornflake mixture and set it on the baking sheet.',
       'Bake 25 minutes, or until the chicken is cooked through.',
+      'For a baby, crush the cornflakes into a powder so no small pieces are left in the coating, and cut the baked nuggets into strips that are soft and easy to chew.',
     ],
     texture: 'baked chicken pieces with a cornflake coating',
     servings: 4,
   },
   {
-    // Mashed sweet potato with butter, orange juice and cinnamon rolled in crushed cornflakes and baked. The brown sugar is left out.
+    // Mashed sweet potato with butter, orange juice and cinnamon rolled in crushed cornflakes and baked. The page describes a crispy, crunchy coating and gives no guidance for babies, so 24-36 only and the brown sugar is kept.
     id: 'b-tx-baked-sweet-potato-bites',
     origin: 'builtin',
     source: {
@@ -620,22 +624,23 @@ export const BATCH_7_RECIPES: Recipe[] = [
       publisher: TX_PUBLISHER,
       url: 'https://texaswic.org/recipes/baked-sweet-potato-bites',
       retrieved: RETRIEVED,
-      adaptations: ['Left out 2 tablespoons brown sugar'],
+      adaptations: [],
     },
     title: 'Baked Sweet Potato Bites',
-    stages: ['12-23', '24-36'],
+    stages: ['24-36'],
     serveAs: ['finger-food'],
     mealTypes: ['snack', 'dinner'],
     ingredients: [
       { name: 'medium sweet potatoes', food: 'sweet potato', quantity: 2, unit: 'piece', category: 'produce' },
       { name: 'butter', food: 'butter', quantity: 2, unit: 'tbsp', category: 'dairy-eggs' },
+      { name: 'brown sugar', food: 'brown sugar', quantity: 2, unit: 'tbsp', category: 'pantry' },
       { name: 'orange juice', food: 'orange juice', quantity: 2, unit: 'tbsp', category: 'produce' },
       { name: 'ground cinnamon', food: 'cinnamon', quantity: 0.5, unit: 'tsp', category: 'pantry' },
       { name: 'corn flakes, crushed', food: 'corn flakes', quantity: 1, unit: 'cup', category: 'grains' },
     ],
     steps: [
       'Microwave or bake the sweet potatoes until soft, then scoop out the flesh and mash it.',
-      'Mix the mashed sweet potato with the butter, orange juice and cinnamon in a bowl.',
+      'Mix the mashed sweet potato with the butter, brown sugar, orange juice and cinnamon in a bowl.',
       'Shape the mixture into 1 1/2 inch balls, roll them in the crushed cornflakes and set them on a baking sheet coated with cooking spray.',
       'Bake at 350 degrees for 15 to 20 minutes, until the cornflakes are golden and the balls are heated through. It makes 12 balls.',
     ],
@@ -871,7 +876,7 @@ export const BATCH_7_RECIPES: Recipe[] = [
     servings: 4,
   },
   {
-    // Peanut butter on whole-wheat bread decorated with raisins, strawberries and peach to make a face. Raisins, so 24-36 only.
+    // Peanut butter on whole-wheat bread decorated with strawberries and peach to make a face. The page also uses raisins for the eyes but has no choking warning, so the raisins are left out.
     id: 'b-tx-funny-face-snack-bread',
     origin: 'builtin',
     source: {
@@ -879,7 +884,7 @@ export const BATCH_7_RECIPES: Recipe[] = [
       publisher: TX_PUBLISHER,
       url: 'https://texaswic.org/recipes/funny-face-snack-bread',
       retrieved: RETRIEVED,
-      adaptations: [],
+      adaptations: ['Left out 1 tablespoon raisins: the page has no choking warning for them'],
     },
     title: 'Funny Face Snack Bread',
     stages: ['24-36'],
@@ -888,13 +893,12 @@ export const BATCH_7_RECIPES: Recipe[] = [
     ingredients: [
       { name: 'whole-wheat bread', food: 'bread', quantity: 2, unit: 'slice', category: 'grains' },
       { name: 'peanut butter', food: 'peanut butter', quantity: 2, unit: 'tbsp', category: 'pantry' },
-      { name: 'raisins', food: 'raisin', quantity: 1, unit: 'tbsp', category: 'produce' },
       { name: 'strawberries, sliced', food: 'strawberry', quantity: 2, unit: 'piece', category: 'produce' },
       { name: 'peach, sliced', food: 'peach', quantity: 1, unit: 'piece', category: 'produce' },
     ],
     steps: [
       'Spread 1 tablespoon of peanut butter on each slice of bread.',
-      'Arrange the raisins, strawberry slices and peach slices in the shape of a face: raisins for eyes, strawberries for a nose and peach for a mouth.',
+      'Arrange the strawberry slices and peach slices in the shape of a face: strawberries for a nose and peach for a mouth.',
     ],
     texture: 'peanut butter bread with fruit',
     servings: 2,

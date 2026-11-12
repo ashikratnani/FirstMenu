@@ -1752,15 +1752,15 @@ const BATCH_7_EXPECTED: Record<string, Batch3Expectation> = {
   'b-tx-easy-peanut-butter-baby-cereal': { publisher: TX, stages: ['6-8', '9-12'], serveAs: ['puree'], allergens: ['peanut'], servings: 1 },
   'b-tx-babys-first-pancakes': { publisher: TX, stages: ['9-12', '12-23'], serveAs: ['finger-food'], allergens: ['egg', 'wheat'], servings: 10 },
   'b-tx-lemon-cauliflower-bites': { publisher: TX, stages: ['9-12', '12-23', '24-36'], serveAs: ['finger-food'], allergens: [], servings: 4 },
-  'b-tx-zucchinibini-snack-bites': { publisher: TX, stages: ['12-23', '24-36'], serveAs: ['finger-food'], allergens: ['dairy'], servings: 2 },
+  'b-tx-zucchinibini-snack-bites': { publisher: TX, stages: ['24-36'], serveAs: ['finger-food'], allergens: ['dairy'], servings: 2 },
   'b-tx-old-fashioned-french-toast': { publisher: TX, stages: ['9-12', '12-23', '24-36'], serveAs: ['finger-food'], allergens: ['dairy', 'egg', 'wheat'], servings: 4 },
-  'b-tx-tex-mex-brown-rice': { publisher: TX, stages: ['9-12', '12-23', '24-36'], serveAs: ['pieces'], allergens: [], servings: 6 },
-  'b-tx-creamy-pasta-primavera': { publisher: TX, stages: ['9-12', '12-23', '24-36'], serveAs: ['pieces'], allergens: ['dairy', 'wheat'], servings: 2 },
+  'b-tx-tex-mex-brown-rice': { publisher: TX, stages: ['24-36'], serveAs: ['pieces'], allergens: [], servings: 6 },
+  'b-tx-creamy-pasta-primavera': { publisher: TX, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: ['dairy', 'wheat'], servings: 2 },
   'b-tx-summer-squash-skillet': { publisher: TX, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: [], servings: 6 },
   'b-tx-dal-fry': { publisher: TX, stages: ['12-23', '24-36'], serveAs: ['mashed', 'pieces'], allergens: [], servings: 4 },
   'b-tx-egg-roll-in-a-bowl': { publisher: TX, stages: ['24-36'], serveAs: ['pieces'], allergens: ['soy', 'wheat'], servings: 4 },
   'b-tx-homemade-chicken-nuggets': { publisher: TX, stages: ['12-23', '24-36'], serveAs: ['finger-food'], allergens: ['dairy'], servings: 4 },
-  'b-tx-baked-sweet-potato-bites': { publisher: TX, stages: ['12-23', '24-36'], serveAs: ['finger-food'], allergens: ['dairy'], servings: 4 },
+  'b-tx-baked-sweet-potato-bites': { publisher: TX, stages: ['24-36'], serveAs: ['finger-food'], allergens: ['dairy'], servings: 4 },
   'b-tx-texas-breakfast-scramble': { publisher: TX, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: ['dairy', 'egg'], servings: 4 },
   'b-tx-easy-homemade-chicken-salad': { publisher: TX, stages: ['24-36'], serveAs: ['pieces'], allergens: ['dairy'], servings: 4 },
   'b-tx-spinach-salad-with-citrus-dressing': { publisher: TX, stages: ['24-36'], serveAs: ['pieces'], allergens: ['egg'], servings: 4 },
@@ -1795,18 +1795,19 @@ const BATCH_7_EXPECTED: Record<string, Batch3Expectation> = {
 const BATCH_7_LEFT_OUT: Record<string, { adaptation: string; absent: RegExp }[]> = {
   'b-tx-lemon-cauliflower-bites': [{ adaptation: 'Left out the salt in "salt and pepper to taste"', absent: /\bsalt\b/i }],
   'b-tx-old-fashioned-french-toast': [{ adaptation: 'Left out optional 1/8 teaspoon salt', absent: /\bsalt\b/i }, { adaptation: 'Left out the optional powdered sugar and cinnamon topping', absent: /powdered/i }],
-  'b-tx-tex-mex-brown-rice': [{ adaptation: 'Left out 1/2 teaspoon salt', absent: /\bsalt\b/i }],
   'b-tx-summer-squash-skillet': [{ adaptation: 'Left out 1/2 teaspoon salt', absent: /\bsalt\b/i }, { adaptation: 'Left out 1/2 teaspoon sugar', absent: /sugar/i }],
   'b-tx-dal-fry': [{ adaptation: 'Left out the salt in "salt to taste"', absent: /\bsalt\b/i }],
-  'b-tx-baked-sweet-potato-bites': [{ adaptation: 'Left out 2 tablespoons brown sugar', absent: /sugar/i }],
   'b-tx-texas-breakfast-scramble': [{ adaptation: 'Left out the salt in "salt and pepper to taste"', absent: /\bsalt\b/i }],
+  'b-tx-funny-face-snack-bread': [{ adaptation: 'Left out 1 tablespoon raisins: the page has no choking warning for them', absent: /raisin/i }],
   'b-mn-lentils-and-rice': [{ adaptation: 'Left out the salt in "salt and pepper to taste"', absent: /\bsalt\b/i }],
   'b-mn-bean-chowder': [{ adaptation: 'Left out 1 teaspoon salt', absent: /\bsalt\b/i }],
 };
 
 /** Batch 7 recipes that keep salt, sugar or soy sauce because they are tagged 24-36 only (the screen does not block them at that age). */
 const BATCH_7_KEEPS_BLOCKED_AT_24 = [
+  'b-tx-tex-mex-brown-rice',
   'b-tx-egg-roll-in-a-bowl',
+  'b-tx-baked-sweet-potato-bites',
   'b-tx-easy-homemade-chicken-salad',
   'b-tx-easy-black-bean-breakfast-tacos',
   'b-tx-sheet-pan-roasted-sausage-and-vegetables',
@@ -2060,9 +2061,9 @@ describe('BUILTIN_RECIPES - batch 7', () => {
     const cellCount = (stage: StageId, effort: Effort) =>
       BATCH_7_RECIPES.filter((r) => r.stages.includes(stage) && recipeEffort(r) === effort).length;
     expect(cellCount('24-36', 'easy')).toBeGreaterThanOrEqual(16);
-    expect(cellCount('12-23', 'easy')).toBeGreaterThanOrEqual(6);
+    expect(cellCount('12-23', 'easy')).toBeGreaterThanOrEqual(5);
     expect(cellCount('6-8', 'medium')).toBeGreaterThanOrEqual(3);
-    expect(cellCount('9-12', 'more')).toBeGreaterThanOrEqual(2);
+    expect(cellCount('9-12', 'more')).toBeGreaterThanOrEqual(1);
     expect(cellCount('12-23', 'more')).toBeGreaterThanOrEqual(5);
     const groupCount = (group: string) =>
       BATCH_7_RECIPES.filter((r) => BATCH_7_EXPECTED[r.id].allergens.includes(group)).length;
@@ -2118,18 +2119,18 @@ const GOAL: Counts = {
  * Floors for this batch (batch 7). The total follows the plan line (about 245
  * after batch 7; the set has 279). Cells and allergens are what the set reaches
  * after batch 7, capped at HARD_MINIMUM, and are raised by each batch. Still
- * under their hard minimum after batch 7: 12-23 Easy (35 of 45) and the total
+ * under their hard minimum after batch 7: 12-23 Easy (34 of 45), 9-12 More (14 of 15) and the total
  * (279 of 300). Batch 7 closed the hard minimum for 6-8 Medium (11 of 10), 6-8
- * total (35 of 30), 9-12 More (15 of 15), 12-23 More (34 of 30), 12-23 total
- * (123 of 120), 24-36 Easy (70 of 70) and 24-36 total (232 of 200).
+ * total (35 of 30), 12-23 More (34 of 30), 12-23 total
+ * (120 of 120), 24-36 Easy (70 of 70) and 24-36 total (232 of 200).
  */
 const CHECKPOINT: Counts = {
   total: 245,
   simpleIdeasMax: 40,
   stages: {
     '6-8': cell(20, 10, 0),
-    '9-12': cell(30, 25, 15),
-    '12-23': cell(35, 45, 30),
+    '9-12': cell(30, 25, 14),
+    '12-23': cell(34, 45, 30),
     '24-36': cell(70, 70, 60),
   },
   allergens: { dairy: 30, egg: 30, wheat: 30, soy: 30, peanut: 8, 'tree nuts': 8, fish: 8, sesame: 4, shellfish: 3 },
