@@ -410,10 +410,11 @@ describe('Recipes list design (task 19.2)', () => {
   it('searches by title or ingredient and tells how many match', async () => {
     const user = userEvent.setup();
     renderRecipes(seedState(8, [HONEY_RECIPE]));
-    await user.type(screen.getByRole('searchbox', { name: 'Search recipes' }), 'oats');
+    await user.type(screen.getByRole('searchbox', { name: 'Search recipes' }), 'honey oat');
     expect(screen.getByRole('link', { name: /Honey Oat Mash/ })).toBeInTheDocument();
     expect(screen.queryByRole('link', { name: /Carrots and Apples/ })).not.toBeInTheDocument();
-    expect(screen.getByText(`Showing ${cards().length} of ${cards().length} recipes`)).toBeInTheDocument();
+    expect(cards()).toHaveLength(1);
+    expect(screen.getByText('Showing 1 of 1 recipe')).toBeInTheDocument();
   });
 
   it('goes back to the first page when the search changes', async () => {
