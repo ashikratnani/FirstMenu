@@ -364,7 +364,7 @@ function SourceLinks({ ids }: { ids: readonly SourceId[] }) {
       {ids.map((id, index) => (
         <span key={id}>
           {index > 0 && ', '}
-          <a href={SOURCES[id].url} target="_blank" rel="noopener noreferrer">
+          <a className="fm-link" href={SOURCES[id].url} target="_blank" rel="noopener noreferrer">
             {SOURCES[id].title}
           </a>
         </span>

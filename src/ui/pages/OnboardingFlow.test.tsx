@@ -339,3 +339,52 @@ describe('/onboarding/tour and Settings "Quick tour"', () => {
     await waitFor(() => expect(primaries()).toEqual(['Show me']));
   });
 });
+
+describe('design refinement (task 19.2, onboarding)', () => {
+  it('opts the problem chips into the shared toggle style and reflects the pressed state', async () => {
+    const user = userEvent.setup();
+    renderApp('/onboarding/tour', onboardedState());
+    await screen.findByRole('heading', { name: PROBLEMS_HEADING });
+    const chips = screen
+      .getByRole('list', { name: /choose one or more/i })
+      .querySelectorAll('button');
+    expect(chips).toHaveLength(5);
+    for (const chip of Array.from(chips)) {
+      expect(chip).toHaveClass('fm-toggle');
+      expect(chip).toHaveAttribute('aria-pressed', 'false');
+    }
+    await user.click(chips[0]);
+    expect(chips[0]).toHaveAttribute('aria-pressed', 'true');
+    expect(chips[0]).toHaveClass('fm-toggle');
+    expect(primaries()).toEqual(['Show me']);
+    await expectNoViolations();
+  });
+
+  it('styles the source links in the safety solve and the end-screen links as fm-link', async () => {
+    const user = userEvent.setup();
+    renderApp('/onboarding/tour', onboardedState(8));
+    await chooseAndShow(user, /what's safe for my child/i);
+    const list = await screen.findByRole('list', { name: /leave out/i });
+    for (const link of within(list).getAllByRole('link')) expect(link).toHaveClass('fm-link');
+  });
+
+  it('gives the end-screen links the fm-link style', async () => {
+    const user = userEvent.setup();
+    renderApp('/onboarding/tour', onboardedState());
+    await chooseAndShow(user, /what's safe for my child/i, /plan the week/i);
+    await screen.findByRole('heading', { name: 'Plan the week' });
+    await user.click(screen.getByRole('button', { name: 'Not now' }));
+    await screen.findByRole('heading', { name: /all set/i });
+    const link = screen.getByRole('link', { name: /open foods/i });
+    expect(link).toHaveClass('fm-link');
+  });
+
+  it('shows the first-run disclaimer on onboarding as the lighter box, wording unchanged', async () => {
+    renderApp('/onboarding', { ...onboardedState(), onboarded: false, disclaimerAcknowledged: false });
+    const box = await screen.findByRole('alertdialog');
+    expect(box.className).toMatch(/compact/);
+    expect(within(box).getByText(NOT_MEDICAL_ADVICE)).toBeInTheDocument();
+    expect(within(box).getByText(SCREEN_LIMITS)).toBeInTheDocument();
+    await expectNoViolations();
+  });
+});

@@ -18,8 +18,10 @@
 }
 
 .label {
-  font-weight: 600;
-  color: var(--fm-color-heading);
+  /* Same look as the Astryx field label used by First name. */
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text-secondary);
 }
 
 .input {
@@ -128,6 +130,19 @@
   padding-left: 1.2rem;
 }
 
+.links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* 44 px tap rows for the "other things you chose" links. */
+.links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+
 .results {
   list-style: none;
   margin: 0;
@@ -153,4 +168,10 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
   gap: var(--space);
+}
+
+.problems h1,
+.solve h1,
+.done h1 {
+  text-wrap: balance;
 }

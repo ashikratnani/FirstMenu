@@ -32,15 +32,16 @@ export default function Disclaimer() {
 /**
  * First-run disclaimer (Req 13.1): shown prominently until acknowledged. Reads
  * disclaimerAcknowledged from context and dispatches `acknowledgeDisclaimer`;
- * it does not reappear once acknowledged.
+ * it does not reappear once acknowledged. `compact` is a lighter restyle used
+ * on onboarding, where the form is the task; wording and position are unchanged.
  */
-export function FirstRunDisclaimer() {
+export function FirstRunDisclaimer({ compact = false }: { compact?: boolean }) {
   const { state, dispatch } = useApp();
   if (state.disclaimerAcknowledged) return null;
 
   return (
     <section
-      className={`${styles.firstRun} print-hide`}
+      className={`${styles.firstRun} ${compact ? styles.compact : ''} print-hide`}
       role="alertdialog"
       aria-labelledby="first-run-disclaimer-title"
       aria-describedby="first-run-disclaimer-body"

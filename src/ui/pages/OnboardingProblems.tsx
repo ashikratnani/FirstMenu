@@ -25,6 +25,7 @@ export default function OnboardingProblems({ selected, onToggle, onShow, onSkip 
           <li key={problem.id}>
             <ToggleButton
               label={problem.label}
+              className="fm-toggle"
               isPressed={selected.includes(problem.id)}
               onPressedChange={() => onToggle(problem.id)}
             />
