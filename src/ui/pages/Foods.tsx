@@ -15,9 +15,16 @@
 // "noticed a reaction" (records status 'reaction'); a monster offers the same
 // two; a reaction ghost offers "clear reaction" (the clearReaction action).
 // Block-covered ghosts are NOT user-clearable (Req 7.4/7.6).
+//
+// Scanning (task 19.2): a search box narrows the list by food name, and a
+// door or monster shows one "Log a try" / "Change" button; the two record
+// buttons appear when it is opened (aria-expanded, one open at a time). A
+// reaction ghost keeps "Clear reaction" always visible. All state text stays.
 
+import { useState } from 'react';
 import { Button } from '@astryxdesign/core/Button';
 import { Link } from '@astryxdesign/core/Link';
+import { TextInput } from '@astryxdesign/core/TextInput';
 import { useApp } from '../../state/AppProvider';
 import { selectAgeMonths, selectFoodViews } from '../../state/selectors';
 import { allergenGuidance } from '../../domain/foods';
@@ -80,7 +87,15 @@ function blockFindingFor(key: string, ageMonths: number) {
 export default function Foods() {
   const { state, dispatch } = useApp();
   const ageMonths = selectAgeMonths(state) ?? 0;
-  const views = selectFoodViews(state);
+  const allViews = selectFoodViews(state);
+  const [search, setSearch] = useState('');
+  const [openKey, setOpenKey] = useState<string | null>(null);
+  const needle = search.trim().toLowerCase();
+  const views = needle
+    ? allViews.filter((v) =>
+        foodLabel(v.key, v.allergenGroup).toLowerCase().includes(needle),
+      )
+    : allViews;
 
   const recordTried = (key: string) => {
     const record: FoodRecord = { status: 'tried', date: todayYmd() };
@@ -98,13 +113,30 @@ export default function Foods() {
   const monsters = views.filter((v) => v.status === 'monster');
   const ghosts = views.filter((v) => v.status === 'ghost');
 
-  /** The two record controls shared by doors and monsters. */
-  const tryControls = (key: string) => (
-    <div className={styles.controls}>
-      <Button label="Tried, no reaction" size="sm" onClick={() => recordTried(key)} />
-      <Button label="Noticed a reaction" size="sm" onClick={() => recordReaction(key)} />
-    </div>
-  );
+  /** The disclosure button, shown at the end of a door or monster's head row. */
+  const tryToggle = (key: string, label: string, hint: string) => {
+    const isOpen = openKey === key;
+    return (
+      <button
+        type="button"
+        className={styles.disclosure}
+        aria-expanded={isOpen}
+        aria-label={`${hint}: ${label}`}
+        onClick={() => setOpenKey(isOpen ? null : key)}
+      >
+        {isOpen ? 'Close' : hint}
+      </button>
+    );
+  };
+
+  /** The two record buttons, shown under the head while that food is open. */
+  const tryControls = (key: string) =>
+    openKey === key && (
+      <div className={styles.controls}>
+        <Button label="Tried, no reaction" size="sm" onClick={() => recordTried(key)} />
+        <Button label="Noticed a reaction" size="sm" onClick={() => recordReaction(key)} />
+      </div>
+    );
 
   return (
     <>
@@ -114,6 +146,33 @@ export default function Foods() {
         mystery door when your child tries something new.
       </p>
 
+      <div className={styles.search}>
+        <TextInput
+          label="Search foods"
+          isLabelHidden
+          type="search"
+          value={search}
+          onChange={setSearch}
+          placeholder="Search by food name"
+          autoComplete="off"
+          enterKeyHint="search"
+        />
+      </div>
+      {/* One live region stays mounted for both outcomes, so a search with no match is announced too. */}
+      <div className={views.length === 0 ? styles.noMatch : styles.status}>
+        <p role="status">
+          {views.length === 0
+            ? 'No foods match your search.'
+            : needle
+              ? `${views.length} of ${allViews.length} foods match.`
+              : `${allViews.length} foods.`}
+        </p>
+        {views.length === 0 && (
+          <Button label="Clear search" onClick={() => setSearch('')} />
+        )}
+      </div>
+
+      {(!needle || doors.length > 0) && (
       <section className={styles.section} aria-labelledby="foods-doors">
         <h2 id="foods-doors" className={styles.sectionHeading}>
           New foods to try
@@ -132,7 +191,11 @@ export default function Foods() {
                 ? allergenGuidance(view.allergenGroup!)
                 : null;
               return (
-                <MysteryDoor key={view.key} label={`New food: ${label}`}>
+                <MysteryDoor
+                  key={view.key}
+                  label={`New food: ${label}`}
+                  action={tryToggle(view.key, label, 'Log a try')}
+                >
                   {guidance && (
                     <>
                       <p className={styles.guidance}>{guidance.generic}</p>
@@ -166,7 +229,9 @@ export default function Foods() {
           </ul>
         )}
       </section>
+      )}
 
+      {(!needle || monsters.length > 0) && (
       <section className={styles.section} aria-labelledby="foods-monsters">
         <h2 id="foods-monsters" className={styles.sectionHeading}>
           Tried foods
@@ -187,6 +252,7 @@ export default function Foods() {
                 <FriendlyMonster
                   key={view.key}
                   label={name}
+                  action={tryToggle(view.key, label, 'Change record')}
                   group={
                     view.isAllergen ? view.allergenGroup ?? undefined : undefined
                   }
@@ -198,7 +264,9 @@ export default function Foods() {
           </ul>
         )}
       </section>
+      )}
 
+      {(!needle || ghosts.length > 0) && (
       <section className={styles.section} aria-labelledby="foods-ghosts">
         <h2 id="foods-ghosts" className={styles.sectionHeading}>
           Not yet
@@ -250,6 +318,7 @@ export default function Foods() {
           </ul>
         )}
       </section>
+      )}
     </>
   );
 }

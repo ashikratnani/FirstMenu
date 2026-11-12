@@ -130,6 +130,9 @@ describe('Foods page', () => {
 
     const eggDoor = screen.getByRole('listitem', { name: 'New food: egg' });
     await user.click(
+      within(eggDoor).getByRole('button', { name: 'Log a try: egg' }),
+    );
+    await user.click(
       within(eggDoor).getByRole('button', { name: /tried, no reaction/i }),
     );
 
@@ -151,6 +154,9 @@ describe('Foods page', () => {
     renderFoods(seedState(8));
 
     const eggDoor = screen.getByRole('listitem', { name: 'New food: egg' });
+    await user.click(
+      within(eggDoor).getByRole('button', { name: 'Log a try: egg' }),
+    );
     await user.click(
       within(eggDoor).getByRole('button', { name: /noticed a reaction/i }),
     );

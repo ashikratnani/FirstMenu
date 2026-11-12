@@ -18,12 +18,15 @@ export interface FriendlyMonsterProps {
    * generic friendly monster.
    */
   group?: AllergenGroup;
+  /** Optional control shown at the end of the head row (e.g. a disclosure button). */
+  action?: ReactNode;
   children?: ReactNode;
 }
 
 export default function FriendlyMonster({
   label,
   group,
+  action,
   children,
 }: FriendlyMonsterProps) {
   return (
@@ -31,6 +34,7 @@ export default function FriendlyMonster({
       <div className={styles.head}>
         <MonsterArt group={group} />
         <span className={styles.label}>{label}</span>
+        {action}
       </div>
       {children}
     </li>
