@@ -559,7 +559,6 @@ describe('built-in recipes derive clean food keys (Item 3)', () => {
       'onion soup mix',
       'wild rice',
       'lima bean',
-      'chocolate chips',
       'apple cider',
       'lamb',
       'garlic scape',

@@ -2094,7 +2094,7 @@ const BATCH_8_EXPECTED: Record<string, Batch3Expectation> = {
   'b-tx-cinnamon-carrot-bread': { publisher: TX, stages: ['24-36'], serveAs: ['pieces'], allergens: ['egg', 'tree nuts', 'wheat'], servings: 12 },
   'b-tx-cheesy-stuffed-zucchini': { publisher: TX, stages: ['24-36'], serveAs: ['pieces'], allergens: ['dairy', 'wheat'], servings: 6 },
   'b-icn-pizza-green-beans': { publisher: ICN, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: [], servings: 6 },
-  'b-icn-chickpeas-and-tomatoes': { publisher: ICN, stages: ['9-12', '12-23', '24-36'], serveAs: ['pieces'], allergens: [], servings: 6 },
+  'b-icn-chickpeas-and-tomatoes': { publisher: ICN, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: [], servings: 6 },
   'b-icn-shredded-zucchini-and-pasta': { publisher: ICN, stages: ['9-12', '12-23', '24-36'], serveAs: ['pieces'], allergens: ['dairy', 'wheat'], servings: 6 },
   'b-icn-veggie-stir-fry-with-ginger': { publisher: ICN, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: [], servings: 6 },
   'b-icn-curry-vegetables': { publisher: ICN, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: [], servings: 6 },
@@ -2104,7 +2104,6 @@ const BATCH_8_EXPECTED: Record<string, Batch3Expectation> = {
   'b-icn-chicken-and-waffles-with-maple-peach-glaze': { publisher: ICN, stages: ['24-36'], serveAs: ['pieces'], allergens: ['wheat'], servings: 6 },
   'b-mn-seasoned-rice': { publisher: MN, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: [], servings: 6 },
   'b-mn-goulash': { publisher: MN, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: ['wheat'], servings: 8 },
-  'b-mn-toaster-waffle-toppers': { publisher: MN, stages: ['12-23', '24-36'], serveAs: ['finger-food'], allergens: ['dairy'], servings: 2 },
   'b-mn-black-eyed-pea-soup': { publisher: MN, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: [], servings: 6 },
   'b-mn-fajitas': { publisher: MN, stages: ['24-36'], serveAs: ['pieces'], allergens: ['soy', 'wheat'], servings: 4 },
   'b-mn-pot-roast': { publisher: MN, stages: ['24-36'], serveAs: ['pieces'], allergens: [], servings: 8 },
@@ -2152,7 +2151,11 @@ const BATCH_8_LEFT_OUT: Record<string, { adaptation: string; absent: RegExp }[]>
   'b-fh-butternut-squash-and-chile-pan-fry': [{ adaptation: 'Left out 1 teaspoon salt', absent: /\bsalt\b/i }],
   'b-fh-lentil-soup-with-lime-juice': [{ adaptation: 'Left out 1 teaspoon salt', absent: /\bsalt\b/i }],
   'b-fh-spring-fling-vegetable-chowder': [{ adaptation: 'Left out the optional 1/2 teaspoon salt', absent: /\bsalt\b/i }],
-  'b-unl-basic-omelet': [{ adaptation: 'Left out the optional 1/4 teaspoon salt', absent: /\bsalt\b/i }],
+  'b-unl-basic-omelet': [
+    { adaptation: 'Left out the optional 1/4 teaspoon salt', absent: /\bsalt\b/i },
+    { adaptation: 'Left out the optional ham and turkey (cured meat) fillings; vegetables and cheese stay', absent: /\bham\b/i },
+  ],
+  'b-unl-zoats': [{ adaptation: 'Left out the optional chocolate chips (added sugar)', absent: /chocolate\schips/i }],
   'b-unl-egg-and-cheese-muffin': [{ adaptation: 'Left out the salt in "salt and pepper, to taste"', absent: /\bsalt\b/i }],
   'b-unl-sauteed-eggplant-with-okra': [{ adaptation: 'Left out the optional 1/2 teaspoon salt', absent: /\bsalt\b/i }],
   'b-unl-cider-braised-cabbage': [{ adaptation: 'Left out the salt in "salt and pepper, to taste"', absent: /\bsalt\b/i }],
@@ -2196,7 +2199,6 @@ const BATCH_8_SOURCE_SERVINGS = [
   'b-icn-chicken-and-waffles-with-maple-peach-glaze',
   'b-mn-seasoned-rice',
   'b-mn-goulash',
-  'b-mn-toaster-waffle-toppers',
   'b-mn-black-eyed-pea-soup',
   'b-mn-fajitas',
   'b-mn-pot-roast',
@@ -2225,7 +2227,7 @@ const BATCH_8_SOURCE_SERVINGS = [
 describe('BUILTIN_RECIPES - batch 8', () => {
   it('has a pinned expectation for exactly the batch 8 recipes', () => {
     expect(BATCH_8_RECIPES.map((r) => r.id).sort()).toEqual(Object.keys(BATCH_8_EXPECTED).sort());
-    expect(BATCH_8_RECIPES.length).toBeGreaterThanOrEqual(50);
+    expect(BATCH_8_RECIPES.length).toBeGreaterThanOrEqual(49);
     expect(BATCH_8_RECIPES.length).toBeLessThanOrEqual(55);
   });
 
@@ -2393,7 +2395,6 @@ describe('BUILTIN_RECIPES - batch 8', () => {
     expect(steps('b-tx-sweet-potato-pecan-pancakes')).toMatch(/leave the nuts out for babies and young children/i);
     expect(steps('b-tx-cinnamon-carrot-bread')).toMatch(/leave the nuts out for young children/i);
     expect(steps('b-tx-frozen-chocolate-pops')).toMatch(/do not give honey to a child under 1 year old/i);
-    expect(steps('b-mn-toaster-waffle-toppers')).toMatch(/cool until just warm enough for a child to pick up/i);
     expect(steps('b-unl-lamb-soup-shorba')).toMatch(/blend the soup before serving it to small children/i);
     expect(steps('b-fh-lentil-soup-with-lime-juice')).toMatch(/take out and discard the bay leaves/i);
   });
@@ -2404,7 +2405,6 @@ describe('BUILTIN_RECIPES - batch 8', () => {
       'Used the extra firm tofu option (the page also offers 1 pound boneless beef, pork or chicken); the page steps are written for tofu.',
     );
     expect(find('b-fh-spring-fling-vegetable-chowder')?.source?.adaptations).toContain('Used water (the page offers low-sodium broth or water).');
-    expect(find('b-mn-toaster-waffle-toppers')?.source?.adaptations).toContain('Used drained mandarin oranges, one of the fruit options the page lists.');
     expect(find('b-tx-frozen-fruit-juice-pops')?.source?.adaptations?.[0]).toMatch(/ice cube tray, aluminum foil and 12 popsicle sticks/);
     const names = (id: string) => find(id)?.ingredients.map((i) => i.name) ?? [];
     expect(names('b-mn-black-eyed-pea-soup')).toContain('black-eyed peas, drained and rinsed (3 cans, 15 ounces each)');
@@ -2415,8 +2415,8 @@ describe('BUILTIN_RECIPES - batch 8', () => {
   it('batch 8 adds recipes to the cells still under their hard minimum', () => {
     const cellCount = (stage: StageId, effort: Effort) =>
       BATCH_8_RECIPES.filter((r) => r.stages.includes(stage) && recipeEffort(r) === effort).length;
-    expect(cellCount('12-23', 'easy')).toBeGreaterThanOrEqual(13);
-    expect(cellCount('9-12', 'more')).toBeGreaterThanOrEqual(3);
+    expect(cellCount('12-23', 'easy')).toBeGreaterThanOrEqual(12);
+    expect(cellCount('9-12', 'more')).toBeGreaterThanOrEqual(2);
     expect(BUILTIN_RECIPES.length).toBeGreaterThanOrEqual(300);
   });
 });

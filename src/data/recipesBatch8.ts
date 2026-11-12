@@ -353,7 +353,7 @@ export const BATCH_8_RECIPES: Recipe[] = [
       adaptations: [],
     },
     title: 'Chickpeas and Tomatoes',
-    stages: ['9-12', '12-23', '24-36'],
+    stages: ['12-23', '24-36'],
     serveAs: ['pieces'],
     mealTypes: ['lunch', 'dinner'],
     ingredients: [
@@ -675,34 +675,6 @@ export const BATCH_8_RECIPES: Recipe[] = [
     ],
     texture: 'beef and macaroni with tomatoes',
     servings: 8,
-  },
-  {
-    // Toasted waffles, cooled until just warm, spread with yogurt and topped with drained mandarin oranges, eaten by hand like toast. The page offers several fruits; mandarin oranges are used.
-    id: 'b-mn-toaster-waffle-toppers',
-    origin: 'builtin',
-    source: {
-      title: 'Toaster Waffle Toppers',
-      publisher: MN_PUBLISHER,
-      url: 'https://www.health.state.mn.us/people/wic/recipes/breads.html#toaster',
-      retrieved: RETRIEVED,
-      adaptations: ['Used drained mandarin oranges, one of the fruit options the page lists.'],
-    },
-    title: 'Toaster Waffle Toppers',
-    stages: ['12-23', '24-36'],
-    serveAs: ['finger-food'],
-    mealTypes: ['breakfast', 'snack'],
-    ingredients: [
-      { name: 'toaster waffles', food: 'waffle', quantity: 2, unit: 'piece', category: 'grains' },
-      { name: 'yogurt (low-fat or light)', food: 'yogurt', quantity: 0.5, unit: 'cup', category: 'dairy-eggs' },
-      { name: 'mandarin oranges, drained', food: 'mandarin orange', quantity: 0.5, unit: 'cup', category: 'produce' },
-    ],
-    steps: [
-      'Toast the waffles as the package directs, then let them cool until just warm enough for a child to pick up without burning their fingers.',
-      'Spread 1/4 cup of yogurt on each waffle and top with 1/4 cup of the fruit.',
-      'Serve them to eat by hand, like toast.',
-    ],
-    texture: 'waffle with yogurt and fruit',
-    servings: 2,
   },
   {
     // Canned black-eyed peas simmered with onion, diced tomatoes, water, bay leaf and Italian seasoning. The salt in "salt to taste" is left out.
@@ -1354,7 +1326,7 @@ export const BATCH_8_RECIPES: Recipe[] = [
       publisher: UNL_PUBLISHER,
       url: 'https://food.unl.edu/recipe/frozen-fruit-cups/',
       retrieved: RETRIEVED,
-      adaptations: [],
+      adaptations: ['The page says "applesauce (no sugar added)"; the ingredient is named "unsweetened applesauce" here, because the safety screen reads "sugar" in a name as added sugar.'],
     },
     title: 'Frozen Fruit Cups',
     stages: ['12-23', '24-36'],
@@ -1376,7 +1348,7 @@ export const BATCH_8_RECIPES: Recipe[] = [
     servings: 6,
   },
   {
-    // Three eggs beaten with a little milk or water, cooked in a skillet and folded, with optional fillings. The optional salt is left out.
+    // Three eggs beaten with a little milk or water, cooked in a skillet and folded, with optional fillings. The optional salt and the ham and turkey fillings are left out.
     id: 'b-unl-basic-omelet',
     origin: 'builtin',
     source: {
@@ -1388,6 +1360,7 @@ export const BATCH_8_RECIPES: Recipe[] = [
         'Used black pepper (the page also offers cayenne pepper).',
         'The page names the nonstick cooking spray only in the steps; it is listed as an ingredient here.',
         'Left out the optional 1/4 teaspoon salt',
+        'Left out the optional ham and turkey (cured meat) fillings; vegetables and cheese stay',
       ],
     },
     title: 'Basic Omelet',
@@ -1399,7 +1372,7 @@ export const BATCH_8_RECIPES: Recipe[] = [
       { name: 'milk or water', food: 'milk', quantity: 1, unit: 'tbsp', category: 'dairy-eggs' },
       { name: 'black pepper, to taste', food: 'black pepper', category: 'pantry' },
       { name: 'nonstick cooking spray', food: 'nonstick cooking spray', category: 'pantry' },
-      { name: 'fillings such as vegetables, cheese, ham or turkey (optional)', food: 'vegetable', category: 'other', optional: true },
+      { name: 'fillings such as vegetables or cheese (optional)', food: 'vegetable', category: 'other', optional: true },
     ],
     steps: [
       'Crack the eggs into a small bowl, add the milk or water and the pepper and beat with a fork until blended.',
@@ -1446,7 +1419,7 @@ export const BATCH_8_RECIPES: Recipe[] = [
     servings: 1,
   },
   {
-    // Oatmeal cooked in the microwave with shredded zucchini, cinnamon and vanilla, with optional peanut butter, banana and chocolate chips on top.
+    // Oatmeal cooked in the microwave with shredded zucchini, cinnamon and vanilla, with optional peanut butter and banana on top. The optional chocolate chips are left out.
     id: 'b-unl-zoats',
     origin: 'builtin',
     source: {
@@ -1454,7 +1427,10 @@ export const BATCH_8_RECIPES: Recipe[] = [
       publisher: UNL_PUBLISHER,
       url: 'https://food.unl.edu/recipe/zoats/',
       retrieved: RETRIEVED,
-      adaptations: ['Used water (the page notes low-fat milk could be used instead).'],
+      adaptations: [
+        'Used water (the page notes low-fat milk could be used instead).',
+        'Left out the optional chocolate chips (added sugar)',
+      ],
     },
     title: 'Zoats',
     stages: ['12-23', '24-36'],
@@ -1468,13 +1444,12 @@ export const BATCH_8_RECIPES: Recipe[] = [
       { name: 'vanilla', food: 'vanilla', quantity: 0.5, unit: 'tsp', category: 'pantry' },
       { name: 'peanut butter (optional)', food: 'peanut butter', quantity: 1, unit: 'tbsp', category: 'pantry', optional: true },
       { name: 'small banana, peeled and sliced (optional)', food: 'banana', quantity: 1, unit: 'piece', category: 'produce', optional: true },
-      { name: 'chocolate chips (optional)', food: 'chocolate chips', quantity: 1, unit: 'tbsp', category: 'pantry', optional: true },
     ],
     steps: [
       'Stir the zucchini, water, oats, cinnamon and vanilla together in a medium microwave-safe bowl.',
       'Microwave on high for 1 minute, then stir.',
       'Microwave 1 minute more and stir, then keep microwaving and stirring until the oats are soft.',
-      'Stir in the peanut butter and top with the banana slices and chocolate chips, if you like. Keep leftovers covered in the fridge for up to 4 days.',
+      'Stir in the peanut butter and top with the banana slices, if you like. Keep leftovers covered in the fridge for up to 4 days.',
     ],
     texture: 'oatmeal with zucchini',
     servings: 4,
