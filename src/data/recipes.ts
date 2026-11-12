@@ -71,6 +71,7 @@ import { BATCH_3_RECIPES } from './recipesBatch3';
 import { BATCH_4_RECIPES } from './recipesBatch4';
 import { BATCH_5_RECIPES } from './recipesBatch5';
 import { BATCH_6_RECIPES } from './recipesBatch6';
+import { BATCH_7_RECIPES } from './recipesBatch7';
 import { SIMPLE_IDEAS } from './simpleIdeas';
 
 const BABYFOOD_URL = 'https://www.health.state.mn.us/people/wic/recipes/babyfood.html';
@@ -502,8 +503,8 @@ export const RECIPES: Recipe[] = [
 
 /**
  * Everything built in: the 10 sourced WIC recipes, the simple ideas and the
- * batch 2, 3, 4, 5 and 6 recipes (Food Hero, ICN, NHLBI, Oregon Sea Grant and
- * others; see recipesBatch2.ts to recipesBatch6.ts).
+ * batch 2, 3, 4, 5, 6 and 7 recipes (Food Hero, ICN, NHLBI, Oregon Sea Grant,
+ * Texas WIC, Minnesota WIC and others; see recipesBatch2.ts to recipesBatch7.ts).
  */
 export const BUILTIN_RECIPES: Recipe[] = [
   ...RECIPES,
@@ -513,4 +514,5 @@ export const BUILTIN_RECIPES: Recipe[] = [
   ...BATCH_4_RECIPES,
   ...BATCH_5_RECIPES,
   ...BATCH_6_RECIPES,
+  ...BATCH_7_RECIPES,
 ];
