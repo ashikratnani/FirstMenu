@@ -2463,7 +2463,9 @@ const BATCH_9_EXPECTED: Record<string, Batch3Expectation> = {
   'b-fh-southern-green-beans': { publisher: FH, stages: ['24-36'], serveAs: ['finger-food'], allergens: [], servings: 6, estimateNote: ESTIMATE_HALF_CUP },
   'b-fh-lemon-dill-brussels-sprouts': { publisher: FH, stages: ['24-36'], serveAs: ['pieces'], allergens: ['dairy'], servings: 4, estimateNote: ESTIMATE_HALF_CUP },
   'b-fh-kiwi-banana-and-apple-salad': { publisher: FH, stages: ['24-36'], serveAs: ['pieces'], allergens: [], servings: 6, estimateNote: ESTIMATE_HALF_CUP },
-  'b-fh-orange-delight': { publisher: FH, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: ['dairy'], servings: 5, estimateNote: ESTIMATE_ONE_CUP },
+  'b-fh-orange-delight': { publisher: FH, stages: ['24-36'], serveAs: ['pieces'], allergens: ['dairy'], servings: 5, estimateNote: ESTIMATE_ONE_CUP },
+  'b-fh-banana-boats': { publisher: FH, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: [], servings: 1 },
+  'b-fh-baked-tofu': { publisher: FH, stages: ['24-36'], serveAs: ['pieces'], allergens: ['soy'], servings: 6, estimateNote: ESTIMATE_HALF_CUP },
   'b-fh-burrito-soup': { publisher: FH, stages: ['24-36'], serveAs: ['pieces'], allergens: [], servings: 10, estimateNote: ESTIMATE_ONE_CUP },
   'b-fh-great-gazpacho-soup': { publisher: FH, stages: ['24-36'], serveAs: ['pieces'], allergens: [], servings: 4, estimateNote: ESTIMATE_ONE_CUP },
   'b-fh-melon-cooler': { publisher: FH, stages: ['24-36'], serveAs: ['pieces'], allergens: ['dairy'], servings: 3, estimateNote: ESTIMATE_ONE_CUP },
@@ -2519,6 +2521,7 @@ const BATCH_9_KEEPS_BLOCKED_AT_24 = [
   'b-icn-baked-carrot-fries-with-yogurt-sunflower-seed-butter-dip',
   'b-fh-one-pan-spaghetti',
   'b-fh-potato-salad',
+  'b-fh-baked-tofu',
 ];
 
 /** Pages (or ICN versions) that state their own serving count (no estimate needed). */
@@ -2551,6 +2554,7 @@ const BATCH_9_SOURCE_SERVINGS = [
   'b-unl-creamy-avocado-chicken-salad',
   'b-unl-baked-eggplant-parmesan',
   'b-fh-whole-wheat-yogurt-rolls',
+  'b-fh-banana-boats',
   'b-icn-cauliflower-rice',
   'b-icn-great-garden-soup',
   'b-icn-oven-baked-pancakes-with-spiced-pears',
@@ -2813,7 +2817,7 @@ const GOAL: Counts = {
 /**
  * Floors for this batch (batch 9). Every floor is what the set reaches after
  * batch 9, capped at HARD_MINIMUM (the plan line for batch 9 is about 325; the
- * set has 377, so the total floor stays at the hard minimum of 300). Every
+ * set has 379, so the total floor stays at the hard minimum of 300). Every
  * floor already equals HARD_MINIMUM since batch 8, so none is raised.
  */
 const CHECKPOINT: Counts = {

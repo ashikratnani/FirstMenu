@@ -2,7 +2,9 @@
 //
 // Priority of this batch: the biggest gaps to the 500 goal, spread over the
 // stages (6-8 and 9-12 puree and mashed recipes, 12-23 Easy, Medium and More,
-// then 24-36 Easy, Medium and More), and the egg and soy allergen groups.
+// then 24-36 Easy, Medium and More), and the egg and soy allergen groups (egg
+// gets 3 recipes and soy 1, Baked Tofu: the other unused soy pages are all
+// stir-fries or sauces with salty soy sauce and many ingredients).
 //
 // Rules followed (design.md "Built-in recipe expansion" and "Recipe source
 // criteria", plus the v1 sourcing rules), the same as batches 4 to 8:
@@ -1184,7 +1186,7 @@ export const BATCH_9_RECIPES: Recipe[] = [
     servings: 6,
   },
   {
-    // Milk, thawed frozen orange juice concentrate and vanilla blended for 30 seconds. Juice concentrate, so not for 9-12.
+    // Milk, thawed frozen orange juice concentrate and vanilla blended for 30 seconds. Sweetened juice concentrate, so 24-36 only.
     id: 'b-fh-orange-delight',
     origin: 'builtin',
     source: {
@@ -1195,7 +1197,7 @@ export const BATCH_9_RECIPES: Recipe[] = [
       adaptations: [ESTIMATE_ONE_CUP],
     },
     title: 'Orange Delight',
-    stages: ['12-23', '24-36'],
+    stages: ['24-36'],
     serveAs: ['pieces'],
     mealTypes: ['breakfast', 'snack'],
     ingredients: [
@@ -1209,6 +1211,69 @@ export const BATCH_9_RECIPES: Recipe[] = [
     ],
     texture: 'orange milk drink',
     servings: 5,
+  },
+  {
+    // A banana split open in its peel, filled with crushed pineapple and coconut flakes, wrapped in foil and warmed on a grill until soft.
+    id: 'b-fh-banana-boats',
+    origin: 'builtin',
+    source: {
+      title: 'Banana Boats',
+      publisher: FH_PUBLISHER,
+      url: 'https://foodhero.org/recipes/banana-boats',
+      retrieved: RETRIEVED,
+      adaptations: ['The page also gives an oven method for when you are not grilling; only the grill method is written into the steps.'],
+    },
+    title: 'Banana Boats',
+    stages: ['12-23', '24-36'],
+    serveAs: ['pieces'],
+    mealTypes: ['snack'],
+    ingredients: [
+      { name: 'banana with peel', food: 'banana', quantity: 1, unit: 'piece', category: 'produce' },
+      { name: 'crushed pineapple', food: 'pineapple', quantity: 1, unit: 'tbsp', category: 'produce' },
+      { name: 'coconut flakes', food: 'coconut', quantity: 1, unit: 'tbsp', category: 'pantry' },
+    ],
+    steps: [
+      'Rinse the banana under running water, leave the peel on and cut a deep slit down the long side, through the peel and into the banana but not all the way through.',
+      'Gently pull the banana open to make a pocket, fill it with the crushed pineapple and top it with the coconut flakes.',
+      'Wrap the banana in foil and put it on a grill or near the coals of a campfire. Heat about 5 minutes at medium high heat, until warm.',
+      'Carefully take the foil packet off the heat, let it cool slightly and unwrap it. The peel may turn black, but the banana inside will be warm and soft. Refrigerate leftovers within 2 hours.',
+    ],
+    texture: 'warm banana with pineapple and coconut',
+    servings: 1,
+  },
+  {
+    // Firm tofu pressed, marinated in soy sauce, lime juice and oil for at least 30 minutes, then baked until firm and lightly browned. Soy sauce is salty, so 24-36 only.
+    id: 'b-fh-baked-tofu',
+    origin: 'builtin',
+    source: {
+      title: 'Baked Tofu',
+      publisher: FH_PUBLISHER,
+      url: 'https://foodhero.org/recipes/baked-tofu',
+      retrieved: RETRIEVED,
+      adaptations: [
+        ESTIMATE_HALF_CUP,
+        'Used the soy-lime marinade (the page also gives a soy-honey marinade).',
+        'Used vegetable oil (the page says to try sesame oil).',
+      ],
+    },
+    title: 'Baked Tofu',
+    stages: ['24-36'],
+    serveAs: ['pieces'],
+    mealTypes: ['lunch', 'dinner'],
+    ingredients: [
+      { name: 'firm or extra-firm tofu (fresh or frozen and thawed)', food: 'tofu', quantity: 16, unit: 'oz', category: 'protein' },
+      { name: 'low-sodium soy sauce', food: 'soy sauce', quantity: 0.333, unit: 'cup', category: 'pantry' },
+      { name: 'lime juice', food: 'lime juice', quantity: 0.333, unit: 'cup', category: 'pantry' },
+      { name: 'vegetable oil', food: 'vegetable oil', quantity: 3, unit: 'tbsp', category: 'pantry' },
+    ],
+    steps: [
+      'Use a clean towel to press the water out of the tofu, then cut it into triangles, cubes, slices or sticks.',
+      'Mix the soy sauce, lime juice and oil in a bowl, add the tofu and marinate for at least 30 minutes. Heat the oven to 350 degrees F.',
+      'Drain the tofu and put the pieces on a baking sheet (foil on the sheet makes clean-up easy). Bake about 30 minutes, turning the pieces once, until the tofu is firm and lightly browned.',
+      'Serve it warm, or use it in place of meat in tacos, stir-fries or skillet meals. Refrigerate leftovers within 2 hours.',
+    ],
+    texture: 'baked marinated tofu',
+    servings: 6,
   },
   {
     // Onion and zucchini softened in oil, then simmered with refried beans, canned tomatoes, corn, black beans and taco seasoning. Taco seasoning, so 24-36 only.
