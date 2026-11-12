@@ -47,6 +47,25 @@ export function pageStatusText(shown: number, total: number): string {
   return `Showing ${shown} of ${total} ${total === 1 ? 'recipe' : 'recipes'}`;
 }
 
+/** How many nutrition tags a card shows before it counts the rest. */
+export const CARD_TAGS_SHOWN = 1;
+
+/** The first CARD_TAGS_SHOWN tags to draw, and how many more are left out of the card. */
+export function collapseTags<T>(tags: readonly T[]): { shown: T[]; hidden: number } {
+  return { shown: tags.slice(0, CARD_TAGS_SHOWN), hidden: Math.max(0, tags.length - CARD_TAGS_SHOWN) };
+}
+
+/**
+ * Whether a recipe matches the search box: every word typed must appear in the
+ * title or in an ingredient name (case-insensitive). A blank search matches all.
+ */
+export function matchesSearch(recipe: Recipe, query: string): boolean {
+  const words = query.toLowerCase().split(/\s+/).filter((w) => w !== '');
+  if (words.length === 0) return true;
+  const text = [recipe.title, ...recipe.ingredients.map((i) => i.name)].join(' ').toLowerCase();
+  return words.every((w) => text.includes(w));
+}
+
 /** The stages, in order, for the stage filter. */
 export const STAGES: readonly StageId[] = STAGE_IDS;
 

@@ -12,11 +12,35 @@
   color: var(--color-text-secondary);
 }
 
+.chips button {
+  min-width: 44px;
+}
+
+.empty button,
+.more button {
+  min-height: 44px;
+}
+
+.search {
+  margin: 0 0 16px;
+}
+
+/* Astryx text inputs are 32px tall; this one is a main control (44px). */
+.search :global(.astryx-text-input) {
+  min-height: 44px;
+}
+
 .filters {
   display: flex;
-  flex-wrap: wrap;
-  gap: 12px 24px;
+  flex-direction: column;
+  gap: 12px;
   margin: 0 0 20px;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .filterGroup {
@@ -86,8 +110,15 @@
 }
 
 .empty {
-  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
   color: var(--color-text-secondary);
+}
+
+.empty p {
+  margin: 0;
 }
 
 .emptiedNotice {
@@ -109,8 +140,18 @@
 }
 
 .facts {
-  font-size: 0.9rem;
-  color: var(--color-text-secondary, var(--fm-color-muted));
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.fact {
+  padding: 2px 10px;
+  border: 1px solid var(--fm-color-border);
+  border-radius: 999px;
+  background: var(--fm-color-surface);
+  color: var(--fm-color-text);
+  font-size: 0.85rem;
 }
 
 .more {

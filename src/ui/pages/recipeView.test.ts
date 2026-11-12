@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { RECIPES_PAGE_SIZE, ghostReason, pageStatusText, recipeView } from './recipeView';
+import { RECIPES_PAGE_SIZE, collapseTags, ghostReason, matchesSearch, pageStatusText, recipeView } from './recipeView';
 import { defaultState } from '../../domain/storage';
 import type { Recipe } from '../../domain/types';
 
@@ -73,5 +73,20 @@ describe('library paging helpers', () => {
   it('words the status line for one and many recipes', () => {
     expect(pageStatusText(50, 142)).toBe('Showing 50 of 142 recipes');
     expect(pageStatusText(1, 1)).toBe('Showing 1 of 1 recipe');
+  });
+});
+
+describe('card tags and search', () => {
+  it('shows the first tag and counts the rest', () => {
+    expect(collapseTags(['a', 'b', 'c', 'd'])).toEqual({ shown: ['a'], hidden: 3 });
+    expect(collapseTags(['a'])).toEqual({ shown: ['a'], hidden: 0 });
+  });
+
+  it('matches every typed word against the title or an ingredient', () => {
+    const r = pasted({ title: 'Pear mash', ingredients: [{ name: 'ripe pear', category: 'produce' }, { name: 'oats', category: 'grains' }] });
+    expect(matchesSearch(r, '')).toBe(true);
+    expect(matchesSearch(r, '  ')).toBe(true);
+    expect(matchesSearch(r, 'MASH oats')).toBe(true);
+    expect(matchesSearch(r, 'mash banana')).toBe(false);
   });
 });
