@@ -19,14 +19,6 @@
   min-height: 44px;
 }
 
-.meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space);
-  color: var(--fm-color-muted);
-  margin: 0 0 var(--space);
-}
-
 /* Fact row under the title (stage, time, effort, texture, servings). */
 .facts {
   display: flex;
@@ -175,11 +167,20 @@
 }
 
 
-/* Footer disclaimer -------------------------------------------------------- */
+/* Footer disclaimer: repeats the shell footer; same text, quieter. ----------- */
 .footer {
-  margin-top: calc(var(--space) * 2);
+  margin-top: calc(var(--space) * 3);
   border-top: 1px solid var(--fm-color-border);
   padding-top: var(--space);
+  font-size: 0.85rem;
+  color: var(--fm-color-muted);
+}
+
+/* The shared <Disclaimer/> paragraphs set their own size and colour, so the
+   quieter style has to reach them directly. */
+.footer p {
+  font-size: inherit;
+  color: inherit;
 }
 
 .serveAs {
@@ -210,6 +211,24 @@
   display: flex;
   flex-wrap: wrap;
   gap: 8px 16px;
+}
+
+/* Checkbox rows: the whole row (box and label) is the 44 px target. */
+.serveAsList :global(.astryx-checkbox-input) {
+  min-height: 44px;
+  align-items: center;
+}
+
+.serveAsList :global(.astryx-checkbox-input) > * {
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+}
+
+.serveAsList label {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
 }
 
 .serveAsActions {
@@ -277,7 +296,7 @@
   flex-wrap: wrap;
   gap: var(--space);
   align-items: flex-start;
-  margin: calc(var(--space) * 1.5) 0;
+  margin: 0 0 var(--space);
 }
 
 /* 44 px targets on this page (buttons, source links). */
@@ -290,17 +309,6 @@
   display: inline-flex;
   align-items: center;
   min-height: 44px;
-}
-
-.historyActions {
-  margin: 0 0 var(--space);
-}
-
-/* Page footer disclaimer repeats the shell footer; same text, quieter. */
-.footer {
-  margin-top: var(--space);
-  font-size: 0.85rem;
-  color: var(--fm-color-muted);
 }
 
 .page li,

@@ -26,14 +26,6 @@
   font-weight: 600;
 }
 
-.meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space);
-  margin: 0 0 var(--space);
-  color: var(--fm-color-muted);
-}
-
 .list {
   margin: 0;
   padding-left: calc(var(--space) * 1.5);

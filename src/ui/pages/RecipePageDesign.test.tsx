@@ -87,10 +87,13 @@ describe('recipe page design', () => {
     renderAt('/recipes/b-carrots-and-apples', seed());
     const facts = screen.getByRole('list', { name: 'Recipe facts' });
     const items = within(facts).getAllByRole('listitem').map((li) => li.textContent);
-    expect(items).toHaveLength(5);
-    expect(items[0]).toMatch(/months|years/);
-    expect(items[3]).toMatch(/^Texture: /);
-    expect(items[4]).toMatch(/^Serves \d+ portions?$/);
+    expect(items).toEqual([
+      expect.stringMatching(/^(6|9|12|2).*(months|years)/),
+      expect.stringMatching(/^(about )?\d+ min$|^\d+(\.\d+)? ?h/),
+      expect.stringMatching(/^(Easy|Medium|Involved|Hard)$/),
+      expect.stringMatching(/^Texture: .+/),
+      expect.stringMatching(/^Serves \d+ portions?$/),
+    ]);
     const h1 = screen.getByRole('heading', { level: 1 });
     expect(before(h1, facts)).toBe(true);
   });
@@ -108,10 +111,45 @@ describe('recipe page design', () => {
     expect(screen.getByRole('link', { name: /Back to recipes/ })).toHaveClass('fm-link');
   });
 
-  it('keeps both disclaimers (page footer and shell footer) with unchanged text', () => {
+  it('shows "Time not given" in the fact row of a simple idea', () => {
+    renderAt('/recipes/b-idea-mashed-banana', seed());
+    const items = within(screen.getByRole('list', { name: 'Recipe facts' }))
+      .getAllByRole('listitem')
+      .map((li) => li.textContent);
+    expect(items).toEqual([
+      expect.stringMatching(/months|years/),
+      'Time not given',
+      expect.stringMatching(/^[A-Z][a-z]+$/),
+      expect.stringMatching(/^Texture: /),
+      'Serves 1 portion',
+    ]);
+  });
+
+  it('keeps both disclaimers, the page one last in the article and the shell copy after it', () => {
     renderAt('/recipes/b-carrots-and-apples', seed());
-    expect(screen.getAllByText(NOT_MEDICAL_ADVICE)).toHaveLength(2);
-    expect(screen.getAllByText(SCREEN_LIMITS)).toHaveLength(2);
+    const notMedical = screen.getAllByText(NOT_MEDICAL_ADVICE);
+    const limits = screen.getAllByText(SCREEN_LIMITS);
+    expect(notMedical).toHaveLength(2);
+    expect(limits).toHaveLength(2);
+    const article = screen.getByRole('article');
+    const [pageNote, shellNote] = notMedical;
+    const [pageLimits, shellLimits] = limits;
+    expect(article).toContainElement(pageNote);
+    expect(article).toContainElement(pageLimits);
+    expect(article).not.toContainElement(shellNote);
+    expect(article).not.toContainElement(shellLimits);
+    // Page footer is the last child of the article, and its text is the last content.
+    const footer = article.lastElementChild as HTMLElement;
+    expect(footer.tagName).toBe('FOOTER');
+    expect(footer).toContainElement(pageNote);
+    expect(footer).toContainElement(pageLimits);
+    expect(before(pageNote, pageLimits)).toBe(true);
+    // Everything else in the article comes before the page footer.
+    expect(before(screen.getByRole('heading', { name: 'Steps' }), pageNote)).toBe(true);
+    // The shell copy follows the article, in the same order.
+    expect(before(article, shellNote)).toBe(true);
+    expect(before(pageLimits, shellNote)).toBe(true);
+    expect(before(shellNote, shellLimits)).toBe(true);
   });
 
   it('has no axe violations for a ghosted recipe and a simple idea', async () => {
