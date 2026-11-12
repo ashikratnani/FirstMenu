@@ -885,8 +885,8 @@ export default function RecipeEditor() {
 
           <p className={styles.viewLink}>
             <Link className={`fm-link ${styles.backLink}`} to="/recipes">
-            Back to recipes
-          </Link>
+              Back to recipes
+            </Link>
           </p>
         </section>
       )}

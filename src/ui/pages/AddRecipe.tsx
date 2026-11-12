@@ -602,7 +602,10 @@ export default function AddRecipe() {
                   onToggle={() => toggleLine(`ingredients-${line.id}`)}
                   onEdit={(t) => update((d) => editLine(d, 'ingredients', line.id, t))}
                   onRemove={() => update((d) => removeLine(d, 'ingredients', line.id))}
-                  onMove={(to) => update((d) => moveLine(d, 'ingredients', line.id, to))}
+                  onMove={(to) => {
+                    setOpenLine(null);
+                    update((d) => moveLine(d, 'ingredients', line.id, to));
+                  }}
                 />
               ))}
             </ul>
@@ -663,7 +666,10 @@ export default function AddRecipe() {
                       onToggle={() => toggleLine(`steps-${line.id}`)}
                       onEdit={(t) => update((d) => editLine(d, 'steps', line.id, t))}
                       onRemove={() => update((d) => removeLine(d, 'steps', line.id))}
-                      onMove={(to) => update((d) => moveLine(d, 'steps', line.id, to))}
+                      onMove={(to) => {
+                    setOpenLine(null);
+                    update((d) => moveLine(d, 'steps', line.id, to));
+                  }}
                     />
                   ))}
                 </ol>
@@ -684,7 +690,10 @@ export default function AddRecipe() {
                           onToggle={() => toggleLine(`notes-${line.id}`)}
                           onEdit={(t) => update((d) => editLine(d, 'notes', line.id, t))}
                           onRemove={() => update((d) => removeLine(d, 'notes', line.id))}
-                          onMove={(to) => update((d) => moveLine(d, 'notes', line.id, to))}
+                          onMove={(to) => {
+                    setOpenLine(null);
+                    update((d) => moveLine(d, 'notes', line.id, to));
+                  }}
                         />
                       ))}
                   </ul>

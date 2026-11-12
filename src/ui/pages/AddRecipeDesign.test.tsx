@@ -153,6 +153,22 @@ describe('Add recipe preview lines', () => {
     expect(screen.queryByRole('button', { name: 'Delete ingredient: 1 cup rolled oats' })).not.toBeInTheDocument();
   });
 
+  it('collapses a line after it is moved, so moving it back does not show it open', async () => {
+    const user = userEvent.setup();
+    renderAt('/add');
+    await readReply(user, REPLY);
+    await user.click(screen.getByRole('button', { name: 'Change step: Cook the oats.' }));
+    await user.click(screen.getByRole('button', { name: 'Move step to notes: Cook the oats.' }));
+    // Moved lines are collapsed.
+    expect(screen.getByRole('button', { name: 'Change note: Cook the oats.' })).toHaveAttribute('aria-expanded', 'false');
+    // Open it in notes and move it back to the steps, then to notes again, never opening another line.
+    await user.click(screen.getByRole('button', { name: 'Change note: Cook the oats.' }));
+    await user.click(screen.getByRole('button', { name: 'Move note to steps: Cook the oats.' }));
+    expect(screen.getByRole('button', { name: 'Change step: Cook the oats.' })).toHaveAttribute('aria-expanded', 'false');
+    const preview = screen.getByRole('region', { name: 'Preview' });
+    expect(within(preview).queryAllByRole('button', { expanded: true })).toHaveLength(0);
+  });
+
   it('keeps the ingredient block, the mention button and the fixed-list note', async () => {
     const user = userEvent.setup();
     renderAt('/add');
