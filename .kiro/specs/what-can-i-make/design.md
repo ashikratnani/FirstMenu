@@ -295,9 +295,9 @@ A recipe gets a tag when any required ingredient name matches. Draft term lists 
 | Fruit | apple, banana, pear, peach, mango, avocado, blueberry, strawberry, raspberry, plum, papaya, kiwi, prune, applesauce | apple juice | CDC-encourage |
 | Whole grain | oat, oatmeal, brown rice, quinoa, barley, whole wheat, whole grain | | CDC-encourage |
 | Dairy | yogurt, cheese, cottage cheese, ricotta, milk | breast, formula, peanut, almond, oat, soy, coconut, rice | CDC-encourage |
-| Healthy fat | avocado, olive oil, salmon, nut butter, peanut butter, almond butter, tahini, ground flaxseed, chia | | CDC-encourage |
+| Healthy fat | seafood, nut, seed, oil | nut free, oil free, seafood seasoning, coconut oil, palm oil, palm kernel oil | DGA-2020-2025 |
 
-**Task 4.1 result:** the lists in `domain/nutrition.ts` replace the draft above. Only terms named in CDC-iron, CDC-encourage or USDA-FNS-iron were kept, with the quoted evidence in that file's header. Healthy fat has no supporting term in those sources, so it has no rule until task 4.3 finds a sourced term list (see `UNCONFIRMED_TAGS`). Six tags ship first; the maintainer chose this on issue #50.
+**Task 4.1 result:** the lists in `domain/nutrition.ts` replace the draft above. Only terms named in CDC-iron, CDC-encourage or USDA-FNS-iron were kept, with the quoted evidence in that file's header. None of those sources names a fat-rich food, so Healthy fat was left out until task 4.3 (issue #50). Task 4.3 found DGA-2020-2025 (Chapter 2, printed page 60: "seafood, nuts, seeds, and oils"), so the rule ships with exactly four terms: seafood, nut, seed, oil. Exceptions: `nut free`, `oil free`, `seafood seasoning` (a spice mix), and `coconut oil`, `palm oil`, `palm kernel oil`, which the same PDF (PDF page 48, "Oils") leaves out of the oils category because of their higher saturated fat. `NUTRITION_VERSION` stays at 2 because version 2 has not shipped yet.
 
 New sources added to the sources table (shared with safety rules):
 
@@ -306,6 +306,7 @@ New sources added to the sources table (shared with safety rules):
 | CDC-iron | [CDC: Iron (Infant and Toddler Nutrition)](https://www.cdc.gov/infant-toddler-nutrition/vitamins-minerals/iron.html) |
 | CDC-encourage | [CDC: Foods and drinks to encourage](https://www.cdc.gov/infant-toddler-nutrition/foods-and-drinks/foods-and-drinks-to-encourage.html) |
 | USDA-FNS-iron | [USDA FNS: For parents, making sure your baby gets enough iron (PDF)](https://www.fns.usda.gov/sites/default/files/resource-files/FI_PHa_5MakingSureEnoughIron.pdf) |
+| DGA-2020-2025 | [Dietary Guidelines for Americans, 2020-2025 (PDF)](https://www.dietaryguidelines.gov/sites/default/files/2021-03/Dietary_Guidelines_for_Americans-2020-2025.pdf) |
 
 The tag explainer (Requirement 5.4): "Tags show which food groups are in a recipe, not how much of each nutrient it gives."
 

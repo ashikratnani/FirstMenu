@@ -41,6 +41,7 @@ export type SourceId =
   | 'CDC-iron'
   | 'CDC-encourage'
   | 'USDA-FNS-iron'
+  | 'DGA-2020-2025'
   | 'HHS-CFOC';
 
 export interface Source {
@@ -143,6 +144,13 @@ export const SOURCES: Record<SourceId, Source> = {
     title: 'USDA FNS: For parents, making sure your baby gets enough iron (PDF)',
     url: 'https://www.fna.usda.gov/sites/default/files/resource-files/FI_PHa_5MakingSureEnoughIron.pdf',
     retrieved: '2026-11-09',
+  },
+  // Healthy fat (task 4.3). Read directly from the canonical PDF; no archive copy.
+  'DGA-2020-2025': {
+    title: 'USDA and HHS: Dietary Guidelines for Americans, 2020-2025, Chapter 2: Infants and Toddlers (PDF)',
+    url: 'https://www.dietaryguidelines.gov/sites/default/files/2021-03/Dietary_Guidelines_for_Americans-2020-2025.pdf',
+    retrieved: '2026-11-10',
+    note: 'Read directly from the PDF (not an archive copy). Healthy fat terms come from printed page 60 (PDF page 73): "seafood, nuts, seeds, and oils".',
   },
   'HHS-CFOC': {
     title: 'Caring for Our Children 4.5.0.10: Foods that are choking hazards',
