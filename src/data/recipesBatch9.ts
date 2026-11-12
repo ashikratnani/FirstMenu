@@ -1238,7 +1238,7 @@ export const BATCH_9_RECIPES: Recipe[] = [
     steps: [
       'Wash the banana but keep the peel on. Slice a deep lengthwise slit in it, cutting through the peel into the fruit without going through to the other side.',
       'Gently pull the banana open to make a pocket, fill it with the crushed pineapple and top it with the coconut flakes.',
-      'Wrap the banana in foil and put it on a grill or near the coals of a campfire. Heat about 5 minutes at medium high heat, until warm.',
+      'Wrap the banana in foil and set it over a grill, or beside the coals of a campfire. Cook for about 5 minutes over medium high heat, until warm.',
       'Carefully take the foil packet off the heat, let it cool slightly and unwrap it. The peel may turn black, but the banana inside will be warm and soft. Refrigerate leftovers within 2 hours.',
     ],
     texture: 'warm banana with pineapple and coconut',
