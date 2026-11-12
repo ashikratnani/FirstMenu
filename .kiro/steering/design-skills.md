@@ -7,7 +7,7 @@ inclusion: always
 The maintainer asked (November 12, 2026) that UI and UX work use two skills, vendored in `.kiro/skills/` (see `.kiro/skills/VENDORED.md`):
 
 - **impeccable** (`.kiro/skills/impeccable/`): the primary skill. Use it for every UI change: critique, audit, layout, typography, color, UX copy, empty states, onboarding, forms, responsive behavior, accessibility, polish.
-- **tasteskill** (`.kiro/skills/taste-skill/`): a second opinion. Use its copy guidance (`references/copy*.md`), its consistency and system rules (`references/system.md`, `references/cards.md`) and its motion restraint (`references/motion.md`). Its scripts and assets are not vendored.
+- **tasteskill** (`.kiro/skills/design-taste-frontend/`): a second opinion. Use its copy guidance (`references/copy*.md`), its consistency and system rules (`references/system.md`, `references/cards.md`) and its motion restraint (`references/motion.md`). Its scripts and assets are not vendored.
 
 Both skills are written mostly for marketing and company websites. FirstMenu is an app a tired parent uses with one hand. Where a skill and this repo disagree, the spec and steering win.
 
@@ -17,7 +17,7 @@ Both skills are written mostly for marketing and company websites. FirstMenu is 
 - **Refinement, not redesign.** Keep the Astryx components, the FirstMenu theme (creams, soft orange, lavender), the friendly ghost, door, monster and pumpkin art, and every safety state and its text. Improve hierarchy, spacing, copy, flows and feedback within that.
 - **Context files.** impeccable looks for `PRODUCT.md` and `DESIGN.md`. If they don't exist, create them at the repo root from `.kiro/steering/product.md`, `tech.md`, the active spec and `src/ui/theme/firstmenu.css`. Don't invent facts.
 - **Inspiration:** `docs/design-inspiration.md`. Use it for patterns, never to copy another site's look, text or images.
-- **Every UI PR** (task 19 and any later UI change): start with an impeccable critique of the screen at 390 px and 1280 px, fix what it finds, then run its craft-floor checks before the PR. Put the critique's main findings and what you changed in the PR body.
+- **Every UI PR** (task 19 and any later UI change): start with an impeccable critique of the screen at 360 px and 1280 px, fix what it finds, then run its craft-floor checks before the PR. Put the critique's main findings and what you changed in the PR body, and commit before and after screenshots of the changed screens at 360 px and 1280 px to `docs/ui-review/<branch name>/`, linked from the PR body.
 
 ## What the skills must not override
 
@@ -31,8 +31,9 @@ Both skills are written mostly for marketing and company websites. FirstMenu is 
 | New dependencies or design-system swaps | Keep Astryx (issue #37). Size budget `check:size` must pass. |
 | Copy that claims or advises | No health or safety wording beyond the design and cited sources (`autonomy.md`). |
 | Several prominent buttons | One filled primary button per screen (Requirement 17.10). |
-| Skill hooks, gates or launchers | Optional. If impeccable's launcher can't run (no network or binary), say so and read the context files directly, as its SKILL.md describes. tasteskill's gate is not vendored. |
+| Trimming or moving disclaimers to tidy a screen | Every disclaimer stays where v1 Requirement 13.1 and active Requirements 11.2 and 20.9 put it. Shorter wording is fine only if it says the same thing. |
+| Skill hooks, gates, launchers and live mode | Never run `impeccable hooks on` (it writes hook files, including `.github/hooks/impeccable.json`) or `impeccable live` (it injects a localhost script into `index.html` and offers to change the CSP). Other impeccable commands are fine. Its working files under `.impeccable/` are not committed (it is in `.gitignore`); only `PRODUCT.md` and `DESIGN.md` at the repo root are. If the launcher can't run (no network or binary), say so and read the context files directly, as its SKILL.md describes. tasteskill's gate is not vendored. |
 
 ## Checks every UI PR still runs
 
-`npm run lint`, `npm test`, `npm run build`, `npm run check:contrast`, `npm run check:external`, `npm run check:size`, and `vitest-axe` on changed pages, plus a look at 390 px and 1280 px.
+`npm run lint`, `npm test`, `npm run build`, `npm run check:contrast`, `npm run check:external`, `npm run check:size`, and `vitest-axe` on changed pages, plus a real-browser look at 360 px and 1280 px and a keyboard-only pass (v1 Requirement 14.4, active Requirement 15.5).

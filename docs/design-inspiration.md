@@ -2,7 +2,7 @@
 
 Popular baby and family food sites, reviewed on November 12, 2026 at 390 px (phone) and 1280 px (desktop). Use them for patterns only. Don't copy their look, text, images or logos.
 
-Screenshots were taken during the research session and are not committed, because they show other companies' copyrighted pages and this repo is public under MIT. To see a page, open its link at 390 px and 1280 px with the browser tool.
+Screenshots were taken during the research session and are not committed, because they show other companies' copyrighted pages and this repo is public under MIT. To see a page, open its link at 360 px and 1280 px with the browser tool.
 
 ## Closest to FirstMenu
 
@@ -11,7 +11,7 @@ Screenshots were taken during the research session and are not committed, becaus
 - **Search first.** The database page leads with one large search box on a soft tinted band.
 - **Food facts as a short table.** A food page opens with three labelled rows: age suggestion, iron-rich, common allergen, each with a small help icon. This maps directly to FirstMenu's stage, Iron-rich tag and allergen door.
 - **Calm palette.** Navy text on a light periwinkle band, white cards, big rounded photo. Generous spacing.
-- **Watch out:** a very long disclaimer block above the content. FirstMenu's disclaimer should stay short and in the footer.
+- **Watch out:** a very long disclaimer block above the content. FirstMenu keeps its disclaimers short, and keeps every one the spec requires, where it requires them (v1 Requirement 13.1, active Requirements 11.2 and 20.9).
 
 ### NHS Best Start in Life: recipes and meal ideas
 - https://www.nhs.uk/best-start-in-life/baby/recipes-and-meal-ideas/ and a recipe, for example https://www.nhs.uk/best-start-in-life/baby/recipes-and-meal-ideas/chicken-noodle-stew/
@@ -59,7 +59,7 @@ Screenshots were taken during the research session and are not committed, becaus
 
 ## Patterns to avoid
 
-Long disclaimer blocks above content, ad and app-download banners, chat bubbles, sale banners, carousels, stock photos, and checkbox walls.
+Long legal-style disclaimer blocks that push content down (FirstMenu's required disclaimers stay, short), ad and app-download banners, chat bubbles, sale banners, carousels, stock photos, and checkbox walls.
 
 ## Not reviewed
 
