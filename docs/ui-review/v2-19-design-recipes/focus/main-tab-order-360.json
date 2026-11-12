@@ -1,0 +1,744 @@
+[
+ {
+  "screen": "recipes",
+  "stops": [
+   {
+    "role": "link",
+    "name": "Skip to content",
+    "tag": "A",
+    "ring": "outline 2px rgb(180, 84, 26) off 3px",
+    "src": "self",
+    "fv": true,
+    "box": [
+     8,
+     8,
+     132,
+     33
+    ],
+    "key": "link|Skip to content|8,8,132,33",
+    "n": 1
+   },
+   {
+    "role": "link",
+    "name": "FirstMenu",
+    "tag": "A",
+    "ring": "outline 1px rgb(16, 16, 16) off 1px",
+    "src": "self",
+    "fv": true,
+    "box": [
+     8,
+     8,
+     94,
+     32
+    ],
+    "key": "link|FirstMenu|8,8,94,32",
+    "n": 2
+   },
+   {
+    "role": "link",
+    "name": "Add recipe",
+    "tag": "A",
+    "ring": "outline 2px rgb(180, 84, 26) off 3px",
+    "src": "self",
+    "fv": true,
+    "box": [
+     223,
+     8,
+     93,
+     32
+    ],
+    "key": "link|Add recipe|223,8,93,32",
+    "n": 3
+   },
+   {
+    "role": "button",
+    "name": "Open navigation",
+    "tag": "BUTTON",
+    "ring": "outline 2px rgb(180, 84, 26) off 3px",
+    "src": "self",
+    "fv": true,
+    "box": [
+     320,
+     8,
+     32,
+     32
+    ],
+    "key": "button|Open navigation|320,8,32,32",
+    "n": 4
+   },
+   {
+    "role": "radio",
+    "name": "6–8 months",
+    "tag": "BUTTON",
+    "ring": "outline 2px rgb(180, 84, 26) off 3px",
+    "src": "self",
+    "fv": true,
+    "box": [
+     46,
+     181,
+     73,
+     20
+    ],
+    "key": "radio|6–8 months|46,181,73,20",
+    "n": 5
+   },
+   {
+    "role": "radio",
+    "name": "All",
+    "tag": "BUTTON",
+    "ring": "outline 2px rgb(180, 84, 26) off 3px",
+    "src": "self",
+    "fv": true,
+    "box": [
+     16,
+     242,
+     30,
+     20
+    ],
+    "key": "radio|All|16,242,30,20",
+    "n": 6
+   },
+   {
+    "role": "link",
+    "name": "Carrots and Apples. New food: carrot, apple. Freez",
+    "tag": "A",
+    "ring": "outline 1px rgb(16, 16, 16) off 1px",
+    "src": "self",
+    "fv": true,
+    "box": [
+     23,
+     297,
+     1,
+     1
+    ],
+    "key": "link|Carrots and Apples. New food: carrot, apple. Freez|23,297,1,1",
+    "n": 7
+   },
+   {
+    "role": "link",
+    "name": "Sweet Potato Chicken. New food: sweet potato, chic",
+    "tag": "A",
+    "ring": "outline 1px rgb(16, 16, 16) off 1px",
+    "src": "self",
+    "fv": true,
+    "box": [
+     23,
+     411,
+     1,
+     1
+    ],
+    "key": "link|Sweet Potato Chicken. New food: sweet potato, chic|23,411,1,1",
+    "n": 8
+   },
+   {
+    "role": "link",
+    "name": "Beef, Peas and Potatoes. New food: beef, potato, p",
+    "tag": "A",
+    "ring": "outline 1px rgb(16, 16, 16) off 1px",
+    "src": "self",
+    "fv": true,
+    "box": [
+     23,
+     569,
+     1,
+     1
+    ],
+    "key": "link|Beef, Peas and Potatoes. New food: beef, potato, p|23,569,1,1",
+    "n": 9
+   },
+   {
+    "role": "link",
+    "name": "Chicken, Broccoli and Rice. New food: chicken, ric",
+    "tag": "A",
+    "ring": "outline 1px rgb(16, 16, 16) off 1px",
+    "src": "self",
+    "fv": true,
+    "box": [
+     23,
+     727,
+     1,
+     1
+    ],
+    "key": "link|Chicken, Broccoli and Rice. New food: chicken, ric|23,727,1,1",
+    "n": 10
+   },
+   {
+    "role": "link",
+    "name": "Beef, Squash and Macaroni. New food: beef, wheat, ",
+    "tag": "A",
+    "ring": "outline 1px rgb(16, 16, 16) off 1px",
+    "src": "self",
+    "fv": true,
+    "box": [
+     23,
+     885,
+     1,
+     1
+    ],
+    "key": "link|Beef, Squash and Macaroni. New food: beef, wheat, |23,885,1,1",
+    "n": 11
+   },
+   {
+    "role": "link",
+    "name": "Apple Rice Pudding. New food: rice cereal, dairy, ",
+    "tag": "A",
+    "ring": "outline 1px rgb(16, 16, 16) off 1px",
+    "src": "self",
+    "fv": true,
+    "box": [
+     23,
+     450,
+     1,
+     1
+    ],
+    "key": "link|Apple Rice Pudding. New food: rice cereal, dairy, |23,450,1,1",
+    "n": 12
+   },
+   {
+    "role": "link",
+    "name": "Mashed banana. New food: banana. Simple idea. Time",
+    "tag": "A",
+    "ring": "outline 1px rgb(16, 16, 16) off 1px",
+    "src": "self",
+    "fv": true,
+    "box": [
+     23,
+     590,
+     1,
+     1
+    ],
+    "key": "link|Mashed banana. New food: banana. Simple idea. Time|23,590,1,1",
+    "n": 13
+   },
+   {
+    "role": "link",
+    "name": "Sweet potato puree. New food: sweet potato. Simple",
+    "tag": "A",
+    "ring": "outline 1px rgb(16, 16, 16) off 1px",
+    "src": "self",
+    "fv": true,
+    "box": [
+     23,
+     700,
+     1,
+     1
+    ],
+    "key": "link|Sweet potato puree. New food: sweet potato. Simple|23,700,1,1",
+    "n": 14
+   },
+   {
+    "role": "link",
+    "name": "Mashed cooked oats. New food: oat. Simple idea. Ti",
+    "tag": "A",
+    "ring": "outline 1px rgb(16, 16, 16) off 1px",
+    "src": "self",
+    "fv": true,
+    "box": [
+     23,
+     810,
+     1,
+     1
+    ],
+    "key": "link|Mashed cooked oats. New food: oat. Simple idea. Ti|23,810,1,1",
+    "n": 15
+   },
+   {
+    "role": "link",
+    "name": "Chicken puree. New food: chicken. Simple idea. Tim",
+    "tag": "A",
+    "ring": "outline 1px rgb(16, 16, 16) off 1px",
+    "src": "self",
+    "fv": true,
+    "box": [
+     23,
+     450,
+     1,
+     1
+    ],
+    "key": "link|Chicken puree. New food: chicken. Simple idea. Tim|23,450,1,1",
+    "n": 16
+   },
+   {
+    "role": "link",
+    "name": "Sweet Potato Hummus. New food: sweet potato, chick",
+    "tag": "A",
+    "ring": "outline 1px rgb(16, 16, 16) off 1px",
+    "src": "self",
+    "fv": true,
+    "box": [
+     23,
+     560,
+     1,
+     1
+    ],
+    "key": "link|Sweet Potato Hummus. New food: sweet potato, chick|23,560,1,1",
+    "n": 17
+   },
+   {
+    "role": "link",
+    "name": "Hummus (No Tahini). New food: chickpea, lemon juic",
+    "tag": "A",
+    "ring": "outline 1px rgb(16, 16, 16) off 1px",
+    "src": "self",
+    "fv": true,
+    "box": [
+     23,
+     708,
+     1,
+     1
+    ],
+    "key": "link|Hummus (No Tahini). New food: chickpea, lemon juic|23,708,1,1",
+    "n": 18
+   },
+   {
+    "role": "link",
+    "name": "Microwave Applesauce. New food: apple, cinnamon. a",
+    "tag": "A",
+    "ring": "outline 1px rgb(16, 16, 16) off 1px",
+    "src": "self",
+    "fv": true,
+    "box": [
+     23,
+     856,
+     1,
+     1
+    ],
+    "key": "link|Microwave Applesauce. New food: apple, cinnamon. a|23,856,1,1",
+    "n": 19
+   },
+   {
+    "role": "link",
+    "name": "Mashed Carrots. New food: carrot, dairy, black pep",
+    "tag": "A",
+    "ring": "outline 1px rgb(16, 16, 16) off 1px",
+    "src": "self",
+    "fv": true,
+    "box": [
+     23,
+     450,
+     1,
+     1
+    ],
+    "key": "link|Mashed Carrots. New food: carrot, dairy, black pep|23,450,1,1",
+    "n": 20
+   },
+   {
+    "role": "link",
+    "name": "Mashed Turnips and Potatoes. New food: turnip, pot",
+    "tag": "A",
+    "ring": "outline 1px rgb(16, 16, 16) off 1px",
+    "src": "self",
+    "fv": true,
+    "box": [
+     23,
+     560,
+     1,
+     1
+    ],
+    "key": "link|Mashed Turnips and Potatoes. New food: turnip, pot|23,560,1,1",
+    "n": 21
+   },
+   {
+    "role": "link",
+    "name": "Refried Beans. New food: bean, vegetable oil, onio",
+    "tag": "A",
+    "ring": "outline 1px rgb(16, 16, 16) off 1px",
+    "src": "self",
+    "fv": true,
+    "box": [
+     23,
+     690,
+     1,
+     1
+    ],
+    "key": "link|Refried Beans. New food: bean, vegetable oil, onio|23,690,1,1",
+    "n": 22
+   },
+   {
+    "role": "link",
+    "name": "Green Pea Soup. New food: pea, dairy, onion powder",
+    "tag": "A",
+    "ring": "outline 1px rgb(16, 16, 16) off 1px",
+    "src": "self",
+    "fv": true,
+    "box": [
+     23,
+     818,
+     1,
+     1
+    ],
+    "key": "link|Green Pea Soup. New food: pea, dairy, onion powder|23,818,1,1",
+    "n": 23
+   },
+   {
+    "role": "link",
+    "name": "Chunky Black Bean Dip. New food: black bean, onion",
+    "tag": "A",
+    "ring": "outline 1px rgb(16, 16, 16) off 1px",
+    "src": "self",
+    "fv": true,
+    "box": [
+     23,
+     450,
+     1,
+     1
+    ],
+    "key": "link|Chunky Black Bean Dip. New food: black bean, onion|23,450,1,1",
+    "n": 24
+   },
+   {
+    "role": "link",
+    "name": "Frozen Strawberry Yogurt. New food: strawberry, da",
+    "tag": "A",
+    "ring": "outline 1px rgb(16, 16, 16) off 1px",
+    "src": "self",
+    "fv": true,
+    "box": [
+     23,
+     580,
+     1,
+     1
+    ],
+    "key": "link|Frozen Strawberry Yogurt. New food: strawberry, da|23,580,1,1",
+    "n": 25
+   },
+   {
+    "role": "link",
+    "name": "Pinto Bean Dip. New food: pinto bean, jalapeno, ve",
+    "tag": "A",
+    "ring": "outline 1px rgb(16, 16, 16) off 1px",
+    "src": "self",
+    "fv": true,
+    "box": [
+     23,
+     690,
+     1,
+     1
+    ],
+    "key": "link|Pinto Bean Dip. New food: pinto bean, jalapeno, ve|23,690,1,1",
+    "n": 26
+   },
+   {
+    "role": "link",
+    "name": "Lemony Garbanzo Bean Dip. New food: chickpea, dair",
+    "tag": "A",
+    "ring": "outline 1px rgb(16, 16, 16) off 1px",
+    "src": "self",
+    "fv": true,
+    "box": [
+     23,
+     838,
+     1,
+     1
+    ],
+    "key": "link|Lemony Garbanzo Bean Dip. New food: chickpea, dair|23,838,1,1",
+    "n": 27
+   },
+   {
+    "role": "link",
+    "name": "Any Berry Sauce. New food: cornstarch, berry. Time",
+    "tag": "A",
+    "ring": "outline 1px rgb(16, 16, 16) off 1px",
+    "src": "self",
+    "fv": true,
+    "box": [
+     23,
+     450,
+     1,
+     1
+    ],
+    "key": "link|Any Berry Sauce. New food: cornstarch, berry. Time|23,450,1,1",
+    "n": 28
+   },
+   {
+    "role": "link",
+    "name": "Cranberry Applesauce. New food: apple, cranberry, ",
+    "tag": "A",
+    "ring": "outline 1px rgb(16, 16, 16) off 1px",
+    "src": "self",
+    "fv": true,
+    "box": [
+     23,
+     560,
+     1,
+     1
+    ],
+    "key": "link|Cranberry Applesauce. New food: apple, cranberry, |23,560,1,1",
+    "n": 29
+   },
+   {
+    "role": "link",
+    "name": "Beet Dip. New food: beet, lemon juice, garlic, cum",
+    "tag": "A",
+    "ring": "outline 1px rgb(16, 16, 16) off 1px",
+    "src": "self",
+    "fv": true,
+    "box": [
+     23,
+     670,
+     1,
+     1
+    ],
+    "key": "link|Beet Dip. New food: beet, lemon juice, garlic, cum|23,670,1,1",
+    "n": 30
+   },
+   {
+    "role": "link",
+    "name": "Strawberry Swirl. New food: strawberry. about 245 ",
+    "tag": "A",
+    "ring": "outline 1px rgb(16, 16, 16) off 1px",
+    "src": "self",
+    "fv": true,
+    "box": [
+     23,
+     800,
+     1,
+     1
+    ],
+    "key": "link|Strawberry Swirl. New food: strawberry. about 245 |23,800,1,1",
+    "n": 31
+   },
+   {
+    "role": "link",
+    "name": "Red Potato and Cabbage (Colcannon). New food: pota",
+    "tag": "A",
+    "ring": "outline 1px rgb(16, 16, 16) off 1px",
+    "src": "self",
+    "fv": true,
+    "box": [
+     23,
+     450,
+     1,
+     1
+    ],
+    "key": "link|Red Potato and Cabbage (Colcannon). New food: pota|23,450,1,1",
+    "n": 32
+   },
+   {
+    "role": "link",
+    "name": "Peach Yogurt Smoothie. New food: dairy, banana, pe",
+    "tag": "A",
+    "ring": "outline 1px rgb(16, 16, 16) off 1px",
+    "src": "self",
+    "fv": true,
+    "box": [
+     23,
+     580,
+     1,
+     1
+    ],
+    "key": "link|Peach Yogurt Smoothie. New food: dairy, banana, pe|23,580,1,1",
+    "n": 33
+   },
+   {
+    "role": "link",
+    "name": "Banana Berry Smoothie. New food: banana, berry, da",
+    "tag": "A",
+    "ring": "outline 1px rgb(16, 16, 16) off 1px",
+    "src": "self",
+    "fv": true,
+    "box": [
+     23,
+     690,
+     1,
+     1
+    ],
+    "key": "link|Banana Berry Smoothie. New food: banana, berry, da|23,690,1,1",
+    "n": 34
+   },
+   {
+    "role": "link",
+    "name": "Un-beet-able Berry Smoothie. New food: dairy, berr",
+    "tag": "A",
+    "ring": "outline 1px rgb(16, 16, 16) off 1px",
+    "src": "self",
+    "fv": true,
+    "box": [
+     23,
+     800,
+     1,
+     1
+    ],
+    "key": "link|Un-beet-able Berry Smoothie. New food: dairy, berr|23,800,1,1",
+    "n": 35
+   },
+   {
+    "role": "link",
+    "name": "Savory Carrot Squash Baby Food. New food: carrot, ",
+    "tag": "A",
+    "ring": "outline 1px rgb(16, 16, 16) off 1px",
+    "src": "self",
+    "fv": true,
+    "box": [
+     23,
+     450,
+     1,
+     1
+    ],
+    "key": "link|Savory Carrot Squash Baby Food. New food: carrot, |23,450,1,1",
+    "n": 36
+   },
+   {
+    "role": "link",
+    "name": "Spiced Apple Pear Baby Food. New food: apple, pear",
+    "tag": "A",
+    "ring": "outline 1px rgb(16, 16, 16) off 1px",
+    "src": "self",
+    "fv": true,
+    "box": [
+     23,
+     560,
+     1,
+     1
+    ],
+    "key": "link|Spiced Apple Pear Baby Food. New food: apple, pear|23,560,1,1",
+    "n": 37
+   },
+   {
+    "role": "link",
+    "name": "Mixed Green Veggie Baby Food. New food: zucchini, ",
+    "tag": "A",
+    "ring": "outline 1px rgb(16, 16, 16) off 1px",
+    "src": "self",
+    "fv": true,
+    "box": [
+     23,
+     670,
+     1,
+     1
+    ],
+    "key": "link|Mixed Green Veggie Baby Food. New food: zucchini, |23,670,1,1",
+    "n": 38
+   },
+   {
+    "role": "link",
+    "name": "Creamy Avocado Berry Baby Food. New food: blueberr",
+    "tag": "A",
+    "ring": "outline 1px rgb(16, 16, 16) off 1px",
+    "src": "self",
+    "fv": true,
+    "box": [
+     23,
+     780,
+     1,
+     1
+    ],
+    "key": "link|Creamy Avocado Berry Baby Food. New food: blueberr|23,780,1,1",
+    "n": 39
+   },
+   {
+    "role": "link",
+    "name": "White Bean and Red Pepper Baby Food. New food: whi",
+    "tag": "A",
+    "ring": "outline 1px rgb(16, 16, 16) off 1px",
+    "src": "self",
+    "fv": true,
+    "box": [
+     23,
+     890,
+     1,
+     1
+    ],
+    "key": "link|White Bean and Red Pepper Baby Food. New food: whi|23,890,1,1",
+    "n": 40
+   },
+   {
+    "role": "link",
+    "name": "Easy Peanut Butter Baby Cereal. New food: peanut, ",
+    "tag": "A",
+    "ring": "outline 1px rgb(16, 16, 16) off 1px",
+    "src": "self",
+    "fv": true,
+    "box": [
+     23,
+     450,
+     1,
+     1
+    ],
+    "key": "link|Easy Peanut Butter Baby Cereal. New food: peanut, |23,450,1,1",
+    "n": 41
+   },
+   {
+    "role": "link",
+    "name": "Lamb Soup (Shorba). New food: olive oil, onion, la",
+    "tag": "A",
+    "ring": "outline 1px rgb(16, 16, 16) off 1px",
+    "src": "self",
+    "fv": true,
+    "box": [
+     23,
+     560,
+     1,
+     1
+    ],
+    "key": "link|Lamb Soup (Shorba). New food: olive oil, onion, la|23,560,1,1",
+    "n": 42
+   },
+   {
+    "role": "link",
+    "name": "Fruit Puree. New food: banana, mango, strawberry. ",
+    "tag": "A",
+    "ring": "outline 1px rgb(16, 16, 16) off 1px",
+    "src": "self",
+    "fv": true,
+    "box": [
+     23,
+     688,
+     1,
+     1
+    ],
+    "key": "link|Fruit Puree. New food: banana, mango, strawberry. |23,688,1,1",
+    "n": 43
+   },
+   {
+    "role": "link",
+    "name": "Pear and Parsnip Smash-up. New food: parsnip, pear",
+    "tag": "A",
+    "ring": "outline 1px rgb(16, 16, 16) off 1px",
+    "src": "self",
+    "fv": true,
+    "box": [
+     23,
+     798,
+     1,
+     1
+    ],
+    "key": "link|Pear and Parsnip Smash-up. New food: parsnip, pear|23,798,1,1",
+    "n": 44
+   },
+   {
+    "role": "link",
+    "name": "Elaine's Green-Mash Potatoes. New food: potato, da",
+    "tag": "A",
+    "ring": "outline 1px rgb(16, 16, 16) off 1px",
+    "src": "self",
+    "fv": true,
+    "box": [
+     23,
+     466,
+     1,
+     1
+    ],
+    "key": "link|Elaine's Green-Mash Potatoes. New food: potato, da|23,466,1,1",
+    "n": 45
+   },
+   {
+    "role": "link",
+    "name": "Honey Toast Fingers. Not yet: honey. Available at ",
+    "tag": "A",
+    "ring": "outline 1px rgb(16, 16, 16) off 1px",
+    "src": "self",
+    "fv": true,
+    "box": [
+     23,
+     576,
+     1,
+     1
+    ],
+    "key": "link|Honey Toast Fingers. Not yet: honey. Available at |23,576,1,1",
+    "n": 46
+   }
+  ],
+  "revOk": true
+ }
+]
