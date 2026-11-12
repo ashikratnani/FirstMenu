@@ -174,7 +174,7 @@ Branch names use the `v2/` prefix (for example `v2/6-paste-parser`) so they don'
     - _Requirements: 20.7, 20.10_
 
 - [ ] 19. Design pass with the impeccable and tasteskill skills (added November 12, 2026, maintainer request; part of M4, before task 16.2). One PR for 19.1 (branch `v2/19-design-critique`), then one PR per screen or flow for 19.2 (branch `v2/19-design-<screen>`).
-  - [ ] 19.1 Create `PRODUCT.md` and `DESIGN.md` at the repo root from `.kiro/steering/product.md`, `tech.md`, the active spec and `src/ui/theme/firstmenu.css`, as impeccable expects (no invented facts). Run an impeccable critique of every page at 360 px and 1280 px and record the findings, ranked, in the PR body, with links to the matching patterns in `docs/design-inspiration.md`.
+  - [x] 19.1 Create `PRODUCT.md` and `DESIGN.md` at the repo root from `.kiro/steering/product.md`, `tech.md`, the active spec and `src/ui/theme/firstmenu.css`, as impeccable expects (no invented facts). Run an impeccable critique of every page at 360 px and 1280 px and record the findings, ranked, in the PR body, with links to the matching patterns in `docs/design-inspiration.md`.
     - _Requirements: 15.8_
   - [ ] 19.2 Fix the findings in small PRs (one per screen or flow, Make screen first), within `.kiro/steering/design-skills.md`. Check copy against tasteskill's copy references. Each PR follows `.kiro/steering/design-skills.md` (critique findings and before and after screenshots at 360 px and 1280 px in `docs/ui-review/<branch name>/`) and passes every UI check. The PR that fixes the last finding ticks 19.2 and 19.
     - _Requirements: 15.1, 15.5, 15.8, 17.10_
