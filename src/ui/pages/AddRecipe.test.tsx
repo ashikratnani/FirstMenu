@@ -106,6 +106,11 @@ async function pasteAndRead(user: ReturnType<typeof userEvent.setup>, text: stri
   await user.click(screen.getByRole('button', { name: 'Read recipe' }));
 }
 
+/** Opens a preview line's actions: the line is the only button until it is tapped. */
+async function openLine(user: ReturnType<typeof userEvent.setup>, kind: string, text: string) {
+  await user.click(screen.getByRole('button', { name: `Change ${kind}: ${text}` }));
+}
+
 describe('Add recipe: paste, preview, save (Req 6.1, 6.4, 6.7, 6.8)', () => {
   it('pastes, previews and saves with no typing into the preview', async () => {
     const user = userEvent.setup();
@@ -198,6 +203,8 @@ describe('Add recipe: line editing and moving (Req 6.5)', () => {
     const { getState } = renderAdd();
     await pasteAndRead(user, REPLY);
 
+    await openLine(user, 'step', 'Mash the banana.');
+
     await user.click(screen.getByRole('button', { name: 'Edit step: Mash the banana.' }));
     const input = screen.getByRole('textbox', { name: 'Edit step' });
     await user.clear(input);
@@ -205,8 +212,12 @@ describe('Add recipe: line editing and moving (Req 6.5)', () => {
     await user.click(screen.getByRole('button', { name: 'Done' }));
     expect(screen.getByText('Mash the banana well.')).toBeInTheDocument();
 
+    await openLine(user, 'ingredient', '2 tbsp oats');
+
     await user.click(screen.getByRole('button', { name: 'Delete ingredient: 2 tbsp oats' }));
     expect(screen.queryByText('2 tbsp oats')).not.toBeInTheDocument();
+
+    await openLine(user, 'step', 'Stir in the oats.');
 
     await user.click(screen.getByRole('button', { name: 'Move step to notes: Stir in the oats.' }));
     expect(within(screen.getByRole('region', { name: 'Notes' })).getByText('Stir in the oats.')).toBeInTheDocument();
@@ -222,7 +233,9 @@ describe('Add recipe: line editing and moving (Req 6.5)', () => {
     const user = userEvent.setup();
     const { getState } = renderAdd();
     await pasteAndRead(user, REPLY);
+    await openLine(user, 'step', 'Stir in the oats.');
     await user.click(screen.getByRole('button', { name: 'Move step to notes: Stir in the oats.' }));
+    await openLine(user, 'note', 'Stir in the oats.');
     await user.click(screen.getByRole('button', { name: 'Move note to ingredients: Stir in the oats.' }));
     await user.click(screen.getByRole('button', { name: 'Save recipe' }));
     expect(getState().customRecipes[0].ingredients).toHaveLength(3);
@@ -279,6 +292,7 @@ describe('Add recipe: safety results (Req 7.3, 7.4, 7.5)', () => {
     await user.click(
       screen.getByRole('button', { name: 'Not used in this recipe: Drizzle a little honey on top.' }),
     );
+    await openLine(user, 'step', 'Drizzle a little honey on top.');
     await user.click(screen.getByRole('button', { name: 'Edit step: Drizzle a little honey on top.' }));
     const input = screen.getByRole('textbox', { name: 'Edit step' });
     await user.clear(input);
@@ -296,6 +310,7 @@ describe('Add recipe: safety results (Req 7.3, 7.4, 7.5)', () => {
     const results = screen.getByRole('region', { name: 'Safety results' });
     expect(within(results).getByText(/Delete the ingredient line to fix this/)).toBeInTheDocument();
     expect(within(results).queryByRole('button', { name: /Not used in this recipe/ })).not.toBeInTheDocument();
+    await openLine(user, 'ingredient', '1 tbsp honey');
     await user.click(screen.getByRole('button', { name: 'Delete ingredient: 1 tbsp honey' }));
     expect(within(results).queryByText(/Delete the ingredient line to fix this/)).not.toBeInTheDocument();
   });
@@ -458,6 +473,7 @@ describe('Add recipe: Recipe JSON intake (Req 18.3 to 18.12, 6.1)', () => {
     ).not.toBeInTheDocument();
 
     // With the ingredient line deleted, the note is a text mention that only "Not used" clears.
+    await openLine(user, 'ingredient', '1 tbsp honey mashed banana');
     await user.click(
       within(preview).getByRole('button', { name: 'Delete ingredient: 1 tbsp honey mashed banana' }),
     );
@@ -489,6 +505,7 @@ describe('Add recipe: Recipe JSON intake (Req 18.3 to 18.12, 6.1)', () => {
     ).not.toBeInTheDocument();
 
     // With the ingredient line deleted, the note is a text mention that only "Not used" clears.
+    await openLine(user, 'ingredient', '1 honey mashed banana');
     await user.click(
       within(preview).getByRole('button', { name: 'Delete ingredient: 1 honey mashed banana' }),
     );

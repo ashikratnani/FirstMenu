@@ -84,13 +84,19 @@ const MOVE_TARGETS: Record<LineList, LineList[]> = {
 interface LineRowProps {
   list: LineList;
   line: DraftLine;
+  /** Whether this line's actions are shown. Only one line at a time. */
+  isOpen: boolean;
+  onToggle: () => void;
   onEdit: (text: string) => void;
   onRemove: () => void;
   onMove: (to: LineList) => void;
 }
 
-/** One preview line: its text with Edit, Delete and move buttons. */
-function LineRow({ list, line, onEdit, onRemove, onMove }: LineRowProps) {
+/**
+ * One preview line. The line is a single button; it reveals Edit, the move
+ * buttons and Delete under it, so a long recipe is not a wall of buttons.
+ */
+function LineRow({ list, line, isOpen, onToggle, onEdit, onRemove, onMove }: LineRowProps) {
   const [editing, setEditing] = useState(false);
   const [value, setValue] = useState(line.text);
   const kind = LIST_LABELS[list];
@@ -132,32 +138,46 @@ function LineRow({ list, line, onEdit, onRemove, onMove }: LineRowProps) {
 
   return (
     <li className={styles.line}>
-      <span className={styles.lineText}>{line.text}</span>
-      <span className={styles.lineActions}>
-        <Button
-          label={`Edit ${kind}: ${line.text}`}
-          size="sm"
-          onClick={() => {
-            setValue(line.text);
-            setEditing(true);
-          }}
-        >
-          Edit
-        </Button>
-        {MOVE_TARGETS[list].map((to) => (
+      <button
+        type="button"
+        className={styles.lineButton}
+        aria-expanded={isOpen}
+        aria-label={`Change ${kind}: ${line.text}`}
+        onClick={onToggle}
+      >
+        <span className={styles.lineText}>{line.text}</span>
+        <span className={styles.lineHint} aria-hidden="true">
+          {isOpen ? 'Close' : 'Change'}
+        </span>
+      </button>
+      {isOpen && (
+        <span className={styles.lineActions}>
           <Button
-            key={to}
-            label={`Move ${kind} to ${to}: ${line.text}`}
+            label={`Edit ${kind}: ${line.text}`}
             size="sm"
-            onClick={() => onMove(to)}
+            onClick={() => {
+              setValue(line.text);
+              setEditing(true);
+              onToggle();
+            }}
           >
-            To {to}
+            Edit
           </Button>
-        ))}
-        <Button label={`Delete ${kind}: ${line.text}`} size="sm" onClick={onRemove}>
-          Delete
-        </Button>
-      </span>
+          {MOVE_TARGETS[list].map((to) => (
+            <Button
+              key={to}
+              label={`Move ${kind} to ${to}: ${line.text}`}
+              size="sm"
+              onClick={() => onMove(to)}
+            >
+              To {to}
+            </Button>
+          ))}
+          <Button label={`Delete ${kind}: ${line.text}`} size="sm" onClick={onRemove}>
+            Delete
+          </Button>
+        </span>
+      )}
     </li>
   );
 }
@@ -191,6 +211,8 @@ export default function AddRecipe() {
   const [cleared, setCleared] = useState<ClearedMention[]>([]);
   const [markMode, setMarkMode] = useState(false);
   const [marked, setMarked] = useState<Set<number>>(new Set());
+  const [helper, setHelper] = useState<'chatgpt' | 'reel' | null>(null);
+  const [openLine, setOpenLine] = useState<string | null>(null);
   const pasteBox = useRef<HTMLTextAreaElement>(null);
   const [recipeId] = useState(() => crypto.randomUUID());
 
@@ -214,6 +236,7 @@ export default function AddRecipe() {
     setCleared([]);
     setMarkMode(false);
     setMarked(new Set());
+    setOpenLine(null);
     setProblem(null);
     setShowReply(false);
     setReadAsJson(false);
@@ -315,6 +338,10 @@ export default function AddRecipe() {
     [recipe, ageMonths],
   );
 
+  function toggleLine(key: string) {
+    setOpenLine((current) => (current === key ? null : key));
+  }
+
   function update(change: (current: Draft) => Draft) {
     setDraft((current) => (current ? change(current) : current));
   }
@@ -332,6 +359,7 @@ export default function AddRecipe() {
     setNotices({ extras: false, outside: false });
     setShowReply(false);
     setMarkMode(false);
+    setOpenLine(null);
     setMessage('');
   }
 
@@ -428,22 +456,27 @@ export default function AddRecipe() {
             <p className={styles.help}>{INSTAGRAM_HELP}</p>
           </section>
 
-          <section className={styles.section}>
+          <section className={styles.helpers} aria-label="Prompt helpers">
             <AskChatGpt
               ageMonths={ageMonths}
               stage={stage}
               have={have}
               leaveOut={leaveOutFor(ageMonths, state.foods)}
               onPasteAnswer={focusPasteBox}
+              isOpen={helper === 'chatgpt'}
+              onOpenChange={(open) => setHelper(open ? 'chatgpt' : null)}
+            />
+            <ReelPrompt
+              onPasteAnswer={focusPasteBoxForReel}
+              isOpen={helper === 'reel'}
+              onOpenChange={(open) => setHelper(open ? 'reel' : null)}
             />
           </section>
 
-          <section className={styles.section}>
-            <ReelPrompt onPasteAnswer={focusPasteBoxForReel} />
-          </section>
-
           <p className={styles.help}>
-            <Link to="/recipes/new">Type a recipe instead</Link>
+            <Link className={`fm-link ${styles.typeLink}`} to="/recipes/new">
+              Type a recipe instead
+            </Link>
           </p>
         </>
       )}
@@ -565,6 +598,8 @@ export default function AddRecipe() {
                   key={line.id}
                   list="ingredients"
                   line={line}
+                  isOpen={openLine === `ingredients-${line.id}`}
+                  onToggle={() => toggleLine(`ingredients-${line.id}`)}
                   onEdit={(t) => update((d) => editLine(d, 'ingredients', line.id, t))}
                   onRemove={() => update((d) => removeLine(d, 'ingredients', line.id))}
                   onMove={(to) => update((d) => moveLine(d, 'ingredients', line.id, to))}
@@ -624,6 +659,8 @@ export default function AddRecipe() {
                       key={line.id}
                       list="steps"
                       line={line}
+                      isOpen={openLine === `steps-${line.id}`}
+                      onToggle={() => toggleLine(`steps-${line.id}`)}
                       onEdit={(t) => update((d) => editLine(d, 'steps', line.id, t))}
                       onRemove={() => update((d) => removeLine(d, 'steps', line.id))}
                       onMove={(to) => update((d) => moveLine(d, 'steps', line.id, to))}
@@ -643,6 +680,8 @@ export default function AddRecipe() {
                           key={line.id}
                           list="notes"
                           line={line}
+                          isOpen={openLine === `notes-${line.id}`}
+                          onToggle={() => toggleLine(`notes-${line.id}`)}
                           onEdit={(t) => update((d) => editLine(d, 'notes', line.id, t))}
                           onRemove={() => update((d) => removeLine(d, 'notes', line.id))}
                           onMove={(to) => update((d) => moveLine(d, 'notes', line.id, to))}
@@ -669,7 +708,9 @@ export default function AddRecipe() {
           </div>
 
           <p className={styles.help}>
-            <Link to="/recipes/new">Type a recipe instead</Link>
+            <Link className={`fm-link ${styles.typeLink}`} to="/recipes/new">
+              Type a recipe instead
+            </Link>
           </p>
         </section>
       )}

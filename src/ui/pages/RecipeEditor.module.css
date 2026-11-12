@@ -9,6 +9,18 @@
   margin: 0 0 var(--space);
 }
 
+/* 44 px targets: the Back link and the form's buttons and category select. */
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+
+.form button,
+.input {
+  min-height: 44px;
+}
+
 .form {
   display: flex;
   flex-direction: column;
@@ -164,6 +176,7 @@
   margin: calc(var(--space) * 0.25) 0 0;
   color: var(--fm-color-muted);
   font-size: 0.8rem;
+  text-wrap: pretty;
 }
 
 .viewLink {
