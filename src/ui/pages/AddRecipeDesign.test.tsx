@@ -289,13 +289,30 @@ describe('axe on the changed states', () => {
 });
 
 describe('disclaimer', () => {
+  // The shell footer is the only contentinfo landmark; Add recipe and the
+  // editor have no footer of their own, so the notice must sit in it, after
+  // the page content.
+  function expectInShellFooter() {
+    const footer = screen.getByRole('contentinfo');
+    expect(footer.tagName).toBe('FOOTER');
+    const notes = screen.getAllByText(NOT_MEDICAL_ADVICE);
+    expect(notes).toHaveLength(1);
+    expect(footer).toContainElement(notes[0]);
+    const main = screen.getByRole('main');
+    expect(main).not.toContainElement(notes[0]);
+    expect(
+      main.compareDocumentPosition(footer) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+  }
+
   it('stays in the shell footer on Add recipe with a preview and on the editor', async () => {
     const user = userEvent.setup();
     renderAt('/add');
     await readReply(user, REPLY);
-    expect(screen.getAllByText(NOT_MEDICAL_ADVICE).length).toBeGreaterThan(0);
+    expect(screen.getByRole('button', { name: 'Save recipe' })).toBeInTheDocument();
+    expectInShellFooter();
     cleanup();
     renderAt('/recipes/new');
-    expect(screen.getAllByText(NOT_MEDICAL_ADVICE).length).toBeGreaterThan(0);
+    expectInShellFooter();
   });
 });
