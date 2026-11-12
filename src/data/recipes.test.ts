@@ -2469,9 +2469,9 @@ const GOAL: Counts = {
 /**
  * Floors for this batch (batch 8). Every floor is what the set reaches after
  * batch 8, capped at HARD_MINIMUM (the plan line for batch 8 is about 285; the
- * set has 329, so the total floor is the hard minimum of 300). Batch 8 closed
- * the last hard minimum gaps: 12-23 Easy (47 of 45), 9-12 More (17 of 15) and
- * the total (329 of 300). Every floor now equals HARD_MINIMUM.
+ * set has 328, so the total floor is the hard minimum of 300). Batch 8 closed
+ * the last hard minimum gaps: 12-23 Easy (46 of 45), 9-12 More (16 of 15) and
+ * the total (328 of 300). Every floor now equals HARD_MINIMUM.
  */
 const CHECKPOINT: Counts = {
   total: 300,
