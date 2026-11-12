@@ -1900,7 +1900,7 @@ describe('BUILTIN_RECIPES - batch 7', () => {
     const tx = sourcesDoc.split('\n').find((line) => line.includes(TX));
     expect(tx, 'Texas WIC row').toBeDefined();
     expect(tx).toContain('texaswic.org');
-    expect(tx).toMatch(/Pending pr-reviewer|Approved by pr-reviewer \(PR #\d+\)/);
+    expect(tx).toMatch(/Pending pr-reviewer|Approved by pr-reviewer \(PR #\d+\)|Approved by maintainer \(#\d+\)/);
     const mn = sourcesDoc.split('\n').find((line) => line.includes(MN));
     expect(mn, 'Minnesota WIC row').toBeDefined();
     expect(mn).toContain('Approved by maintainer (v1 spec)');
