@@ -549,6 +549,21 @@ describe('built-in recipes derive clean food keys (Item 3)', () => {
       'sausage',
       'brussels sprout',
       'pudding mix',
+      'fruit juice',
+      'cocoa powder',
+      'turkey bacon',
+      'liquid smoke',
+      'cream',
+      'black-eyed pea',
+      'bay leaf',
+      'onion soup mix',
+      'wild rice',
+      'lima bean',
+      'chocolate chips',
+      'apple cider',
+      'lamb',
+      'garlic scape',
+      'pickle',
     ]);
   });
 

@@ -72,6 +72,7 @@ import { BATCH_4_RECIPES } from './recipesBatch4';
 import { BATCH_5_RECIPES } from './recipesBatch5';
 import { BATCH_6_RECIPES } from './recipesBatch6';
 import { BATCH_7_RECIPES } from './recipesBatch7';
+import { BATCH_8_RECIPES } from './recipesBatch8';
 import { SIMPLE_IDEAS } from './simpleIdeas';
 
 const BABYFOOD_URL = 'https://www.health.state.mn.us/people/wic/recipes/babyfood.html';
@@ -515,4 +516,5 @@ export const BUILTIN_RECIPES: Recipe[] = [
   ...BATCH_5_RECIPES,
   ...BATCH_6_RECIPES,
   ...BATCH_7_RECIPES,
+  ...BATCH_8_RECIPES,
 ];
