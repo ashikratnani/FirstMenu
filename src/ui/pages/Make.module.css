@@ -170,3 +170,19 @@
   padding: 0 4px;
   cursor: pointer;
 }
+
+/* First-use offer right under the search box (Req 2.4); the full setup panel
+   sits below the results. */
+.setupPrompt {
+  display: flex;
+}
+
+.setupPrompt button,
+.panel .row button,
+.dialogBody .row button {
+  min-height: 44px;
+}
+
+.group > button {
+  min-height: 44px;
+}

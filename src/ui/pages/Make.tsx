@@ -329,7 +329,16 @@ export default function Make() {
         <div className={styles.dialogBody}>
           <PantryEditor idPrefix="dialog" />
           <div className={styles.row}>
-            <Button label="Done" onClick={() => setPantryOpen(false)} />
+            <Button
+              label="Done"
+              onClick={() => {
+                setPantryOpen(false);
+                if (setupOpen && state.pantry.length > 0) {
+                  dispatch({ type: 'dismissSuggestion', id: PANTRY_SETUP_ID, at: new Date().toISOString() });
+                  setSetupOpen(false);
+                }
+              }}
+            />
           </div>
         </div>
       </Dialog>
@@ -346,6 +355,11 @@ export default function Make() {
           }}
           onCommit={commit}
         />
+        {setupOpen && (
+          <div className={styles.setupPrompt}>
+            <Button label="Set up your pantry" size="sm" onClick={() => setPantryOpen(true)} />
+          </div>
+        )}
 
         {typedFoods.length > 0 && (
           <ul className={styles.chips} aria-label="Recognized foods">
@@ -540,6 +554,7 @@ export default function Make() {
         <ToggleButton
           label="Iron-rich only"
           size="sm"
+          className="fm-toggle"
           isPressed={ironRichOnly}
           onPressedChange={(on) => {
             if (on) setManualFilters((current) => setIronRichFilter(current, true));
@@ -549,6 +564,7 @@ export default function Make() {
         <ToggleButton
           label="All stages"
           size="sm"
+          className="fm-toggle"
           isPressed={allStages}
           onPressedChange={setAllStages}
         />

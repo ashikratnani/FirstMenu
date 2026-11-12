@@ -97,17 +97,17 @@
   text-underline-offset: 3px;
 }
 
-/* Toggle buttons (aria-pressed): pressed is a tinted lavender surface with a
+/* Toggle buttons (class fm-toggle, opt-in per screen; Make only for now): pressed is a tinted lavender surface with a
    strong border and bold text; unpressed is an outlined white chip. Never the
    filled primary orange (Requirement 17.10). */
-[data-astryx-theme='neutral'] button[aria-pressed] {
+[data-astryx-theme='neutral'] button.fm-toggle[aria-pressed] {
   min-height: 44px;
   background-color: var(--color-background-surface);
   border: 1px solid var(--color-border-emphasized);
   color: var(--color-text-primary);
 }
 
-[data-astryx-theme='neutral'] button[aria-pressed='true'] {
+[data-astryx-theme='neutral'] button.fm-toggle[aria-pressed='true'] {
   background-color: var(--color-background-purple);
   border-color: var(--color-text-purple);
   color: var(--color-text-purple);

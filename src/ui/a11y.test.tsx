@@ -372,6 +372,13 @@ describe('Accessibility: axe on every main page (color-contrast disabled)', () =
       await expectNoViolations(document.body);
     });
 
+    it('first use with an empty pantry and the compact offer has no violations', async () => {
+      const { container } = renderApp('/', populated({ pantry: [], dismissed: {} }));
+      expect(screen.getByRole('button', { name: 'Set up your pantry' })).toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: 'Set up your pantry' })).toBeInTheDocument();
+      await expectNoViolations(container);
+    });
+
     it('the empty state with the Ask ChatGPT panel open has no violations', async () => {
       const user = userEvent.setup();
       const { container } = renderApp(
