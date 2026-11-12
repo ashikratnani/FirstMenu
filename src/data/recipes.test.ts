@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import type { AllergenGroup, GroceryCategory, MealType, StageId } from '../domain/types';
 import { STAGE_IDS, STAGE_MIN_MONTHS } from '../domain/age';
 import { recipeEffort, type Effort } from '../domain/effort';
+import { foodKeyFromName } from '../domain/foods';
 import { screenRecipe } from '../domain/safety/screen';
 import { BUILTIN_RECIPES, INFANT_PORTION_OZ, RECIPES, estimateServings } from './recipes';
 import { BATCH_2_RECIPES } from './recipesBatch2';
@@ -2907,6 +2908,28 @@ describe('BUILTIN_RECIPES - batch 10', () => {
     expect(BATCH_10_RECIPES.map((r) => r.id).sort()).toEqual(Object.keys(BATCH_10_EXPECTED).sort());
     expect(BATCH_10_RECIPES.length).toBeGreaterThanOrEqual(43);
     expect(BATCH_10_RECIPES.length).toBeLessThanOrEqual(55);
+  });
+
+  it('every batch 10 ingredient food key is what foodKeyFromName derives (no plural keys)', () => {
+    // An override must equal foodKeyFromName of the name or of itself, or be a key an
+    // earlier batch already uses (for example 'asparagus', which the
+    // singularizer would cut to 'asparagu' if it were run on the key itself).
+    const batch10 = new Set(BATCH_10_RECIPES.map((r) => r.id));
+    const earlier = new Set<string>();
+    for (const recipe of BUILTIN_RECIPES) {
+      if (batch10.has(recipe.id)) continue;
+      for (const ing of recipe.ingredients) earlier.add(ing.food ?? foodKeyFromName(ing.name));
+    }
+    for (const recipe of BATCH_10_RECIPES) {
+      for (const ing of recipe.ingredients) {
+        const label = `${recipe.id}: ${ing.name}`;
+        if (ing.food === undefined) continue;
+        // Hand-written canonical key, like 'cream of chicken soup' in earlier batches.
+        if (earlier.has(ing.food) || ing.food === 'cream of celery soup') continue;
+        const derived = [foodKeyFromName(ing.name), foodKeyFromName(ing.food)];
+        expect(derived, label).toContain(ing.food);
+      }
+    }
   });
 
   it('every batch 10 recipe is a full recipe with serveAs and at least one quantity', () => {

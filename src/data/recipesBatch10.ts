@@ -4,10 +4,11 @@
 // (12-23 Easy, 24-36 Easy and the soy allergen group first). The unused UNL
 // Food and Food Hero pages are mostly near-duplicates of earlier recipes or use
 // salt, sugar, broth or a jarred sauce, so this batch also draws on the
-// Minnesota WIC and Texas WIC pages that earlier batches left unused (23 and 4
+// Minnesota WIC and Texas WIC pages that earlier batches left unused (18 and 4
 // recipes). Many recipes are tagged 24-36 only (everything the page lists is
-// kept) and the rest leave salt or sugar out and are tagged 12-23 only. Soy
-// gets 16 recipes (soy sauce, tofu), all 24-36 only where a soy sauce is kept.
+// kept) and the rest leave salt or sugar out and are tagged 12-23 only, except
+// Kale Dip (6-8 and 9-12) and Enchilada Bake (12-23 and 24-36). Soy
+// gets 14 recipes (soy sauce, tofu), all 24-36 only where a soy sauce is kept.
 // Easy stays thin because an Easy recipe has at most 5 required ingredients,
 // at most 4 steps and no oven, and the unused pages that fit are duplicates.
 //
@@ -191,7 +192,7 @@ export const BATCH_10_RECIPES: Recipe[] = [
       { name: 'thinly sliced or chopped kale', food: 'kale', quantity: 3, unit: 'cup', category: 'produce' },
       { name: 'garlic clove, minced', food: 'garlic', quantity: 1, unit: 'clove', category: 'produce' },
       { name: 'low-fat cottage cheese', food: 'cottage cheese', quantity: 1, unit: 'cup', category: 'dairy-eggs' },
-      { name: 'red pepper flakes', food: 'red pepper flakes', quantity: 0.5, unit: 'tsp', category: 'pantry' },
+      { name: 'red pepper flakes', food: 'red pepper flake', quantity: 0.5, unit: 'tsp', category: 'pantry' },
       { name: 'lemon juice', food: 'lemon juice', quantity: 1, unit: 'tbsp', category: 'produce' },
     ],
     steps: [
@@ -219,7 +220,7 @@ export const BATCH_10_RECIPES: Recipe[] = [
     serveAs: ['pieces'],
     mealTypes: ['breakfast'],
     ingredients: [
-      { name: 'whole-wheat flour', food: 'whole wheat flour', quantity: 0.5, unit: 'cup', category: 'grains' },
+      { name: 'whole-wheat flour', food: 'flour', quantity: 0.5, unit: 'cup', category: 'grains' },
       { name: 'all-purpose flour', food: 'flour', quantity: 0.5, unit: 'cup', category: 'grains' },
       { name: 'salt', food: 'salt', quantity: 0.5, unit: 'tsp', category: 'pantry' },
       { name: 'baking soda', food: 'baking soda', quantity: 0.5, unit: 'tsp', category: 'pantry' },
@@ -265,7 +266,7 @@ export const BATCH_10_RECIPES: Recipe[] = [
       { name: 'medium carrots, cut into 1/4 inch cubes', food: 'carrot', quantity: 2, unit: 'piece', category: 'produce' },
       { name: 'salt', food: 'salt', quantity: 0.125, unit: 'tsp', category: 'pantry' },
       { name: 'garlic cloves, minced', food: 'garlic', quantity: 4, unit: 'clove', category: 'produce' },
-      { name: 'sesame seeds', food: 'sesame seeds', quantity: 2, unit: 'tbsp', category: 'pantry' },
+      { name: 'sesame seeds', food: 'sesame seed', quantity: 2, unit: 'tbsp', category: 'pantry' },
       { name: 'honey', food: 'honey', quantity: 3, unit: 'tbsp', category: 'pantry' },
     ],
     steps: [
@@ -331,10 +332,10 @@ export const BATCH_10_RECIPES: Recipe[] = [
     mealTypes: ['lunch', 'dinner'],
     ingredients: [
       { name: 'whole-wheat spaghetti noodles', food: 'spaghetti', quantity: 8, unit: 'oz', category: 'grains' },
-      { name: 'sesame seeds', food: 'sesame seeds', quantity: 1, unit: 'tbsp', category: 'pantry' },
+      { name: 'sesame seeds', food: 'sesame seed', quantity: 1, unit: 'tbsp', category: 'pantry' },
       { name: 'sugar', food: 'sugar', quantity: 2, unit: 'tbsp', category: 'pantry' },
       { name: 'low-sodium soy sauce', food: 'soy sauce', quantity: 3, unit: 'tbsp', category: 'pantry' },
-      { name: 'rice vinegar', food: 'rice vinegar', quantity: 2, unit: 'tbsp', category: 'pantry' },
+      { name: 'rice vinegar', food: 'vinegar', quantity: 2, unit: 'tbsp', category: 'pantry' },
       { name: 'vegetable oil', food: 'vegetable oil', quantity: 0.25, unit: 'cup', category: 'pantry' },
       { name: 'bite-size cut broccoli (fresh or frozen)', food: 'broccoli', quantity: 1.5, unit: 'cup', category: 'produce' },
       { name: 'garlic cloves, minced', food: 'garlic', quantity: 3, unit: 'clove', category: 'produce' },
@@ -379,7 +380,7 @@ export const BATCH_10_RECIPES: Recipe[] = [
       { name: 'pineapple chunks, drained, with the juice saved (1 can, 8 ounces)', food: 'pineapple', quantity: 1, unit: 'can', category: 'produce' },
       { name: 'chicken broth', food: 'chicken broth', quantity: 0.5, unit: 'cup', category: 'pantry' },
       { name: 'vinegar', food: 'vinegar', quantity: 2, unit: 'tbsp', category: 'pantry' },
-      { name: 'sliced vegetables (celery, green peppers, onions and mushrooms)', food: 'mixed vegetables', quantity: 4, unit: 'cup', category: 'produce' },
+      { name: 'sliced vegetables (celery, green peppers, onions and mushrooms)', food: 'mixed vegetable', quantity: 4, unit: 'cup', category: 'produce' },
       { name: 'orange juice', food: 'orange juice', quantity: 0.5, unit: 'cup', category: 'produce' },
       { name: 'low-sodium soy sauce', food: 'soy sauce', quantity: 2, unit: 'tbsp', category: 'pantry' },
       { name: 'sugar', food: 'sugar', quantity: 1, unit: 'tbsp', category: 'pantry' },
@@ -473,7 +474,7 @@ export const BATCH_10_RECIPES: Recipe[] = [
     mealTypes: ['lunch', 'dinner'],
     ingredients: [
       { name: 'vegetable oil', food: 'vegetable oil', quantity: 1, unit: 'tbsp', category: 'pantry' },
-      { name: 'green pepper, chopped', food: 'green pepper', quantity: 1, unit: 'piece', category: 'produce' },
+      { name: 'green pepper, chopped', food: 'bell pepper', quantity: 1, unit: 'piece', category: 'produce' },
       { name: 'onion, chopped', food: 'onion', quantity: 1, unit: 'piece', category: 'produce' },
       { name: 'zucchini, sliced', food: 'zucchini', quantity: 3, unit: 'piece', category: 'produce' },
       { name: 'fresh mushrooms, sliced', food: 'mushroom', quantity: 0.5, unit: 'lb', category: 'produce' },
@@ -507,7 +508,7 @@ export const BATCH_10_RECIPES: Recipe[] = [
     serveAs: ['finger-food'],
     mealTypes: ['snack', 'dinner'],
     ingredients: [
-      { name: 'small spaghetti squash', food: 'spaghetti squash', quantity: 1, unit: 'piece', category: 'produce' },
+      { name: 'small spaghetti squash', food: 'squash', quantity: 1, unit: 'piece', category: 'produce' },
       { name: 'egg', food: 'egg', quantity: 1, unit: 'piece', category: 'dairy-eggs' },
       { name: 'panko breadcrumbs', food: 'breadcrumbs', quantity: 1, unit: 'cup', category: 'grains' },
       { name: 'grated Parmesan cheese', food: 'parmesan', quantity: 0.5, unit: 'cup', category: 'dairy-eggs' },
@@ -576,7 +577,7 @@ export const BATCH_10_RECIPES: Recipe[] = [
       { name: 'lime juice', food: 'lime juice', quantity: 2, unit: 'tbsp', category: 'produce' },
       { name: 'low-sodium soy sauce', food: 'soy sauce', quantity: 0.5, unit: 'tbsp', category: 'pantry' },
       { name: 'sesame oil', food: 'sesame oil', quantity: 0.5, unit: 'tsp', category: 'pantry' },
-      { name: 'sesame seeds', food: 'sesame seeds', quantity: 0.5, unit: 'tbsp', category: 'pantry' },
+      { name: 'sesame seeds', food: 'sesame seed', quantity: 0.5, unit: 'tbsp', category: 'pantry' },
       { name: 'salt (optional)', food: 'salt', quantity: 0.25, unit: 'tsp', category: 'pantry', optional: true },
     ],
     steps: [
@@ -605,7 +606,7 @@ export const BATCH_10_RECIPES: Recipe[] = [
       { name: 'broccoli slaw (1 package, 12 ounces)', food: 'broccoli slaw', quantity: 1, unit: 'package', category: 'produce' },
       { name: 'green onions, chopped', food: 'green onion', quantity: 0.5, unit: 'cup', category: 'produce' },
       { name: 'slivered almonds', food: 'almond', quantity: 0.25, unit: 'cup', category: 'pantry' },
-      { name: 'dried cranberries', food: 'dried cranberry', quantity: 0.75, unit: 'cup', category: 'produce' },
+      { name: 'dried cranberries', food: 'cranberry', quantity: 0.75, unit: 'cup', category: 'produce' },
       { name: 'vegetable oil', food: 'vegetable oil', quantity: 2, unit: 'tbsp', category: 'pantry' },
       { name: 'vinegar', food: 'vinegar', quantity: 0.25, unit: 'cup', category: 'pantry' },
       { name: 'low sodium soy sauce', food: 'soy sauce', quantity: 0.5, unit: 'tbsp', category: 'pantry' },
@@ -655,7 +656,7 @@ export const BATCH_10_RECIPES: Recipe[] = [
       { name: 'peeled and shredded carrot', food: 'carrot', quantity: 1, unit: 'cup', category: 'produce' },
       { name: 'jalapeno pepper, sliced (optional)', food: 'jalapeno', quantity: 1, unit: 'piece', category: 'produce', optional: true },
       { name: 'chopped cilantro', food: 'cilantro', quantity: 0.5, unit: 'cup', category: 'produce' },
-      { name: 'pickled vegetables or kimchi (optional)', food: 'pickled vegetables', quantity: 1, unit: 'cup', category: 'produce', optional: true },
+      { name: 'pickled vegetables or kimchi (optional)', food: 'pickled vegetable', quantity: 1, unit: 'cup', category: 'produce', optional: true },
     ],
     steps: [
       'Brown the pork in a large skillet until it reaches 160°F on a food thermometer. Drain the fat.',
@@ -683,7 +684,7 @@ export const BATCH_10_RECIPES: Recipe[] = [
     mealTypes: ['lunch', 'dinner'],
     ingredients: [
       { name: 'vegetable oil', food: 'vegetable oil', quantity: 3, unit: 'tbsp', category: 'pantry' },
-      { name: 'red wine vinegar', food: 'red wine vinegar', quantity: 2, unit: 'tbsp', category: 'pantry' },
+      { name: 'red wine vinegar', food: 'vinegar', quantity: 2, unit: 'tbsp', category: 'pantry' },
       { name: 'diced zucchini', food: 'zucchini', quantity: 2, unit: 'cup', category: 'produce' },
       { name: 'kidney beans, rinsed and drained (1 can, 15 ounces)', food: 'kidney bean', quantity: 1, unit: 'can', category: 'produce' },
       { name: 'shredded mozzarella cheese (4 ounces)', food: 'mozzarella', quantity: 4, unit: 'oz', category: 'dairy-eggs' },
@@ -751,7 +752,7 @@ export const BATCH_10_RECIPES: Recipe[] = [
       { name: 'garlic cloves, minced', food: 'garlic', quantity: 3, unit: 'clove', category: 'produce' },
       { name: 'fresh ginger, peeled and minced', food: 'ginger', quantity: 2, unit: 'tsp', category: 'produce' },
       { name: 'low-sodium soy sauce', food: 'soy sauce', quantity: 2, unit: 'tbsp', category: 'pantry' },
-      { name: 'toasted sesame seeds (optional)', food: 'sesame seeds', quantity: 0.5, unit: 'tsp', category: 'pantry', optional: true },
+      { name: 'toasted sesame seeds (optional)', food: 'sesame seed', quantity: 0.5, unit: 'tsp', category: 'pantry', optional: true },
     ],
     steps: [
       'Trim and throw away about 1 inch of the thick base of the bok choy. Separate the stalks, wash them well and pat dry with paper towels.',
@@ -823,7 +824,7 @@ export const BATCH_10_RECIPES: Recipe[] = [
       { name: 'uncooked brown rice', food: 'brown rice', quantity: 1, unit: 'cup', category: 'grains' },
       { name: 'vegetable oil', food: 'vegetable oil', quantity: 1, unit: 'tbsp', category: 'pantry' },
       { name: 'extra firm tofu, cubed', food: 'tofu', quantity: 1, unit: 'lb', category: 'protein' },
-      { name: 'mixed vegetables, cut into bite sized pieces (1 cup broccoli, 1 cup bell peppers, 1/2 cup mushrooms and 1/2 cup green onions)', food: 'mixed vegetables', quantity: 3, unit: 'cup', category: 'produce' },
+      { name: 'mixed vegetables, cut into bite sized pieces (1 cup broccoli, 1 cup bell peppers, 1/2 cup mushrooms and 1/2 cup green onions)', food: 'mixed vegetable', quantity: 3, unit: 'cup', category: 'produce' },
       { name: 'chopped peanuts (optional)', food: 'peanut', quantity: 0.25, unit: 'cup', category: 'pantry', optional: true },
       { name: 'creamy peanut butter', food: 'peanut butter', quantity: 2, unit: 'tbsp', category: 'pantry' },
       { name: 'low-sodium soy sauce', food: 'soy sauce', quantity: 1.5, unit: 'tbsp', category: 'pantry' },
@@ -979,7 +980,7 @@ export const BATCH_10_RECIPES: Recipe[] = [
       { name: 'butter, melted', food: 'butter', quantity: 2, unit: 'tbsp', category: 'dairy-eggs' },
       { name: 'chicken broth', food: 'chicken broth', quantity: 0.5, unit: 'cup', category: 'pantry' },
       { name: 'soy sauce', food: 'soy sauce', quantity: 1, unit: 'tbsp', category: 'pantry' },
-      { name: 'sesame seeds', food: 'sesame seeds', quantity: 0.25, unit: 'cup', category: 'pantry' },
+      { name: 'sesame seeds', food: 'sesame seed', quantity: 0.25, unit: 'cup', category: 'pantry' },
     ],
     steps: [
       'Heat the oven to 350°F.',
@@ -1103,7 +1104,7 @@ export const BATCH_10_RECIPES: Recipe[] = [
       { name: 'water, one empty soup can', food: 'water', quantity: 1, unit: 'can', category: 'pantry' },
       { name: 'dry quick-cooking rice', food: 'rice', quantity: 1, unit: 'cup', category: 'grains' },
       { name: 'soy sauce', food: 'soy sauce', quantity: 3, unit: 'tbsp', category: 'pantry' },
-      { name: 'chow mein noodles (optional)', food: 'chow mein noodles', quantity: 1, unit: 'cup', category: 'grains', optional: true },
+      { name: 'chow mein noodles (optional)', food: 'noodle', quantity: 1, unit: 'cup', category: 'grains', optional: true },
     ],
     steps: [
       'Cook the ground beef and onion over medium-high heat until the meat is brown all the way through, then drain.',
@@ -1493,10 +1494,10 @@ export const BATCH_10_RECIPES: Recipe[] = [
       { name: 'ground beef', food: 'ground beef', quantity: 1, unit: 'lb', category: 'protein' },
       { name: 'onion, chopped', food: 'onion', quantity: 1, unit: 'piece', category: 'produce' },
       { name: 'no-stick cooking spray', food: 'nonstick cooking spray', category: 'pantry' },
-      { name: 'frozen vegetables (carrot, green bean and corn mix or other medley; 8 ounces)', food: 'mixed vegetables', quantity: 2, unit: 'cup', category: 'frozen' },
+      { name: 'frozen vegetables (carrot, green bean and corn mix or other medley; 8 ounces)', food: 'mixed vegetable', quantity: 2, unit: 'cup', category: 'frozen' },
       { name: 'condensed cream of mushroom soup (1 can, 10 ounces)', food: 'cream of mushroom soup', quantity: 1, unit: 'can', category: 'pantry' },
       { name: 'milk', food: 'milk', quantity: 0.5, unit: 'cup', category: 'dairy-eggs' },
-      { name: 'frozen tater tots (1 bag, 14 ounces)', food: 'tater tots', quantity: 1, unit: 'package', category: 'frozen' },
+      { name: 'frozen tater tots (1 bag, 14 ounces)', food: 'tater tot', quantity: 1, unit: 'package', category: 'frozen' },
     ],
     steps: [
       'Heat the oven to 350°F. Cook the meat and onion over medium heat until the meat is thoroughly brown, then drain.',
@@ -1531,7 +1532,7 @@ export const BATCH_10_RECIPES: Recipe[] = [
       { name: 'lemon juice', food: 'lemon juice', quantity: 0.25, unit: 'cup', category: 'produce' },
       { name: 'honey', food: 'honey', quantity: 2, unit: 'tbsp', category: 'pantry' },
       { name: 'vegetable oil', food: 'vegetable oil', quantity: 1, unit: 'tsp', category: 'pantry' },
-      { name: 'mixed salad greens', food: 'salad greens', quantity: 3, unit: 'cup', category: 'produce' },
+      { name: 'mixed salad greens', food: 'greens', quantity: 3, unit: 'cup', category: 'produce' },
     ],
     steps: [
       'Mix the apples and cheese in a medium bowl.',
@@ -1589,9 +1590,9 @@ export const BATCH_10_RECIPES: Recipe[] = [
     mealTypes: ['lunch', 'snack'],
     ingredients: [
       { name: 'whole wheat English muffin', food: 'english muffin', quantity: 1, unit: 'piece', category: 'grains' },
-      { name: 'ranch style dressing', food: 'ranch dressing', quantity: 2, unit: 'tsp', category: 'pantry' },
+      { name: 'ranch style dressing', food: 'salad dressing', quantity: 2, unit: 'tsp', category: 'pantry' },
       { name: 'shredded cheese', food: 'cheese', quantity: 0.25, unit: 'cup', category: 'dairy-eggs' },
-      { name: 'grated or chopped vegetables (such as peppers, peas, broccoli, celery, carrots, tomatoes or summer squash)', food: 'mixed vegetables', quantity: 0.5, unit: 'cup', category: 'produce' },
+      { name: 'grated or chopped vegetables (such as peppers, peas, broccoli, celery, carrots, tomatoes or summer squash)', food: 'mixed vegetable', quantity: 0.5, unit: 'cup', category: 'produce' },
     ],
     steps: [
       'Spread 1 teaspoon of the ranch dressing on each half of the English muffin.',
