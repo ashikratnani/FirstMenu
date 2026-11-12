@@ -89,7 +89,10 @@ export const BATCH_9_RECIPES: Recipe[] = [
       publisher: UNL_PUBLISHER,
       url: 'https://food.unl.edu/recipe/pear-and-parsnip-smash/',
       retrieved: RETRIEVED,
-      adaptations: ['Left out 1/2 teaspoon salt'],
+      adaptations: [
+        'Left out 1/2 teaspoon salt',
+        'The page lists no water; the steps cook the parsnips in water to cover, so it is listed as an ingredient here.',
+      ],
     },
     title: 'Pear and Parsnip Smash-up',
     stages: ['6-8', '9-12'],
@@ -145,7 +148,7 @@ export const BATCH_9_RECIPES: Recipe[] = [
     servings: 4,
   },
   {
-    // Lentils boiled and blended smooth, then simmered with sauteed onion, carrot, garlic, vermicelli and curry powder until the noodles are tender. The salt is left out; the optional parsley, lemon and jalapeno garnishes are kept as optional. Tagged 9-12 and 12-23 only, because the salt is blocked at both stages and left out.
+    // Lentils boiled and blended smooth, then simmered with sauteed onion, carrot, garlic, vermicelli and curry powder until the noodles are tender. The salt is left out; the optional parsley, lemon and jalapeno garnishes are kept as optional. Tagged 12-23 only: the salt is blocked there and left out, and the optional raw jalapeno and whole lemon slices on the side are not for a 9-12 baby.
     id: 'b-unl-curried-lentil-soup',
     origin: 'builtin',
     source: {
@@ -156,7 +159,7 @@ export const BATCH_9_RECIPES: Recipe[] = [
       adaptations: ['Left out 1/4 teaspoon salt'],
     },
     title: 'Curried Lentil Soup',
-    stages: ['9-12', '12-23'],
+    stages: ['12-23'],
     serveAs: ['pieces'],
     mealTypes: ['lunch', 'dinner'],
     ingredients: [
@@ -848,7 +851,7 @@ export const BATCH_9_RECIPES: Recipe[] = [
     servings: 5,
   },
   {
-    // Potatoes, carrots, onion and celery simmered until tender and mashed slightly, then thickened with milk and a margarine and flour mixture, with optional cheese. The page says to mash the vegetables slightly. The optional salt is left out, so the recipe is tagged 9-12 and 12-23 only (salt is blocked at both).
+    // Potatoes, carrots, onion and celery simmered until tender and mashed slightly, then thickened with milk and a margarine and flour mixture, with optional cheese. The page says to mash the vegetables only slightly, so vegetable pieces stay: served as pieces and tagged 12-23 only. The optional salt is left out, so it is not tagged 24-36 (salt is blocked at 12-23).
     id: 'b-unl-potato-soup',
     origin: 'builtin',
     source: {
@@ -863,8 +866,8 @@ export const BATCH_9_RECIPES: Recipe[] = [
       ],
     },
     title: 'Potato Soup',
-    stages: ['9-12', '12-23'],
-    serveAs: ['mashed', 'pieces'],
+    stages: ['12-23'],
+    serveAs: ['pieces'],
     mealTypes: ['lunch', 'dinner'],
     ingredients: [
       { name: 'water', food: 'water', quantity: 2, unit: 'cup', category: 'pantry' },
@@ -1233,7 +1236,7 @@ export const BATCH_9_RECIPES: Recipe[] = [
       { name: 'coconut flakes', food: 'coconut', quantity: 1, unit: 'tbsp', category: 'pantry' },
     ],
     steps: [
-      'Rinse the banana under running water, leave the peel on and cut a deep slit down the long side, through the peel and into the banana but not all the way through.',
+      'Wash the banana but keep the peel on. Slice a deep lengthwise slit in it, cutting through the peel into the fruit without going through to the other side.',
       'Gently pull the banana open to make a pocket, fill it with the crushed pineapple and top it with the coconut flakes.',
       'Wrap the banana in foil and put it on a grill or near the coals of a campfire. Heat about 5 minutes at medium high heat, until warm.',
       'Carefully take the foil packet off the heat, let it cool slightly and unwrap it. The peel may turn black, but the banana inside will be warm and soft. Refrigerate leftovers within 2 hours.',
@@ -1408,39 +1411,6 @@ export const BATCH_9_RECIPES: Recipe[] = [
     ],
     texture: 'cheesy hominy',
     servings: 8,
-  },
-  {
-    // Potato pieces tossed with oil and garlic powder and roasted at 400 degrees until soft. The page says soft, so 9-12 and 12-23. The 1/2 teaspoon salt is left out, so the recipe is tagged 9-12 and 12-23 only (salt is blocked at both).
-    id: 'b-fh-potato-pals',
-    origin: 'builtin',
-    source: {
-      title: 'Potato Pals',
-      publisher: FH_PUBLISHER,
-      url: 'https://foodhero.org/recipes/potato-pals',
-      retrieved: RETRIEVED,
-      adaptations: [
-        ESTIMATE_HALF_CUP,
-        'Used garlic powder (the page also offers 2 cloves of garlic, minced).',
-        'Left out 1/2 teaspoon salt',
-      ],
-    },
-    title: 'Potato Pals',
-    stages: ['9-12', '12-23'],
-    serveAs: ['finger-food'],
-    mealTypes: ['lunch', 'dinner'],
-    ingredients: [
-      { name: 'potatoes, cut in 1 inch pieces', food: 'potato', quantity: 1, unit: 'lb', category: 'produce' },
-      { name: 'vegetable oil', food: 'vegetable oil', quantity: 1, unit: 'tbsp', category: 'pantry' },
-      { name: 'garlic powder', food: 'garlic powder', quantity: 0.5, unit: 'tsp', category: 'pantry' },
-    ],
-    steps: [
-      'Heat the oven to 400°F and lightly grease a large baking sheet.',
-      'Stir the potatoes, oil and garlic powder together in a large bowl.',
-      'Spread the potatoes on the baking sheet with space between the pieces.',
-      'Roast about 20 minutes, stirring a couple of times, until the potatoes are soft.',
-    ],
-    texture: 'roasted potato pieces',
-    servings: 6,
   },
   {
     // A whole spaghetti squash halved, microwaved cut side down until a fork pierces it easily, then scraped into strands. The page says "Topping ingredients as you choose"; no topping is listed, so none is added here.
@@ -1686,6 +1656,7 @@ export const BATCH_9_RECIPES: Recipe[] = [
       'Heat the oven to 400°F. Mix the yogurt and sunflower seed butter in a small bowl with a fork or rubber spatula until smooth, and keep the dip cold.',
       'Toss the carrots with the salt and oil in a small bowl, then spread them in a single layer on a baking sheet.',
       'Bake 20 minutes, until lightly brown on the bottom. Serve about 6 to 10 carrot fries per child with 2 tablespoons of dip.',
+      'Keep in mind that nut butters can be a choking risk for children under 4 years old, so take care when you serve the dip.',
     ],
     texture: 'baked carrot sticks with yogurt dip',
     servings: 6,

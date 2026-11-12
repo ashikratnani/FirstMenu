@@ -2434,7 +2434,7 @@ const BATCH_9_EXPECTED: Record<string, Batch3Expectation> = {
   'b-unl-fruit-puree': { publisher: UNL, stages: ['6-8', '9-12'], serveAs: ['puree'], allergens: [], servings: 2 },
   'b-unl-pear-and-parsnip-smash-up': { publisher: UNL, stages: ['6-8', '9-12'], serveAs: ['mashed'], allergens: ['dairy'], servings: 4 },
   'b-unl-elaines-green-mash-potatoes': { publisher: UNL, stages: ['6-8', '9-12'], serveAs: ['mashed'], allergens: ['dairy'], servings: 4 },
-  'b-unl-curried-lentil-soup': { publisher: UNL, stages: ['9-12', '12-23'], serveAs: ['pieces'], allergens: ['wheat'], servings: 6 },
+  'b-unl-curried-lentil-soup': { publisher: UNL, stages: ['12-23'], serveAs: ['pieces'], allergens: ['wheat'], servings: 6 },
   'b-unl-ham-and-egg-frittata': { publisher: UNL, stages: ['24-36'], serveAs: ['pieces'], allergens: ['dairy', 'egg'], servings: 6 },
   'b-unl-chicken-and-rice-soup': { publisher: UNL, stages: ['24-36'], serveAs: ['pieces'], allergens: ['dairy'], servings: 6 },
   'b-unl-brown-rice-risotto': { publisher: UNL, stages: ['24-36'], serveAs: ['pieces'], allergens: ['dairy'], servings: 4 },
@@ -2454,7 +2454,7 @@ const BATCH_9_EXPECTED: Record<string, Batch3Expectation> = {
   'b-unl-vegetables-in-cream-sauce': { publisher: UNL, stages: ['12-23'], serveAs: ['pieces'], allergens: ['dairy', 'wheat'], servings: 4 },
   'b-unl-simply-summer-fruit-salad': { publisher: UNL, stages: ['24-36'], serveAs: ['pieces'], allergens: [], servings: 5 },
   'b-unl-baked-lentil-casserole': { publisher: UNL, stages: ['12-23'], serveAs: ['pieces'], allergens: ['dairy'], servings: 5 },
-  'b-unl-potato-soup': { publisher: UNL, stages: ['9-12', '12-23'], serveAs: ['mashed', 'pieces'], allergens: ['dairy', 'wheat'], servings: 10 },
+  'b-unl-potato-soup': { publisher: UNL, stages: ['12-23'], serveAs: ['pieces'], allergens: ['dairy', 'wheat'], servings: 10 },
   'b-unl-spinach-lasagna': { publisher: UNL, stages: ['24-36'], serveAs: ['pieces'], allergens: ['dairy', 'egg', 'wheat'], servings: 8 },
   'b-unl-creamy-avocado-chicken-salad': { publisher: UNL, stages: ['24-36'], serveAs: ['pieces'], allergens: ['dairy'], servings: 4 },
   'b-unl-baked-eggplant-parmesan': { publisher: UNL, stages: ['24-36'], serveAs: ['pieces'], allergens: ['dairy', 'egg'], servings: 4 },
@@ -2470,7 +2470,6 @@ const BATCH_9_EXPECTED: Record<string, Batch3Expectation> = {
   'b-fh-great-gazpacho-soup': { publisher: FH, stages: ['24-36'], serveAs: ['pieces'], allergens: [], servings: 4, estimateNote: ESTIMATE_ONE_CUP },
   'b-fh-melon-cooler': { publisher: FH, stages: ['24-36'], serveAs: ['pieces'], allergens: ['dairy'], servings: 3, estimateNote: ESTIMATE_ONE_CUP },
   'b-fh-chili-cheese-hominy': { publisher: FH, stages: ['24-36'], serveAs: ['pieces'], allergens: ['dairy'], servings: 8, estimateNote: ESTIMATE_HALF_CUP },
-  'b-fh-potato-pals': { publisher: FH, stages: ['9-12', '12-23'], serveAs: ['finger-food'], allergens: [], servings: 6, estimateNote: ESTIMATE_HALF_CUP },
   'b-fh-spaghetti-squash': { publisher: FH, stages: ['9-12', '12-23', '24-36'], serveAs: ['pieces'], allergens: [], servings: 8, estimateNote: ESTIMATE_HALF_CUP },
   'b-fh-whole-wheat-yogurt-rolls': { publisher: FH, stages: ['12-23'], serveAs: ['pieces'], allergens: ['dairy', 'wheat'], servings: 10 },
   'b-fh-beef-barley-soup': { publisher: FH, stages: ['24-36'], serveAs: ['pieces'], allergens: [], servings: 14, estimateNote: ESTIMATE_ONE_CUP },
@@ -2496,7 +2495,6 @@ const BATCH_9_LEFT_OUT: Record<string, { adaptation: string; absent: RegExp }[]>
   'b-unl-vegetables-in-cream-sauce': [{ adaptation: 'Left out the salt in "salt and pepper to taste"', absent: /\bsalt\b/i }],
   'b-unl-baked-lentil-casserole': [{ adaptation: 'Left out the optional 1/2 teaspoon salt', absent: /\bsalt\b/i }],
   'b-unl-potato-soup': [{ adaptation: 'Left out the optional 1 teaspoon salt', absent: /\bsalt\b/i }],
-  'b-fh-potato-pals': [{ adaptation: 'Left out 1/2 teaspoon salt', absent: /\bsalt\b/i }],
   'b-fh-whole-wheat-yogurt-rolls': [{ adaptation: 'Left out 1 teaspoon salt', absent: /\bsalt\b/i }],
   'b-fh-tasty-hamburger-skillet': [{ adaptation: 'Left out 1/4 teaspoon salt', absent: /\bsalt\b/i }],
 };
@@ -2735,6 +2733,7 @@ describe('BUILTIN_RECIPES - batch 9', () => {
     expect(steps('b-fh-kiwi-banana-and-apple-salad')).toMatch(/do not give honey to a child under 1 year old/i);
     expect(steps('b-unl-sauteed-parmesan-asparagus')).toMatch(/still a bit crunchy/i);
     expect(steps('b-unl-curried-lentil-soup')).toMatch(/carefully move the lentil mixture/i);
+    expect(steps('b-icn-baked-carrot-fries-with-yogurt-sunflower-seed-butter-dip')).toMatch(/nut butters can be a choking risk for children under 4/i);
     expect(steps('b-unl-butternut-squash-mac-n-cheese')).toMatch(/because it can be hot/i);
   });
 
@@ -2748,6 +2747,10 @@ describe('BUILTIN_RECIPES - batch 9', () => {
     expect(names('b-icn-oven-baked-pancakes-with-spiced-pears')).toContain(
       'diced pears canned in extra light syrup (4 cups plus 1 tablespoon, about 2 cans, 15 ounces each)',
     );
+    expect(names('b-unl-pear-and-parsnip-smash-up')).toContain('water, enough to cover the parsnips');
+    expect(find('b-unl-pear-and-parsnip-smash-up')?.source?.adaptations).toContain(
+      'The page lists no water; the steps cook the parsnips in water to cover, so it is listed as an ingredient here.',
+    );
     expect(names('b-icn-great-garden-soup')).toContain('nonstick cooking spray');
     expect(find('b-unl-fruit-puree')?.serveAs).toEqual(['puree']);
     expect(find('b-unl-pear-and-parsnip-smash-up')?.stages).toEqual(['6-8', '9-12']);
@@ -2757,9 +2760,9 @@ describe('BUILTIN_RECIPES - batch 9', () => {
     const cellCount = (stage: StageId, effort: Effort) =>
       BATCH_9_RECIPES.filter((r) => r.stages.includes(stage) && recipeEffort(r) === effort).length;
     expect(cellCount('6-8', 'easy')).toBeGreaterThanOrEqual(3);
-    expect(cellCount('9-12', 'more')).toBeGreaterThanOrEqual(2);
+    // Review round 1 moved two soups to 12-23 and dropped Potato Pals, so these bounds are the real counts.
     expect(cellCount('12-23', 'easy')).toBeGreaterThanOrEqual(2);
-    expect(cellCount('12-23', 'medium')).toBeGreaterThanOrEqual(6);
+    expect(cellCount('12-23', 'medium')).toBeGreaterThanOrEqual(5);
     expect(cellCount('12-23', 'more')).toBeGreaterThanOrEqual(5);
     expect(cellCount('24-36', 'easy')).toBeGreaterThanOrEqual(6);
     expect(cellCount('24-36', 'medium')).toBeGreaterThanOrEqual(14);
