@@ -387,8 +387,6 @@ describe('design refinement (task 19.2, onboarding)', () => {
     expect(within(box).getByRole('heading', { name: 'Before you start' })).toBeVisible();
     expect(within(box).getByText(NOT_MEDICAL_ADVICE)).toBeVisible();
     expect(within(box).getByText(SCREEN_LIMITS)).toBeVisible();
-    expect(within(box).getByText(NOT_MEDICAL_ADVICE)).toBeInTheDocument();
-    expect(within(box).getByText(SCREEN_LIMITS)).toBeInTheDocument();
     await expectNoViolations();
   });
 });
