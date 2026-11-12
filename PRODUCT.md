@@ -18,11 +18,11 @@ The parent of a baby or toddler who decides what to cook, on her phone, often wi
 
 ## Product Purpose
 
-Answer "What can I make for my baby with what I have?" The parent sets her usual pantry once, taps what else she has today, and sees recipes she can make now, quickest and easiest first, with food-group tags. Every recipe is screened against a fixed infant-safety list based on pediatric guidance. Success, as far as the sources state it: she finds something safe to cook without typing, and adds recipes by pasting.
+Answer "What can I make for my baby with what I have?" The parent sets her usual pantry once, taps what else she has today, and sees recipes she can make now, quickest and easiest first, with food-group tags. Every recipe is screened against a fixed infant-safety list based on pediatric guidance. Success measures: Undecided (not stated in the sources).
 
 ## Positioning
 
-A free, no-account, no-backend app that checks every recipe against a fixed, source-cited infant-safety list in the browser, and tracks first tastes as a game-like theme (mystery doors, friendly monsters, ghosts). A general recipe app could not truthfully claim the fixed safety screen or the no-network guarantee.
+A free, no-account, no-backend app that checks every recipe against a fixed, source-cited infant-safety list in the browser, and tracks first tastes as a game-like theme (mystery doors, friendly monsters, ghosts).
 
 ## Operating Context
 
@@ -54,18 +54,18 @@ A free, no-account, no-backend app that checks every recipe against a fixed, sou
 
 ## Evidence on Hand
 
-- Built-in recipes: 234 published recipes from sourced publishers (`docs/recipe-sources.md`, `src/data/`).
+- Built-in recipes: 221 sourced recipes and 13 simple ideas (`docs/recipe-sources.md`, `src/data/`).
 - Sources page lists the safety-rule sources.
 - Inspiration notes: `docs/design-inspiration.md` (patterns only, never copy another site).
 - Absent and not to be invented: user testimonials, usage data, photographs, press, a logo file.
 
 ## Product Principles
 
-1. Task first: every screen is a task screen (find something to cook, add a recipe, check a food). Clarity and speed over spectacle.
-2. Safety is never softened for layout: states and disclaimer text are fixed, and a themed picture never carries a state alone.
-3. No typing where pasting or tapping will do.
-4. Warm reassurance without advice: copy does not claim or advise beyond the design and cited sources.
-5. Everything stays on the device, and the app says so plainly.
+1. Every screen is a task screen (find something to cook, add a recipe, check a food). Ambition shows as clarity, speed and precision, not spectacle (`.kiro/steering/design-skills.md`, Mode: Operate).
+2. Disclaimer wording is fixed and may be restyled only, never reworded, shortened, removed or moved (`.kiro/steering/design-skills.md`).
+3. Add a recipe by pasting text, with preview and save with no typing (`.kiro/steering/product.md`).
+4. Copy does not add health or safety wording that is not in the design or a cited source (`.kiro/steering/autonomy.md`).
+5. Other principles: Undecided (not stated in the sources).
 
 ## Accessibility & Inclusion
 

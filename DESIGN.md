@@ -27,7 +27,7 @@ colors:
   yellow-text: "#4b3900"
 typography:
   body:
-    fontFamily: "Figtree, sans-serif"
+    fontFamily: "Figtree"
 ---
 
 # Design System: FirstMenu
@@ -67,7 +67,7 @@ Figtree, self-hosted through `@fontsource/figtree` (imported in `ThemeRoot.tsx`)
 
 ## Layout
 
-Single column on phones (360 px and up); the top nav collapses to a drawer. On desktop the nav sits in one top bar and content is centered in a column. Result and recipe lists become a three-column card grid on desktop. Spacing comes from Astryx tokens and CSS modules in `src/ui/pages/*.module.css`.
+Single column on phones (360 px and up); the top nav collapses to a drawer. On desktop the nav sits in one top bar and content is centered in a column. Result and recipe lists use a card grid of `repeat(auto-fill, minmax(240px, 1fr))` (`Make.module.css`, `Recipes.module.css`), so the column count depends on width. Spacing comes from Astryx tokens and CSS modules in `src/ui/pages/*.module.css`.
 
 ## Elevation & Depth
 
