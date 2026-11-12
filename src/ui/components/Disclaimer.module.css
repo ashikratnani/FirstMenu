@@ -10,6 +10,7 @@
 
 .text p {
   margin: 0 0 calc(var(--space) * 0.5);
+  text-wrap: pretty;
 }
 
 .text p:last-child {

@@ -251,6 +251,17 @@ describe('Make screen filters (Req 3.6, 3.9)', () => {
     await user.click(toggle);
     expect(screen.getByRole('link', { name: /Blorp Mash/ })).toBeInTheDocument();
   });
+
+  it('"All stages" reports its pressed state so the theme can style it', async () => {
+    const user = userEvent.setup();
+    renderMake(seedState());
+    const toggle = screen.getByRole('button', { name: 'All stages' });
+    expect(toggle).toHaveAttribute('aria-pressed', 'false');
+    await user.click(toggle);
+    expect(toggle).toHaveAttribute('aria-pressed', 'true');
+    await user.click(toggle);
+    expect(toggle).toHaveAttribute('aria-pressed', 'false');
+  });
 });
 
 describe('Make screen on-hand foods (Req 3.1, 3.2)', () => {
@@ -287,6 +298,16 @@ describe('Make screen on-hand foods (Req 3.1, 3.2)', () => {
 });
 
 describe('Make screen pantry (Req 2.1 to 2.4)', () => {
+  it('shows the search and results before the first-use pantry setup', () => {
+    renderMake(seedState({ pantry: [], dismissed: {} }));
+    const setup = screen.getByRole('heading', { name: 'Set up your pantry' });
+    const search = screen.getByRole('heading', { name: 'What do you have?' });
+    const follows = (a: Node, b: Node) =>
+      Boolean(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
+    expect(follows(search, setup)).toBe(true);
+    expect(follows(screen.getByRole('heading', { name: /^Missing one/ }), setup)).toBe(true);
+  });
+
   it('offers the suggested list on first use and lets the user skip it', async () => {
     const user = userEvent.setup();
     renderMake(seedState({ pantry: [], dismissed: {} }));
