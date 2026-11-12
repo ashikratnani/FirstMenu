@@ -17,7 +17,7 @@
 // recording a reaction on a planned recipe's food ghosts that slot and shows
 // the Replace prompt on the next render (Req 7.6).
 //
-// Above the grid: active-slot toggles (Req 8.2, dispatch setActiveSlots), a
+// Below the grid (the week comes first): active-slot toggles (Req 8.2, dispatch setActiveSlots), a
 // new-week keep|empty control (Req 8.5, dispatch newWeek{mode}), a prep-date
 // input (Req 8.4, dispatch setPrepDate), and — when newFoodSpacingWarning is
 // non-null — ONE new-food spacing warning citing its source (Req 7.8). No new
@@ -82,108 +82,50 @@ export default function Plan() {
     <>
       <h1>This week</h1>
 
-      <section className={styles.controls} aria-labelledby="week-controls">
-        <h2 id="week-controls" className={styles.controlsHeading}>
-          Plan settings
-        </h2>
+      {/* One live region stays mounted for both notices (the new-food spacing
+          warning and the no-meals message), so each is announced when it
+          appears. */}
+      <div role="status">
+        {spacing && (
+          <section className={styles.spacingWarning}>
+            <p className={styles.spacingText}>
+              New foods are planned fewer than {spacing.spacingDays} days apart:{' '}
+              {spacing.foodLabels
+                .map((label, i) => `${label} (${dayLabel(spacing.firstDays[i])})`)
+                .join(', ')}
+              . Try spacing new foods at least {spacing.spacingDays} days apart.
+            </p>
+            <p className={styles.spacingSources}>
+              Source
+              {spacing.sources.length > 1 ? 's' : ''}:{' '}
+              {spacing.sources.map((id, i) => (
+                <span key={id}>
+                  {i > 0 ? ', ' : ''}
+                  <a
+                    href={SOURCES[id].url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {SOURCES[id].title}
+                  </a>
+                </span>
+              ))}
+            </p>
+          </section>
+        )}
 
-        <fieldset className={styles.slotToggles}>
-          <legend className={styles.legend}>Meals to plan</legend>
-          {MEAL_TYPES.map((meal) => (
-            <label key={meal} className={styles.toggle}>
-              <input
-                type="checkbox"
-                checked={plan.activeSlots.includes(meal)}
-                onChange={() => toggleSlot(meal)}
-              />
-              {mealTypeLabel(meal)}
-            </label>
-          ))}
-        </fieldset>
-
-        <div className={styles.prepControl}>
-          <label htmlFor="start-date" className={styles.controlLabel}>
-            Start day
-          </label>
-          <input
-            id="start-date"
-            type="date"
-            value={plan.startDate}
-            onChange={(e) =>
-              dispatch({ type: 'setStartDate', startDate: e.target.value })
-            }
-          />
-        </div>
-
-        <div className={styles.prepControl}>
-          <label htmlFor="prep-date" className={styles.controlLabel}>
-            Prep day
-          </label>
-          <input
-            id="prep-date"
-            type="date"
-            value={plan.prepDate}
-            onChange={(e) =>
-              dispatch({ type: 'setPrepDate', prepDate: e.target.value })
-            }
-          />
-        </div>
-
-        <div className={styles.newWeek}>
-          <button
-            type="button"
-            className={styles.newWeekButton}
-            onClick={() => dispatch({ type: 'newWeek', mode: 'keep' })}
-          >
-            Start next week (keep meals)
-          </button>
-          <button
-            type="button"
-            className={styles.newWeekButton}
-            onClick={() => dispatch({ type: 'newWeek', mode: 'empty' })}
-          >
-            Start next week (empty)
-          </button>
-          {/* Opens the printable week view (Task 14.1, Req 6.1). */}
-          <Link to="/print" className={styles.printLink}>
-            Print
-          </Link>
-        </div>
-      </section>
-
-      {spacing && (
-        <section className={styles.spacingWarning} role="status">
-          <p className={styles.spacingText}>
-            New foods are planned fewer than {spacing.spacingDays} days apart:{' '}
-            {spacing.foodLabels
-              .map((label, i) => `${label} (${dayLabel(spacing.firstDays[i])})`)
-              .join(', ')}
-            . Try spacing new foods at least {spacing.spacingDays} days apart.
+        {activeSlots.length === 0 && (
+          <p className={styles.noSlots}>
+            No meals selected. Choose at least one meal in{' '}
+            <a href="#week-controls" className={`fm-link ${styles.nextStep}`}>
+              Plan settings
+            </a>{' '}
+            to start planning.
           </p>
-          <p className={styles.spacingSources}>
-            Source
-            {spacing.sources.length > 1 ? 's' : ''}:{' '}
-            {spacing.sources.map((id, i) => (
-              <span key={id}>
-                {i > 0 ? ', ' : ''}
-                <a
-                  href={SOURCES[id].url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {SOURCES[id].title}
-                </a>
-              </span>
-            ))}
-          </p>
-        </section>
-      )}
+        )}
+      </div>
 
-      {activeSlots.length === 0 ? (
-        <p className={styles.noSlots}>
-          No meals selected. Choose at least one meal above to start planning.
-        </p>
-      ) : (
+      {activeSlots.length > 0 && (
         <ol className={styles.weekGrid}>
           {DAY_INDEXES.map((day) => {
             const dateYmd = dayDateYmd(plan.startDate, day);
@@ -252,14 +194,14 @@ export default function Plan() {
                             <div className={styles.slotActions}>
                               <button
                                 type="button"
-                                className={styles.replaceButton}
+                                className={styles.slotButton}
                                 onClick={() => setOpenSlot(slot)}
                               >
                                 Replace
                               </button>
                               <button
                                 type="button"
-                                className={styles.clearButton}
+                                className={styles.slotButton}
                                 onClick={() =>
                                   dispatch({ type: 'clearSlot', slot })
                                 }
@@ -280,14 +222,14 @@ export default function Plan() {
                             <div className={styles.slotActions}>
                               <button
                                 type="button"
-                                className={styles.changeButton}
+                                className={styles.slotButton}
                                 onClick={() => setOpenSlot(slot)}
                               >
                                 Change
                               </button>
                               <button
                                 type="button"
-                                className={styles.clearButton}
+                                className={styles.slotButton}
                                 onClick={() =>
                                   dispatch({ type: 'clearSlot', slot })
                                 }
@@ -314,6 +256,73 @@ export default function Plan() {
           })}
         </ol>
       )}
+
+      <section className={styles.controls} aria-labelledby="week-controls">
+        <h2 id="week-controls" className={styles.controlsHeading}>
+          Plan settings
+        </h2>
+
+        <fieldset className={styles.slotToggles}>
+          <legend className={styles.legend}>Meals to plan</legend>
+          {MEAL_TYPES.map((meal) => (
+            <label key={meal} className={styles.toggle}>
+              <input
+                type="checkbox"
+                checked={plan.activeSlots.includes(meal)}
+                onChange={() => toggleSlot(meal)}
+              />
+              {mealTypeLabel(meal)}
+            </label>
+          ))}
+        </fieldset>
+
+        <div className={styles.prepControl}>
+          <label htmlFor="start-date" className={styles.controlLabel}>
+            Start day
+          </label>
+          <input
+            id="start-date"
+            className={styles.dateInput}
+            type="date"
+            value={plan.startDate}
+            onChange={(e) =>
+              dispatch({ type: 'setStartDate', startDate: e.target.value })
+            }
+          />
+        </div>
+
+        <div className={styles.prepControl}>
+          <label htmlFor="prep-date" className={styles.controlLabel}>
+            Prep day
+          </label>
+          <input
+            id="prep-date"
+            className={styles.dateInput}
+            type="date"
+            value={plan.prepDate}
+            onChange={(e) =>
+              dispatch({ type: 'setPrepDate', prepDate: e.target.value })
+            }
+          />
+        </div>
+
+        <div className={styles.newWeek}>
+          <button
+            type="button"
+            className={styles.newWeekButton}
+            onClick={() => dispatch({ type: 'newWeek', mode: 'keep' })}
+          >
+            Start next week (keep meals)
+          </button>
+          <button
+            type="button"
+            className={styles.newWeekButton}
+            onClick={() => dispatch({ type: 'newWeek', mode: 'empty' })}
+          >
+            Start next week (empty)
+          </button>
+        </div>
+      </section>
     </>
   );
 }

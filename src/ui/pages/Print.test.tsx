@@ -2,6 +2,8 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import Print from './Print';
+import printCss from './Print.module.css?raw';
+import { ruleBody } from '../../test/cssRule';
 import { AppProvider } from '../../state/AppProvider';
 import { STORAGE_KEY, defaultState } from '../../domain/storage';
 import type {
@@ -210,5 +212,15 @@ describe('Print page', () => {
         'FirstMenu is not medical advice. Check with your pediatrician.',
       ),
     ).toBeInTheDocument();
+  });
+
+  it('keeps the single Print button inside the print-hide wrapper', () => {
+    renderPrint(seedState(8, []));
+    const button = screen.getByRole('button', { name: 'Print' });
+    expect(button.closest('.print-hide')).not.toBeNull();
+    expect(screen.getAllByRole('button')).toHaveLength(1);
+    expect(ruleBody(printCss, '.toolbar button')).toContain(
+      'min-height: 44px',
+    );
   });
 });

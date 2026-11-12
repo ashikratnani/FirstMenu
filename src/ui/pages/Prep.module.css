@@ -32,6 +32,10 @@
   gap: calc(var(--space) * 0.25);
 }
 
+.dateInput {
+  min-height: 44px;
+}
+
 .controlLabel {
   font-size: 0.85rem;
   font-weight: 600;
@@ -41,6 +45,16 @@
 .empty {
   margin: var(--space) 0;
   color: var(--fm-color-muted);
+}
+
+.emptyText {
+  margin: 0;
+}
+
+.nextStep {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
 }
 
 .sectionHeading {

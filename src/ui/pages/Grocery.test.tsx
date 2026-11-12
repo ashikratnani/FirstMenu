@@ -2,6 +2,8 @@ import { fireEvent, render, screen, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, expect, it, beforeEach } from 'vitest';
 import Grocery from './Grocery';
+import groceryCss from './Grocery.module.css?raw';
+import { ruleBody } from '../../test/cssRule';
 import { AppProvider, useApp } from '../../state/AppProvider';
 import { STORAGE_KEY, defaultState } from '../../domain/storage';
 import type { AppState, GroceryCategory, Ingredient, MealType, Recipe } from '../../domain/types';
@@ -250,5 +252,26 @@ describe('Grocery page', () => {
         'FirstMenu is not medical advice. Check with your pediatrician.',
       ),
     ).toBeInTheDocument();
+  });
+
+  it('keeps one live region mounted and offers a next step when empty', () => {
+    const { unmount } = renderGrocery(seedState(8, []));
+    const region = screen.getByRole('status');
+    const link = within(region).getByRole('link', { name: 'Plan your week' });
+    expect(link).toHaveAttribute('href', '/plan');
+    expect(link).toHaveClass('fm-link');
+    unmount();
+
+    const recipe = makeRecipe('r-a', [ing('pear', 'produce', 50, 'g')]);
+    renderGrocery(
+      seedState(8, [recipe], daysWithBreakfast([{ day: 0, recipeId: 'r-a' }])),
+    );
+    expect(screen.getByRole('status')).toBeEmptyDOMElement();
+    // The checkbox name still carries the amount.
+    expect(screen.getByRole('checkbox', { name: /pear, 50 g/ })).toBeInTheDocument();
+  });
+
+  it('the empty-state next step is a 44 px target (CSS)', () => {
+    expect(ruleBody(groceryCss, '.nextStep')).toContain('min-height: 44px');
   });
 });

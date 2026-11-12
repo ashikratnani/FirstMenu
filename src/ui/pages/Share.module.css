@@ -31,6 +31,23 @@
 
 
 
+/* 44 px targets for the copy button and the manual-copy field. */
+.linkBlock button,
+.linkBlock input {
+  min-height: 44px;
+}
+
+.emptyNote {
+  margin: var(--space) 0;
+  color: var(--fm-color-muted);
+}
+
+.nextStep {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+
 .copied {
   font-weight: 600;
   color: var(--fm-color-heading);

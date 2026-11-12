@@ -28,6 +28,9 @@ export default function Share() {
   const { state } = useApp();
   const { url } = encodeSharePayload(state);
   const tooLong = isShareLinkLong(url);
+  const planIsEmpty = state.plan.days.every((day) =>
+    Object.values(day).every((id) => id === undefined),
+  );
 
   const [copied, setCopied] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -60,6 +63,15 @@ export default function Share() {
         prep list, grocery list and recipes. Whoever opens it sees the plan
         only, with the safety screen run again on their device.
       </p>
+
+      {planIsEmpty && (
+        <p className={styles.emptyNote}>
+          Nothing is planned yet, so the link would show an empty week.{' '}
+          <Link to="/plan" className={`fm-link ${styles.nextStep}`}>
+            Plan your week
+          </Link>
+        </p>
+      )}
 
       <section className={styles.linkBlock} aria-labelledby="share-link-heading">
         <h2 id="share-link-heading" className={styles.sectionHeading}>

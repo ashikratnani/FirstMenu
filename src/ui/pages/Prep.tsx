@@ -12,6 +12,7 @@
 // every store state is carried by visible TEXT + accessible name (no color-only
 // signalling) and any illustration stays aria-hidden with the state in text.
 
+import { Link as RouterLink } from 'react-router-dom';
 import { Link } from '@astryxdesign/core/Link';
 import { useApp } from '../../state/AppProvider';
 import { selectAgeMonths, selectAllRecipes } from '../../state/selectors';
@@ -73,6 +74,7 @@ export default function Prep() {
           </label>
           <input
             id="prep-date"
+            className={styles.dateInput}
             type="date"
             value={plan.prepDate}
             onChange={(e) =>
@@ -82,11 +84,22 @@ export default function Prep() {
         </div>
       </section>
 
-      {isEmpty ? (
-        <p className={styles.empty}>
-          Nothing to prep yet. Add meals to your week to see a prep plan.
-        </p>
-      ) : (
+      {/* One live region stays mounted, so the empty message is announced
+          when the last planned meal goes away. */}
+      <div role="status" className={isEmpty ? styles.empty : undefined}>
+        {isEmpty && (
+          <>
+            <p className={styles.emptyText}>
+              Nothing to prep yet. Add meals to your week to see a prep plan.
+            </p>
+            <RouterLink className={`fm-link ${styles.nextStep}`} to="/plan">
+              Plan your week
+            </RouterLink>
+          </>
+        )}
+      </div>
+
+      {!isEmpty && (
         <>
           <section aria-labelledby="cook-sessions-heading">
             <h2 id="cook-sessions-heading" className={styles.sectionHeading}>

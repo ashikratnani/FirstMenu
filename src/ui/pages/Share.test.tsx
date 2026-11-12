@@ -3,6 +3,8 @@ import { MemoryRouter } from 'react-router-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import Share from './Share';
+import shareCss from './Share.module.css?raw';
+import { ruleBody } from '../../test/cssRule';
 import { AppProvider } from '../../state/AppProvider';
 import { STORAGE_KEY, defaultState } from '../../domain/storage';
 import { SHARE_BASE_URL } from '../../domain/share';
@@ -143,5 +145,23 @@ describe('Share page', () => {
     // which caused a reaction (the payload carries reaction records).
     expect(note).toHaveTextContent(/tried/i);
     expect(note).toHaveTextContent(/reaction/i);
+  });
+
+  it('points an empty plan to /plan and says nothing for a planned week', () => {
+    const { unmount } = renderShare(shortState());
+    const link = screen.getByRole('link', { name: 'Plan your week' });
+    expect(link).toHaveAttribute('href', '/plan');
+    expect(link).toHaveClass('fm-link');
+    // The empty note is plain text; it adds no live region of its own.
+    expect(link.closest('[role="status"]')).toBeNull();
+    unmount();
+
+    renderShare(longState());
+    expect(screen.queryByRole('link', { name: 'Plan your week' })).toBeNull();
+  });
+
+  it('the copy button, field and next step are 44 px targets (CSS)', () => {
+    expect(ruleBody(shareCss, '.linkBlock button')).toContain('min-height: 44px');
+    expect(ruleBody(shareCss, '.nextStep')).toContain('min-height: 44px');
   });
 });

@@ -16,6 +16,7 @@
 // guarded so it only runs when there is actually a stale key to drop.
 
 import { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { CheckboxInput } from '@astryxdesign/core/CheckboxInput';
 import { useApp } from '../../state/AppProvider';
 import { selectAgeMonths, selectAllRecipes } from '../../state/selectors';
@@ -78,11 +79,22 @@ export default function Grocery() {
     <>
       <h1>Grocery</h1>
 
-      {isEmpty ? (
-        <p className={styles.empty}>
-          Nothing to buy yet. Add meals to your week to see a grocery list.
-        </p>
-      ) : (
+      {/* One live region stays mounted, so the empty message is announced
+          when the last planned meal goes away. */}
+      <div role="status" className={isEmpty ? styles.empty : undefined}>
+        {isEmpty && (
+          <>
+            <p className={styles.emptyText}>
+              Nothing to buy yet. Add meals to your week to see a grocery list.
+            </p>
+            <Link className={`fm-link ${styles.nextStep}`} to="/plan">
+              Plan your week
+            </Link>
+          </>
+        )}
+      </div>
+
+      {!isEmpty &&
         groups.map((group) => (
           <section
             key={group.category}
@@ -126,8 +138,7 @@ export default function Grocery() {
               })}
             </ul>
           </section>
-        ))
-      )}
+        ))}
 
       <div className={styles.footer}>
         <Disclaimer />

@@ -23,6 +23,9 @@
 }
 
 
+.toolbar button {
+  min-height: 44px;
+}
 
 .section {
   display: flex;
