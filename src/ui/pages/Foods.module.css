@@ -105,7 +105,7 @@
   min-height: 44px;
 }
 
-/* One opens-the-record-buttons button per food, in the fm-link look. */
+/* The button that opens a food's record buttons, in the fm-link look. */
 .disclosure {
   flex: none;
   margin-left: auto;

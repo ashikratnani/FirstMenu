@@ -115,6 +115,53 @@ describe('Foods disclosure', () => {
   });
 });
 
+describe('Foods after logging and filtering', () => {
+  it('collapses the card and moves focus to the new card toggle after "Tried, no reaction"', async () => {
+    const user = userEvent.setup();
+    renderFoods();
+    await user.click(screen.getByRole('button', { name: 'Log a try: egg' }));
+    await user.click(screen.getByRole('button', { name: 'Tried, no reaction' }));
+    const toggle = screen.getByRole('button', { name: 'Change record: egg' });
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    expect(recordButtons()).toHaveLength(0);
+    expect(document.activeElement).toBe(toggle);
+  });
+
+  it('collapses an already tried card after changing its record, keeping focus on its toggle', async () => {
+    const user = userEvent.setup();
+    renderFoods();
+    await user.click(screen.getByRole('button', { name: 'Change record: carrot' }));
+    await user.click(screen.getByRole('button', { name: 'Tried, no reaction' }));
+    const toggle = screen.getByRole('button', { name: 'Change record: carrot' });
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    expect(document.activeElement).toBe(toggle);
+  });
+
+  it('moves focus to the reaction note after "Noticed a reaction"', async () => {
+    const user = userEvent.setup();
+    renderFoods();
+    await user.click(screen.getByRole('button', { name: 'Log a try: egg' }));
+    await user.click(screen.getByRole('button', { name: 'Noticed a reaction' }));
+    const ghost = screen.getByRole('listitem', { name: /Not yet: egg\. Reaction recorded\./ });
+    expect(document.activeElement).toBe(within(ghost).getByText(REACTION_ADVICE));
+    expect(recordButtons()).toHaveLength(0);
+  });
+
+  it('does not bring an open food back when the search is cleared', async () => {
+    const user = userEvent.setup();
+    renderFoods();
+    await user.click(screen.getByRole('button', { name: 'Log a try: egg' }));
+    const box = screen.getByRole('searchbox', { name: 'Search foods' });
+    await user.type(box, 'zzzz');
+    await user.clear(box);
+    expect(screen.getByRole('button', { name: 'Log a try: egg' })).toHaveAttribute(
+      'aria-expanded',
+      'false',
+    );
+    expect(recordButtons()).toHaveLength(0);
+  });
+});
+
 describe('Foods search', () => {
   it('filters by food name, announces the count, and keeps ghost text and reaction advice', async () => {
     const user = userEvent.setup();

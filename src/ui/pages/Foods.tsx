@@ -21,7 +21,7 @@
 // buttons appear when it is opened (aria-expanded, one open at a time). A
 // reaction ghost keeps "Clear reaction" always visible. All state text stays.
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Button } from '@astryxdesign/core/Button';
 import { Link } from '@astryxdesign/core/Link';
 import { TextInput } from '@astryxdesign/core/TextInput';
@@ -90,6 +90,8 @@ export default function Foods() {
   const allViews = selectFoodViews(state);
   const [search, setSearch] = useState('');
   const [openKey, setOpenKey] = useState<string | null>(null);
+  // The food whose card should take focus once the record change renders.
+  const focusKey = useRef<string | null>(null);
   const needle = search.trim().toLowerCase();
   const views = needle
     ? allViews.filter((v) =>
@@ -97,12 +99,29 @@ export default function Foods() {
       )
     : allViews;
 
+  // Logging collapses the card, and the control that held focus unmounts (a
+  // door becomes a monster). Send focus to the new card's toggle, or to the
+  // reaction note, so keyboard users are not dropped at the top of the page.
+  useEffect(() => {
+    const key = focusKey.current;
+    if (key === null) return;
+    focusKey.current = null;
+    const target = Array.from(
+      document.querySelectorAll<HTMLElement>('[data-food-focus]'),
+    ).find((el) => el.dataset.foodFocus === key);
+    target?.focus();
+  });
+
   const recordTried = (key: string) => {
     const record: FoodRecord = { status: 'tried', date: todayYmd() };
+    focusKey.current = key;
+    setOpenKey(null);
     dispatch({ type: 'setFoodRecord', key, record });
   };
   const recordReaction = (key: string) => {
     const record: FoodRecord = { status: 'reaction', date: todayYmd() };
+    focusKey.current = key;
+    setOpenKey(null);
     dispatch({ type: 'setFoodRecord', key, record });
   };
   const clearReaction = (key: string) => {
@@ -120,6 +139,7 @@ export default function Foods() {
       <button
         type="button"
         className={styles.disclosure}
+        data-food-focus={key}
         aria-expanded={isOpen}
         aria-label={`${hint}: ${label}`}
         onClick={() => setOpenKey(isOpen ? null : key)}
@@ -152,7 +172,10 @@ export default function Foods() {
           isLabelHidden
           type="search"
           value={search}
-          onChange={setSearch}
+          onChange={(value) => {
+            setSearch(value);
+            setOpenKey(null);
+          }}
           placeholder="Search by food name"
           autoComplete="off"
           enterKeyHint="search"
@@ -168,7 +191,10 @@ export default function Foods() {
               : `${allViews.length} foods.`}
         </p>
         {views.length === 0 && (
-          <Button label="Clear search" onClick={() => setSearch('')} />
+          <Button label="Clear search" onClick={() => {
+              setSearch('');
+              setOpenKey(null);
+            }} />
         )}
       </div>
 
@@ -286,7 +312,12 @@ export default function Foods() {
                     key={view.key}
                     label={`Not yet: ${label}. Reaction recorded.`}
                   >
-                    <p className={styles.reactionAdvice} role="note">
+                    <p
+                      className={styles.reactionAdvice}
+                      role="note"
+                      tabIndex={-1}
+                      data-food-focus={view.key}
+                    >
                       {REACTION_ADVICE}
                     </p>
                     <div className={styles.controls}>
