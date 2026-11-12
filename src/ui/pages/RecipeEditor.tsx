@@ -378,7 +378,9 @@ export default function RecipeEditor() {
           the recipe may have been deleted.
         </p>
         <p>
-          <Link to="/recipes">Back to recipes</Link>
+          <Link className={`fm-link ${styles.backLink}`} to="/recipes">
+            Back to recipes
+          </Link>
         </p>
       </>
     );
@@ -496,7 +498,9 @@ export default function RecipeEditor() {
   return (
     <>
       <p className={styles.back}>
-        <Link to="/recipes">&larr; Back to recipes</Link>
+        <Link className={`fm-link ${styles.backLink}`} to="/recipes">
+          &larr; Back to recipes
+        </Link>
       </p>
 
       <h1>{isEditMode ? 'Edit recipe' : 'New recipe'}</h1>
@@ -880,7 +884,9 @@ export default function RecipeEditor() {
             )}
 
           <p className={styles.viewLink}>
-            <Link to="/recipes">Back to recipes</Link>
+            <Link className={`fm-link ${styles.backLink}`} to="/recipes">
+              Back to recipes
+            </Link>
           </p>
         </section>
       )}

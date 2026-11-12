@@ -5,6 +5,11 @@
   gap: 12px;
 }
 
+/* 44 px targets: the open/copy/paste buttons. */
+.helper button {
+  min-height: 44px;
+}
+
 .panel {
   display: flex;
   flex-direction: column;
@@ -28,6 +33,7 @@
   color: var(--color-text-primary);
   font: inherit;
   font-size: 0.875rem;
+  min-height: 44px;
 }
 
 .row {
@@ -38,9 +44,7 @@
 }
 
 .link {
-  color: var(--color-text-accent);
-  font-weight: 500;
-  min-height: 40px;
+  min-height: 44px;
   display: inline-flex;
   align-items: center;
 }

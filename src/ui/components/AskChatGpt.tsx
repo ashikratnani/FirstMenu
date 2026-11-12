@@ -24,6 +24,9 @@ export interface AskChatGptProps {
   leaveOut: string[];
   /** Add recipe passes this to use its own paste box instead of linking there. */
   onPasteAnswer?: () => void;
+  /** Add recipe controls which helper is open, so only one panel shows at a time. */
+  isOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
 /** Add recipe with ChatGPT preselected as the source (design "Prompt helper"). */
@@ -31,8 +34,18 @@ export const PASTE_ANSWER_PATH = '/add?from=chatgpt';
 
 export const CHATGPT_URL = 'https://chatgpt.com/';
 
-export default function AskChatGpt({ ageMonths, stage, have, leaveOut, onPasteAnswer }: AskChatGptProps) {
-  const [open, setOpen] = useState(false);
+export default function AskChatGpt({
+  ageMonths,
+  stage,
+  have,
+  leaveOut,
+  onPasteAnswer,
+  isOpen,
+  onOpenChange,
+}: AskChatGptProps) {
+  const [ownOpen, setOwnOpen] = useState(false);
+  const open = isOpen ?? ownOpen;
+  const setOpen = onOpenChange ?? setOwnOpen;
   const [message, setMessage] = useState('');
   const [asked, setAsked] = useState(false);
   // Until the user edits the box, it follows the foods on hand.
@@ -71,7 +84,7 @@ export default function AskChatGpt({ ageMonths, stage, have, leaveOut, onPasteAn
     <section className={styles.helper} aria-label="Ask ChatGPT">
       <Button
         label={open ? 'Hide the question' : 'Ask ChatGPT'}
-        onClick={() => setOpen((value) => !value)}
+        onClick={() => setOpen(!open)}
       />
       {open && (
         <div className={styles.panel}>
@@ -90,7 +103,7 @@ export default function AskChatGpt({ ageMonths, stage, have, leaveOut, onPasteAn
           <div className={styles.row}>
             <Button label="Copy question" onClick={() => void copy()} />
             <a
-              className={styles.link}
+              className={`fm-link ${styles.link}`}
               href={CHATGPT_URL}
               target="_blank"
               rel="noopener noreferrer"
@@ -122,7 +135,7 @@ export default function AskChatGpt({ ageMonths, stage, have, leaveOut, onPasteAn
               {onPasteAnswer ? (
                 <Button label="Paste the answer" onClick={onPasteAnswer} />
               ) : (
-                <Link className={styles.link} to={PASTE_ANSWER_PATH}>
+                <Link className={`fm-link ${styles.link}`} to={PASTE_ANSWER_PATH}>
                   Paste the answer
                 </Link>
               )}

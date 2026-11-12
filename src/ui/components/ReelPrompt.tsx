@@ -25,10 +25,15 @@ export const REEL_MISREAD_NOTICE = 'AI apps can misread a reel. Check the ingred
 export interface ReelPromptProps {
   /** Called with the checked URL when the user moves on to pasting the reply. */
   onPasteAnswer: (url: string) => void;
+  /** Add recipe controls which helper is open, so only one panel shows at a time. */
+  isOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
-export default function ReelPrompt({ onPasteAnswer }: ReelPromptProps) {
-  const [open, setOpen] = useState(false);
+export default function ReelPrompt({ onPasteAnswer, isOpen, onOpenChange }: ReelPromptProps) {
+  const [ownOpen, setOwnOpen] = useState(false);
+  const open = isOpen ?? ownOpen;
+  const setOpen = onOpenChange ?? setOwnOpen;
   const [reelUrl, setReelUrl] = useState('');
   const [message, setMessage] = useState('');
   // The paste step only follows a valid reel link.
@@ -68,7 +73,7 @@ export default function ReelPrompt({ onPasteAnswer }: ReelPromptProps) {
     <section className={styles.helper} aria-label="From an Instagram reel">
       <Button
         label={open ? 'Hide the reel prompt' : 'From an Instagram reel'}
-        onClick={() => setOpen((value) => !value)}
+        onClick={() => setOpen(!open)}
       />
       {open && (
         <div className={styles.panel}>
@@ -103,7 +108,7 @@ export default function ReelPrompt({ onPasteAnswer }: ReelPromptProps) {
           <div className={styles.row}>
             <Button label="Copy reel prompt" onClick={() => void copy()} />
             <a
-              className={styles.link}
+              className={`fm-link ${styles.link}`}
               href={META_AI_URL}
               target="_blank"
               rel="noopener noreferrer"
