@@ -537,6 +537,18 @@ describe('built-in recipes derive clean food keys (Item 3)', () => {
       'plantain',
       'coconut',
       'apricot',
+      // Batch 7 (task 14.3) recipes add these.
+      'avocado',
+      'epazote',
+      'mustard seed',
+      'dried chili',
+      'fenugreek',
+      'tortilla',
+      'mango',
+      'enchilada sauce',
+      'sausage',
+      'brussels sprout',
+      'pudding mix',
     ]);
   });
 
