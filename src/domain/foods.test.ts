@@ -588,7 +588,6 @@ describe('built-in recipes derive clean food keys (Item 3)', () => {
       'root vegetable',
       'tortilla chip',
       'tater tots',
-      'cornflakes',
       'salad greens',
       'ranch dressing',
     ]);

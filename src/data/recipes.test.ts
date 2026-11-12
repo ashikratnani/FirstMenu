@@ -2785,7 +2785,7 @@ const BATCH_10_EXPECTED: Record<string, Batch3Expectation> = {
   'b-fh-potato-wedges': { publisher: FH, stages: ['12-23', '24-36'], serveAs: ['finger-food'], allergens: [], servings: 8, estimateNote: ESTIMATE_HALF_CUP },
   'b-fh-asparagus-mushroom-melt': { publisher: FH, stages: ['24-36'], serveAs: ['pieces'], allergens: ['dairy'], servings: 8 },
   'b-fh-baked-tomatoes-with-cheese': { publisher: FH, stages: ['12-23'], serveAs: ['pieces'], allergens: ['dairy'], servings: 8 },
-  'b-fh-kale-dip': { publisher: FH, stages: ['12-23'], serveAs: ['mashed', 'finger-food'], allergens: ['dairy'], servings: 3, estimateNote: ESTIMATE_HALF_CUP },
+  'b-fh-kale-dip': { publisher: FH, stages: ['6-8', '9-12'], serveAs: ['puree', 'mashed'], allergens: ['dairy'], servings: 3, estimateNote: ESTIMATE_HALF_CUP },
   'b-fh-gingerbread-pancakes': { publisher: FH, stages: ['24-36'], serveAs: ['pieces'], allergens: ['dairy', 'egg', 'wheat'], servings: 8 },
   'b-fh-sesame-turnips-and-carrots': { publisher: FH, stages: ['24-36'], serveAs: ['pieces'], allergens: ['sesame'], servings: 6, estimateNote: ESTIMATE_HALF_CUP },
   'b-fh-rice-salad': { publisher: FH, stages: ['24-36'], serveAs: ['pieces'], allergens: ['dairy', 'tree nuts'], servings: 8, estimateNote: ESTIMATE_HALF_CUP },
@@ -2797,7 +2797,6 @@ const BATCH_10_EXPECTED: Record<string, Batch3Expectation> = {
   'b-unl-super-spaghetti-squash-bites': { publisher: UNL, stages: ['12-23', '24-36'], serveAs: ['finger-food'], allergens: ['dairy', 'egg', 'wheat'], servings: 5, estimateNote: 'Serving count is an estimate (the page gives the yield as about 20 bites): 4 bites per serving.' },
   'b-unl-banana-in-a-blanket': { publisher: UNL, stages: ['24-36'], serveAs: ['finger-food'], allergens: ['peanut', 'wheat'], servings: 1 },
   'b-unl-asian-cabbage-slaw': { publisher: UNL, stages: ['24-36'], serveAs: ['pieces'], allergens: ['sesame', 'soy'], servings: 6 },
-  'b-unl-easy-stir-fry': { publisher: UNL, stages: ['24-36'], serveAs: ['pieces'], allergens: ['soy'], servings: 4 },
   'b-unl-broccoli-slaw-with-cranberries': { publisher: UNL, stages: ['24-36'], serveAs: ['pieces'], allergens: ['soy', 'tree nuts'], servings: 11 },
   'b-unl-pork-rice-bowls': { publisher: UNL, stages: ['24-36'], serveAs: ['pieces'], allergens: ['dairy', 'soy'], servings: 6 },
   'b-unl-zucchini-and-kidney-bean-salad': { publisher: UNL, stages: ['24-36'], serveAs: ['pieces'], allergens: ['dairy'], servings: 6 },
@@ -2806,7 +2805,6 @@ const BATCH_10_EXPECTED: Record<string, Batch3Expectation> = {
   'b-tx-southwest-stuffed-bell-peppers': { publisher: TX, stages: ['24-36'], serveAs: ['pieces'], allergens: ['dairy'], servings: 4 },
   'b-tx-vegetable-stir-fry-with-peanut-sauce': { publisher: TX, stages: ['24-36'], serveAs: ['pieces'], allergens: ['peanut', 'soy'], servings: 4 },
   'b-tx-weeknight-chicken-and-rice-casserole': { publisher: TX, stages: ['24-36'], serveAs: ['pieces'], allergens: ['soy', 'tree nuts'], servings: 6 },
-  'b-mn-macaroni-and-cheese': { publisher: MN, stages: ['12-23'], serveAs: ['pieces'], allergens: ['dairy', 'wheat'], servings: 4 },
   'b-mn-broccoli-strata': { publisher: MN, stages: ['12-23'], serveAs: ['pieces'], allergens: ['dairy', 'egg', 'wheat'], servings: 6 },
   'b-mn-scrambled-egg-enchiladas': { publisher: MN, stages: ['24-36'], serveAs: ['finger-food'], allergens: ['dairy', 'egg'], servings: 4 },
   'b-mn-sesame-chicken': { publisher: MN, stages: ['24-36'], serveAs: ['pieces'], allergens: ['dairy', 'egg', 'sesame', 'soy', 'wheat'], servings: 4 },
@@ -2814,20 +2812,16 @@ const BATCH_10_EXPECTED: Record<string, Batch3Expectation> = {
   'b-mn-tofu-casserole': { publisher: MN, stages: ['24-36'], serveAs: ['pieces'], allergens: ['dairy', 'soy'], servings: 6 },
   'b-mn-hamburger-and-rice-hotdish': { publisher: MN, stages: ['24-36'], serveAs: ['pieces'], allergens: ['dairy', 'soy', 'wheat'], servings: 8 },
   'b-mn-broccoli': { publisher: MN, stages: ['24-36'], serveAs: ['finger-food'], allergens: ['soy'], servings: 6 },
-  'b-mn-broccoli-carrot-stir-fry': { publisher: MN, stages: ['24-36'], serveAs: ['finger-food'], allergens: ['soy'], servings: 4 },
   'b-mn-cauliflower-casserole': { publisher: MN, stages: ['24-36'], serveAs: ['pieces'], allergens: ['dairy', 'soy'], servings: 5 },
   'b-mn-scalloped-potatoes': { publisher: MN, stages: ['12-23'], serveAs: ['pieces'], allergens: ['dairy', 'wheat'], servings: 4 },
   'b-mn-bean-huevos-rancheros': { publisher: MN, stages: ['24-36'], serveAs: ['pieces'], allergens: ['dairy', 'egg', 'wheat'], servings: 3 },
   'b-mn-enchilada-bake': { publisher: MN, stages: ['12-23', '24-36'], serveAs: ['pieces'], allergens: ['dairy'], servings: 8 },
-  'b-mn-spicy-bean-burgers': { publisher: MN, stages: ['12-23'], serveAs: ['pieces'], allergens: ['egg'], servings: 4 },
   'b-mn-italian-broccoli-and-pasta': { publisher: MN, stages: ['24-36'], serveAs: ['pieces'], allergens: ['dairy'], servings: 4 },
   'b-mn-popovers': { publisher: MN, stages: ['12-23'], serveAs: ['finger-food'], allergens: ['dairy', 'egg', 'wheat'], servings: 12 },
   'b-mn-chicken-barley-soup': { publisher: MN, stages: ['24-36'], serveAs: ['pieces'], allergens: [], servings: 8 },
   'b-mn-spanish-rice-supreme': { publisher: MN, stages: ['12-23'], serveAs: ['pieces'], allergens: [], servings: 4 },
   'b-mn-skillet-stroganoff': { publisher: MN, stages: ['24-36'], serveAs: ['pieces'], allergens: ['dairy', 'egg', 'wheat'], servings: 4 },
   'b-mn-tator-tot-hotdish': { publisher: MN, stages: ['24-36'], serveAs: ['pieces'], allergens: ['dairy'], servings: 6 },
-  'b-mn-crispy-fish': { publisher: MN, stages: ['24-36'], serveAs: ['pieces'], allergens: ['dairy', 'fish'], servings: 6 },
-  'b-mn-bell-pepper-stir-fry': { publisher: MN, stages: ['24-36'], serveAs: ['finger-food'], allergens: [], servings: 4 },
   'b-mn-apple-cheddar-salad': { publisher: MN, stages: ['24-36'], serveAs: ['pieces'], allergens: ['dairy'], servings: 6 },
   'b-unl-berry-butterfly': { publisher: UNL, stages: ['12-23', '24-36'], serveAs: ['finger-food'], allergens: ['dairy', 'wheat'], servings: 1 },
   'b-unl-silly-sandwiches': { publisher: UNL, stages: ['24-36'], serveAs: ['finger-food'], allergens: ['dairy', 'wheat'], servings: 2 },
@@ -2838,10 +2832,8 @@ const BATCH_10_LEFT_OUT: Record<string, { adaptation: string; absent: RegExp }[]
   'b-fh-baked-tomatoes-with-cheese': [{ adaptation: 'Left out 1/4 teaspoon salt', absent: /\bsalt\b/i }],
   'b-fh-kale-dip': [{ adaptation: 'Left out 1/8 teaspoon salt', absent: /\bsalt\b/i }],
   'b-unl-roasted-root-vegetables': [{ adaptation: 'Left out 1/4 teaspoon salt', absent: /\bsalt\b/i }],
-  'b-mn-macaroni-and-cheese': [{ adaptation: 'Left out 1/2 teaspoon salt', absent: /\bsalt\b/i }],
   'b-mn-broccoli-strata': [{ adaptation: 'Left out 1/2 teaspoon salt', absent: /\bsalt\b/i }],
   'b-mn-scalloped-potatoes': [{ adaptation: 'Left out 1/4 teaspoon salt', absent: /\bsalt\b/i }],
-  'b-mn-spicy-bean-burgers': [{ adaptation: 'Left out 1/4 teaspoon salt', absent: /\bsalt\b/i }],
   'b-mn-popovers': [{ adaptation: 'Left out 1/4 teaspoon salt', absent: /\bsalt\b/i }],
   'b-mn-spanish-rice-supreme': [{ adaptation: 'Left out 1/2 teaspoon salt', absent: /\bsalt\b/i }],
 };
@@ -2856,7 +2848,6 @@ const BATCH_10_KEEPS_BLOCKED_AT_24 = [
   'b-fh-pineapple-veggie-chicken',
   'b-unl-banana-in-a-blanket',
   'b-unl-asian-cabbage-slaw',
-  'b-unl-easy-stir-fry',
   'b-unl-broccoli-slaw-with-cranberries',
   'b-unl-pork-rice-bowls',
   'b-unl-zucchini-and-kidney-bean-salad',
@@ -2867,11 +2858,8 @@ const BATCH_10_KEEPS_BLOCKED_AT_24 = [
   'b-mn-tofu-casserole',
   'b-mn-hamburger-and-rice-hotdish',
   'b-mn-broccoli',
-  'b-mn-broccoli-carrot-stir-fry',
   'b-mn-cauliflower-casserole',
   'b-mn-skillet-stroganoff',
-  'b-mn-crispy-fish',
-  'b-mn-bell-pepper-stir-fry',
 ];
 
 /** Pages that state their own serving count (no estimate needed). */
@@ -2884,7 +2872,6 @@ const BATCH_10_SOURCE_SERVINGS = [
   'b-unl-skillet-zucchini-and-mushrooms',
   'b-unl-banana-in-a-blanket',
   'b-unl-asian-cabbage-slaw',
-  'b-unl-easy-stir-fry',
   'b-unl-broccoli-slaw-with-cranberries',
   'b-unl-pork-rice-bowls',
   'b-unl-zucchini-and-kidney-bean-salad',
@@ -2893,7 +2880,6 @@ const BATCH_10_SOURCE_SERVINGS = [
   'b-tx-southwest-stuffed-bell-peppers',
   'b-tx-vegetable-stir-fry-with-peanut-sauce',
   'b-tx-weeknight-chicken-and-rice-casserole',
-  'b-mn-macaroni-and-cheese',
   'b-mn-broccoli-strata',
   'b-mn-scrambled-egg-enchiladas',
   'b-mn-sesame-chicken',
@@ -2901,20 +2887,16 @@ const BATCH_10_SOURCE_SERVINGS = [
   'b-mn-tofu-casserole',
   'b-mn-hamburger-and-rice-hotdish',
   'b-mn-broccoli',
-  'b-mn-broccoli-carrot-stir-fry',
   'b-mn-cauliflower-casserole',
   'b-mn-scalloped-potatoes',
   'b-mn-bean-huevos-rancheros',
   'b-mn-enchilada-bake',
-  'b-mn-spicy-bean-burgers',
   'b-mn-italian-broccoli-and-pasta',
   'b-mn-popovers',
   'b-mn-chicken-barley-soup',
   'b-mn-spanish-rice-supreme',
   'b-mn-skillet-stroganoff',
   'b-mn-tator-tot-hotdish',
-  'b-mn-crispy-fish',
-  'b-mn-bell-pepper-stir-fry',
   'b-mn-apple-cheddar-salad',
   'b-unl-berry-butterfly',
   'b-unl-silly-sandwiches',
@@ -2923,7 +2905,7 @@ const BATCH_10_SOURCE_SERVINGS = [
 describe('BUILTIN_RECIPES - batch 10', () => {
   it('has a pinned expectation for exactly the batch 10 recipes', () => {
     expect(BATCH_10_RECIPES.map((r) => r.id).sort()).toEqual(Object.keys(BATCH_10_EXPECTED).sort());
-    expect(BATCH_10_RECIPES.length).toBeGreaterThanOrEqual(45);
+    expect(BATCH_10_RECIPES.length).toBeGreaterThanOrEqual(43);
     expect(BATCH_10_RECIPES.length).toBeLessThanOrEqual(55);
   });
 
@@ -3101,7 +3083,8 @@ describe('BUILTIN_RECIPES - batch 10', () => {
 
   it('records the option each page offered and the step-derived ingredients', () => {
     const find = (id: string) => BATCH_10_RECIPES.find((r) => r.id === id);
-    expect(find('b-unl-easy-stir-fry')?.source?.adaptations).toContain('Used chicken (the page offers beef, pork, chicken, shrimp or tofu).');
+    expect(find('b-mn-chicken-barley-soup')?.source?.adaptations).toContain('Used chicken broth (the page offers chicken broth or prepared bouillon).');
+    expect(find('b-mn-broccoli-tofu-casserole')?.source?.adaptations).toContain('Used butter (the page offers butter or margarine).');
     expect(find('b-tx-vegetable-stir-fry-with-peanut-sauce')?.source?.adaptations).toContain('Used tofu (the page offers extra firm tofu or chicken).');
     expect(find('b-mn-broccoli-tofu-casserole')?.source?.adaptations).toContain('Used garlic powder (the page offers salt to taste or 1 1/2 teaspoons garlic powder).');
     expect(find('b-unl-pork-rice-bowls')?.source?.adaptations).toContain('The page gives the Sriracha as 1-2 teaspoons; the lower amount, 1 teaspoon, is entered.');
@@ -3124,12 +3107,12 @@ describe('BUILTIN_RECIPES - batch 10', () => {
   it('batch 10 fills the biggest gaps to the goal', () => {
     const cellCount = (stage: StageId, effort: Effort) =>
       BATCH_10_RECIPES.filter((r) => r.stages.includes(stage) && recipeEffort(r) === effort).length;
-    // Bounds are modest so a review-driven drop or retag does not break them.
+    // Bounds are modest so a review-driven drop or retag does not break them (set to the real counts after the round 1 review drops).
     expect(cellCount('12-23', 'easy')).toBeGreaterThanOrEqual(1);
-    expect(cellCount('12-23', 'medium')).toBeGreaterThanOrEqual(9);
+    expect(cellCount('12-23', 'medium')).toBeGreaterThanOrEqual(8);
     expect(cellCount('12-23', 'more')).toBeGreaterThanOrEqual(1);
     expect(cellCount('24-36', 'easy')).toBeGreaterThanOrEqual(4);
-    expect(cellCount('24-36', 'medium')).toBeGreaterThanOrEqual(18);
+    expect(cellCount('24-36', 'medium')).toBeGreaterThanOrEqual(17);
     expect(cellCount('24-36', 'more')).toBeGreaterThanOrEqual(12);
     expect(BUILTIN_RECIPES.length).toBeGreaterThanOrEqual(300);
   });
@@ -3184,8 +3167,8 @@ const GOAL: Counts = {
 
 /**
  * Floors for this batch (batch 10). Every floor is what the set reaches after
- * batch 10, capped at HARD_MINIMUM (the plan line for batch 10 is about 325; the
- * set has 427, so the total floor stays at the hard minimum of 300). Every
+ * batch 10, capped at HARD_MINIMUM (the plan line for batch 10 is about 365; the
+ * set has 421, so the total floor stays at the hard minimum of 300). Every
  * floor already equals HARD_MINIMUM since batch 8, so none is raised.
  */
 const CHECKPOINT: Counts = {

@@ -16,8 +16,9 @@
 //  - Every recipe comes from a published page of a publisher listed in
 //    docs/recipe-sources.md: UNL Food (Nebraska Extension), Food Hero (Oregon
 //    State University Extension), Texas WIC or Minnesota WIC. Pages were
-//    fetched on RETRIEVED. Ingredients and quantities are copied from the page; steps are
-//    reworded and keep the source's method, times, temperatures and tips.
+//    fetched on 2026-11-12. Ingredients and quantities are copied from the page;
+//    steps are reworded and keep the source's method, times, temperatures and
+//    tips.
 //  - An ingredient the screen blocks is left out (and recorded in
 //    source.adaptations) only when the screen blocks it at every stage the
 //    recipe is tagged with. A recipe that keeps salt, sugar, honey or maple
@@ -165,7 +166,7 @@ export const BATCH_10_RECIPES: Recipe[] = [
     servings: 8,
   },
   {
-    // Kale cooked with garlic, blended with cottage cheese, then flavored with red pepper flakes and lemon juice. The 1/8 teaspoon salt is left out, so the recipe is tagged 12-23 only (salt is blocked there).
+    // Kale cooked with garlic, blended with cottage cheese, then flavored with red pepper flakes and lemon juice. The page says to puree it until smooth (and gives a mash-with-a-fork version), so it is tagged 6-8 and 9-12 only, like the earlier blended dips (puree and mash only, so no toddler tag). Nothing in it is blocked at those stages; the 1/8 teaspoon salt is blocked at both, so it is left out.
     id: 'b-fh-kale-dip',
     origin: 'builtin',
     source: {
@@ -182,8 +183,8 @@ export const BATCH_10_RECIPES: Recipe[] = [
       ],
     },
     title: 'Kale Dip',
-    stages: ['12-23'],
-    serveAs: ['mashed', 'finger-food'],
+    stages: ['6-8', '9-12'],
+    serveAs: ['puree', 'mashed'],
     mealTypes: ['snack'],
     ingredients: [
       { name: 'vegetable oil', food: 'vegetable oil', quantity: 1.5, unit: 'tsp', category: 'pantry' },
@@ -356,7 +357,7 @@ export const BATCH_10_RECIPES: Recipe[] = [
     source: {
       title: 'Pineapple Veggie Chicken',
       publisher: FH_PUBLISHER,
-      url: 'https://foodhero.org/recipes/asian-citrus-chicken',
+      url: 'https://foodhero.org/recipes/pineapple-veggie-chicken',
       retrieved: RETRIEVED,
       adaptations: [
         ESTIMATE_ONE_CUP,
@@ -386,7 +387,7 @@ export const BATCH_10_RECIPES: Recipe[] = [
       { name: 'medium tomato, cut in wedges', food: 'tomato', quantity: 1, unit: 'piece', category: 'produce' },
     ],
     steps: [
-      'Heat the oil in a large skillet over medium-high heat (350°F in an electric skillet).',
+      'Warm the oil in a big skillet on medium-high (350°F if you use an electric skillet).',
       'Cook the chicken, ginger and garlic 5 minutes, until the chicken is no longer pink.',
       'Pour in the saved pineapple juice, the broth and the vinegar, cover and simmer 5 minutes.',
       'Add the sliced vegetables, cover and cook 3 minutes.',
@@ -586,45 +587,6 @@ export const BATCH_10_RECIPES: Recipe[] = [
     servings: 6,
   },
   {
-    // Onion and cubed chicken stir-fried with vegetables, then a sauce of water, cornstarch, lemon juice, sugar and soy sauce, served over brown rice. Soy sauce and sugar kept, so 24-36 only.
-    id: 'b-unl-easy-stir-fry',
-    origin: 'builtin',
-    source: {
-      title: 'Easy Stir Fry',
-      publisher: UNL_PUBLISHER,
-      url: 'https://food.unl.edu/recipe/easy-stir-fry/',
-      retrieved: RETRIEVED,
-      adaptations: [
-        'Used chicken (the page offers beef, pork, chicken, shrimp or tofu).',
-        'Used a 14 ounce package of frozen stir-fry vegetables, thawed (the page also offers 4 cups of fresh chopped vegetables).',
-      ],
-    },
-    title: 'Easy Stir Fry',
-    stages: ['24-36'],
-    serveAs: ['pieces'],
-    mealTypes: ['dinner'],
-    ingredients: [
-      { name: 'vegetable oil', food: 'vegetable oil', quantity: 1, unit: 'tbsp', category: 'pantry' },
-      { name: 'small onion, sliced', food: 'onion', quantity: 1, unit: 'piece', category: 'produce' },
-      { name: 'chicken, cubed or thinly sliced', food: 'chicken', quantity: 1, unit: 'lb', category: 'protein' },
-      { name: 'frozen stir-fry vegetables, thawed (1 package, 14 ounces)', food: 'mixed vegetables', quantity: 1, unit: 'package', category: 'frozen' },
-      { name: 'water', food: 'water', quantity: 0.75, unit: 'cup', category: 'pantry' },
-      { name: 'cornstarch', food: 'cornstarch', quantity: 1, unit: 'tbsp', category: 'pantry' },
-      { name: 'lemon juice', food: 'lemon juice', quantity: 1, unit: 'tsp', category: 'produce' },
-      { name: 'sugar', food: 'sugar', quantity: 1, unit: 'tsp', category: 'pantry' },
-      { name: 'soy sauce', food: 'soy sauce', quantity: 2, unit: 'tbsp', category: 'pantry' },
-      { name: 'cooked brown rice', food: 'brown rice', quantity: 2, unit: 'cup', category: 'grains' },
-    ],
-    steps: [
-      'Heat the oil in a large skillet and saute the onion 1 minute.',
-      'Add the chicken and stir-fry until nearly cooked through. Add the vegetables and cook 2 to 4 minutes, adding water if needed, until the chicken is cooked through.',
-      'Mix the water, cornstarch, lemon juice, sugar and soy sauce well in a separate bowl.',
-      'Pour the sauce over the vegetables and heat 2 to 3 minutes, until thickened. Serve over the rice.',
-    ],
-    texture: 'chicken and vegetable stir-fry over rice',
-    servings: 4,
-  },
-  {
     // Broccoli slaw with green onions, slivered almonds and dried cranberries in an oil, vinegar, soy sauce and honey dressing, chilled an hour. Raw crunchy slaw, almond slivers, honey, soy sauce and optional salt, so 24-36 only.
     id: 'b-unl-broccoli-slaw-with-cranberries',
     origin: 'builtin',
@@ -670,7 +632,10 @@ export const BATCH_10_RECIPES: Recipe[] = [
       publisher: UNL_PUBLISHER,
       url: 'https://food.unl.edu/recipe/ground-pork-rice-bowls/',
       retrieved: RETRIEVED,
-      adaptations: ['The page gives the Sriracha as 1-2 teaspoons; the lower amount, 1 teaspoon, is entered.'],
+      adaptations: [
+        'The page gives the Sriracha as 1-2 teaspoons; the lower amount, 1 teaspoon, is entered.',
+        'The page only says to drizzle with spicy sour cream and does not give the method; mixing the sour cream and Sriracha together is added.',
+      ],
     },
     title: 'Pork Rice Bowls',
     stages: ['24-36'],
@@ -888,7 +853,6 @@ export const BATCH_10_RECIPES: Recipe[] = [
       retrieved: RETRIEVED,
       adaptations: [
         'Used slivered almonds (the page offers slivered almonds or chopped peanuts, optional).',
-        'The page names the cooking spray only in the steps; it is listed as an ingredient here.',
       ],
     },
     title: 'Weeknight Chicken and Rice Casserole',
@@ -913,42 +877,6 @@ export const BATCH_10_RECIPES: Recipe[] = [
     ],
     texture: 'chicken, rice and pea casserole',
     servings: 6,
-  },
-  {
-    // Elbow macaroni in a butter, flour and milk sauce with American cheese. The 1/2 teaspoon salt is left out, so the recipe is tagged 12-23 only (salt is blocked there). The page variations and the baked option are not included.
-    id: 'b-mn-macaroni-and-cheese',
-    origin: 'builtin',
-    source: {
-      title: 'Macaroni & Cheese',
-      publisher: MN_PUBLISHER,
-      url: 'https://www.health.state.mn.us/people/wic/recipes/main.html#macaroni',
-      retrieved: RETRIEVED,
-      adaptations: [
-        'The page gives 4-6 servings; the lower count, 4, is used.',
-        'Only the stovetop method is written into the steps (the page also gives a baked version).',
-        'Left out 1/2 teaspoon salt',
-      ],
-    },
-    title: 'Macaroni & Cheese',
-    stages: ['12-23'],
-    serveAs: ['pieces'],
-    mealTypes: ['lunch', 'dinner'],
-    ingredients: [
-      { name: 'dry elbow macaroni, spirals or wheels', food: 'pasta', quantity: 2, unit: 'cup', category: 'grains' },
-      { name: 'butter', food: 'butter', quantity: 3, unit: 'tbsp', category: 'dairy-eggs' },
-      { name: 'flour', food: 'flour', quantity: 3, unit: 'tbsp', category: 'grains' },
-      { name: 'pepper', food: 'black pepper', quantity: 0.125, unit: 'tsp', category: 'pantry' },
-      { name: 'milk', food: 'milk', quantity: 2, unit: 'cup', category: 'dairy-eggs' },
-      { name: 'American cheese, shredded or cut into cubes', food: 'american cheese', quantity: 2, unit: 'cup', category: 'dairy-eggs' },
-    ],
-    steps: [
-      'Cook the macaroni following the package directions and drain it well.',
-      'Melt the butter in a separate pan, stir in the flour and pepper until smooth, then add the milk slowly while stirring.',
-      'Cook over medium heat, stirring all the time, until the sauce boils and thickens.',
-      'Stir in the cheese and cook until it melts. Add the macaroni and heat through.',
-    ],
-    texture: 'macaroni in cheese sauce',
-    servings: 4,
   },
   {
     // Layers of bread, cooked broccoli, cheese and chicken soaked in an egg and milk mixture, chilled, then baked. The 1/2 teaspoon salt is left out, so the recipe is tagged 12-23 only (salt is blocked there). The onion variation is not included.
@@ -1076,6 +1004,7 @@ export const BATCH_10_RECIPES: Recipe[] = [
         'The page gives a 10-12 ounce can of soup; 10 ounces, the low end, is used.',
         'The page gives a 12-16 ounce package of tofu; 12 ounces, the low end, is used.',
         'Used garlic powder (the page offers salt to taste or 1 1/2 teaspoons garlic powder).',
+        'Used butter (the page offers butter or margarine).',
       ],
     },
     title: 'Broccoli Tofu Casserole',
@@ -1214,43 +1143,6 @@ export const BATCH_10_RECIPES: Recipe[] = [
     ],
     texture: 'crisp-tender broccoli',
     servings: 6,
-  },
-  {
-    // Broccoli, carrots, onion, garlic and ginger cooked in a covered pan, then uncovered until crisp-tender, finished with soy sauce. Soy sauce and crisp-tender vegetables, so 24-36 only.
-    id: 'b-mn-broccoli-carrot-stir-fry',
-    origin: 'builtin',
-    source: {
-      title: 'Broccoli Carrot Stir-Fry',
-      publisher: MN_PUBLISHER,
-      url: 'https://www.health.state.mn.us/people/wic/recipes/fv.html#broccolicarrot',
-      retrieved: RETRIEVED,
-      adaptations: [
-        'The page gives 4-6 servings; the lower count, 4, is used.',
-        'Used minced garlic (the page offers 1 teaspoon minced garlic or 1/2 teaspoon garlic powder).',
-      ],
-    },
-    title: 'Broccoli Carrot Stir-Fry',
-    stages: ['24-36'],
-    serveAs: ['finger-food'],
-    mealTypes: ['dinner'],
-    ingredients: [
-      { name: 'vegetable oil', food: 'vegetable oil', quantity: 1, unit: 'tbsp', category: 'pantry' },
-      { name: 'head broccoli, cut into florets', food: 'broccoli', quantity: 1, unit: 'piece', category: 'produce' },
-      { name: 'thinly sliced carrots', food: 'carrot', quantity: 1, unit: 'cup', category: 'produce' },
-      { name: 'onion, chopped', food: 'onion', quantity: 1, unit: 'piece', category: 'produce' },
-      { name: 'minced garlic', food: 'garlic', quantity: 1, unit: 'tsp', category: 'produce' },
-      { name: 'ground ginger', food: 'ginger', quantity: 0.5, unit: 'tsp', category: 'pantry' },
-      { name: 'water', food: 'water', quantity: 2, unit: 'tbsp', category: 'pantry' },
-      { name: 'soy sauce', food: 'soy sauce', quantity: 1, unit: 'tbsp', category: 'pantry' },
-    ],
-    steps: [
-      'Warm the oil in a large frying pan on medium-high.',
-      'Mix the broccoli, carrots, onion, garlic and ginger in a large bowl, then tip them into the pan and add the water.',
-      'Cover and cook 3 minutes over medium heat. Take the lid off, turn the heat up to high and cook, stirring, about 5 minutes more, until the vegetables are crisp-tender.',
-      'Stir in the soy sauce and serve.',
-    ],
-    texture: 'crisp-tender broccoli and carrot stir-fry',
-    servings: 4,
   },
   {
     // Cauliflower pieces and onion cooked in oil, mixed with soy sauce, garlic powder, cooked rice and cheese and baked 30 minutes. Soy sauce kept, so 24-36 only. The mushroom variation is not included.
@@ -1401,42 +1293,6 @@ export const BATCH_10_RECIPES: Recipe[] = [
     servings: 8,
   },
   {
-    // Pinto beans, egg, chili powder and crisp rice cereal mashed and shaped into patties, coated with crushed cereal and pan-fried. The 1/4 teaspoon salt is left out, so the recipe is tagged 12-23 only (salt is blocked there). The page also suggests picante sauce or salsa, which is not included.
-    id: 'b-mn-spicy-bean-burgers',
-    origin: 'builtin',
-    source: {
-      title: 'Spicy Bean Burgers',
-      publisher: MN_PUBLISHER,
-      url: 'https://www.health.state.mn.us/people/wic/recipes/cereals.html#spicy',
-      retrieved: RETRIEVED,
-      adaptations: [
-        'Used onion (the page offers onion or bell pepper).',
-        'Left out 1/4 teaspoon salt',
-      ],
-    },
-    title: 'Spicy Bean Burgers',
-    stages: ['12-23'],
-    serveAs: ['pieces'],
-    mealTypes: ['lunch', 'dinner'],
-    ingredients: [
-      { name: 'crisp rice cereal', food: 'cereal', quantity: 2.25, unit: 'cup', category: 'grains' },
-      { name: 'pinto beans, drained and rinsed (1 can, 15 ounces)', food: 'pinto bean', quantity: 1, unit: 'can', category: 'produce' },
-      { name: 'egg, slightly beaten', food: 'egg', quantity: 1, unit: 'piece', category: 'dairy-eggs' },
-      { name: 'water', food: 'water', quantity: 2, unit: 'tbsp', category: 'pantry' },
-      { name: 'chili powder', food: 'chili powder', quantity: 2, unit: 'tsp', category: 'pantry' },
-      { name: 'finely chopped onion', food: 'onion', quantity: 0.333, unit: 'cup', category: 'produce' },
-      { name: 'vegetable oil', food: 'vegetable oil', quantity: 2, unit: 'tsp', category: 'pantry' },
-    ],
-    steps: [
-      'Crush 3/4 cup of the cereal into fine crumbs and set them aside.',
-      'Mix the rest of the cereal (1 1/2 cups) with the beans, egg, water and chili powder, and coarsely mash the mixture with a potato masher. Stir in the onion.',
-      'Measure out 4 portions with a 1/2 cup measure and shape each into a patty 1/2 inch thick, then coat them with the crushed cereal.',
-      'Spray a big nonstick skillet with nonstick cooking spray, set it over medium-high heat and fry the patties 6 to 10 minutes, turning once, until golden brown. Add oil to the pan as needed.',
-    ],
-    texture: 'mashed bean patties',
-    servings: 4,
-  },
-  {
     // Fettuccini topped with broccoli and green onions cooked briefly, then oregano, pepper and canned tomatoes. Broccoli cooked only 3 minutes and canned stewed tomatoes, so 24-36 only.
     id: 'b-mn-italian-broccoli-and-pasta',
     origin: 'builtin',
@@ -1513,7 +1369,7 @@ export const BATCH_10_RECIPES: Recipe[] = [
       publisher: MN_PUBLISHER,
       url: 'https://www.health.state.mn.us/people/wic/recipes/breads.html#chicken',
       retrieved: RETRIEVED,
-      adaptations: [],
+      adaptations: ['Used chicken broth (the page offers chicken broth or prepared bouillon).'],
     },
     title: 'Chicken Barley Soup',
     stages: ['24-36'],
@@ -1650,78 +1506,6 @@ export const BATCH_10_RECIPES: Recipe[] = [
     ],
     texture: 'layered beef, vegetable and tater tot hotdish',
     servings: 6,
-  },
-  {
-    // Fish fillets dipped in milk with garlic powder and optional hot sauce, coated in crushed cornflakes with pepper, salt and onion powder and baked 20 minutes. Salt and optional hot sauce kept, so 24-36 only.
-    id: 'b-mn-crispy-fish',
-    origin: 'builtin',
-    source: {
-      title: 'Crispy Fish',
-      publisher: MN_PUBLISHER,
-      url: 'https://www.health.state.mn.us/people/wic/recipes/main.html#crispy',
-      retrieved: RETRIEVED,
-      adaptations: [
-        'Used milk (the page offers milk or buttermilk).',
-        'Used 3 cups of cornflakes (the page also offers 1 cup of dry bread crumbs).',
-      ],
-    },
-    title: 'Crispy Fish',
-    stages: ['24-36'],
-    serveAs: ['pieces'],
-    mealTypes: ['dinner'],
-    ingredients: [
-      { name: 'no-stick cooking spray', food: 'nonstick cooking spray', category: 'pantry' },
-      { name: 'fish fillets, thawed', food: 'white fish', quantity: 2, unit: 'lb', category: 'protein' },
-      { name: 'milk', food: 'milk', quantity: 0.75, unit: 'cup', category: 'dairy-eggs' },
-      { name: 'hot sauce (optional)', food: 'hot sauce', quantity: 2, unit: 'dash', category: 'pantry', optional: true },
-      { name: 'garlic powder', food: 'garlic powder', quantity: 0.25, unit: 'tsp', category: 'pantry' },
-      { name: 'cornflakes', food: 'cornflakes', quantity: 3, unit: 'cup', category: 'grains' },
-      { name: 'pepper', food: 'black pepper', quantity: 0.25, unit: 'tsp', category: 'pantry' },
-      { name: 'salt', food: 'salt', quantity: 0.25, unit: 'tsp', category: 'pantry' },
-      { name: 'onion powder', food: 'onion powder', quantity: 0.25, unit: 'tsp', category: 'pantry' },
-    ],
-    steps: [
-      'Heat the oven to 350°F and spray a baking dish with no-stick cooking spray. Rinse the fish and pat it dry with paper towels.',
-      'Combine the milk, hot sauce (2 drops) and garlic powder in a shallow bowl.',
-      'Put the cornflakes in a resealable plastic bag and crush them into fine crumbs. Add the pepper, salt and onion powder, shake to combine and pour into another shallow bowl.',
-      'Dip each piece of fish in the milk, then in the crumbs to coat it completely, and set it on the prepared baking dish.',
-      'Bake 20 minutes, until cooked through.',
-    ],
-    texture: 'cornflake-crusted baked fish',
-    servings: 6,
-  },
-  {
-    // Zucchini, red and green bell peppers and carrots cooked in oil, with vinegar and salt and pepper to taste, until crisp-tender. Salt kept and crisp-tender vegetables, so 24-36 only. The red cabbage variation is not included.
-    id: 'b-mn-bell-pepper-stir-fry',
-    origin: 'builtin',
-    source: {
-      title: 'Bell Pepper Stir-Fry',
-      publisher: MN_PUBLISHER,
-      url: 'https://www.health.state.mn.us/people/wic/recipes/fv.html#bell',
-      retrieved: RETRIEVED,
-      adaptations: ['The page gives 4-6 servings; the lower count, 4, is used.'],
-    },
-    title: 'Bell Pepper Stir-Fry',
-    stages: ['24-36'],
-    serveAs: ['finger-food'],
-    mealTypes: ['lunch', 'dinner'],
-    ingredients: [
-      { name: 'vegetable oil', food: 'vegetable oil', quantity: 2, unit: 'tbsp', category: 'pantry' },
-      { name: 'sliced zucchini', food: 'zucchini', quantity: 1, unit: 'cup', category: 'produce' },
-      { name: 'large red bell peppers, chopped', food: 'bell pepper', quantity: 2, unit: 'piece', category: 'produce' },
-      { name: 'large green bell peppers, chopped', food: 'bell pepper', quantity: 2, unit: 'piece', category: 'produce' },
-      { name: 'thinly sliced carrots', food: 'carrot', quantity: 1, unit: 'cup', category: 'produce' },
-      { name: 'vinegar', food: 'vinegar', quantity: 4, unit: 'tsp', category: 'pantry' },
-      { name: 'salt, to taste', food: 'salt', category: 'pantry' },
-      { name: 'pepper, to taste', food: 'black pepper', category: 'pantry' },
-    ],
-    steps: [
-      'Heat the oil in a large frying pan over medium heat.',
-      'Add the zucchini, peppers and carrots and cook, stirring, for 5 minutes.',
-      'Add the vinegar, salt and pepper and cook and stir about 5 minutes more, until the vegetables are crisp-tender.',
-    ],
-    texture: 'crisp-tender zucchini, pepper and carrot stir-fry',
-    servings: 4,
   },
   {
     // Chopped apple with peel and cubed cheddar in a lemon juice, honey and oil dressing, served over salad greens. Raw apple, cheese cubes and honey, so 24-36 only.
