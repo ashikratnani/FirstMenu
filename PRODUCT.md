@@ -22,7 +22,7 @@ Answer "What can I make for my baby with what I have?" The parent sets her usual
 
 ## Positioning
 
-A free, no-account, no-backend app that checks every recipe against a fixed, source-cited infant-safety list in the browser, and tracks first tastes as a game-like theme (mystery doors, friendly monsters, ghosts).
+Undecided (not stated in the sources).
 
 ## Operating Context
 
@@ -54,8 +54,7 @@ A free, no-account, no-backend app that checks every recipe against a fixed, sou
 
 ## Evidence on Hand
 
-- Built-in recipes: 221 sourced recipes and 13 simple ideas (`docs/recipe-sources.md`, `src/data/`).
-- Sources page lists the safety-rule sources.
+- Built-in recipes and their publishers: `docs/recipe-sources.md`. The Sources page lists the nutrition tag food lists and their sources (active Requirement 11.3).
 - Inspiration notes: `docs/design-inspiration.md` (patterns only, never copy another site).
 - Absent and not to be invented: user testimonials, usage data, photographs, press, a logo file.
 

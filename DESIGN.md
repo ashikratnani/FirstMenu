@@ -67,15 +67,15 @@ Figtree, self-hosted through `@fontsource/figtree` (imported in `ThemeRoot.tsx`)
 
 ## Layout
 
-Single column on phones (360 px and up); the top nav collapses to a drawer. On desktop the nav sits in one top bar and content is centered in a column. Result and recipe lists use a card grid of `repeat(auto-fill, minmax(240px, 1fr))` (`Make.module.css`, `Recipes.module.css`), so the column count depends on width. Spacing comes from Astryx tokens and CSS modules in `src/ui/pages/*.module.css`.
+The app must work from 360 px wide and up (`.kiro/steering/tech.md`). Undecided (not stated in the sources): the page grid, column counts and spacing scale.
 
 ## Elevation & Depth
 
-Flat. Cards are white with a thin border on cream; no shadows are set by FirstMenu.
+`firstmenu.css` sets no shadows. Cards use the white card color (`--color-background-card`) and the quiet border color. Anything more: Undecided (not stated in the sources).
 
 ## Shapes
 
-Rounded corners from the Astryx neutral theme (rounded cards, pill-like chips and tags). Radii are not set in `firstmenu.css`.
+Rounded shapes are required by `.kiro/steering/product.md`. Radii are not set in `firstmenu.css`; Astryx's neutral theme supplies them.
 
 ## Components
 
@@ -85,13 +85,13 @@ Astryx components are used throughout and stay (issue #37). Native controls stay
 One filled primary button per screen (Requirement 17.10), orange with white text. The primary action is coordinated through `usePagePrimaryAction` and `PrimaryAction`: on screens without their own primary, the nav "Add recipe" button is the filled one. Everything else is a quiet gray or outlined button.
 
 ### Chips and tags
-Food-group tags (green tint: Vegetable, Fruit, Iron-rich and others), peach "New food:" tags, a pumpkin "Freezes for N months" badge. Pantry and on-hand foods are chips; toggle buttons are Astryx `ToggleButton`.
+Food-group tags (Iron-rich, Vegetable and others, active spec Requirement 5) and a pumpkin-yellow freezer badge (`firstmenu.css`). On-hand foods are shown as chips (active spec Requirement 16). Tag and chip colors beyond that: Undecided (not stated in the sources).
 
 ### Cards
-White, thin border, used for recipe results, plan days and notices (`ResultCard`, `Suggestion`, `GhostCard`, `MysteryDoor`, `FriendlyMonster`).
+White card color, used for the ghost, door and monster states and recipe results. Anything more: Undecided (not stated in the sources).
 
 ### Navigation
-Top nav: FirstMenu, Make, My recipes, Add recipe, Foods, Plan, Sources, Settings. The Plan area has its own tabs: Week, Prep, Grocery, Share, Print.
+Main navigation, in order: Make, My recipes, Add recipe, Foods, Plan, Sources, Settings (active Requirement 1.2). The Plan area has its own tabs: Week, Prep, Grocery, Share, Print.
 
 ### Disclaimer
 `Disclaimer.tsx` wording is fixed by requirements and tests. It may be restyled, never reworded, shortened, moved or removed.
