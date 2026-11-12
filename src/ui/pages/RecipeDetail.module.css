@@ -299,15 +299,9 @@
   margin: 0 0 var(--space);
 }
 
-/* 44 px targets on this page (buttons, source links). */
+/* 44 px targets on this page (buttons). The Source link sits inside a
+   sentence, so it stays inline (WCAG 2.5.8 exempts inline links). */
 .page button {
-  min-height: 44px;
-}
-
-.source a,
-.sourceLink {
-  display: inline-flex;
-  align-items: center;
   min-height: 44px;
 }
 

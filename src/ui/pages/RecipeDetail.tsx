@@ -428,7 +428,6 @@ export default function RecipeDetail() {
                 href={source.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={styles.sourceLink}
               >
                 {source.title}
               </ExternalLink>
