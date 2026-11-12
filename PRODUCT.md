@@ -26,7 +26,7 @@ Undecided (not stated in the sources).
 
 ## Operating Context
 
-- Used on a phone, also on desktop. Must work from 360 px wide and up and be fully keyboard-usable.
+- Used on a phone. Must work from 360 px wide and up and be fully keyboard-usable.
 - All data lives in the browser's `localStorage`. One child per device. The user can export all data to JSON and import it back.
 - Recipes arrive by pasting a ChatGPT reply or an Instagram caption; the app can write the ChatGPT or Meta AI question for her. The app never calls an AI service and never opens Instagram links.
 - Screens: Make (home), My recipes, recipe page, recipe editor, Add recipe, Foods, Sources, Settings, onboarding, and under Plan: Week, Prep, Grocery, Share, Print. Read-only shared plan (`/shared/:data`) and shared recipe (`/r/:data`) views sit outside the app shell.

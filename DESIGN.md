@@ -36,7 +36,7 @@ This file records the incumbent system as it is today. It is built only from `sr
 
 ## Overview
 
-A friendly, calm app for a tired parent. Warm cream page, white cards, one soft orange accent, lavender and orange tints for the themed states. Light mode only (`<Theme mode="light">`). Rounded shapes and smiling inline-SVG characters: friendly ghost, mystery door, friendly monster, pumpkin. It is an Operate-mode product (see `.kiro/steering/design-skills.md`): the look serves speed and clarity. No hero, no photos, no hosted fonts.
+A friendly, calm app for a tired parent. Warm cream page, white cards, one soft orange accent, lavender and orange tints for some states. Light mode only (`<Theme mode="light">`). Rounded shapes and smiling inline-SVG characters: friendly ghost, mystery door, friendly monster, pumpkin. It is an Operate-mode product (see `.kiro/steering/design-skills.md`): the look serves speed and clarity. No hero, no photos, no hosted fonts.
 
 ## Colors
 
@@ -52,8 +52,8 @@ Defined as overrides of the Astryx neutral theme in `src/ui/theme/firstmenu.css`
 - **Border** (`#eadccf`) for quiet edges; **emphasized border** (`#9c8574`, 3.49:1 on white) for controls that need 3:1.
 
 ### Themed state colors
-- **Lavender** (`#efe7f7`, border `#cdbdf0`, text `#4a2f5e`): ghost, door and monster states.
-- **Peach** (`#fde6d3`, border `#f0b98f`, text `#7a3410`).
+- **Lavender** (`#efe7f7`, border `#cdbdf0`, text `#4a2f5e`): ghosted recipe cards (`Recipes.tsx:83`) and active filter tokens (`Make.tsx:403`).
+- **Peach** (`#fde6d3`, border `#f0b98f`, text `#7a3410`): the mystery-door badge (`ResultCard.tsx:55`, `Recipes.tsx:100`) and the suggested meal chip (`Make.tsx:415`).
 - **Pumpkin yellow** (`#fae19e`, text `#4b3900`): the freezer badge.
 
 ### Named Rules
@@ -71,7 +71,7 @@ The app must work from 360 px wide and up (`.kiro/steering/tech.md`). Undecided 
 
 ## Elevation & Depth
 
-`firstmenu.css` sets no shadows. Cards use the white card color (`--color-background-card`) and the quiet border color. Anything more: Undecided (not stated in the sources).
+`firstmenu.css` sets no shadows. Cards use the white card color (`--color-background-card`) Anything more: Undecided (not stated in the sources).
 
 ## Shapes
 
@@ -88,7 +88,7 @@ One filled primary button per screen (Requirement 17.10), orange with white text
 Food-group tags (Iron-rich, Vegetable and others, active spec Requirement 5) and a pumpkin-yellow freezer badge (`firstmenu.css`). On-hand foods are shown as chips (active spec Requirement 16). Tag and chip colors beyond that: Undecided (not stated in the sources).
 
 ### Cards
-White card color, used for the ghost, door and monster states and recipe results. Anything more: Undecided (not stated in the sources).
+White card color, used for recipe results. Anything more: Undecided (not stated in the sources).
 
 ### Navigation
 Main navigation, in order: Make, My recipes, Add recipe, Foods, Plan, Sources, Settings (active Requirement 1.2). The Plan area has its own tabs: Week, Prep, Grocery, Share, Print.
