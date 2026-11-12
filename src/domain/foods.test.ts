@@ -563,6 +563,15 @@ describe('built-in recipes derive clean food keys (Item 3)', () => {
       'lamb',
       'garlic scape',
       'pickle',
+      'lemon',
+      'ham',
+      'caraway',
+      'pasta sauce',
+      'pasta',
+      'refried beans',
+      'sunflower seed butter',
+      'spaghetti',
+      'chili sauce',
     ]);
   });
 
