@@ -43,3 +43,19 @@
   align-items: flex-end;
   gap: 8px;
 }
+
+.addRow button {
+  min-height: 44px;
+}
+
+/* The whole label row of a checkbox is the tap target. */
+.checklist li {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+}
+.checklist li label {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+}

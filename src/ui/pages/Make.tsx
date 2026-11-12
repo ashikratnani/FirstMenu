@@ -315,27 +315,7 @@ export default function Make() {
     <>
       <h1 className={styles.heading}>What can I make?</h1>
 
-      {setupOpen ? (
-        <section className={styles.panel} aria-labelledby="make-setup">
-          <h2 id="make-setup" className={styles.panelHeading}>
-            Set up your pantry
-          </h2>
-          <p className={styles.hint}>
-            Tap the foods you usually have at home. You only do this once, and you can
-            change it any time.
-          </p>
-          <PantryEditor idPrefix="setup" />
-          <div className={styles.row}>
-            <Button
-              label={state.pantry.length > 0 ? 'Done' : 'Skip for now'}
-              onClick={() => {
-                dispatch({ type: 'dismissSuggestion', id: PANTRY_SETUP_ID, at: new Date().toISOString() });
-                setSetupOpen(false);
-              }}
-            />
-          </div>
-        </section>
-      ) : (
+      {!setupOpen && (
         <p className={styles.pantryRow}>
           <span>
             Pantry: {state.pantry.length} {plural(state.pantry.length, 'food', 'foods')}
@@ -349,7 +329,16 @@ export default function Make() {
         <div className={styles.dialogBody}>
           <PantryEditor idPrefix="dialog" />
           <div className={styles.row}>
-            <Button label="Done" onClick={() => setPantryOpen(false)} />
+            <Button
+              label="Done"
+              onClick={() => {
+                setPantryOpen(false);
+                if (setupOpen && state.pantry.length > 0) {
+                  dispatch({ type: 'dismissSuggestion', id: PANTRY_SETUP_ID, at: new Date().toISOString() });
+                  setSetupOpen(false);
+                }
+              }}
+            />
           </div>
         </div>
       </Dialog>
@@ -366,6 +355,11 @@ export default function Make() {
           }}
           onCommit={commit}
         />
+        {setupOpen && (
+          <div className={styles.setupPrompt}>
+            <Button label="Set up your pantry" size="sm" onClick={() => setPantryOpen(true)} />
+          </div>
+        )}
 
         {typedFoods.length > 0 && (
           <ul className={styles.chips} aria-label="Recognized foods">
@@ -462,8 +456,8 @@ export default function Make() {
               onDismiss={() => dismiss(NEW_FOOD_ID)}
             >
               <p className={styles.bannerText}>
-                <Link to={`/recipes/${newFood.result.recipe.id}`}>{newFood.result.recipe.title}</Link>{' '}
-                introduces <Link to="/foods">{foodLabel(newFood.food)}</Link>.
+                <Link className="fm-link" to={`/recipes/${newFood.result.recipe.id}`}>{newFood.result.recipe.title}</Link>{' '}
+                introduces <Link className="fm-link" to="/foods">{foodLabel(newFood.food)}</Link>.
               </p>
             </Suggestion>
           );
@@ -560,6 +554,7 @@ export default function Make() {
         <ToggleButton
           label="Iron-rich only"
           size="sm"
+          className="fm-toggle"
           isPressed={ironRichOnly}
           onPressedChange={(on) => {
             if (on) setManualFilters((current) => setIronRichFilter(current, true));
@@ -569,6 +564,7 @@ export default function Make() {
         <ToggleButton
           label="All stages"
           size="sm"
+          className="fm-toggle"
           isPressed={allStages}
           onPressedChange={setAllStages}
         />
@@ -578,6 +574,28 @@ export default function Make() {
         renderGroup('make-ready', 'Ready now', groups.readyNow, false)}
       {groups.missingOne.length > 0 &&
         renderGroup('make-missing', 'Missing one', groups.missingOne, true)}
+
+      {setupOpen && (
+        <section className={styles.panel} aria-labelledby="make-setup">
+          <h2 id="make-setup" className={styles.panelHeading}>
+            Set up your pantry
+          </h2>
+          <p className={styles.hint}>
+            Tap the foods you usually have at home. You only do this once, and you can
+            change it any time.
+          </p>
+          <PantryEditor idPrefix="setup" />
+          <div className={styles.row}>
+            <Button
+              label={state.pantry.length > 0 ? 'Done' : 'Skip for now'}
+              onClick={() => {
+                dispatch({ type: 'dismissSuggestion', id: PANTRY_SETUP_ID, at: new Date().toISOString() });
+                setSetupOpen(false);
+              }}
+            />
+          </div>
+        </section>
+      )}
 
       {makeAgain.length > 0 && (
         <Suggestion
@@ -623,7 +641,7 @@ export default function Make() {
               const reason = view ? ghostReason(view) : 'Not yet.';
               return (
                 <GhostCard key={result.recipe.id} label={`${result.recipe.title}. ${reason}`}>
-                  <Link to={`/recipes/${result.recipe.id}`}>Open {result.recipe.title}</Link>
+                  <Link className="fm-link" to={`/recipes/${result.recipe.id}`}>Open {result.recipe.title}</Link>
                 </GhostCard>
               );
             })}
@@ -639,7 +657,7 @@ export default function Make() {
           <p className={styles.hint}>
             No recipe is ready to make or missing just one food with what you have. Tap
             a few more foods above, or ask ChatGPT for an idea.{' '}
-            <Link to="/recipes">Browse all recipes</Link>
+            <Link className="fm-link" to="/recipes">Browse all recipes</Link>
           </p>
           <AskChatGpt
             ageMonths={ageMonths}
@@ -694,7 +712,7 @@ export default function Make() {
                 const reason = view ? ghostReason(view) : 'Not yet.';
                 return (
                   <GhostCard key={result.recipe.id} label={`${result.recipe.title}. ${reason}`}>
-                    <Link to={`/recipes/${result.recipe.id}`}>Open {result.recipe.title}</Link>
+                    <Link className="fm-link" to={`/recipes/${result.recipe.id}`}>Open {result.recipe.title}</Link>
                   </GhostCard>
                 );
               })}

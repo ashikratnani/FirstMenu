@@ -44,3 +44,7 @@
   flex-wrap: wrap;
   gap: 8px;
 }
+
+.head button {
+  min-height: 44px;
+}
