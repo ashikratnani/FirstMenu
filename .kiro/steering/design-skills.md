@@ -31,7 +31,7 @@ Both skills are written mostly for marketing and company websites. FirstMenu is 
 | New dependencies or design-system swaps | Keep Astryx (issue #37). Size budget `check:size` must pass. |
 | Copy that claims or advises | No health or safety wording beyond the design and cited sources (`autonomy.md`). |
 | Several prominent buttons | One filled primary button per screen (Requirement 17.10). |
-| Trimming or moving disclaimers to tidy a screen | Every disclaimer stays where v1 Requirement 13.1 and active Requirements 11.2 and 20.9 put it. Shorter wording is fine only if it says the same thing. |
+| Trimming, rewording or moving disclaimers to tidy a screen | Disclaimer wording is fixed (`src/ui/components/Disclaimer.tsx` and its tests pin it, from the requirements). It may be restyled only: never reworded, shortened, removed or moved. It stays everywhere v1 Requirement 13.1, active Requirements 11.2 and 20.9, and `product.md` "Not medical advice" put it, including the paste preview and the prompt helper. |
 | Skill hooks, gates, launchers and live mode | Never run `impeccable hooks on` (it writes hook files, including `.github/hooks/impeccable.json`) or `impeccable live` (it injects a localhost script into `index.html` and offers to change the CSP). Other impeccable commands are fine. Its working files under `.impeccable/` are not committed (it is in `.gitignore`); only `PRODUCT.md` and `DESIGN.md` at the repo root are. If the launcher can't run (no network or binary), say so and read the context files directly, as its SKILL.md describes. tasteskill's gate is not vendored. |
 
 ## Checks every UI PR still runs
