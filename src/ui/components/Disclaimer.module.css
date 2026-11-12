@@ -35,3 +35,22 @@
 .firstRun p {
   margin: 0 0 calc(var(--space) * 0.5);
 }
+
+/* Onboarding: a quieter box so the form is the first thing you read. Same
+   words, same place. */
+.compact {
+  padding: calc(var(--space) * 0.5) var(--space);
+  margin: 0 0 var(--space);
+  border-width: 0 0 0 4px;
+  border-radius: calc(var(--radius) * 0.5);
+  font-size: 0.875rem;
+}
+
+.compact .firstRunTitle {
+  font-size: 0.95rem;
+  margin-bottom: calc(var(--space) * 0.25);
+}
+
+.compact p {
+  margin-bottom: calc(var(--space) * 0.25);
+}

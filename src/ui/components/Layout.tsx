@@ -123,7 +123,7 @@ function LayoutShell() {
             {/* Storage-unavailable banner (Req 12.7) and first-run disclaimer
                 (Req 13.1) show above the routed page on every route. */}
             <StorageBanner />
-            <FirstRunDisclaimer />
+            <FirstRunDisclaimer compact={pathname.startsWith('/onboarding')} />
             {isPlanPath(pathname) && <PlanNav pathname={pathname} />}
             <Outlet />
           </div>

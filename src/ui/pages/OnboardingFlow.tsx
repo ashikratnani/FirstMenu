@@ -60,12 +60,12 @@ function Done({ others, onGo }: { others: ProblemId[]; onGo: () => void }) {
     <section className={styles.done} aria-labelledby="onboarding-done">
       <h1 id="onboarding-done">You&apos;re all set</h1>
       {others.length > 0 && (
-        <ul className={styles.list} aria-label="Other things you chose">
+        <ul className={styles.links} aria-label="Other things you chose">
           {others.map((id) => {
             const problem = PROBLEMS.find((p) => p.id === id)!;
             return (
               <li key={id}>
-                <Link to={problem.path}>{problem.linkLabel}</Link>
+                <Link className="fm-link" to={problem.path}>{problem.linkLabel}</Link>
               </li>
             );
           })}

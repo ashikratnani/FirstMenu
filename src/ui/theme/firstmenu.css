@@ -97,9 +97,10 @@
   text-underline-offset: 3px;
 }
 
-/* Toggle buttons (class fm-toggle, opt-in per screen; Make only for now): pressed is a tinted lavender surface with a
-   strong border and bold text; unpressed is an outlined white chip. Never the
-   filled primary orange (Requirement 17.10). */
+/* Toggle buttons (class fm-toggle, opt-in per screen; used by Make and
+   onboarding): pressed is a tinted lavender surface with a strong border and
+   bold text; unpressed is an outlined white chip. Never the filled primary
+   orange (Requirement 17.10). */
 [data-astryx-theme='neutral'] button.fm-toggle[aria-pressed] {
   min-height: 44px;
   background-color: var(--color-background-surface);
