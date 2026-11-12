@@ -71,7 +71,7 @@ The app must work from 360 px wide and up (`.kiro/steering/tech.md`). Undecided 
 
 ## Elevation & Depth
 
-`firstmenu.css` sets no shadows. Cards use the white card color (`--color-background-card`) Anything more: Undecided (not stated in the sources).
+`firstmenu.css` sets no shadows. Cards use the white card color (`--color-background-card`). Anything more: Undecided (not stated in the sources).
 
 ## Shapes
 
