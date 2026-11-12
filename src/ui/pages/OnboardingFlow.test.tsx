@@ -360,7 +360,7 @@ describe('design refinement (task 19.2, onboarding)', () => {
     await expectNoViolations();
   });
 
-  it('styles the source links in the safety solve and the end-screen links as fm-link', async () => {
+  it('styles the source links in the safety solve as fm-link', async () => {
     const user = userEvent.setup();
     renderApp('/onboarding/tour', onboardedState(8));
     await chooseAndShow(user, /what's safe for my child/i);
@@ -377,12 +377,16 @@ describe('design refinement (task 19.2, onboarding)', () => {
     await screen.findByRole('heading', { name: /all set/i });
     const link = screen.getByRole('link', { name: /open foods/i });
     expect(link).toHaveClass('fm-link');
+    expect(screen.getByRole('list', { name: /other things/i }).className).toMatch(/links/);
   });
 
   it('shows the first-run disclaimer on onboarding as the lighter box, wording unchanged', async () => {
     renderApp('/onboarding', { ...onboardedState(), onboarded: false, disclaimerAcknowledged: false });
     const box = await screen.findByRole('alertdialog');
     expect(box.className).toMatch(/compact/);
+    expect(within(box).getByRole('heading', { name: 'Before you start' })).toBeVisible();
+    expect(within(box).getByText(NOT_MEDICAL_ADVICE)).toBeVisible();
+    expect(within(box).getByText(SCREEN_LIMITS)).toBeVisible();
     expect(within(box).getByText(NOT_MEDICAL_ADVICE)).toBeInTheDocument();
     expect(within(box).getByText(SCREEN_LIMITS)).toBeInTheDocument();
     await expectNoViolations();
