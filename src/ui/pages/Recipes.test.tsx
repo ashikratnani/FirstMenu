@@ -417,6 +417,31 @@ describe('Recipes list design (task 19.2)', () => {
     expect(screen.getByText('Showing 1 of 1 recipe')).toBeInTheDocument();
   });
 
+  it('finds a recipe by a word that is only in an ingredient name', async () => {
+    const user = userEvent.setup();
+    const tamarind: Recipe = {
+      ...EGG_RECIPE,
+      id: 'custom-tamarind',
+      ingredients: [{ name: 'tamarind paste', category: 'pantry' }],
+    };
+    renderRecipes(seedState(10, [tamarind]));
+    await user.type(screen.getByRole('searchbox', { name: 'Search recipes' }), 'tamarind');
+    expect(tamarind.title).not.toMatch(/tamarind/i);
+    expect(cards()).toHaveLength(1);
+    expect(cards()[0]).toHaveTextContent('Egg Scramble');
+    expect(screen.getByText('Showing 1 of 1 recipe')).toHaveAttribute('role', 'status');
+  });
+
+  it('keeps the same live region mounted when a search has no match', async () => {
+    const user = userEvent.setup();
+    renderRecipes(seedState(8));
+    const status = screen.getByText(/^Showing \d+ of \d+ recipes$/);
+    expect(status).toHaveAttribute('role', 'status');
+    await user.type(screen.getByRole('searchbox', { name: 'Search recipes' }), 'zzzqq');
+    expect(status).toBeInTheDocument();
+    expect(status).toHaveTextContent('No recipes match your search or filters.');
+  });
+
   it('goes back to the first page when the search changes', async () => {
     const user = userEvent.setup();
     renderRecipes(seedState(8, manyCustomRecipes(120)));
@@ -439,7 +464,8 @@ describe('Recipes list design (task 19.2)', () => {
     const user = userEvent.setup();
     renderRecipes(seedState(8));
     await user.type(screen.getByRole('searchbox', { name: 'Search recipes' }), 'zzzqq');
-    expect(screen.getByText('No recipes match these filters.')).toBeInTheDocument();
+    expect(screen.getByText('No recipes match your search or filters.')).toBeInTheDocument();
+    expect(screen.getByText('No recipes match your search or filters.')).toHaveAttribute('role', 'status');
     await user.click(screen.getByRole('button', { name: 'Show all recipes' }));
     expect(screen.getByRole('searchbox', { name: 'Search recipes' })).toHaveValue('');
     expect(within(stageGroup()).getByRole('button', { name: 'All' })).toHaveAttribute('aria-pressed', 'true');

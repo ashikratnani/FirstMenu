@@ -50,7 +50,7 @@ export function pageStatusText(shown: number, total: number): string {
 /** How many nutrition tags a card shows before it counts the rest. */
 export const CARD_TAGS_SHOWN = 1;
 
-/** The first few tags to draw, and how many more are left out of the card. */
+/** The first CARD_TAGS_SHOWN tags to draw, and how many more are left out of the card. */
 export function collapseTags<T>(tags: readonly T[]): { shown: T[]; hidden: number } {
   return { shown: tags.slice(0, CARD_TAGS_SHOWN), hidden: Math.max(0, tags.length - CARD_TAGS_SHOWN) };
 }

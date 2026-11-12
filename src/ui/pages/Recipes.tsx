@@ -242,31 +242,25 @@ export default function Recipes() {
         </div>
       </div>
 
-      {matching.length === 0 ? (
-        <div className={styles.empty}>
-          <p>No recipes match these filters.</p>
-          <Button label="Show all recipes" onClick={showAll} />
-        </div>
-      ) : (
-        <>
-          <ul className={styles.grid} aria-label="Recipes">
-            {views.map((view) => (
-              <RecipeCard key={view.recipe.id} view={view} />
-            ))}
-          </ul>
-          <div className={styles.more}>
-            <p className={styles.moreStatus} role="status">
-              {pageStatusText(views.length, matching.length)}
-            </p>
-            {views.length < matching.length && (
-              <Button
-                label="Show more"
-                onClick={() => setShownCount((n) => n + RECIPES_PAGE_SIZE)}
-              />
-            )}
-          </div>
-        </>
+      {matching.length > 0 && (
+        <ul className={styles.grid} aria-label="Recipes">
+          {views.map((view) => (
+            <RecipeCard key={view.recipe.id} view={view} />
+          ))}
+        </ul>
       )}
+      {/* One live region stays mounted for both outcomes, so a search with no match is announced too. */}
+      <div className={matching.length === 0 ? styles.empty : styles.more}>
+        <p className={matching.length === 0 ? undefined : styles.moreStatus} role="status">
+          {matching.length === 0
+            ? 'No recipes match your search or filters.'
+            : pageStatusText(views.length, matching.length)}
+        </p>
+        {matching.length === 0 && <Button label="Show all recipes" onClick={showAll} />}
+        {views.length < matching.length && (
+          <Button label="Show more" onClick={() => setShownCount((n) => n + RECIPES_PAGE_SIZE)} />
+        )}
+      </div>
     </>
   );
 }
