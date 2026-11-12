@@ -14,15 +14,28 @@
 }
 
 .back a {
-  color: var(--fm-color-accent);
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
 }
 
-.meta {
+/* Fact row under the title (stage, time, effort, texture, servings). */
+.facts {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space);
-  color: var(--fm-color-muted);
-  margin: 0 0 var(--space);
+  gap: 8px;
+  list-style: none;
+  padding: 0;
+  margin: 0 0 12px;
+}
+
+.facts li {
+  padding: 4px 12px;
+  border: 1px solid var(--fm-color-border);
+  border-radius: 999px;
+  background: var(--fm-color-surface);
+  color: var(--fm-color-text);
+  font-size: 0.9rem;
 }
 
 /* Ghost / block panel ------------------------------------------------------ */
@@ -146,15 +159,28 @@
 }
 
 .edit {
-  color: var(--fm-color-accent);
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  min-width: 44px;
+  justify-content: center;
 }
 
 
-/* Footer disclaimer -------------------------------------------------------- */
+/* Footer disclaimer: repeats the shell footer; same text, quieter. ----------- */
 .footer {
-  margin-top: calc(var(--space) * 2);
+  margin-top: calc(var(--space) * 3);
   border-top: 1px solid var(--fm-color-border);
   padding-top: var(--space);
+  font-size: 0.85rem;
+  color: var(--fm-color-muted);
+}
+
+/* The shared <Disclaimer/> paragraphs set their own size and colour, so the
+   quieter style has to reach them directly. */
+.footer p {
+  font-size: inherit;
+  color: inherit;
 }
 
 .serveAs {
@@ -185,6 +211,24 @@
   display: flex;
   flex-wrap: wrap;
   gap: 8px 16px;
+}
+
+/* Checkbox rows: the whole row (box and label) is the 44 px target. */
+.serveAsList :global(.astryx-checkbox-input) {
+  min-height: 44px;
+  align-items: center;
+}
+
+.serveAsList :global(.astryx-checkbox-input) > * {
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+}
+
+.serveAsList label {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
 }
 
 .serveAsActions {
@@ -252,5 +296,16 @@
   flex-wrap: wrap;
   gap: var(--space);
   align-items: flex-start;
-  margin: calc(var(--space) * 1.5) 0;
+  margin: 0 0 var(--space);
+}
+
+/* 44 px targets on this page (buttons). The Source link sits inside a
+   sentence, so it stays inline (WCAG 2.5.8 exempts inline links). */
+.page button {
+  min-height: 44px;
+}
+
+.page li,
+.page p {
+  text-wrap: pretty;
 }

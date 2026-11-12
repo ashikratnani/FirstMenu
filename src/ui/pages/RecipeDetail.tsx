@@ -17,6 +17,7 @@ import { Badge } from '@astryxdesign/core/Badge';
 import { Button } from '@astryxdesign/core/Button';
 import { CheckboxInput } from '@astryxdesign/core/CheckboxInput';
 import { Link as ExternalLink } from '@astryxdesign/core/Link';
+import { STAGE_LABELS } from '../../domain/age';
 import { recipeEffort, recipeMinutes } from '../../domain/effort';
 import { recipeServeAs } from '../../domain/make';
 import { recipeNutritionTags } from '../../domain/nutrition';
@@ -278,7 +279,9 @@ export default function RecipeDetail() {
   return (
     <article className={styles.page}>
       <p className={styles.back}>
-        <Link to="/recipes">&larr; Back to recipes</Link>
+        <Link to="/recipes" className="fm-link">
+          &larr; Back to recipes
+        </Link>
       </p>
 
       <h1>{recipe.title}</h1>
@@ -333,17 +336,15 @@ export default function RecipeDetail() {
         </section>
       )}
 
-      <p className={styles.meta}>
-        <span>Texture: {recipe.texture}</span>
-        <span>
+      <ul className={styles.facts} aria-label="Recipe facts">
+        <li>{recipe.stages.map((stage) => STAGE_LABELS[stage]).join(', ')}</li>
+        <li>{timeLabel({ minutes: time?.minutes, minutesKind: time?.kind })}</li>
+        <li>{effortLabel(recipeEffort(recipe))}</li>
+        <li>Texture: {recipe.texture}</li>
+        <li>
           Serves {recipe.servings} {recipe.servings === 1 ? 'portion' : 'portions'}
-        </span>
-      </p>
-
-      <p className={styles.meta}>
-        <span>{timeLabel({ minutes: time?.minutes, minutesKind: time?.kind })}</span>
-        <span>{effortLabel(recipeEffort(recipe))}</span>
-      </p>
+        </li>
+      </ul>
       {tags.length > 0 && (
         <ul className={styles.tags} aria-label="Nutrition tags">
           {tags.map((tag) => (
@@ -354,6 +355,12 @@ export default function RecipeDetail() {
         </ul>
       )}
       <p className={styles.explainer}>{TAG_EXPLAINER}</p>
+
+      <section aria-label="Plan and history" className={styles.historyActions}>
+        {!view.isGhosted && <AddToPlan recipe={recipe} />}
+        <MadeThis recipe={recipe} />
+        <ShareRecipe recipe={recipe} />
+      </section>
 
       <ServeAsLine key={`${recipe.id}-${recipe.serveAs?.join() ?? ''}`} recipe={recipe} />
 
@@ -417,7 +424,11 @@ export default function RecipeDetail() {
           <h2 id="recipe-source">Source</h2>
           <p>
             {isHttpUrl(source.url) ? (
-              <ExternalLink href={source.url} target="_blank" rel="noopener noreferrer">
+              <ExternalLink
+                href={source.url}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 {source.title}
               </ExternalLink>
             ) : (
@@ -483,15 +494,9 @@ export default function RecipeDetail() {
         </section>
       )}
 
-      <section aria-label="Plan and history" className={styles.historyActions}>
-        {!view.isGhosted && <AddToPlan recipe={recipe} />}
-        <MadeThis recipe={recipe} />
-        <ShareRecipe recipe={recipe} />
-      </section>
-
       {recipe.origin === 'custom' && (
         <section aria-label="Recipe actions" className={styles.actions}>
-          <Link to={`/recipes/${recipe.id}/edit`} className={styles.edit}>
+          <Link to={`/recipes/${recipe.id}/edit`} className={`fm-link ${styles.edit}`}>
             Edit
           </Link>
           <Button label="Delete" variant="destructive" onClick={handleDelete} />
