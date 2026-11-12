@@ -1798,7 +1798,6 @@ const BATCH_7_LEFT_OUT: Record<string, { adaptation: string; absent: RegExp }[]>
   'b-tx-summer-squash-skillet': [{ adaptation: 'Left out 1/2 teaspoon salt', absent: /\bsalt\b/i }, { adaptation: 'Left out 1/2 teaspoon sugar', absent: /sugar/i }],
   'b-tx-dal-fry': [{ adaptation: 'Left out the salt in "salt to taste"', absent: /\bsalt\b/i }],
   'b-tx-texas-breakfast-scramble': [{ adaptation: 'Left out the salt in "salt and pepper to taste"', absent: /\bsalt\b/i }],
-  'b-tx-funny-face-snack-bread': [{ adaptation: 'Left out 1 tablespoon raisins: the page has no choking warning for them', absent: /raisin/i }],
   'b-mn-lentils-and-rice': [{ adaptation: 'Left out the salt in "salt and pepper to taste"', absent: /\bsalt\b/i }],
   'b-mn-bean-chowder': [{ adaptation: 'Left out 1 teaspoon salt', absent: /\bsalt\b/i }],
 };
@@ -2039,6 +2038,10 @@ describe('BUILTIN_RECIPES - batch 7', () => {
     );
     expect(steps('b-tx-old-fashioned-french-toast')).toMatch(/cut the French toast into long thin strips/i);
     expect(steps('b-tx-lemon-cauliflower-bites')).toMatch(/squishy and tender/i);
+    const nuggets = BATCH_7_RECIPES.find((r) => r.id === 'b-tx-homemade-chicken-nuggets');
+    const lastStep = nuggets?.steps[nuggets.steps.length - 1] ?? '';
+    expect(lastStep).toMatch(/crush the cornflakes into a powder/i);
+    expect(lastStep).toMatch(/cut the baked nuggets into strips/i);
   });
 
   it('records the option each page offered, and the Texas WIC baby foods carry the storage advice', () => {

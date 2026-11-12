@@ -876,7 +876,7 @@ export const BATCH_7_RECIPES: Recipe[] = [
     servings: 4,
   },
   {
-    // Peanut butter on whole-wheat bread decorated with strawberries and peach to make a face. The page also uses raisins for the eyes but has no choking warning, so the raisins are left out.
+    // Peanut butter on whole-wheat bread decorated with strawberries and peach to make a face. The raisins are a reminder, not a block, so they stay.
     id: 'b-tx-funny-face-snack-bread',
     origin: 'builtin',
     source: {
@@ -884,7 +884,7 @@ export const BATCH_7_RECIPES: Recipe[] = [
       publisher: TX_PUBLISHER,
       url: 'https://texaswic.org/recipes/funny-face-snack-bread',
       retrieved: RETRIEVED,
-      adaptations: ['Left out 1 tablespoon raisins: the page has no choking warning for them'],
+      adaptations: [],
     },
     title: 'Funny Face Snack Bread',
     stages: ['24-36'],
@@ -893,12 +893,13 @@ export const BATCH_7_RECIPES: Recipe[] = [
     ingredients: [
       { name: 'whole-wheat bread', food: 'bread', quantity: 2, unit: 'slice', category: 'grains' },
       { name: 'peanut butter', food: 'peanut butter', quantity: 2, unit: 'tbsp', category: 'pantry' },
+      { name: 'raisins', food: 'raisin', quantity: 1, unit: 'tbsp', category: 'produce' },
       { name: 'strawberries, sliced', food: 'strawberry', quantity: 2, unit: 'piece', category: 'produce' },
       { name: 'peach, sliced', food: 'peach', quantity: 1, unit: 'piece', category: 'produce' },
     ],
     steps: [
       'Spread 1 tablespoon of peanut butter on each slice of bread.',
-      'Arrange the strawberry slices and peach slices in the shape of a face: strawberries for a nose and peach for a mouth.',
+      'Arrange the raisins, strawberry slices and peach slices in the shape of a face: raisins for eyes, strawberries for a nose and peach for a mouth.',
     ],
     texture: 'peanut butter bread with fruit',
     servings: 2,
