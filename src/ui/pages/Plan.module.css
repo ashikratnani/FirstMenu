@@ -34,16 +34,16 @@
   flex-wrap: wrap;
   gap: calc(var(--space) * 0.75);
   margin: 0;
-  padding: calc(var(--space) * 0.5) var(--space);
-  border: 1px solid var(--fm-color-border);
-  border-radius: var(--radius);
+  padding: 0;
+  border: 0;
 }
 
 .legend {
   font-size: 0.85rem;
   font-weight: 600;
   color: var(--fm-color-heading);
-  padding: 0 calc(var(--space) * 0.5);
+  padding: 0;
+  margin-bottom: calc(var(--space) * 0.25);
 }
 
 .toggle {
@@ -104,6 +104,8 @@
   margin: 0 0 calc(var(--space) * 0.5);
   color: var(--fm-color-text);
   font-weight: 600;
+  max-width: 48ch;
+  text-wrap: pretty;
 }
 
 .spacingSources {
