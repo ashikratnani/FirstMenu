@@ -287,6 +287,49 @@ describe('Make screen on-hand foods (Req 3.1, 3.2)', () => {
 });
 
 describe('Make screen pantry (Req 2.1 to 2.4)', () => {
+  it('opts the filter toggles into the Make-only toggle style', async () => {
+    const user = userEvent.setup();
+    renderMake(seedState());
+    for (const name of ['Iron-rich only', 'All stages']) {
+      const toggle = screen.getByRole('button', { name });
+      expect(toggle).toHaveClass('fm-toggle');
+      expect(toggle).toHaveAttribute('aria-pressed', 'false');
+      await user.click(toggle);
+      expect(toggle).toHaveAttribute('aria-pressed', 'true');
+    }
+  });
+
+  it('keeps a compact pantry offer right under the search box on first use', async () => {
+    const user = userEvent.setup();
+    renderMake(seedState({ pantry: [], dismissed: {} }));
+    const offer = screen.getByRole('button', { name: 'Set up your pantry' });
+    const box = screen.getByRole('textbox', { name: 'What do you have?' });
+    const heading = screen.getByRole('heading', { name: 'Set up your pantry' });
+    expect(box.compareDocumentPosition(offer) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(offer.compareDocumentPosition(heading) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    await user.click(offer);
+    const dialog = await screen.findByRole('dialog');
+    await user.click(within(dialog).getByRole('checkbox', { name: 'oat' }));
+    await user.click(within(dialog).getByRole('button', { name: 'Done' }));
+    expect(screen.queryByRole('button', { name: 'Set up your pantry' })).not.toBeInTheDocument();
+    expect(screen.getByText('Pantry: 1 food')).toBeInTheDocument();
+  });
+
+  it('hides the compact offer once the pantry setup is skipped', () => {
+    renderMake(seedState({ pantry: [] }));
+    expect(screen.queryByRole('button', { name: 'Set up your pantry' })).not.toBeInTheDocument();
+  });
+
+  it('shows the search and results before the first-use pantry setup', () => {
+    renderMake(seedState({ pantry: [], dismissed: {} }));
+    const setup = screen.getByRole('heading', { name: 'Set up your pantry' });
+    const search = screen.getByRole('heading', { name: 'What do you have?' });
+    const follows = (a: Node, b: Node) =>
+      Boolean(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
+    expect(follows(search, setup)).toBe(true);
+    expect(follows(screen.getByRole('heading', { name: /^Missing one/ }), setup)).toBe(true);
+  });
+
   it('offers the suggested list on first use and lets the user skip it', async () => {
     const user = userEvent.setup();
     renderMake(seedState({ pantry: [], dismissed: {} }));

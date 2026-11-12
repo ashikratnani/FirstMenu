@@ -87,3 +87,29 @@
 [data-astryx-theme='neutral'] a.astryx-top-nav-item[aria-current='page'] {
   color: var(--color-text-primary);
 }
+
+/* In-content links (banners, "Browse all recipes") use the theme accent text
+   color, not the browser blue. Opt-in by class so nav items and cards are
+   untouched. Accent text on body is 6.91:1. */
+[data-astryx-theme='neutral'] a.fm-link {
+  color: var(--color-text-accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Toggle buttons (class fm-toggle, opt-in per screen; Make only for now): pressed is a tinted lavender surface with a
+   strong border and bold text; unpressed is an outlined white chip. Never the
+   filled primary orange (Requirement 17.10). */
+[data-astryx-theme='neutral'] button.fm-toggle[aria-pressed] {
+  min-height: 44px;
+  background-color: var(--color-background-surface);
+  border: 1px solid var(--color-border-emphasized);
+  color: var(--color-text-primary);
+}
+
+[data-astryx-theme='neutral'] button.fm-toggle[aria-pressed='true'] {
+  background-color: var(--color-background-purple);
+  border-color: var(--color-text-purple);
+  color: var(--color-text-purple);
+  font-weight: 700;
+}

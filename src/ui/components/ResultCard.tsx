@@ -64,6 +64,7 @@ export default function ResultCard({ result, doorText, showMissing, onHave }: Re
             <Button
               key={food}
               label={`I have this: ${foodLabel(food)}`}
+              variant="ghost"
               size="sm"
               onClick={() => onHave(food)}
             />

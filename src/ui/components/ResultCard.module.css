@@ -37,5 +37,15 @@
 .actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 0 8px;
+  margin-top: -2px;
+}
+
+/* A quiet, theme-coloured action under its card instead of a grey chip:
+   text-style, underlined, with a 44 px target. */
+.actions button {
+  min-height: 44px;
+  color: var(--color-text-accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }

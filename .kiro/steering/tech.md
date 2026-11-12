@@ -90,3 +90,7 @@ src/
   `.kiro/steering/workflow.md`.
 - `npm run lint`, `npm test` and `npm run build` must all pass before a PR is
   marked ready. CI runs the same on every pull request.
+
+## Design skills
+
+UI work uses the vendored impeccable and tasteskill skills under the rules in `.kiro/steering/design-skills.md`.

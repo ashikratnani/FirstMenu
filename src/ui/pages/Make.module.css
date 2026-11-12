@@ -134,3 +134,55 @@
   justify-content: space-between;
   gap: 8px;
 }
+
+/* 44 px targets for chips and small actions where the layout allows. */
+.chips > li > button,
+.pantryRow button {
+  min-height: 44px;
+}
+
+.chips li {
+  display: flex;
+}
+
+/* Tokens (removable chips) are 44 px tall; their remove button is at least
+   32 px square so it stays tappable without breaking the chip. */
+.chips :global(.astryx-token),
+.hintRow :global(.astryx-token) {
+  min-height: 44px;
+}
+
+.chips :global(.astryx-token) button[aria-label^='Remove'],
+.hintRow :global(.astryx-token) button[aria-label^='Remove'] {
+  min-width: 32px;
+  min-height: 32px;
+}
+
+/* One chip: the Suggested token's label button is the browser default button
+   (its own border), which sat as a box inside the tag. Make it plain so the
+   tag's border is the only one. */
+.hintRow :global(.astryx-token) button:not([aria-label^='Remove']) {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  min-height: 44px;
+  padding: 0 4px;
+  cursor: pointer;
+}
+
+/* First-use offer right under the search box (Req 2.4); the full setup panel
+   sits below the results. */
+.setupPrompt {
+  display: flex;
+}
+
+.setupPrompt button,
+.panel .row button,
+.dialogBody .row button {
+  min-height: 44px;
+}
+
+.group > button {
+  min-height: 44px;
+}

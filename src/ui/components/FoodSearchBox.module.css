@@ -9,3 +9,7 @@
   flex: 1 1 16rem;
   min-width: 0;
 }
+
+.row button {
+  min-height: 44px;
+}
