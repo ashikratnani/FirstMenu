@@ -572,6 +572,25 @@ describe('built-in recipes derive clean food keys (Item 3)', () => {
       'sunflower seed butter',
       'spaghetti',
       'chili sauce',
+      // Batch 10 (task 14.3) recipes add these.
+      'red pepper flakes',
+      'molasses',
+      'rice vinegar',
+      'mixed vegetables',
+      'green pepper',
+      'spaghetti squash',
+      'cereal',
+      'broccoli slaw',
+      'dried cranberry',
+      'sriracha',
+      'pickled vegetables',
+      'red wine vinegar',
+      'root vegetable',
+      'tortilla chip',
+      'tater tots',
+      'cornflakes',
+      'salad greens',
+      'ranch dressing',
     ]);
   });
 
