@@ -12,6 +12,7 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Button } from '@astryxdesign/core/Button';
+import { STAGE_LABELS } from '../../domain/age';
 import { decodeRecipeShare, recipeFromShare } from '../../domain/recipeShare';
 import { screenRecipe, screenTextMentions } from '../../domain/safety/screen';
 import { localYmd } from '../../domain/suggest';
@@ -108,12 +109,17 @@ export default function SharedRecipeView() {
         </section>
       )}
 
-      <p className={styles.meta}>
-        <span>Texture: {shared.texture}</span>
-        <span>
+      <ul className={styles.facts} aria-label="Recipe facts">
+        <li>{shared.stages.map((stage) => STAGE_LABELS[stage]).join(', ')}</li>
+        <li>Texture: {shared.texture}</li>
+        <li>
           Serves {shared.servings} {shared.servings === 1 ? 'portion' : 'portions'}
-        </span>
-      </p>
+        </li>
+      </ul>
+
+      <section aria-label="Add this recipe" className={styles.actions}>
+        <Button label="Add to my recipes" variant="primary" onClick={add} />
+      </section>
 
       <section aria-labelledby="shared-recipe-ingredients">
         <h2 id="shared-recipe-ingredients">Ingredients</h2>
@@ -142,10 +148,6 @@ export default function SharedRecipeView() {
             <li key={index}>{step}</li>
           ))}
         </ol>
-      </section>
-
-      <section aria-label="Add this recipe" className={styles.actions}>
-        <Button label="Add to my recipes" variant="primary" onClick={add} />
       </section>
     </Shell>
   );
