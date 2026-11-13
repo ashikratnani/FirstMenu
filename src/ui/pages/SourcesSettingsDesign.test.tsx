@@ -69,7 +69,6 @@ function renderAt(path: string, state: AppState = seed()) {
   );
 }
 
-
 async function noViolations(container: HTMLElement) {
   expect(await axe(container, AXE_OPTIONS)).toHaveNoViolations();
 }
@@ -77,19 +76,28 @@ async function noViolations(container: HTMLElement) {
 const primaries = () =>
   Array.from(document.querySelectorAll('[data-variant="primary"]')).map((e) => e.textContent);
 
-const distinctRecipeSources = () => new Set(BUILTIN_RECIPES.flatMap((r) => (r.source ? [r.source.url] : [])));
+const distinctRecipeSources = () =>
+  new Set(BUILTIN_RECIPES.flatMap((r) => (r.source ? [r.source.url] : [])));
 
 describe('Sources: jump list and grouping', () => {
   it('opens with an "On this page" list of the five sections, with counts', () => {
     renderAt('/sources');
     const nav = screen.getByRole('navigation', { name: 'On this page' });
-    const names = within(nav).getAllByRole('link').map((a) => a.textContent);
+    const names = within(nav)
+      .getAllByRole('link')
+      .map((a) => a.textContent);
     expect(names).toHaveLength(5);
     expect(names[0]).toBe(`Safety rules (${RULES.length})`);
     expect(names[2]).toBe('New food spacing');
     expect(names[4]).toBe(`Recipe sources (${distinctRecipeSources().size})`);
     // Each jump link goes to a heading that exists.
-    for (const name of ['Safety rules', 'Nutrition tags', 'New food spacing', 'References', 'Recipe sources']) {
+    for (const name of [
+      'Safety rules',
+      'Nutrition tags',
+      'New food spacing',
+      'References',
+      'Recipe sources',
+    ]) {
       expect(screen.getByRole('heading', { name, level: 2 })).toHaveAttribute('id');
     }
   });
@@ -105,7 +113,9 @@ describe('Sources: jump list and grouping', () => {
 
   it('groups recipe sources by publisher with a jump link and a count each', () => {
     renderAt('/sources');
-    const section = screen.getByRole('heading', { name: 'Recipe sources', level: 2 }).closest('section') as HTMLElement;
+    const section = screen
+      .getByRole('heading', { name: 'Recipe sources', level: 2 })
+      .closest('section') as HTMLElement;
     const groups = within(section).getAllByRole('heading', { level: 3 });
     expect(groups.length).toBeGreaterThan(1);
     let total = 0;
@@ -113,7 +123,9 @@ describe('Sources: jump list and grouping', () => {
       const items = group.nextElementSibling?.querySelectorAll(':scope > li') ?? [];
       expect(items.length).toBeGreaterThan(0);
       total += items.length;
-      const jump = within(section).getByRole('link', { name: new RegExp(`^${group.textContent?.replace(/[()]/g, '\\$&')} \\(${items.length}\\)$`) });
+      const jump = within(section).getByRole('link', {
+        name: new RegExp(`^${group.textContent?.replace(/[()]/g, '\\$&')} \\(${items.length}\\)$`),
+      });
       fireEvent.click(jump);
       expect(group).toHaveFocus();
     }
@@ -124,7 +136,9 @@ describe('Sources: jump list and grouping', () => {
 
   it('gives every source link its own full-size row and the shared link style', () => {
     renderAt('/sources');
-    const external = screen.getAllByRole('link').filter((a) => a.getAttribute('target') === '_blank');
+    const external = screen
+      .getAllByRole('link')
+      .filter((a) => a.getAttribute('target') === '_blank');
     expect(external.length).toBeGreaterThan(400);
     for (const a of external) {
       expect(a).toHaveClass('fm-link');
@@ -135,12 +149,16 @@ describe('Sources: jump list and grouping', () => {
     const rule = screen.getByRole('heading', { name: 'peanut' }).closest('li') as HTMLElement;
     const rows = rule.querySelectorAll('li');
     expect(rows).toHaveLength(2);
-    expect(rule.querySelector('ul')?.textContent).toBe([...rows].map((r) => r.textContent).join(''));
+    expect(rule.querySelector('ul')?.textContent).toBe(
+      [...rows].map((r) => r.textContent).join(''),
+    );
   });
 
   it('puts each section on a band with its own way back to the top', () => {
     renderAt('/sources');
-    const band = screen.getByRole('heading', { name: 'Safety rules', level: 2 }).closest('section') as HTMLElement;
+    const band = screen
+      .getByRole('heading', { name: 'Safety rules', level: 2 })
+      .closest('section') as HTMLElement;
     expect(band.className).toMatch(/band/);
     expect(within(band).getByRole('link', { name: 'Back to top' })).toBeInTheDocument();
   });

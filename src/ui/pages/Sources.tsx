@@ -131,7 +131,7 @@ function EntryLink({ href, children }: { href: string; children: ReactNode }) {
 /** "Source:" or "Sources:" and a list of links for a list of source ids. */
 function SourceLinks({ ids }: { ids: SourceId[] }) {
   return (
-    <div className={styles.ruleSources}>
+    <div>
       <p className={styles.sourcesLabel}>Source{ids.length > 1 ? 's' : ''}:</p>
       <ul className={styles.sourceLinks}>
         {ids.flatMap((id) =>
@@ -241,12 +241,12 @@ export default function Sources() {
         </h2>
         <ul aria-label="New food spacing sources" className={styles.ruleList}>
           <li className={styles.rule}>
-          <p className={styles.ruleMessage}>
-            FirstMenu uses a gap of at least {NEW_FOOD_SPACING_DAYS} days between new foods when
-            it checks the week plan and suggests a new food.
-          </p>
-          <SourceLinks ids={NEW_FOOD_SPACING_SOURCES} />
-        </li>
+            <p className={styles.ruleMessage}>
+              FirstMenu uses a gap of at least {NEW_FOOD_SPACING_DAYS} days between new foods when
+              it checks the week plan and suggests a new food.
+            </p>
+            <SourceLinks ids={NEW_FOOD_SPACING_SOURCES} />
+          </li>
         </ul>
         {backToTop}
       </section>
