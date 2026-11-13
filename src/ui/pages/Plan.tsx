@@ -218,7 +218,7 @@ export default function Plan() {
                                 type="button"
                                 className={styles.slotButton}
                                 data-slot-opener={`${day}-${meal}`}
-                              onClick={() => setOpenSlot(slot)}
+                                onClick={() => setOpenSlot(slot)}
                               >
                                 Replace
                               </button>
@@ -247,7 +247,7 @@ export default function Plan() {
                                 type="button"
                                 className={styles.slotButton}
                                 data-slot-opener={`${day}-${meal}`}
-                              onClick={() => setOpenSlot(slot)}
+                                onClick={() => setOpenSlot(slot)}
                               >
                                 Change
                               </button>

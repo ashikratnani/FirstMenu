@@ -194,6 +194,48 @@ describe('Plan week view', () => {
     expect(screen.getByRole('button', { name: 'Change' })).toHaveFocus();
   });
 
+  it('Escape returns focus to a Change button (filled slot)', async () => {
+    const user = userEvent.setup();
+    renderHome(
+      seedState(8, [OATS_RECIPE], ['breakfast'], daysWith('custom-oats')),
+    );
+    const change = screen.getByRole('button', { name: 'Change' });
+    await user.click(change);
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    await user.keyboard('{Escape}');
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Change' })).toHaveFocus();
+  });
+
+  it('Escape returns focus to a Replace button (ghosted slot)', async () => {
+    const user = userEvent.setup();
+    renderHome(
+      seedState(10, [EGG_RECIPE], ['breakfast'], daysWith('custom-egg'), {
+        'allergen:egg': { status: 'reaction', date: '2026-11-10' },
+      }),
+    );
+    await user.click(screen.getByRole('button', { name: 'Replace' }));
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    await user.keyboard('{Escape}');
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Replace' })).toHaveFocus();
+  });
+
+  it('Escape does nothing once the picker has closed', async () => {
+    const user = userEvent.setup();
+    renderHome(seedState(8, [OATS_RECIPE], ['breakfast']));
+    const add = screen.getByRole('button', {
+      name: /Add a Breakfast for Day 1/,
+    });
+    await user.click(add);
+    await user.keyboard('{Escape}');
+    expect(add).toHaveFocus();
+    await user.click(document.body);
+    await user.keyboard('{Escape}');
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(add).not.toHaveFocus();
+  });
+
   it('eligible recipes come before ghosted ones in the picker, with a door marker on an untried-food recipe', async () => {
     const user = userEvent.setup();
     renderHome(seedState(8, [HONEY_RECIPE, OATS_RECIPE], ['breakfast']));
