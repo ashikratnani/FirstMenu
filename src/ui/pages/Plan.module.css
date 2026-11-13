@@ -1,9 +1,9 @@
 /*
  * Week home screen (Task 10.2). Per design "Theme mapping" the week home screen
  * is a plain, bright grid of day cards with NO themed scene; the ghost/door
- * states are carried by card text + accessible name. Above the grid sit the
- * plan controls (meal toggles, prep date, new-week) and, when relevant, the
- * new-food spacing warning.
+ * states are carried by card text + accessible name. When relevant, the
+ * new-food spacing warning sits above the grid and the plan settings (meal
+ * toggles, dates, new-week) come below it.
  *
  * Fluid grid that stays usable at 360px width (Req 14.6): auto-fill columns
  * that stack to a single column on narrow screens. Any motion inherits the
@@ -11,7 +11,7 @@
  */
 
 .controls {
-  margin: var(--space) 0;
+  margin: calc(var(--space) * 1.5) 0 var(--space);
   padding: var(--space);
   border: 1px solid var(--fm-color-border);
   border-radius: var(--radius);
@@ -34,23 +34,28 @@
   flex-wrap: wrap;
   gap: calc(var(--space) * 0.75);
   margin: 0;
-  padding: calc(var(--space) * 0.5) var(--space);
-  border: 1px solid var(--fm-color-border);
-  border-radius: var(--radius);
+  padding: 0;
+  border: 0;
 }
 
 .legend {
   font-size: 0.85rem;
   font-weight: 600;
   color: var(--fm-color-heading);
-  padding: 0 calc(var(--space) * 0.5);
+  padding: 0;
+  margin-bottom: calc(var(--space) * 0.25);
 }
 
 .toggle {
   display: inline-flex;
   align-items: center;
   gap: calc(var(--space) * 0.35);
+  min-height: 44px;
   font-size: 0.9rem;
+}
+
+.dateInput {
+  min-height: 44px;
 }
 
 .prepControl {
@@ -72,6 +77,7 @@
 }
 
 .newWeekButton {
+  min-height: 44px;
   padding: calc(var(--space) * 0.5) var(--space);
   border: 1px solid var(--fm-color-border);
   border-radius: var(--radius);
@@ -83,23 +89,6 @@
 
 .newWeekButton:hover,
 .newWeekButton:focus-visible {
-  border-color: var(--fm-color-heading);
-}
-
-/* Print link: opens the printable week view; styled like the new-week button. */
-.printLink {
-  display: inline-block;
-  padding: calc(var(--space) * 0.5) var(--space);
-  border: 1px solid var(--fm-color-border);
-  border-radius: var(--radius);
-  background: var(--fm-color-surface, #fff);
-  color: var(--fm-color-heading);
-  font-weight: 600;
-  text-decoration: none;
-}
-
-.printLink:hover,
-.printLink:focus-visible {
   border-color: var(--fm-color-heading);
 }
 
@@ -115,6 +104,8 @@
   margin: 0 0 calc(var(--space) * 0.5);
   color: var(--fm-color-text);
   font-weight: 600;
+  max-width: 48ch;
+  text-wrap: pretty;
 }
 
 .spacingSources {
@@ -128,12 +119,18 @@
   color: var(--fm-color-muted);
 }
 
+.nextStep {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+
 .weekGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   gap: var(--space);
   padding: 0;
-  margin: var(--space) 0 0;
+  margin: 0;
   list-style: none;
 }
 
@@ -219,26 +216,29 @@
 }
 
 .addButton,
-.changeButton,
-.replaceButton,
-.clearButton {
-  padding: calc(var(--space) * 0.25) calc(var(--space) * 0.6);
+.slotButton {
+  min-height: 44px;
+  padding: calc(var(--space) * 0.25) calc(var(--space) * 0.75);
   border: 1px solid var(--fm-color-border);
   border-radius: var(--radius);
   background: var(--fm-color-surface, #fff);
   color: var(--fm-color-heading);
-  font-size: 0.82rem;
+  font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
 }
 
+/* An empty slot is a quiet dashed prompt; filled slots keep solid buttons. */
+.addButton {
+  border-style: dashed;
+  background: transparent;
+  color: var(--fm-color-muted);
+}
+
 .addButton:hover,
 .addButton:focus-visible,
-.changeButton:hover,
-.changeButton:focus-visible,
-.replaceButton:hover,
-.replaceButton:focus-visible,
-.clearButton:hover,
-.clearButton:focus-visible {
+.slotButton:hover,
+.slotButton:focus-visible {
   border-color: var(--fm-color-heading);
+  color: var(--fm-color-heading);
 }

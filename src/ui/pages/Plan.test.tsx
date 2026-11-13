@@ -1,8 +1,11 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { MemoryRouter } from 'react-router-dom';
+import { HashRouter, MemoryRouter, Route, Routes } from 'react-router-dom';
 import { describe, expect, it, beforeEach } from 'vitest';
 import Plan from './Plan';
+import Layout from '../components/Layout';
+import planCss from './Plan.module.css?raw';
+import { ruleBody } from '../../test/cssRule';
 import { AppProvider, useApp } from '../../state/AppProvider';
 import { STORAGE_KEY, defaultState } from '../../domain/storage';
 import type { AppState, MealType, Recipe } from '../../domain/types';
@@ -342,5 +345,65 @@ describe('Plan week view', () => {
     expect(captured!.plan.prepDate).toBe(prepBefore); // cleared -> no-op
     fireEvent.change(prep, { target: { value: '2030-01-02' } });
     expect(captured!.plan.prepDate).toBe('2030-01-02');
+  });
+
+  it('shows the week before the plan settings, with no second Print control', () => {
+    renderHome(seedState(8, [OATS_RECIPE], ['breakfast'], daysWith('custom-oats')));
+    const day1 = screen.getByRole('heading', { name: /Day 1/ });
+    const settings = screen.getByRole('heading', { name: 'Plan settings' });
+    expect(
+      day1.compareDocumentPosition(settings) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+    // The Print tab in the plan navigation is the one way to open /print.
+    expect(screen.queryByRole('link', { name: 'Print' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Print' })).toBeNull();
+  });
+
+  it('keeps one live region mounted and links to the settings when no meal is selected', async () => {
+    const user = userEvent.setup();
+    renderHome(seedState(8, [OATS_RECIPE], ['breakfast']));
+    const region = screen.getByRole('status');
+    expect(region).toBeEmptyDOMElement();
+
+    await user.click(screen.getByLabelText('Breakfast'));
+    // The same region element now carries the message and a link to the settings.
+    expect(screen.getByRole('status')).toBe(region);
+    expect(region).toHaveTextContent('No meals selected.');
+    const link = within(region).getByRole('link', { name: 'Go to Plan settings' });
+    expect(link).toHaveAttribute('href', '#week-controls');
+    expect(link).toHaveClass('fm-link');
+    expect(document.getElementById('week-controls')).not.toBeNull();
+    expect(screen.queryByRole('heading', { name: /Day 1/ })).toBeNull();
+  });
+
+  it('the settings link keeps the page and moves focus to Plan settings under HashRouter', async () => {
+    const user = userEvent.setup();
+    window.location.hash = '#/plan';
+    render(
+      <AppProvider storage={makeStorage(seedState(8, [OATS_RECIPE], []))}>
+        <HashRouter>
+          <Routes>
+            <Route element={<Layout />}>
+              <Route path="/plan" element={<Plan />} />
+            </Route>
+          </Routes>
+        </HashRouter>
+      </AppProvider>,
+    );
+    await user.click(screen.getByRole('link', { name: 'Go to Plan settings' }));
+    // The fragment click is not read as a route change: the page is still there.
+    expect(screen.getByRole('heading', { name: 'This week' })).toBeInTheDocument();
+    expect(screen.getByText(/No meals selected/)).toBeInTheDocument();
+    expect(window.location.hash).toBe('#/plan');
+    expect(document.activeElement).toBe(document.getElementById('week-controls'));
+    window.location.hash = '';
+  });
+
+  it('slot buttons and settings controls are 44 px targets (CSS)', () => {
+    for (const selector of ['.slotButton', '.toggle', '.dateInput', '.newWeekButton', '.nextStep']) {
+      expect(ruleBody(planCss, selector), selector).toContain(
+        'min-height: 44px',
+      );
+    }
   });
 });

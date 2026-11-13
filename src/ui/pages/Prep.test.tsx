@@ -3,6 +3,8 @@ import { MemoryRouter } from 'react-router-dom';
 import RouterLinkProvider from '../theme/RouterLinkProvider';
 import { describe, expect, it, beforeEach } from 'vitest';
 import Prep from './Prep';
+import prepCss from './Prep.module.css?raw';
+import { ruleBody } from '../../test/cssRule';
 import { AppProvider, useApp } from '../../state/AppProvider';
 import { STORAGE_KEY, defaultState } from '../../domain/storage';
 import type { AppState, MealType, Recipe } from '../../domain/types';
@@ -228,5 +230,26 @@ describe('Prep page', () => {
       ),
     ).toBeInTheDocument();
     expect(screen.queryByRole('group')).toBeNull();
+  });
+
+  it('keeps one live region mounted and offers a next step when empty', () => {
+    const { unmount } = renderPrep(seedState(8, [FREEZER_RECIPE], ['dinner']));
+    const region = screen.getByRole('status');
+    const link = within(region).getByRole('link', { name: 'Plan your week' });
+    expect(link).toHaveAttribute('href', '/plan');
+    expect(link).toHaveClass('fm-link');
+    unmount();
+
+    // With something to prep, the same single region stays mounted, empty.
+    renderPrep(
+      seedState(8, [FREEZER_RECIPE], ['dinner'], daysWithDinner([{ day: 1, recipeId: FREEZER_RECIPE.id }])),
+    );
+    expect(screen.getByRole('status')).toBeEmptyDOMElement();
+  });
+
+  it('the prep date and next step are 44 px targets (CSS)', () => {
+    for (const selector of ['.dateInput', '.nextStep']) {
+      expect(ruleBody(prepCss, selector)).toContain('min-height: 44px');
+    }
   });
 });

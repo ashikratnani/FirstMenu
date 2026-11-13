@@ -3,10 +3,12 @@ import { MemoryRouter } from 'react-router-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import Share from './Share';
+import shareCss from './Share.module.css?raw';
+import { ruleBody } from '../../test/cssRule';
 import { AppProvider } from '../../state/AppProvider';
 import { STORAGE_KEY, defaultState } from '../../domain/storage';
 import { SHARE_BASE_URL } from '../../domain/share';
-import type { AppState, Recipe } from '../../domain/types';
+import type { AppState, MealType, Recipe } from '../../domain/types';
 
 // The Share page copies a read-only share link (navigator.clipboard with a
 // graceful fallback field), warns when the link is long (Req 11.6) and surfaces
@@ -143,5 +145,40 @@ describe('Share page', () => {
     // which caused a reaction (the payload carries reaction records).
     expect(note).toHaveTextContent(/tried/i);
     expect(note).toHaveTextContent(/reaction/i);
+  });
+
+  it('points an empty plan to /plan and says nothing for a planned week', () => {
+    const { unmount } = renderShare(shortState());
+    const link = screen.getByRole('link', { name: 'Plan your week' });
+    expect(link).toHaveAttribute('href', '/plan');
+    expect(link).toHaveClass('fm-link');
+    // The empty note is plain text; it adds no live region of its own.
+    expect(link.closest('[role="status"]')).toBeNull();
+    unmount();
+
+    renderShare(longState());
+    expect(screen.queryByRole('link', { name: 'Plan your week' })).toBeNull();
+  });
+
+  it('counts only active slots when deciding the plan is empty', () => {
+    const withMeal = (activeSlots: MealType[]): AppState => {
+      const base = shortState();
+      const days: AppState['plan']['days'] = Array.from({ length: 7 }, () => ({}));
+      days[0] = { dinner: 'b-carrots-and-apples' };
+      return { ...base, plan: { ...base.plan, activeSlots, days } };
+    };
+    // A meal in a deselected slot is not shared, so the empty note shows.
+    const { unmount } = renderShare(withMeal(['breakfast']));
+    expect(screen.getByRole('link', { name: 'Plan your week' })).toBeInTheDocument();
+    unmount();
+
+    // The same meal in an active slot: no note.
+    renderShare(withMeal(['breakfast', 'dinner']));
+    expect(screen.queryByRole('link', { name: 'Plan your week' })).toBeNull();
+  });
+
+  it('the copy button, field and next step are 44 px targets (CSS)', () => {
+    expect(ruleBody(shareCss, '.linkBlock button')).toContain('min-height: 44px');
+    expect(ruleBody(shareCss, '.nextStep')).toContain('min-height: 44px');
   });
 });

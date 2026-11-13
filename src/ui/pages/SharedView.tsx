@@ -158,6 +158,10 @@ export default function SharedView() {
     plan.activeSlots.includes(meal),
   );
 
+  const nothingPlanned = plan.days.every((day) =>
+    activeSlots.every((meal) => day[meal] === undefined),
+  );
+
   // Prep + grocery driven by the payload age (read-only; never stored).
   const { sessions, thawReminders } = computePrepList(
     plan,
@@ -182,6 +186,10 @@ export default function SharedView() {
         </h2>
         {activeSlots.length === 0 ? (
           <p className={styles.empty}>No meals planned.</p>
+        ) : nothingPlanned ? (
+          <p className={styles.empty}>
+            Nothing is planned for this week yet.
+          </p>
         ) : (
           <ol className={styles.weekGrid}>
             {DAY_INDEXES.map((day) => {

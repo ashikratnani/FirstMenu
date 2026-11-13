@@ -294,4 +294,15 @@ describe('SharedView (read-only shared link)', () => {
       within(card).queryByText('Quarter lengthwise before serving.'),
     ).toBeNull();
   });
+
+  it('says so when the shared week has nothing planned, instead of blank rows', () => {
+    const base = sampleState();
+    const { encoded } = encodeSharePayload({
+      ...base,
+      plan: { ...base.plan, days: Array.from({ length: 7 }, () => ({})) },
+    });
+    renderShared(encoded);
+    expect(screen.getByText('Nothing is planned for this week yet.')).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { level: 3, name: /jan 15/i })).toBeNull();
+  });
 });

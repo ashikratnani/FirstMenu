@@ -443,6 +443,47 @@ describe('Accessibility: axe on every main page (color-contrast disabled)', () =
     expect(results).toHaveNoViolations();
   });
 
+  it.each([
+    ['Prep', '/prep', /^prep$/i],
+    ['Grocery', '/grocery', /^grocery$/i],
+    ['Share', '/share', /^share$/i],
+    ['Plan (week)', '/plan', /^this week$/i],
+  ])('%s with an empty plan has no axe violations', async (_label, path, heading) => {
+    const base = seededState();
+    const emptyPlan = {
+      ...base,
+      plan: {
+        ...base.plan,
+        // No meals selected on the week, nothing planned elsewhere.
+        activeSlots: path === '/plan' ? [] : base.plan.activeSlots,
+        days: Array.from({ length: 7 }, () => ({})),
+      },
+    } as AppState;
+    const { container } = renderApp(path, emptyPlan);
+    expect(screen.getByRole('heading', { level: 1, name: heading })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /^(Plan your week|Go to Plan settings)$/ })).toBeInTheDocument();
+    const results = await axe(container, AXE_OPTIONS);
+    expect(results).toHaveNoViolations();
+  });
+
+  it('SharedView with nothing planned has no axe violations', async () => {
+    const base = seededState();
+    const { encoded } = encodeSharePayload({
+      ...base,
+      plan: { ...base.plan, days: Array.from({ length: 7 }, () => ({})) },
+    });
+    const { container } = render(
+      <MemoryRouter initialEntries={[`/shared/${encoded}`]}>
+        <Routes>
+          <Route path="/shared/:data" element={<SharedView />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+    expect(screen.getByText('Nothing is planned for this week yet.')).toBeInTheDocument();
+    const results = await axe(container, AXE_OPTIONS);
+    expect(results).toHaveNoViolations();
+  });
+
   it('SharedView (read-only link, no AppProvider) has no axe violations', async () => {
     // SharedView renders entirely from the encoded fragment and touches no
     // store/storage (Req 11.4), so it is rendered WITHOUT an AppProvider,

@@ -2,6 +2,8 @@ import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, beforeEach } from 'vitest';
 import SlotPicker from './SlotPicker';
+import slotpickerCss from './SlotPicker.module.css?raw';
+import { ruleBody } from '../../test/cssRule';
 import { AppProvider, useApp } from '../../state/AppProvider';
 import { STORAGE_KEY, defaultState } from '../../domain/storage';
 import type { AppState, Recipe } from '../../domain/types';
@@ -123,5 +125,13 @@ describe('SlotPicker', () => {
     renderPicker(seedState([OATS_RECIPE]));
     await user.click(screen.getByRole('button', { name: /Oat Porridge/ }));
     expect(captured!.plan.days[0].breakfast).toBe('custom-oats');
+  });
+
+  it('the options and the Cancel control are 44 px targets (CSS)', () => {
+    for (const selector of ['.option', '.close']) {
+      expect(ruleBody(slotpickerCss, selector)).toContain(
+        'min-height: 44px',
+      );
+    }
   });
 });
