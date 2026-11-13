@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { RECIPES_PAGE_SIZE, collapseTags, doorBadgeText, ghostReason, matchesSearch, pageStatusText, recipeView } from './recipeView';
+import { RECIPES_PAGE_SIZE, collapseTags, doorBadgeText, ghostReason, matchesSearch, pageStatusText, plateNotYetCheck, recipeView } from './recipeView';
 import { defaultState } from '../../domain/storage';
 import type { Recipe } from '../../domain/types';
 
@@ -98,5 +98,40 @@ describe('door badge text (v1 Req 7.3)', () => {
     expect(text).toBe('New food: wheat, oat, banana, dairy, egg, cinnamon, vanilla extract');
     for (const label of labels) expect(text).toContain(label);
     expect(text).not.toMatch(/more/);
+  });
+});
+
+describe('plateNotYetCheck', () => {
+  const withChild = {
+    ...state,
+    child: { birthDate: '2025-07-01' },
+  };
+
+  it('returns () => false for a Not yet recipe, so its plate keeps every main food', () => {
+    const banana = pasted({ title: 'Mashed banana', ingredients: [{ name: 'ripe banana', category: 'produce' }] });
+    const reacted = { ...withChild, foods: { banana: { status: 'reaction' as const, date: '2026-01-01' } } };
+    const view = recipeView(banana, reacted);
+    expect(view.isGhosted).toBe(true);
+    const isNotYet = plateNotYetCheck(view, reacted);
+    expect(isNotYet('banana')).toBe(false);
+    expect(isNotYet('shark')).toBe(false);
+  });
+
+  it('returns the foodStatus check for a recipe that is not Not yet', () => {
+    // "mako" counts as shark, so the screen does not read the name as shark.
+    const r = pasted({ ingredients: [{ name: 'mako', food: 'shark', category: 'protein' }, { name: 'carrot', category: 'produce' }] });
+    const view = recipeView(r, withChild);
+    expect(view.isGhosted).toBe(false);
+    const isNotYet = plateNotYetCheck(view, withChild);
+    expect(isNotYet('shark')).toBe(true);
+    expect(isNotYet('carrot')).toBe(false);
+  });
+
+  it('treats a recorded reaction as Not yet for a food on a recipe that is not Not yet', () => {
+    const r = pasted({ ingredients: [{ name: 'pear', category: 'produce' }] });
+    const reacted = { ...withChild, foods: { apple: { status: 'reaction' as const, date: '2026-01-01' } } };
+    const isNotYet = plateNotYetCheck(recipeView(r, reacted), reacted);
+    expect(isNotYet('apple')).toBe(true);
+    expect(isNotYet('pear')).toBe(false);
   });
 });

@@ -240,3 +240,19 @@ export function freezerBadgeText(months: number): string {
   const unit = months === 1 ? 'month' : 'months';
   return `Freezes for ${months} ${unit}`;
 }
+
+/**
+ * The `isNotYet` check a plate needs (design "Main foods and plates", step 7),
+ * built once for every page. A Not yet recipe keeps every main food on its
+ * plate and greys the plate as a whole, so it gets `() => false`. Any other
+ * recipe leaves a Not yet food (a plain key whose foodStatus is 'ghost') off
+ * its plate.
+ */
+export function plateNotYetCheck(
+  view: RecipeView,
+  state: AppState,
+): (key: string) => boolean {
+  if (view.isGhosted) return () => false;
+  const ageMonths = selectAgeMonths(state) ?? 0;
+  return (key) => foodStatus(key, state, ageMonths) === 'ghost';
+}
