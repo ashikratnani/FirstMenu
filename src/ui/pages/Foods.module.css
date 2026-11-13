@@ -54,7 +54,7 @@
 
 .reactionAdvice {
   margin: 0;
-  padding: calc(var(--space) * 0.5);
+  padding: var(--space);
   border: 1px solid var(--fm-color-border);
   border-radius: var(--radius);
   font-size: 0.85rem;
@@ -71,4 +71,65 @@
   display: flex;
   flex-wrap: wrap;
   gap: calc(var(--space) * 0.5);
+}
+
+.search {
+  margin: 0 0 var(--space);
+}
+
+/* Astryx text inputs are 32px tall; this one is a main control (44px). */
+.search :global(.astryx-text-input) {
+  min-height: 44px;
+}
+
+.status,
+.noMatch {
+  margin: 0 0 var(--space);
+}
+
+.status p,
+.noMatch p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--fm-color-muted);
+}
+
+.noMatch {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: calc(var(--space) * 0.75);
+}
+
+.noMatch button {
+  min-height: 44px;
+}
+
+/* The button that opens a food's record buttons, in the fm-link look. */
+.disclosure {
+  flex: none;
+  margin-left: auto;
+  min-height: 44px;
+  padding: 0 calc(var(--space) * 0.5);
+  border: 0;
+  background: none;
+  color: var(--color-text-accent);
+  font: inherit;
+  font-size: 0.9rem;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.disclosure:focus-visible {
+  outline: 2px solid var(--color-text-accent);
+  outline-offset: 2px;
+}
+
+.disclosure[aria-expanded='true'] {
+  font-weight: 600;
+}
+
+.controls button {
+  min-height: 44px;
 }
