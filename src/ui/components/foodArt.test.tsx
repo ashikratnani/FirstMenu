@@ -8,9 +8,7 @@ import {
   PeekabooArt,
   PumpkinArt,
 } from './foodArt';
-import FriendlyMonster from './FriendlyMonster';
 import GhostCard from './GhostCard';
-import MysteryDoor from './MysteryDoor';
 import cardStyles from './foodCard.module.css';
 // Load the stylesheets as raw text (Vite `?raw`) so we can assert, without
 // running CSS, that the animations exist and are gated by reduced motion.
@@ -105,49 +103,6 @@ describe('monster drawings use unique ids', () => {
 });
 
 describe('card components keep text + accessible name, art stays decorative', () => {
-  it('FriendlyMonster: label is the only visible/accessible text; art aria-hidden', () => {
-    render(
-      <ul>
-        <FriendlyMonster label="egg — tried on Nov 12" group="egg" />
-      </ul>,
-    );
-    const item = screen.getByRole('listitem', {
-      name: 'egg — tried on Nov 12',
-    });
-    expect(item).toHaveTextContent('egg — tried on Nov 12');
-    const svg = item.querySelector('svg');
-    expect(svg).toHaveAttribute('aria-hidden', 'true');
-    // The per-group variant renders via a non-text hook only.
-    expect(svg).toHaveAttribute('data-monster', 'egg');
-  });
-
-  it('FriendlyMonster without a group renders the generic monster', () => {
-    render(
-      <ul>
-        <FriendlyMonster label="apple — tried, no reaction" />
-      </ul>,
-    );
-    const item = screen.getByRole('listitem', {
-      name: 'apple — tried, no reaction',
-    });
-    const svg = item.querySelector('svg');
-    expect(svg).toHaveAttribute('data-monster', 'generic');
-  });
-
-  it('MysteryDoor: label carries the accessible name; door art aria-hidden', () => {
-    render(
-      <ul>
-        <MysteryDoor label="New food: egg" />
-      </ul>,
-    );
-    const item = screen.getByRole('listitem', { name: 'New food: egg' });
-    expect(item).toHaveTextContent('New food: egg');
-    const svg = item.querySelector('svg');
-    expect(svg).toHaveAttribute('aria-hidden', 'true');
-    // The door-open animation targets the decorative panel group.
-    expect(svg?.querySelector('.doorPanel')).not.toBeNull();
-  });
-
   it('GhostCard: label carries the accessible name; ghost art aria-hidden', () => {
     render(
       <ul>
