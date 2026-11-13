@@ -1,0 +1,5 @@
+Real-browser keyboard pass, Prep at 360 px, seeded with three cook sessions (two freezable).
+Tab order before (main 0afee9b) and after: identical (diff of before-prep-tab-order.txt and after-prep-tab-order.txt is empty), 12 stops.
+The snowflake is an img with alt="" inside the badge span, so it adds no tab stop and no name; the badge text is unchanged.
+Focus ring: 2px accent on links and buttons in both builds. Stops 6 to 9 are the native date input segments, the same in both builds (the last segment reports no outline in Chrome, also on main).
+Focus crops: before-kb-focus.png and after-kb-focus.png (Veggie Stew link).

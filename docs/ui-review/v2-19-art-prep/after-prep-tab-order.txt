@@ -1,0 +1,12 @@
+1. Skip to content | ring 2px rgb(180, 84, 26) focus-visible=true
+2. FirstMenu | ring 1px rgb(16, 16, 16) focus-visible=true
+3. Add recipe | ring 2px rgb(180, 84, 26) focus-visible=true
+4. Open navigation | ring 2px rgb(180, 84, 26) focus-visible=true
+5. Prep | ring 2px rgb(180, 84, 26) focus-visible=true
+6. date | ring 1px rgb(16, 16, 16) focus-visible=true
+7. date | ring 1px rgb(16, 16, 16) focus-visible=true
+8. date | ring 1px rgb(16, 16, 16) focus-visible=true
+9. date | ring NONE focus-visible=false
+10. Carrot Mash | ring 2px rgb(180, 84, 26) focus-visible=true
+11. Oat Fingers | ring 2px rgb(180, 84, 26) focus-visible=true
+12. Veggie Stew | ring 2px rgb(180, 84, 26) focus-visible=true
