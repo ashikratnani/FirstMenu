@@ -380,7 +380,7 @@ This requirement replaces the theme elements of v1 Requirement 14.1 and the mapp
 5. EVERY recipe card (the design lists them), for built-in and pasted recipes, and the top of every recipe page SHALL show a plate with up to 3 of the recipe's main foods, chosen by the rules in the design.
 6. A plate SHALL NEVER show a food that is matched, at any age, by the `choking-no-safe-form` block rule or by a prep reminder for round or tube-shaped foods (`grapes`, `cherry-tomato`, `cherries`, `small-round-fruit`, `sausages`, `whole-nuts`). It SHALL show the recipe's other main foods instead, or the generic bowl IF none are left.
 7. A Foods page tile MAY show the picture of a food that criterion 6 keeps off plates, but only with that rule's message, unchanged, as the first line under the picture and the food's name.
-8. A food or recipe is Not yet for the child when it is blocked for the child's age or paused after a recorded reaction. THE cards and recipe page of a Not yet recipe, and the Foods tile of a Not yet food, SHALL show the hourglass, and the plate of a Not yet recipe SHALL be greyed. EVERY picture of a Not yet food SHALL be greyed, so a plate SHALL NEVER show a Not yet food in full color. Only pictures are greyed; text keeps its contrast. Other screens keep showing Not yet as text.
+8. A food or recipe is Not yet for the child when it is blocked for the child's age or paused after a recorded reaction. THE cards and recipe page of a Not yet recipe, and the Foods tile of a Not yet food, SHALL show the hourglass, and the plate of a Not yet recipe SHALL be greyed. EVERY picture of a Not yet food SHALL be greyed, so a plate SHALL NEVER show a Not yet food in full color. Only pictures are greyed; text keeps its contrast. ON the shared recipe view, Not yet is what that view's "Not yet" section shows for the viewer's child, so with no child set up nothing is greyed. Other screens keep showing Not yet as text.
 9. THE state pictures SHALL be:
 
    | State | Shown for | Picture |
@@ -409,6 +409,6 @@ This requirement replaces the theme elements of v1 Requirement 14.1 and the mapp
 - Nutrient amounts, calorie or portion tracking.
 - Image cards for Instagram stories (possible later, depending on Requirement 9 review).
 - Photos, pictures made by an image-generation model, and pictures from other hosts (Requirement 21).
-- New work on the week plan, prep list, grocery list, print view or plan share link.
+- New work on the week plan, prep list, grocery list, print view or plan share link, apart from the snowflake on the Prep page's freezer badge (Requirement 21.1).
 - Children older than 3 years.
 - Built-in recipes from publishers that fail the recipe source criteria (Requirement 14.2).

@@ -42,7 +42,8 @@ Active spec: `.kiro/specs/what-can-i-make/`. v1 baseline (built):
 - Shows a picture of each food (Fluent Emoji, 3D style) and a plate of each
   recipe's main foods (active spec Requirement 21).
 - Secondary (under Plan): 7-day plan, prep list, grocery list, print view and
-  plan share link. No new work on these.
+  plan share link. No new work on these, apart from the snowflake on the Prep
+  page's freezer badge (active spec Requirement 21).
 
 ## Hard constraints
 
