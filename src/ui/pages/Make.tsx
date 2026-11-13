@@ -24,6 +24,7 @@ import {
   type MakeResult,
 } from '../../domain/make';
 import { leaveOutFor } from '../../domain/prompt';
+import type { Recipe } from '../../domain/types';
 import { isRecipeGhosted } from '../../domain/plan';
 import {
   MAKE_AGAIN_ID,
@@ -52,10 +53,12 @@ import AskChatGpt from '../components/AskChatGpt';
 import FoodSearchBox from '../components/FoodSearchBox';
 import GhostCard from '../components/GhostCard';
 import PantryEditor from '../components/PantryEditor';
+import Plate from '../components/Plate';
+import StatePicture from '../components/StatePicture';
 import { usePagePrimaryAction } from '../components/primaryActionContext';
 import ResultCard from '../components/ResultCard';
 import Suggestion from '../components/Suggestion';
-import { doorBadgeText, ghostReason, recipeView } from './recipeView';
+import { doorBadgeText, ghostReason, plateNotYetCheck, recipeView } from './recipeView';
 import { removeFilterPhrases, removeTypedWord } from './makeText';
 import { effortLabel, plural, timeLabel } from './makeView';
 import styles from './Make.module.css';
@@ -308,6 +311,12 @@ export default function Make() {
     </section>
   );
 
+  /** The compact plate for a recipe; a Not yet recipe greys it and keeps its foods. */
+  const platePicture = (recipe: Recipe, notYet = false) => {
+    const view = views.get(recipe.id) ?? recipeView(recipe, state, ageMonths);
+    return <Plate recipe={recipe} isNotYet={plateNotYetCheck(view, state)} notYet={notYet} size={48} compact />;
+  };
+
   const nothingFits = groups.readyNow.length === 0 && groups.missingOne.length === 0;
   const stage = stageFor(ageMonths);
 
@@ -438,10 +447,15 @@ export default function Make() {
             </>
           }
         >
-          <p className={styles.tryTitle}>{tryPick.result.recipe.title}</p>
-          <p className={styles.hint}>
-            {timeLabel(tryPick.result)} · {effortLabel(tryPick.result.effort)}
-          </p>
+          <div className={styles.tryRow}>
+            {platePicture(tryPick.result.recipe)}
+            <div>
+              <p className={styles.tryTitle}>{tryPick.result.recipe.title}</p>
+              <p className={styles.hint}>
+                {timeLabel(tryPick.result)} · {effortLabel(tryPick.result.effort)}
+              </p>
+            </div>
+          </div>
         </Suggestion>
       )}
 
@@ -607,8 +621,11 @@ export default function Make() {
           <ul className={styles.againList}>
             {makeAgain.map(({ recipe, date }) => (
               <li key={recipe.id} className={styles.againItem}>
-                <span>
-                  {recipe.title} <span className={styles.hint}>(made on {date})</span>
+                <span className={styles.againName}>
+                  {platePicture(recipe)}
+                  <span>
+                    {recipe.title} <span className={styles.hint}>(made on {date})</span>
+                  </span>
                 </span>
                 <Button
                   label={`Make again: ${recipe.title}`}
@@ -640,7 +657,11 @@ export default function Make() {
               const view = views.get(result.recipe.id);
               const reason = view ? ghostReason(view) : 'Not yet.';
               return (
-                <GhostCard key={result.recipe.id} label={`${result.recipe.title}. ${reason}`}>
+                <GhostCard
+                  key={result.recipe.id}
+                  label={`${result.recipe.title}. ${reason}`}
+                  art={platePicture(result.recipe, true)}
+                >
                   <Link className="fm-link" to={`/recipes/${result.recipe.id}`}>Open {result.recipe.title}</Link>
                 </GhostCard>
               );
@@ -651,9 +672,12 @@ export default function Make() {
 
       {nothingFits && (
         <section className={styles.panel} aria-labelledby="make-empty">
-          <h2 id="make-empty" className={styles.panelHeading}>
-            Nothing fits yet
-          </h2>
+          <div className={styles.emptyHead}>
+            <StatePicture state="tried" size={96} />
+            <h2 id="make-empty" className={styles.panelHeading}>
+              Nothing fits yet
+            </h2>
+          </div>
           <p className={styles.hint}>
             No recipe is ready to make or missing just one food with what you have. Tap
             a few more foods above, or ask ChatGPT for an idea.{' '}
@@ -711,7 +735,11 @@ export default function Make() {
                 const view = views.get(result.recipe.id);
                 const reason = view ? ghostReason(view) : 'Not yet.';
                 return (
-                  <GhostCard key={result.recipe.id} label={`${result.recipe.title}. ${reason}`}>
+                  <GhostCard
+                    key={result.recipe.id}
+                    label={`${result.recipe.title}. ${reason}`}
+                    art={platePicture(result.recipe, true)}
+                  >
                     <Link className="fm-link" to={`/recipes/${result.recipe.id}`}>Open {result.recipe.title}</Link>
                   </GhostCard>
                 );

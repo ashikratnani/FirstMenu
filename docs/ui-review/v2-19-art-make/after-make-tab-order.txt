@@ -1,0 +1,123 @@
+Keyboard tab order on Make with plates (v2/19-art-make)
+
+## Make with results, 360px (40 stops)
+1. a: Skip to content
+2. a: FirstMenu
+3. a: Add recipe
+4. button: Open navigation
+5. button: Edit pantry
+6. input: 
+7. button: Suggested: Lunch
+8. button: Remove Suggested: Lunch
+9. button: Not now
+10. a: Open recipe
+11. button: onion
+12. button: vegetable oil
+13. button: black pepper
+14. button: garlic
+15. button: carrot
+16. button: garlic powder
+17. button: salt
+18. button: bell pepper
+19. button: cheddar cheese
+20. button: soy sauce
+21. button: lemon juice
+22. button: celery
+23. button: cinnamon
+24. button: potato
+25. button: cumin
+26. button: green onion
+27. button: Iron-rich only
+28. button: All stages
+29. a: Chicken puree. Time not given. Easy. Iron-rich, Protein. New
+30. a: Chicken, Broccoli and Rice. Time not given. Easy. Iron-rich,
+31. a: Mashed banana. Time not given. Easy. Fruit
+32. a: Strawberry Swirl. about 245 min. Easy. Fruit. New food: stra
+33. button: I have this: strawberry
+34. a: Creamy Avocado Berry Baby Food. Time not given. Easy. Fruit.
+35. button: I have this: blueberry
+36. a: Mashed cooked oats. Time not given. Easy. New food: oat. Mis
+37. button: I have this: oat
+38. a: Sweet potato puree. Time not given. Medium. Vegetable. New f
+39. button: I have this: sweet potato
+40. button: Show left-out recipes
+
+## Make with left-out expanded, 360px (14 stops)
+1. a: Open Frozen Strawberry Yogurt
+2. a: Open Pear and Parsnip Smash-up
+3. a: Open Elaine's Green-Mash Potatoes
+4. a: Open Banana Berry Smoothie
+5. a: Open Mashed Carrots
+6. a: Open Peach Yogurt Smoothie
+7. a: Open Un-beet-able Berry Smoothie
+8. a: Open Kale Dip
+9. a: Open Green Pea Soup
+10. a: Open Mashed Turnips and Potatoes
+11. a: Open Red Potato and Cabbage (Colcannon)
+12. a: Open Apple Rice Pudding
+13. a: Open Hummus (No Tahini)
+14. a: Open Lemony Garbanzo Bean Dip
+
+## Make with results, 1280px (46 stops)
+1. a: Skip to content
+2. a: FirstMenu
+3. a: Make
+4. a: My recipes
+5. a: Add recipe
+6. a: Foods
+7. a: Plan
+8. a: Sources
+9. a: Settings
+10. a: Add recipe
+11. button: Edit pantry
+12. input: 
+13. button: Suggested: Lunch
+14. button: Remove Suggested: Lunch
+15. button: Not now
+16. a: Open recipe
+17. button: onion
+18. button: vegetable oil
+19. button: black pepper
+20. button: garlic
+21. button: carrot
+22. button: garlic powder
+23. button: salt
+24. button: bell pepper
+25. button: cheddar cheese
+26. button: soy sauce
+27. button: lemon juice
+28. button: celery
+29. button: cinnamon
+30. button: potato
+31. button: cumin
+32. button: green onion
+33. button: Iron-rich only
+34. button: All stages
+35. a: Chicken puree. Time not given. Easy. Iron-rich, Protein. New
+36. a: Chicken, Broccoli and Rice. Time not given. Easy. Iron-rich,
+37. a: Mashed banana. Time not given. Easy. Fruit
+38. a: Strawberry Swirl. about 245 min. Easy. Fruit. New food: stra
+39. button: I have this: strawberry
+40. a: Creamy Avocado Berry Baby Food. Time not given. Easy. Fruit.
+41. button: I have this: blueberry
+42. a: Mashed cooked oats. Time not given. Easy. New food: oat. Mis
+43. button: I have this: oat
+44. a: Sweet potato puree. Time not given. Medium. Vegetable. New f
+45. button: I have this: sweet potato
+46. button: Show left-out recipes
+
+## Make with left-out expanded, 1280px (14 stops)
+1. a: Open Frozen Strawberry Yogurt
+2. a: Open Pear and Parsnip Smash-up
+3. a: Open Elaine's Green-Mash Potatoes
+4. a: Open Banana Berry Smoothie
+5. a: Open Mashed Carrots
+6. a: Open Peach Yogurt Smoothie
+7. a: Open Un-beet-able Berry Smoothie
+8. a: Open Kale Dip
+9. a: Open Green Pea Soup
+10. a: Open Mashed Turnips and Potatoes
+11. a: Open Red Potato and Cabbage (Colcannon)
+12. a: Open Apple Rice Pudding
+13. a: Open Hummus (No Tahini)
+14. a: Open Lemony Garbanzo Bean Dip

@@ -1,0 +1,134 @@
+Focus ring per stop (real Chromium, Tab key)
+360 Open Frozen Strawberry Yogurt outline=auto 1px focus-visible=true
+360 Open Pear and Parsnip Smash-up outline=auto 1px focus-visible=true
+360 Open Elaine's Green-Mash Potatoes outline=auto 1px focus-visible=true
+360 Open Banana Berry Smoothie outline=auto 1px focus-visible=true
+360 Open Mashed Carrots outline=auto 1px focus-visible=true
+360 Open Peach Yogurt Smoothie outline=auto 1px focus-visible=true
+360 Open Un-beet-able Berry Smoothie outline=auto 1px focus-visible=true
+360 Open Kale Dip outline=auto 1px focus-visible=true
+360 Open Green Pea Soup outline=auto 1px focus-visible=true
+360 Open Mashed Turnips and Potatoes outline=auto 1px focus-visible=true
+360 Open Red Potato and Cabbage (Colcannon) outline=auto 1px focus-visible=true
+360 Open Apple Rice Pudding outline=auto 1px focus-visible=true
+360 Open Hummus (No Tahini) outline=auto 1px focus-visible=true
+360 Open Lemony Garbanzo Bean Dip outline=auto 1px focus-visible=true
+1280 Open Frozen Strawberry Yogurt outline=auto 1px focus-visible=true
+1280 Open Pear and Parsnip Smash-up outline=auto 1px focus-visible=true
+1280 Open Elaine's Green-Mash Potatoes outline=auto 1px focus-visible=true
+1280 Open Banana Berry Smoothie outline=auto 1px focus-visible=true
+1280 Open Mashed Carrots outline=auto 1px focus-visible=true
+1280 Open Peach Yogurt Smoothie outline=auto 1px focus-visible=true
+1280 Open Un-beet-able Berry Smoothie outline=auto 1px focus-visible=true
+1280 Open Kale Dip outline=auto 1px focus-visible=true
+1280 Open Green Pea Soup outline=auto 1px focus-visible=true
+1280 Open Mashed Turnips and Potatoes outline=auto 1px focus-visible=true
+1280 Open Red Potato and Cabbage (Colcannon) outline=auto 1px focus-visible=true
+1280 Open Apple Rice Pudding outline=auto 1px focus-visible=true
+1280 Open Hummus (No Tahini) outline=auto 1px focus-visible=true
+1280 Open Lemony Garbanzo Bean Dip outline=auto 1px focus-visible=true
+
+Network requests (all pages, both widths): 102
+Non-localhost requests: 0
+360 http://localhost:4377/FirstMenu/
+360 http://localhost:4377/FirstMenu/assets/index-zp_l6UvI.js
+360 http://localhost:4377/FirstMenu/assets/recipe-data-BuRUkITF.js
+360 http://localhost:4377/FirstMenu/assets/index-BnE5VrOD.css
+360 http://localhost:4377/FirstMenu/assets/Make-BjLmMR2E.js
+360 http://localhost:4377/FirstMenu/assets/ResultCard-BDXDBFoe.js
+360 http://localhost:4377/FirstMenu/assets/foodNames-QxNPRw9v.js
+360 http://localhost:4377/FirstMenu/assets/TextInput-sD_hcHH-.js
+360 http://localhost:4377/FirstMenu/assets/useBusyAnnouncement-BEqZPhky.js
+360 http://localhost:4377/FirstMenu/assets/TagBadge-BYt_aV7c.js
+360 http://localhost:4377/FirstMenu/assets/makeView-CaDzjpCp.js
+360 http://localhost:4377/FirstMenu/assets/Badge-Dlsa_3ki.js
+360 http://localhost:4377/FirstMenu/assets/recipeView-kwyn6K0S.js
+360 http://localhost:4377/FirstMenu/assets/age-p-nzRQW7.js
+360 http://localhost:4377/FirstMenu/assets/selectors-CP_EvDg3.js
+360 http://localhost:4377/FirstMenu/assets/foodArt-CEiVCsHZ.js
+360 http://localhost:4377/FirstMenu/assets/ClickableCard-CXnCK3Xb.js
+360 http://localhost:4377/FirstMenu/assets/chainEventHandlers-DEVizudM.js
+360 http://localhost:4377/FirstMenu/assets/ResultCard-C24ASj1t.css
+360 http://localhost:4377/FirstMenu/assets/make-szo3Q2cb.js
+360 http://localhost:4377/FirstMenu/assets/nutrition-DjB_GMO3.js
+360 http://localhost:4377/FirstMenu/assets/AskChatGpt-4LwjUs2q.js
+360 http://localhost:4377/FirstMenu/assets/AskChatGpt-Dtfet4UW.css
+360 http://localhost:4377/FirstMenu/assets/GhostCard-FNz207tc.js
+360 http://localhost:4377/FirstMenu/assets/GhostCard-DjWscuDk.css
+360 http://localhost:4377/FirstMenu/assets/PantryEditor-BkCckkFN.js
+360 http://localhost:4377/FirstMenu/assets/CheckboxInput-DdG2p-ii.js
+360 http://localhost:4377/FirstMenu/assets/PantryEditor-CPwNeV2Q.css
+360 http://localhost:4377/FirstMenu/assets/ToggleButton-Cgc_VFZV.js
+360 http://localhost:4377/FirstMenu/assets/Make-Bx6ZgGz_.css
+360 http://localhost:4377/FirstMenu/assets/figtree-latin-600-normal-Cv_xCTDl.woff2
+360 http://localhost:4377/FirstMenu/assets/figtree-latin-500-normal-BWnGEVsr.woff2
+360 http://localhost:4377/FirstMenu/assets/figtree-latin-400-normal-g7Dtegnw.woff2
+360 http://localhost:4377/FirstMenu/assets/fredoka-latin-600-normal-C4zohCW5.woff2
+360 http://localhost:4377/FirstMenu/assets/figtree-latin-700-normal-th6qEP7c.woff2
+360 http://localhost:4377/FirstMenu/art/foods/banana.webp
+360 http://localhost:4377/FirstMenu/art/foods/poultry_leg.webp
+360 http://localhost:4377/FirstMenu/art/foods/cooked_rice.webp
+360 http://localhost:4377/FirstMenu/art/foods/broccoli.webp
+360 http://localhost:4377/FirstMenu/art/foods/strawberry.webp
+360 http://localhost:4377/FirstMenu/art/foods/avocado.webp
+360 http://localhost:4377/FirstMenu/art/foods/bowl_with_spoon.webp
+360 http://localhost:4377/FirstMenu/art/foods/roasted_sweet_potato.webp
+360 http://localhost:4377/FirstMenu/art/state/hourglass_not_done.webp
+360 http://localhost:4377/FirstMenu/art/foods/pear.webp
+360 http://localhost:4377/FirstMenu/art/foods/potato.webp
+360 http://localhost:4377/FirstMenu/art/foods/glass_of_milk.webp
+360 http://localhost:4377/FirstMenu/art/foods/pea_pod.webp
+360 http://localhost:4377/FirstMenu/art/foods/carrot.webp
+360 http://localhost:4377/FirstMenu/art/foods/leafy_green.webp
+360 http://localhost:4377/FirstMenu/art/foods/red_apple.webp
+1280 http://localhost:4377/FirstMenu/
+1280 http://localhost:4377/FirstMenu/assets/index-zp_l6UvI.js
+1280 http://localhost:4377/FirstMenu/assets/recipe-data-BuRUkITF.js
+1280 http://localhost:4377/FirstMenu/assets/index-BnE5VrOD.css
+1280 http://localhost:4377/FirstMenu/assets/Make-BjLmMR2E.js
+1280 http://localhost:4377/FirstMenu/assets/ResultCard-BDXDBFoe.js
+1280 http://localhost:4377/FirstMenu/assets/foodNames-QxNPRw9v.js
+1280 http://localhost:4377/FirstMenu/assets/TextInput-sD_hcHH-.js
+1280 http://localhost:4377/FirstMenu/assets/useBusyAnnouncement-BEqZPhky.js
+1280 http://localhost:4377/FirstMenu/assets/TagBadge-BYt_aV7c.js
+1280 http://localhost:4377/FirstMenu/assets/makeView-CaDzjpCp.js
+1280 http://localhost:4377/FirstMenu/assets/Badge-Dlsa_3ki.js
+1280 http://localhost:4377/FirstMenu/assets/recipeView-kwyn6K0S.js
+1280 http://localhost:4377/FirstMenu/assets/age-p-nzRQW7.js
+1280 http://localhost:4377/FirstMenu/assets/selectors-CP_EvDg3.js
+1280 http://localhost:4377/FirstMenu/assets/foodArt-CEiVCsHZ.js
+1280 http://localhost:4377/FirstMenu/assets/ClickableCard-CXnCK3Xb.js
+1280 http://localhost:4377/FirstMenu/assets/chainEventHandlers-DEVizudM.js
+1280 http://localhost:4377/FirstMenu/assets/ResultCard-C24ASj1t.css
+1280 http://localhost:4377/FirstMenu/assets/make-szo3Q2cb.js
+1280 http://localhost:4377/FirstMenu/assets/nutrition-DjB_GMO3.js
+1280 http://localhost:4377/FirstMenu/assets/AskChatGpt-4LwjUs2q.js
+1280 http://localhost:4377/FirstMenu/assets/AskChatGpt-Dtfet4UW.css
+1280 http://localhost:4377/FirstMenu/assets/GhostCard-FNz207tc.js
+1280 http://localhost:4377/FirstMenu/assets/GhostCard-DjWscuDk.css
+1280 http://localhost:4377/FirstMenu/assets/PantryEditor-BkCckkFN.js
+1280 http://localhost:4377/FirstMenu/assets/CheckboxInput-DdG2p-ii.js
+1280 http://localhost:4377/FirstMenu/assets/PantryEditor-CPwNeV2Q.css
+1280 http://localhost:4377/FirstMenu/assets/ToggleButton-Cgc_VFZV.js
+1280 http://localhost:4377/FirstMenu/assets/Make-Bx6ZgGz_.css
+1280 http://localhost:4377/FirstMenu/assets/figtree-latin-600-normal-Cv_xCTDl.woff2
+1280 http://localhost:4377/FirstMenu/assets/figtree-latin-500-normal-BWnGEVsr.woff2
+1280 http://localhost:4377/FirstMenu/assets/figtree-latin-400-normal-g7Dtegnw.woff2
+1280 http://localhost:4377/FirstMenu/assets/fredoka-latin-600-normal-C4zohCW5.woff2
+1280 http://localhost:4377/FirstMenu/assets/figtree-latin-700-normal-th6qEP7c.woff2
+1280 http://localhost:4377/FirstMenu/art/foods/banana.webp
+1280 http://localhost:4377/FirstMenu/art/foods/poultry_leg.webp
+1280 http://localhost:4377/FirstMenu/art/foods/cooked_rice.webp
+1280 http://localhost:4377/FirstMenu/art/foods/broccoli.webp
+1280 http://localhost:4377/FirstMenu/art/foods/strawberry.webp
+1280 http://localhost:4377/FirstMenu/art/foods/avocado.webp
+1280 http://localhost:4377/FirstMenu/art/foods/bowl_with_spoon.webp
+1280 http://localhost:4377/FirstMenu/art/foods/roasted_sweet_potato.webp
+1280 http://localhost:4377/FirstMenu/art/state/hourglass_not_done.webp
+1280 http://localhost:4377/FirstMenu/art/foods/pear.webp
+1280 http://localhost:4377/FirstMenu/art/foods/potato.webp
+1280 http://localhost:4377/FirstMenu/art/foods/glass_of_milk.webp
+1280 http://localhost:4377/FirstMenu/art/foods/pea_pod.webp
+1280 http://localhost:4377/FirstMenu/art/foods/carrot.webp
+1280 http://localhost:4377/FirstMenu/art/foods/leafy_green.webp
+1280 http://localhost:4377/FirstMenu/art/foods/red_apple.webp

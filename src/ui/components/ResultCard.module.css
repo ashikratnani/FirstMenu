@@ -10,10 +10,30 @@
   min-width: 0;
 }
 
+.row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
 .body {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  min-width: 0;
+}
+
+.stateLine {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.stateLine > :first-child {
+  flex: none;
 }
 
 .title {

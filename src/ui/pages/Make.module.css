@@ -102,6 +102,18 @@
   font-size: 1.1rem;
 }
 
+.tryRow,
+.againName,
+.emptyHead {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.emptyHead > :first-child {
+  flex: none;
+}
+
 .bannerText {
   margin: 0;
 }

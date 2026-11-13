@@ -18,3 +18,19 @@
   box-shadow: 0 1px 3px rgba(43, 35, 48, 0.18);
   overflow: hidden;
 }
+
+/* Compact row block: a 64 px square, the hourglass sits on the lower corner. */
+.compact {
+  position: relative;
+  box-sizing: border-box;
+  flex: none;
+  width: 64px;
+  height: 64px;
+  padding: 0;
+}
+
+.compact > img:last-child {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+}

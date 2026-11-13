@@ -5,8 +5,9 @@
 // `isNotYet` is required (build it with plateNotYetCheck), so no page can leave
 // it out. Decorative: it adds no text.
 
+import { useMemo } from 'react';
 import { GROUP_PICTURES } from '../../data/foodPictures';
-import { plateFoods, plateGroup } from '../../domain/plate';
+import { plateFoods } from '../../domain/plate';
 import type { Recipe } from '../../domain/types';
 import FoodPicture from './FoodPicture';
 import StatePicture from './StatePicture';
@@ -20,21 +21,24 @@ export interface PlateProps {
   notYet?: boolean;
   /** Plate diameter in px (about 112 on cards, 160 on the recipe page). */
   size?: number;
+  /** A 64 px square band with the hourglass on its corner, for list rows (design "Screens"). */
+  compact?: boolean;
 }
 
-export default function Plate({ recipe, isNotYet, notYet = false, size = 112 }: PlateProps) {
-  const foods = plateFoods(recipe, isNotYet);
-  const band = notYet ? 'not-yet' : plateGroup(recipe, isNotYet);
+export default function Plate({ recipe, isNotYet, notYet = false, size = 112, compact = false }: PlateProps) {
+  // Screening names is the costly part, so it runs once per recipe and check.
+  const foods = useMemo(() => plateFoods(recipe, isNotYet), [recipe, isNotYet]);
+  const band = notYet ? 'not-yet' : (foods[0]?.group ?? 'other');
   const pictures = foods.length > 0 ? foods.map((f) => f.picture) : [GROUP_PICTURES.other];
   const px = Math.round(size * (pictures.length === 1 ? 0.55 : pictures.length === 2 ? 0.42 : 0.4));
   return (
-    <div className={styles.band} style={{ backgroundColor: `var(--fm-color-group-${band})` }} data-band={band}>
+    <div className={compact ? `${styles.band} ${styles.compact}` : styles.band} style={{ backgroundColor: `var(--fm-color-group-${band})` }} data-band={band}>
       <div className={styles.plate} style={{ width: size, height: size }}>
         {pictures.map((name) => (
           <FoodPicture key={name} name={name} size={px} greyed={notYet} />
         ))}
       </div>
-      {notYet && <StatePicture state="not-yet" size={Math.round(size * 0.4)} />}
+      {notYet && <StatePicture state="not-yet" size={Math.round(size * (compact ? 0.45 : 0.4))} />}
     </div>
   );
 }
