@@ -89,10 +89,11 @@ Requirement 21, design "Food art"):
 - The cards and recipe page of a Not yet recipe, and the Foods tile of a Not
   yet food, show the hourglass, and the plate of a Not yet recipe is greyed.
   Every picture of a Not yet food is greyed, so a plate never shows a Not yet
-  food in full color; on a recipe that is not Not yet, such a food is left off
-  the plate. The shared recipe view greys and shows the hourglass only when it
-  shows its own "Not yet" section, greys nothing when no child is set up, and
-  leaves no food off its plate for being Not yet.
+  food in full color. A Not yet recipe's plate keeps all its main foods and is
+  greyed as a whole; on a recipe that is not Not yet, a Not yet food is left
+  off the plate. The shared recipe view greys and shows the hourglass only
+  when it shows its own "Not yet" section, greys nothing when no child is set
+  up, and leaves no food off its plate for being Not yet.
 - No photos, no pictures made by an image-generation model, and no pictures
   from other hosts.
 - Renaming or removing one of these rule ids needs the same change in
