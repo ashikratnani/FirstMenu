@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { RECIPES_PAGE_SIZE, collapseTags, ghostReason, matchesSearch, pageStatusText, recipeView } from './recipeView';
+import { RECIPES_PAGE_SIZE, collapseTags, doorBadgeText, ghostReason, matchesSearch, pageStatusText, recipeView } from './recipeView';
 import { defaultState } from '../../domain/storage';
 import type { Recipe } from '../../domain/types';
 
@@ -88,5 +88,15 @@ describe('card tags and search', () => {
     expect(matchesSearch(r, '  ')).toBe(true);
     expect(matchesSearch(r, 'MASH oats')).toBe(true);
     expect(matchesSearch(r, 'mash banana')).toBe(false);
+  });
+});
+
+describe('door badge text (v1 Req 7.3)', () => {
+  it('names every untried food, however many, instead of shortening the list', () => {
+    const labels = ['wheat', 'oat', 'banana', 'dairy', 'egg', 'cinnamon', 'vanilla extract'];
+    const text = doorBadgeText(labels);
+    expect(text).toBe('New food: wheat, oat, banana, dairy, egg, cinnamon, vanilla extract');
+    for (const label of labels) expect(text).toContain(label);
+    expect(text).not.toMatch(/more/);
   });
 });

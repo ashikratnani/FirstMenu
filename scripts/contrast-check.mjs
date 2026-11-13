@@ -12,6 +12,26 @@ const tokens = Object.fromEntries(
   [...css.matchAll(/(--color-[a-z-]+):\s*(#[0-9a-fA-F]{6})\b/g)].map((m) => [m[1], m[2]]),
 );
 
+// FirstMenu app tokens (--fm-*), used by the lavender band on the Sources page:
+// 60% lavender over the cream page background (Sources.module.css .band).
+const fm = Object.fromEntries(
+  [...readFileSync('src/ui/theme.css', 'utf8').matchAll(/(--fm-color-[a-z-]+):\s*(#[0-9a-fA-F]{6})\b/g)].map(
+    (m) => [m[1], m[2]],
+  ),
+);
+const mix = (a, b, pct) =>
+  '#' +
+  [1, 3, 5]
+    .map((i) =>
+      Math.round(parseInt(a.slice(i, i + 2), 16) * pct + parseInt(b.slice(i, i + 2), 16) * (1 - pct))
+        .toString(16)
+        .padStart(2, '0'),
+    )
+    .join('');
+tokens['--band'] = mix(fm['--fm-color-lavender'], fm['--fm-color-bg'], 0.6);
+tokens['--fm-color-heading'] = fm['--fm-color-heading'];
+tokens['--fm-color-muted'] = fm['--fm-color-muted'];
+
 // [foreground, background, minimum ratio, what it is]
 const PAIRS = [
   ['--color-text-primary', '--color-background-body', 4.5, 'body text'],
@@ -27,6 +47,10 @@ const PAIRS = [
   ['--color-text-orange', '--color-background-orange', 4.5, 'notice text'],
   ['--color-text-primary', '--color-background-orange', 4.5, 'text on notices'],
   ['--color-text-yellow', '--color-background-yellow', 4.5, 'pumpkin badge text'],
+  ['--fm-color-heading', '--band', 4.5, 'headings on the Sources lavender band'],
+  ['--fm-color-muted', '--band', 4.5, 'muted text on the Sources lavender band'],
+  ['--color-text-primary', '--band', 4.5, 'body text on the Sources lavender band'],
+  ['--color-text-accent', '--band', 4.5, 'links on the Sources lavender band'],
 ];
 
 function luminance(hex) {

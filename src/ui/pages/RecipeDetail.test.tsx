@@ -147,6 +147,20 @@ describe('RecipeDetail page', () => {
     expect(screen.getByText(NOT_MEDICAL_ADVICE)).toBeInTheDocument();
   });
 
+  it('names the publisher once on the source section, not again on the storage line', () => {
+    renderDetail('b-carrots-and-apples', seedState(8));
+    const section = screen.getByRole('heading', { name: 'Source' }).closest('section') as HTMLElement;
+    const publisher = 'Minnesota Department of Health';
+    const text = section.textContent ?? '';
+    expect(text.split(publisher).length - 1).toBe(1);
+    expect(text).toMatch(/Retrieved /);
+    const storage = within(section).getByRole('link', { name: 'see the storage page' });
+    expect(storage).toHaveAttribute(
+      'href',
+      'https://www.health.state.mn.us/people/wic/recipes/babyfood.html',
+    );
+  });
+
   it('shows a per-ingredient prep reminder for an ingredient that triggers one', () => {
     // carrots + apple both trigger the hard-produce "Cook until soft" reminder.
     renderDetail('b-carrots-and-apples', seedState(8));

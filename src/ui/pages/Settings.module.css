@@ -21,11 +21,12 @@
 .label {
   font-weight: 500;
   font-size: 0.875rem;
+  color: var(--color-text-secondary);
 }
 
 /* Native date input styled to match the Astryx text input. */
 .input {
-  min-height: 40px;
+  min-height: 44px;
   padding: 8px 12px;
   border: 1px solid var(--color-border-emphasized);
   border-radius: var(--radius-element);
@@ -101,33 +102,75 @@
   min-width: 0;
 }
 
+/* Sticky pill: only the button (and "Saved.") is drawn, so the field the
+   parent is on stays visible beside it instead of hidden under a full-width
+   bar. Fields keep a bottom scroll margin so focus never lands under it. */
 .actions {
   position: sticky;
   bottom: 0;
   display: flex;
   align-items: center;
   gap: 12px;
-  margin: 0 -16px;
-  padding: 12px 16px;
-  background: var(--color-background-body);
-  border-top: 1px solid var(--color-border);
+  padding: 12px 0;
+  /* Pill on the right, Saved. to its left; tab order stays Save last. */
+  flex-direction: row-reverse;
+  pointer-events: none;
+}
+
+.actions > * {
+  pointer-events: auto;
+}
+
+.actions button[type='submit'] {
+  min-height: 48px;
+  min-width: 8rem;
+  border-radius: 999px;
+  box-shadow: 0 2px 8px rgb(43 35 48 / 0.25);
 }
 
 .saved {
   margin: 0;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: var(--color-background-surface);
   font-weight: 600;
   color: var(--color-text-primary);
 }
 
-.pantry {
+.form input,
+.form fieldset {
+  scroll-margin-bottom: 96px;
+}
+
+.pantry,
+.profile {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  max-width: 34rem;
-  margin: 0 0 24px;
+  padding: 16px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-container);
+  background: var(--color-background-surface);
 }
 
-.pantryHeading {
+.pantry {
+  max-width: 34rem;
+  margin: 0 0 16px;
+}
+
+.tour {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}
+
+.tourLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+
+.sectionHeading {
   margin: 0;
   font-size: 1.15rem;
 }
