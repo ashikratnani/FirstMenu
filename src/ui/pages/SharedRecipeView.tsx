@@ -21,7 +21,6 @@ import { useApp } from '../../state/AppProvider';
 import { selectAgeMonths } from '../../state/selectors';
 import Disclaimer from '../components/Disclaimer';
 import Plate from '../components/Plate';
-import StatePicture from '../components/StatePicture';
 import styles from './SharedRecipeView.module.css';
 
 function quantityLabel(ingredient: Ingredient): string {
@@ -94,12 +93,9 @@ export default function SharedRecipeView() {
       {ageMonths === null && <p className={styles.intro}>Set up your child to check this recipe.</p>}
       {(blocks.length > 0 || textMentions.length > 0) && (
         <section className={styles.ghost} role="note" aria-labelledby="shared-recipe-not-yet">
-          <div className={styles.ghostTitle}>
-            <StatePicture state="not-yet" />
-            <h2 id="shared-recipe-not-yet" className={styles.ghostHeading}>
-              Not yet
-            </h2>
-          </div>
+          <h2 id="shared-recipe-not-yet" className={styles.ghostHeading}>
+            Not yet
+          </h2>
           <ul className={styles.blockList}>
             {blocks.map((block, i) => (
               <li key={`${block.ruleId}-${block.ingredientIndex}-${i}`}>

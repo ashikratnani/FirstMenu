@@ -115,12 +115,13 @@ describe('Shared recipe view plate', () => {
     expect(band()!.parentElement!.className).toMatch(/plate/);
   });
 
-  it('with a block finding greys the plate, keeps the foods and shows the hourglass in the Not yet section', () => {
+  it('with a block finding greys the plate, keeps the foods and shows no hourglass at the Not yet heading', () => {
     renderShared(seedState(), HONEY_BANANA);
     expect(band()).toHaveAttribute('data-band', 'not-yet');
     expect(bananaGreyed()).toBe(true);
     const note = screen.getByRole('note', { name: 'Not yet' });
-    expect(hasHourglass(note)).toBe(true);
+    expect(hasHourglass(note)).toBe(false);
+    expect(hasHourglass(document.body)).toBe(true);
     const title = screen.getByRole('heading', { level: 1, name: 'Honey Banana Bites' });
     expect(title.compareDocumentPosition(band()!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });

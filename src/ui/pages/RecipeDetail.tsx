@@ -319,10 +319,7 @@ export default function RecipeDetail() {
           role="note"
           aria-label={`Not yet. ${ghostReason(view)}`}
         >
-          <div className={styles.ghostTitle}>
-            <StatePicture state="not-yet" />
-            <h2 className={styles.ghostHeading}>Not yet</h2>
-          </div>
+          <h2 className={styles.ghostHeading}>Not yet</h2>
           {blocks.length > 0 || view.textMentions.length > 0 ? (
             <ul className={styles.blockList}>
               {blocks.map((block, i) => (
@@ -427,7 +424,7 @@ export default function RecipeDetail() {
       </section>
 
       {(storage?.fridgeDays !== undefined ||
-        storage?.freezerMonths !== undefined ||
+        (storage?.freezerMonths ?? 0) > 0 ||
         recipe.makeAheadNote) && (
         <section aria-labelledby="recipe-storage">
           <h2 id="recipe-storage">Storage</h2>
@@ -435,7 +432,7 @@ export default function RecipeDetail() {
             {storage?.fridgeDays !== undefined && (
               <li>{fridgeText(storage.fridgeDays)}</li>
             )}
-            {storage?.freezerMonths !== undefined && (
+            {storage?.freezerMonths !== undefined && storage.freezerMonths > 0 && (
               <li className={styles.freezer}>
                 <StatePicture state="freezes" />
                 <span>{freezerText(storage.freezerMonths)}</span>

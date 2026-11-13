@@ -70,6 +70,10 @@ const GRAPE = recipe('c-grape', 'Grape Rice', ['grapes', 'rice']);
 const SALMON = recipe('c-salmon', 'Salmon Rice', ['salmon', 'rice']);
 const FROZEN = recipe('c-frozen', 'Freezer Chicken', ['chicken'], { storage: { freezerMonths: 3 } } as Partial<Recipe>);
 
+const ZERO_FREEZER = recipe('c-zero', 'No Freeze Chicken', ['chicken'], {
+  storage: { fridgeDays: 3, freezerMonths: 0 },
+} as Partial<Recipe>);
+
 const OLD = '2026-01-01';
 function seedState(extra: Partial<AppState> = {}, ageMonths = 10, customRecipes: Recipe[] = []): AppState {
   return {
@@ -78,7 +82,7 @@ function seedState(extra: Partial<AppState> = {}, ageMonths = 10, customRecipes:
     onboarded: true,
     customRecipes: customRecipes.length
       ? customRecipes
-      : [CHICKEN, HONEY_BANANA, MASHED, GRAPE, SALMON, FROZEN],
+      : [CHICKEN, HONEY_BANANA, MASHED, GRAPE, SALMON, FROZEN, ZERO_FREEZER],
     foods: Object.fromEntries(
       ['chicken', 'rice', 'banana', 'grapes'].map((key) => [key, { status: 'tried' as const, date: OLD }]),
     ),
@@ -153,7 +157,7 @@ describe('Recipe page plate (Requirement 21.5)', () => {
 });
 
 describe('Not yet recipe page', () => {
-  it('greys the plate, keeps its foods and shows the hourglass by the unchanged Not yet note', () => {
+  it('greys the plate, keeps its foods and shows the hourglass beside the plate only, not at the Not yet heading', () => {
     renderDetail(seedState(), 'c-honey');
     expect(band()).toHaveAttribute('data-band', 'not-yet');
     const banana = [...document.querySelectorAll('img')].find((i) => i.getAttribute('src')?.includes('/banana.webp'));
@@ -161,7 +165,8 @@ describe('Not yet recipe page', () => {
     expect(banana!.className).toMatch(/greyed/);
     const note = screen.getByRole('note', { name: /^Not yet\. / });
     expect(within(note).getByRole('heading', { level: 2, name: 'Not yet' })).toBeInTheDocument();
-    expect(hasHourglass(note)).toBe(true);
+    expect(hasHourglass(note)).toBe(false);
+    expect(hasHourglass(document.body)).toBe(true);
   });
 
   it('a recorded reaction keeps the food on the plate, greyed, never the generic bowl', () => {
@@ -179,6 +184,13 @@ describe('Freezer line', () => {
     renderDetail(seedState(), 'c-frozen');
     const line = screen.getByText('Freezes for 3 months');
     expect(line.parentElement?.querySelector('img')?.getAttribute('src')).toContain('snowflake');
+  });
+
+  it('shows no snowflake or freezer line when freezer time is 0 months', () => {
+    renderDetail(seedState(), 'c-zero');
+    expect(imgs(document.body).some((s) => s.includes('snowflake'))).toBe(false);
+    expect(screen.queryByText(/Freezes for/)).toBeNull();
+    expect(screen.getByText(/fridge/i)).toBeInTheDocument();
   });
 
   it('shows no snowflake without freezer information', () => {
