@@ -80,9 +80,12 @@ Requirement 21, design "Food art"):
 
 - A plate never shows a food that `choking-no-safe-form` or the prep reminders
   for round or tube-shaped foods (`grapes`, `cherry-tomato`, `cherries`,
-  `small-round-fruit`, `sausages`, `whole-nuts`) match, at any age. A Foods
-  tile may show such a food's picture only with the rule's message, unchanged,
-  as the first line under it.
+  `small-round-fruit`, `sausages`, `whole-nuts`) match, at any age, and never
+  a choking-shape picture (`CHOKING_SHAPE_PICTURES`), whatever food uses it.
+- A Foods tile may show such a food's picture only with the rule's message,
+  unchanged, as the first line under the picture and the food's name. A tile
+  shows the group picture instead of a choking-shape picture whose food none
+  of those rules matches (for example Chestnut).
 - The cards and recipe page of a Not yet recipe, and the Foods tile of a Not
   yet food, show the hourglass, and the plate of a Not yet recipe is greyed.
   Every picture of a Not yet food is greyed, so a plate never shows a Not yet
