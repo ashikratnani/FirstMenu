@@ -239,6 +239,8 @@ describe('Accessibility: axe on every main page (color-contrast disabled)', () =
       const results = await axe(container, AXE_OPTIONS);
       expect(results).toHaveNoViolations();
     },
+    // The Foods page draws a monster badge on every tile; axe takes about 13 s on it.
+    60_000,
   );
 
   it('shared recipe view (#/r/) has no axe violations', async () => {

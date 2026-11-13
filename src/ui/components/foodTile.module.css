@@ -1,0 +1,99 @@
+/*
+ * Foods tile (task 19.4): a card with the food picture on a group-colored
+ * circle, the state picture as a badge at the circle's edge, and the label.
+ * Works at 360 px (Req 14.6).
+ */
+.tile {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--space) * 0.5);
+  padding: var(--space);
+  border: 1px solid var(--fm-color-border);
+  border-radius: var(--radius);
+  background: var(--fm-color-surface);
+  color: var(--fm-color-text);
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--space) * 0.75);
+}
+
+.art {
+  position: relative;
+  flex: none;
+  width: 56px;
+  height: 56px;
+}
+
+.circle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+}
+
+.badge {
+  position: absolute;
+  right: -10px;
+  bottom: -8px;
+  display: flex;
+  width: 32px;
+  height: 32px;
+}
+
+.label {
+  font-family: var(--font-family-heading);
+  font-weight: 600;
+  color: var(--fm-color-heading);
+}
+
+/*
+ * First-taste moment (Req 21.13): the monster rises out of a dark hole once,
+ * 500 ms. The class is set from component state and removed on animationend.
+ */
+.pop .badge {
+  clip-path: inset(-24px -24px 0 -24px);
+}
+
+.pop .badge::before {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 10px;
+  border-radius: 50%;
+  background: #2b2330;
+}
+
+.pop .badge > svg {
+  position: relative;
+  animation: monster-rise 500ms ease-out 1 both;
+}
+
+@keyframes monster-rise {
+  from {
+    transform: translateY(100%) scale(0.7);
+  }
+  to {
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pop .badge {
+    clip-path: none;
+  }
+
+  .pop .badge::before {
+    display: none;
+  }
+
+  .pop .badge > svg {
+    animation: none;
+  }
+}

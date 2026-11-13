@@ -1,27 +1,28 @@
-// Foods page (Task 8.2, Req 7.1/7.4/7.6/7.7/14.3). Shows every food the app
-// knows about as one of three themed cards:
-//   - MysteryDoor  — an untried food (design "New food: egg");
-//   - FriendlyMonster — a food tried with no reaction (design "Tried on Nov 12");
-//   - GhostCard — a food blocked by the safety screen for this age OR a food
-//     with a recorded reaction (design "Not yet: honey. Available at 12 months.").
+// Foods page (Task 8.2, Req 7.1/7.4/7.6/7.7/14.3, Req 21). Shows every food
+// the app knows about as one tile (FoodTile) in one of three states:
+//   - New food, with the peekaboo monster (design "New food: egg");
+//   - Tried, with the friendly monster (design "Tried on Nov 12");
+//   - Not yet, with the hourglass and a greyed picture: a food blocked by the
+//     safety screen for this age OR a food with a recorded reaction (design
+//     "Not yet: honey. Available at 12 months.").
 //
-// Layout decision: a single scrollable page split into three sections — doors
-// first (the actionable "try something new" list, with allergen guidance on
-// allergen doors), then tried monsters, then ghosts (block-covered + reaction).
-// State is carried by VISIBLE text labels and each card's accessible name; the
-// SVGs are decorative/aria-hidden (Req 14.3 / design "Theme mapping").
+// Layout decision: a single scrollable page split into three sections: new
+// foods first (the actionable "try something new" list, with allergen guidance
+// on allergen foods), then tried foods, then Not yet (block-covered + reaction).
+// State is carried by VISIBLE text labels and each tile's accessible name; the
+// pictures are decorative (Req 14.3 / design "Theme mapping").
 //
-// Actions: a door offers "tried, no reaction" (records status 'tried') and
-// "noticed a reaction" (records status 'reaction'); a monster offers the same
-// two; a reaction ghost offers "clear reaction" (the clearReaction action).
-// Block-covered ghosts are NOT user-clearable (Req 7.4/7.6).
+// Actions: a new food offers "tried, no reaction" (records status 'tried') and
+// "noticed a reaction" (records status 'reaction'); a tried food offers the
+// same two; a reaction tile offers "clear reaction" (the clearReaction action).
+// Block-covered tiles are NOT user-clearable (Req 7.4/7.6).
 //
 // Scanning (task 19.2): a search box narrows the list by food name, and a
 // door or monster shows one "Log a try" / "Change" button; the two record
 // buttons appear when it is opened (aria-expanded, one open at a time). A
 // reaction ghost keeps "Clear reaction" always visible. All state text stays.
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Button } from '@astryxdesign/core/Button';
 import { Link } from '@astryxdesign/core/Link';
 import { TextInput } from '@astryxdesign/core/TextInput';
@@ -32,9 +33,9 @@ import { screenIngredient } from '../../domain/safety/screen';
 import { SOURCES } from '../../domain/safety/rules';
 import type { FoodRecord, Ingredient } from '../../domain/types';
 import { todayYmd } from './childProfile';
-import MysteryDoor from '../components/MysteryDoor';
-import FriendlyMonster from '../components/FriendlyMonster';
-import GhostCard from '../components/GhostCard';
+import FoodTile from '../components/FoodTile';
+import StatePicture from '../components/StatePicture';
+import { foodTilePicture } from './foodsPicture';
 import styles from './Foods.module.css';
 
 // ---------------------------------------------------------------------------
@@ -84,14 +85,26 @@ function blockFindingFor(key: string, ageMonths: number) {
   return screenIngredient(key, ageMonths).find((f) => f.kind === 'block');
 }
 
+/** True when the user asks the system for less motion (no first-taste animation then). */
+function prefersReducedMotion(): boolean {
+  return typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
 export default function Foods() {
   const { state, dispatch } = useApp();
   const ageMonths = selectAgeMonths(state) ?? 0;
   const allViews = selectFoodViews(state);
   const [search, setSearch] = useState('');
   const [openKey, setOpenKey] = useState<string | null>(null);
+  // The tile playing the first-taste animation (component state, never stored).
+  const [poppedKey, setPoppedKey] = useState<string | null>(null);
   // The food whose card should take focus once the record change renders.
   const focusKey = useRef<string | null>(null);
+  // Screening names is the costly part, so it runs once per food list.
+  const pictures = useMemo(
+    () => new Map(allViews.map((v) => [v.key, foodTilePicture(v.key, foodLabel(v.key, v.allergenGroup))])),
+    [allViews],
+  );
   const needle = search.trim().toLowerCase();
   // A food also matches when the typed word maps to its key (shrimp finds the
   // shellfish card, milk the dairy card), using the same allergen matching as
@@ -122,12 +135,14 @@ export default function Foods() {
     const record: FoodRecord = { status: 'tried', date: todayYmd() };
     focusKey.current = key;
     setOpenKey(null);
+    setPoppedKey(prefersReducedMotion() ? null : key);
     dispatch({ type: 'setFoodRecord', key, record });
   };
   const recordReaction = (key: string) => {
     const record: FoodRecord = { status: 'reaction', date: todayYmd() };
     focusKey.current = key;
     setOpenKey(null);
+    setPoppedKey(null);
     dispatch({ type: 'setFoodRecord', key, record });
   };
   const clearReaction = (key: string) => {
@@ -137,6 +152,12 @@ export default function Foods() {
   const doors = views.filter((v) => v.status === 'door');
   const monsters = views.filter((v) => v.status === 'monster');
   const ghosts = views.filter((v) => v.status === 'ghost');
+
+  /** The rule message that goes with a food's own picture, first under the picture and name. */
+  const hiddenNote = (key: string, except?: string) => {
+    const message = pictures.get(key)?.hiddenMessage;
+    return message && message !== except ? <p className={styles.detail}>{message}</p> : null;
+  };
 
   /** The disclosure button, shown at the end of a door or monster's head row. */
   const tryToggle = (key: string, label: string, hint: string) => {
@@ -168,8 +189,8 @@ export default function Foods() {
     <>
       <h1>Foods</h1>
       <p className={styles.intro}>
-        Every food your plans use, plus anything you have already tried. Open a
-        mystery door when your child tries something new.
+        Every food your plans use, plus anything you have already tried. Tap
+        "Log a try" when your child tries something new.
       </p>
 
       <div className={styles.search}>
@@ -189,13 +210,16 @@ export default function Foods() {
       </div>
       {/* One live region stays mounted for both outcomes, so a search with no match is announced too. */}
       <div className={views.length === 0 ? styles.noMatch : styles.status}>
-        <p role="status">
-          {views.length === 0
-            ? 'No foods match your search.'
-            : needle
-              ? `${views.length} of ${allViews.length} foods match.`
-              : `${allViews.length} foods.`}
-        </p>
+        <div className={styles.emptyRow}>
+          {views.length === 0 && <StatePicture state="tried" size={96} />}
+          <p role="status">
+            {views.length === 0
+              ? 'No foods match your search.'
+              : needle
+                ? `${views.length} of ${allViews.length} foods match.`
+                : `${allViews.length} foods.`}
+          </p>
+        </div>
         {views.length === 0 && (
           <Button
             label="Clear search"
@@ -213,11 +237,13 @@ export default function Foods() {
             New foods to try
           </h2>
           <p className={styles.sectionHint}>
-            Each untried food is a mystery door. Allergen doors include guidance
-            from published sources.
+            Allergen foods show guidance from published sources.
           </p>
           {doors.length === 0 ? (
-            <p className={styles.empty}>No new foods right now.</p>
+            <div className={styles.emptyRow}>
+              <StatePicture state="tried" size={96} />
+              <p className={styles.empty}>No new foods right now.</p>
+            </div>
           ) : (
             <ul className={styles.grid}>
               {doors.map((view) => {
@@ -225,12 +251,17 @@ export default function Foods() {
                 const guidance = view.isAllergen
                   ? allergenGuidance(view.allergenGroup!)
                   : null;
+                const art = pictures.get(view.key)!;
                 return (
-                  <MysteryDoor
+                  <FoodTile
                     key={view.key}
                     label={`New food: ${label}`}
+                    picture={art.picture}
+                    group={art.group}
+                    state="new"
                     action={tryToggle(view.key, label, 'Log a try')}
                   >
+                    {hiddenNote(view.key)}
                     {guidance && (
                       <>
                         <p className={styles.guidance}>{guidance.generic}</p>
@@ -258,7 +289,7 @@ export default function Foods() {
                       </>
                     )}
                     {tryControls(view.key)}
-                  </MysteryDoor>
+                  </FoodTile>
                 );
               })}
             </ul>
@@ -272,7 +303,10 @@ export default function Foods() {
             Tried foods
           </h2>
           {monsters.length === 0 ? (
-            <p className={styles.empty}>Nothing tried yet.</p>
+            <div className={styles.emptyRow}>
+              <StatePicture state="new" size={96} />
+              <p className={styles.empty}>Nothing tried yet.</p>
+            </div>
           ) : (
             <ul className={styles.grid}>
               {monsters.map((view) => {
@@ -283,17 +317,24 @@ export default function Foods() {
                 const name = when
                   ? `${label} — tried on ${when}`
                   : `${label} — tried, no reaction`;
+                const art = pictures.get(view.key)!;
                 return (
-                  <FriendlyMonster
+                  <FoodTile
                     key={view.key}
                     label={name}
-                    action={tryToggle(view.key, label, 'Change record')}
-                    group={
+                    picture={art.picture}
+                    group={art.group}
+                    state="tried"
+                    monsterGroup={
                       view.isAllergen ? view.allergenGroup ?? undefined : undefined
                     }
+                    popping={poppedKey === view.key}
+                    onPopEnd={() => setPoppedKey(null)}
+                    action={tryToggle(view.key, label, 'Change record')}
                   >
+                    {hiddenNote(view.key)}
                     {tryControls(view.key)}
-                  </FriendlyMonster>
+                  </FoodTile>
                 );
               })}
             </ul>
@@ -307,20 +348,29 @@ export default function Foods() {
             Not yet
           </h2>
           {ghosts.length === 0 ? (
-            <p className={styles.empty}>No foods on hold.</p>
+            <div className={styles.emptyRow}>
+              <StatePicture state="tried" size={96} />
+              <p className={styles.empty}>No foods on hold.</p>
+            </div>
           ) : (
             <ul className={styles.grid}>
               {ghosts.map((view) => {
                 const label = foodLabel(view.key, view.allergenGroup);
                 const isReaction = view.record?.status === 'reaction';
                 const block = blockFindingFor(view.key, ageMonths);
+                const art = pictures.get(view.key)!;
 
                 if (isReaction) {
                   return (
-                    <GhostCard
+                    <FoodTile
                       key={view.key}
                       label={`Not yet: ${label}. Reaction recorded.`}
+                      picture={art.picture}
+                      group="not-yet"
+                      state="not-yet"
+                      greyed
                     >
+                      {hiddenNote(view.key)}
                       <p
                         className={styles.reactionAdvice}
                         role="note"
@@ -336,7 +386,7 @@ export default function Foods() {
                           onClick={() => clearReaction(view.key)}
                         />
                       </div>
-                    </GhostCard>
+                    </FoodTile>
                   );
                 }
 
@@ -348,11 +398,19 @@ export default function Foods() {
                     ? `Not yet: ${label}. Available at ${available} months.`
                     : `Not yet: ${label}.`;
                 return (
-                  <GhostCard key={view.key} label={name}>
+                  <FoodTile
+                    key={view.key}
+                    label={name}
+                    picture={art.picture}
+                    group="not-yet"
+                    state="not-yet"
+                    greyed
+                  >
+                    {hiddenNote(view.key, block?.message)}
                     {block && (
                       <p className={styles.detail}>{block.message}</p>
                     )}
-                  </GhostCard>
+                  </FoodTile>
                 );
               })}
             </ul>

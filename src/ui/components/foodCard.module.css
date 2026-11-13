@@ -1,9 +1,8 @@
 /*
- * Shared layout for the three Foods-page cards (Task 8.2): MysteryDoor,
- * FriendlyMonster and GhostCard. Plain, rounded, light cards usable at 360px
- * (Req 14.6). State is conveyed by the visible .label text and the card's
- * accessible name; the SVG is decorative (aria-hidden). No required animation —
- * cards are static, which already satisfies prefers-reduced-motion (Req 14.5).
+ * Layout for GhostCard (Task 8.2), which the Make screen's left-out cards still
+ * use. A plain, rounded, light card usable at 360px (Req 14.6). State is
+ * conveyed by the visible .label text and the card's accessible name; the art
+ * is decorative (aria-hidden).
  */
 
 .card {
@@ -60,26 +59,4 @@
   font-family: var(--font-family-heading);
   font-weight: 600;
   color: var(--fm-color-heading);
-}
-
-.detail {
-  margin: 0;
-  font-size: 0.85rem;
-  color: var(--fm-color-muted);
-}
-
-.controls {
-  display: flex;
-  flex-wrap: wrap;
-  gap: calc(var(--space) * 0.5);
-}
-
-.button {
-  padding: calc(var(--space) * 0.4) calc(var(--space) * 0.75);
-  border: 1px solid var(--fm-color-border);
-  border-radius: var(--radius);
-  background: var(--fm-color-surface);
-  color: var(--fm-color-text);
-  font: inherit;
-  cursor: pointer;
 }
