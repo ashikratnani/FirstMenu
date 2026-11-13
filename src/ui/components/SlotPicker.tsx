@@ -17,6 +17,7 @@
 // Door markers (Req 7.3/8.3): a recipe using an untried food shows its
 // doorBadgeText NAMING the untried food(s).
 
+import { useEffect } from 'react';
 import { useApp } from '../../state/AppProvider';
 import { selectAllRecipes, selectStage } from '../../state/selectors';
 import type { MealType } from '../../domain/types';
@@ -42,6 +43,17 @@ export default function SlotPicker({ slot, onPicked, onClose }: SlotPickerProps)
   const { state, dispatch } = useApp();
   const stage = selectStage(state);
   const recipes = selectAllRecipes(state);
+
+  // Escape closes the picker (Req 14.4 keyboard use). The picker is
+  // non-modal, so listen on the document rather than only inside the dialog.
+  useEffect(() => {
+    if (!onClose) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onClose();
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [onClose]);
 
   // Eligible (non-ghosted) first, then ghosted — all via recipeView() so the
   // picker matches the library (weekView.slotCandidates).

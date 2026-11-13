@@ -170,6 +170,30 @@ describe('Plan week view', () => {
     expect(captured!.plan.days[0].breakfast).toBe('custom-oats');
   });
 
+  it('Cancel, Escape and choosing a recipe return focus to the slot button (Req 14.4)', async () => {
+    const user = userEvent.setup();
+    renderHome(seedState(8, [OATS_RECIPE], ['breakfast']));
+    const add = () =>
+      screen.getByRole('button', { name: /Add a Breakfast for Day 1/ });
+
+    await user.click(add());
+    await user.click(screen.getByRole('button', { name: 'Cancel' }));
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(add()).toHaveFocus();
+
+    await user.click(add());
+    await user.keyboard('{Escape}');
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(add()).toHaveFocus();
+
+    await user.click(add());
+    await user.click(screen.getByRole('button', { name: /Oat Porridge/ }));
+    expect(captured!.plan.days[0].breakfast).toBe('custom-oats');
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    // The Add button became Change; focus lands on it.
+    expect(screen.getByRole('button', { name: 'Change' })).toHaveFocus();
+  });
+
   it('eligible recipes come before ghosted ones in the picker, with a door marker on an untried-food recipe', async () => {
     const user = userEvent.setup();
     renderHome(seedState(8, [HONEY_RECIPE, OATS_RECIPE], ['breakfast']));

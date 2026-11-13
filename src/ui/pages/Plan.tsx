@@ -25,7 +25,7 @@
 // setActiveSlots), a new-week keep|empty control (Req 8.5, dispatch
 // newWeek{mode}) and a prep-date input (Req 8.4, dispatch setPrepDate).
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useApp } from '../../state/AppProvider';
 import { selectAgeMonths, selectAllRecipes } from '../../state/selectors';
@@ -56,6 +56,24 @@ export default function Plan() {
     day: number;
     meal: MealType;
   } | null>(null);
+
+  // Keyboard focus (Req 14.4): when the picker closes (Cancel, Escape or after
+  // choosing a recipe) focus returns to the slot button that opened it. The
+  // opener can be replaced by a different button (Add -> Change), so we look
+  // it up by data attribute after the render instead of holding an element.
+  const restoreFocus = useRef<string | null>(null);
+  const closePicker = (slot: { day: number; meal: MealType }) => {
+    restoreFocus.current = `${slot.day}-${slot.meal}`;
+    setOpenSlot(null);
+  };
+  useEffect(() => {
+    if (openSlot !== null || restoreFocus.current === null) return;
+    const key = restoreFocus.current;
+    restoreFocus.current = null;
+    document
+      .querySelector<HTMLElement>(`[data-slot-opener="${key}"]`)
+      ?.focus();
+  }, [openSlot]);
 
   // Active slots in MEAL_TYPES order so the grid is stable regardless of the
   // order the user toggled them in.
@@ -167,6 +185,7 @@ export default function Plan() {
                             <button
                               type="button"
                               className={styles.addButton}
+                              data-slot-opener={`${day}-${meal}`}
                               onClick={() => setOpenSlot(slot)}
                               aria-label={`Add a ${mealTypeLabel(
                                 meal,
@@ -198,7 +217,8 @@ export default function Plan() {
                               <button
                                 type="button"
                                 className={styles.slotButton}
-                                onClick={() => setOpenSlot(slot)}
+                                data-slot-opener={`${day}-${meal}`}
+                              onClick={() => setOpenSlot(slot)}
                               >
                                 Replace
                               </button>
@@ -226,7 +246,8 @@ export default function Plan() {
                               <button
                                 type="button"
                                 className={styles.slotButton}
-                                onClick={() => setOpenSlot(slot)}
+                                data-slot-opener={`${day}-${meal}`}
+                              onClick={() => setOpenSlot(slot)}
                               >
                                 Change
                               </button>
@@ -246,8 +267,8 @@ export default function Plan() {
                         {open && (
                           <SlotPicker
                             slot={slot}
-                            onPicked={() => setOpenSlot(null)}
-                            onClose={() => setOpenSlot(null)}
+                            onPicked={() => closePicker(slot)}
+                            onClose={() => closePicker(slot)}
                           />
                         )}
                       </li>
