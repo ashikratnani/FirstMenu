@@ -84,8 +84,9 @@ Requirement 21, design "Food art"):
   tile may show such a food's picture only with the rule's message, unchanged,
   as the first line under it.
 - The cards and recipe page of a Not yet recipe, and the Foods tile of a Not
-  yet food, show the hourglass. Every picture of a Not yet food is greyed, so
-  a plate never shows a Not yet food in full color.
+  yet food, show the hourglass, and the plate of a Not yet recipe is greyed.
+  Every picture of a Not yet food is greyed, so a plate never shows a Not yet
+  food in full color.
 - No photos, no pictures made by an image-generation model, and no pictures
   from other hosts.
 - Renaming or removing one of these rule ids needs the same change in
