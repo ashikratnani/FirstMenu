@@ -5,6 +5,7 @@ import {
   GhostArt,
   LanternArt,
   MonsterArt,
+  PeekabooArt,
   PumpkinArt,
 } from './foodArt';
 import FriendlyMonster from './FriendlyMonster';
@@ -21,6 +22,7 @@ describe('foodArt illustrations stay decorative', () => {
   const arts = {
     DoorArt,
     MonsterArt,
+    PeekabooArt,
     PumpkinArt,
     GhostArt,
     LanternArt,
@@ -50,6 +52,54 @@ describe('MonsterArt per-group variant', () => {
     const svg = container.querySelector('svg');
     expect(svg).toHaveAttribute('data-monster', 'peanut');
     // No visible/accessible text is introduced by the variant (Req 14.3).
+    expect(container.textContent).toBe('');
+  });
+});
+
+describe('monster drawings use unique ids', () => {
+  const ids = (svg: Element) => [...svg.querySelectorAll('[id]')].map((el) => el.id);
+
+  it('two monsters of different colors on one page share no id and each reference their own', () => {
+    const { container } = render(
+      <>
+        <MonsterArt group="egg" />
+        <MonsterArt group="fish" />
+      </>,
+    );
+    const [egg, fish] = [...container.querySelectorAll('svg')];
+    const all = [...ids(egg), ...ids(fish)];
+    expect(all.length).toBeGreaterThan(0);
+    expect(new Set(all).size).toBe(all.length);
+    // The body fill points at a gradient inside the same drawing.
+    for (const svg of [egg, fish]) {
+      const own = new Set(ids(svg));
+      const refs = [...svg.querySelectorAll('[fill]')]
+        .map((el) => /^url\(#(.+)\)$/.exec(el.getAttribute('fill')!)?.[1])
+        .filter((ref): ref is string => ref !== undefined);
+      expect(refs.length).toBeGreaterThan(0);
+      for (const ref of refs) expect(own.has(ref)).toBe(true);
+    }
+    expect(container.innerHTML).toContain('#e0a338');
+    expect(container.innerHTML).toContain('#70a8ad');
+  });
+
+  it('a monster and the peekaboo monster share no id, and ids are safe inside url()', () => {
+    const { container } = render(
+      <>
+        <MonsterArt />
+        <PeekabooArt />
+      </>,
+    );
+    const all = [...container.querySelectorAll('[id]')].map((el) => el.id);
+    expect(new Set(all).size).toBe(all.length);
+    for (const id of all) expect(id).toMatch(/^[A-Za-z][\w-]*$/);
+  });
+
+  it('draws at the size it is given in a 128-unit viewBox and adds no text', () => {
+    const { container } = render(<MonsterArt size={96} />);
+    const svg = container.querySelector('svg')!;
+    expect(svg).toHaveAttribute('width', '96');
+    expect(svg).toHaveAttribute('viewBox', '0 0 128 128');
     expect(container.textContent).toBe('');
   });
 });

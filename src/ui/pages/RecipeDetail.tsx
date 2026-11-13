@@ -13,7 +13,7 @@
 
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { Badge } from '@astryxdesign/core/Badge';
+import TagBadge from '../components/TagBadge';
 import { Button } from '@astryxdesign/core/Button';
 import { CheckboxInput } from '@astryxdesign/core/CheckboxInput';
 import { Link as ExternalLink } from '@astryxdesign/core/Link';
@@ -27,7 +27,7 @@ import { selectAgeMonths, selectAllRecipes } from '../../state/selectors';
 import { screenRecipe } from '../../domain/safety/screen';
 import type { Ingredient, MealType, Recipe, ServeAs } from '../../domain/types';
 import { MEAL_TYPES, dayLabel, ghostReason, mealTypeLabel, recipeView } from './recipeView';
-import { FIXED_LIST_NOTE, TAG_EXPLAINER, effortLabel, tagLabel, timeLabel } from './makeView';
+import { FIXED_LIST_NOTE, TAG_EXPLAINER, effortLabel, timeLabel } from './makeView';
 import Disclaimer from '../components/Disclaimer';
 import ShareRecipe from '../components/ShareRecipe';
 import styles from './RecipeDetail.module.css';
@@ -349,7 +349,7 @@ export default function RecipeDetail() {
         <ul className={styles.tags} aria-label="Nutrition tags">
           {tags.map((tag) => (
             <li key={tag}>
-              <Badge label={tagLabel(tag)} />
+              <TagBadge tag={tag} />
             </li>
           ))}
         </ul>

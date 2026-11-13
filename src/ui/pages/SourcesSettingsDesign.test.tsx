@@ -80,16 +80,17 @@ const distinctRecipeSources = () =>
   new Set(BUILTIN_RECIPES.flatMap((r) => (r.source ? [r.source.url] : [])));
 
 describe('Sources: jump list and grouping', () => {
-  it('opens with an "On this page" list of the five sections, with counts', () => {
+  it('opens with an "On this page" list of the six sections, with counts', () => {
     renderAt('/sources');
     const nav = screen.getByRole('navigation', { name: 'On this page' });
     const names = within(nav)
       .getAllByRole('link')
       .map((a) => a.textContent);
-    expect(names).toHaveLength(5);
+    expect(names).toHaveLength(6);
     expect(names[0]).toBe(`Safety rules (${RULES.length})`);
     expect(names[2]).toBe('New food spacing');
     expect(names[4]).toBe(`Recipe sources (${distinctRecipeSources().size})`);
+    expect(names[5]).toBe('Credits');
     // Each jump link goes to a heading that exists.
     for (const name of [
       'Safety rules',
@@ -97,6 +98,7 @@ describe('Sources: jump list and grouping', () => {
       'New food spacing',
       'References',
       'Recipe sources',
+      'Credits',
     ]) {
       expect(screen.getByRole('heading', { name, level: 2 })).toHaveAttribute('id');
     }

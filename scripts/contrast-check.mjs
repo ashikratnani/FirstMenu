@@ -31,6 +31,11 @@ const mix = (a, b, pct) =>
 tokens['--band'] = mix(fm['--fm-color-lavender'], fm['--fm-color-bg'], 0.6);
 tokens['--fm-color-heading'] = fm['--fm-color-heading'];
 tokens['--fm-color-muted'] = fm['--fm-color-muted'];
+// Nutrition tag chips (theme.css): each text color on its background.
+const TAGS = ['vegetable', 'fruit', 'whole-grain', 'protein', 'dairy', 'iron-rich', 'healthy-fat'];
+for (const [token, value] of Object.entries(fm)) {
+  if (/^--fm-color-tag-/.test(token)) tokens[token] = value;
+}
 
 // [foreground, background, minimum ratio, what it is]
 const PAIRS = [
@@ -51,6 +56,7 @@ const PAIRS = [
   ['--fm-color-muted', '--band', 4.5, 'muted text on the Sources lavender band'],
   ['--color-text-primary', '--band', 4.5, 'body text on the Sources lavender band'],
   ['--color-text-accent', '--band', 4.5, 'links on the Sources lavender band'],
+  ...TAGS.map((tag) => [`--fm-color-tag-${tag}-text`, `--fm-color-tag-${tag}-bg`, 4.5, `${tag} tag chip`]),
 ];
 
 function luminance(hex) {

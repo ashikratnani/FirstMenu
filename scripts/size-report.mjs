@@ -10,13 +10,17 @@
 // The recipe data chunk has its own budget (size-budget.mjs): a warning at
 // 160 KB gzipped and a failure at 200 KB (active spec Requirement 14.9).
 //
+// Picture files in dist/art are not JavaScript or CSS and stay out of both
+// budgets; each may be at most 8 KB and the total warns past 900 KB
+// (size-budget.mjs, design "Food art").
+//
 // Reads dist/.vite/manifest.json (vite.config.ts sets build.manifest).
 // Usage: node scripts/size-report.mjs [distDir]   (default: dist)
 
-import { readFileSync, readdirSync } from 'node:fs';
-import { join } from 'node:path';
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
+import { join, relative } from 'node:path';
 import { gzipSync } from 'node:zlib';
-import { recipeDataStatus } from './size-budget.mjs';
+import { artStatus, recipeDataStatus } from './size-budget.mjs';
 
 // v1 build on main (commit 17bc237), gzip level 9: 120,625 B JS + 5,501 B CSS.
 const V1_BASELINE_BYTES = 126_126;
@@ -83,6 +87,15 @@ console.log(`Recipe data chunk (gzip):       ${kb(dataBytes)} (warn 160 KB, fail
 console.log(`All JS + CSS in the build:      ${kb(allJsCss)}`);
 console.log(`Fonts (latin woff2):            ${kb(fonts)} (not budgeted)`);
 
+function artFiles(dir) {
+  return readdirSync(dir).flatMap((name) => {
+    const path = join(dir, name);
+    return statSync(path).isDirectory() ? artFiles(path) : [{ path: relative(join(dist, 'art'), path), bytes: statSync(path).size }];
+  });
+}
+const art = artStatus(existsSync(join(dist, 'art')) ? artFiles(join(dist, 'art')) : []);
+console.log(`Art files (dist/art):           ${art.message}`);
+
 const heaviest = pages[0];
 const growth = heaviest.bytes - V1_BASELINE_BYTES;
 console.log(`Heaviest page vs v1:            ${heaviest.name} ${kb(heaviest.bytes)} vs ${kb(V1_BASELINE_BYTES)} (${growth >= 0 ? '+' : ''}${kb(growth)})`);
@@ -102,5 +115,11 @@ if (dataStatus.level === 'fail') {
   console.warn(`::warning::${dataStatus.message}`);
 } else {
   console.log(dataStatus.message);
+}
+if (art.level === 'fail') {
+  console.error(art.message);
+  failed = true;
+} else if (art.level === 'warn') {
+  console.warn(`::warning::${art.message}`);
 }
 if (failed) process.exit(1);

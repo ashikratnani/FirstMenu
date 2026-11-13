@@ -236,3 +236,39 @@ describe('Sources page', () => {
     }
   });
 });
+
+describe('Sources page credits (Requirement 21.15)', () => {
+  it('ends with a Credits section naming the picture and font licenses', () => {
+    render(
+      <MemoryRouter>
+        <Sources />
+      </MemoryRouter>,
+    );
+    const headings = screen.getAllByRole('heading', { level: 2 });
+    expect(headings[headings.length - 1]).toHaveTextContent('Credits');
+    expect(
+      screen.getByText('Food pictures, the hourglass and the snowflake: Fluent Emoji by Microsoft, MIT License'),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText('Headings: Fredoka. Body text: Figtree. Both under the SIL Open Font License 1.1.'),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Fluent Emoji on GitHub' })).toHaveAttribute(
+      'href',
+      'https://github.com/microsoft/fluentui-emoji',
+    );
+    expect(screen.getByRole('link', { name: 'Fluent Emoji license text' })).toHaveAttribute(
+      'href',
+      '/FirstMenu/art/LICENSE-fluentui-emoji.txt',
+    );
+  });
+
+  it('lists Credits in the jump list', () => {
+    render(
+      <MemoryRouter>
+        <Sources />
+      </MemoryRouter>,
+    );
+    const nav = screen.getByRole('navigation', { name: 'On this page' });
+    expect(nav).toHaveTextContent('Credits');
+  });
+});

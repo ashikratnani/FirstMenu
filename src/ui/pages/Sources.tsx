@@ -22,6 +22,8 @@ import { BUILTIN_RECIPES } from '../../data/recipes';
 import type { RecipeSource } from '../../domain/types';
 import styles from './Sources.module.css';
 
+const FLUENT_EMOJI_URL = 'https://github.com/microsoft/fluentui-emoji';
+
 /** All URLs a source cites (urls[] when present, else the single url). */
 function sourceUrls(source: Source): string[] {
   return source.urls && source.urls.length > 0 ? source.urls : [source.url];
@@ -158,6 +160,7 @@ export default function Sources() {
     { id: 'sources-spacing', label: 'New food spacing' },
     { id: 'sources-references', label: `References (${distinctSourceIds.length})` },
     { id: 'sources-recipes', label: `Recipe sources (${recipeCount})` },
+    { id: 'sources-credits', label: 'Credits' },
   ];
 
   const backToTop = (
@@ -302,6 +305,25 @@ export default function Sources() {
             </ul>
           </section>
         ))}
+        {backToTop}
+      </section>
+
+      <section className={styles.band}>
+        <h2 id="sources-credits" tabIndex={-1} className={styles.sectionTitle}>
+          Credits
+        </h2>
+        <p>Food pictures, the hourglass and the snowflake: Fluent Emoji by Microsoft, MIT License</p>
+        <ul className={styles.referenceList}>
+          <li className={styles.reference}>
+            <EntryLink href={FLUENT_EMOJI_URL}>Fluent Emoji on GitHub</EntryLink>
+          </li>
+          <li className={styles.reference}>
+            <EntryLink href={`${import.meta.env.BASE_URL}art/LICENSE-fluentui-emoji.txt`}>
+              Fluent Emoji license text
+            </EntryLink>
+          </li>
+        </ul>
+        <p>Headings: Fredoka. Body text: Figtree. Both under the SIL Open Font License 1.1.</p>
         {backToTop}
       </section>
     </>

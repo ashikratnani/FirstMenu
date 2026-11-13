@@ -6,7 +6,9 @@
 //   - HTML: <script src>, <link href>, <img src>, <iframe src>, <source src>
 //   - CSS:  @import and url(...)
 //   - JS:   import()/import from, fetch(), new URL(...), importScripts()
-//           with an absolute http(s) or protocol-relative URL.
+//           with an absolute http(s) or protocol-relative URL, and a `src`
+//           property set to one (src:"https://..."), which is how React
+//           renders a remote <img> (food pictures are local files).
 // Plain http(s) strings that are only shown or linked to (for example source
 // citations on the Sources page) are not fetches and are allowed.
 //
@@ -32,6 +34,7 @@ const PATTERNS = {
     new RegExp(String.raw`\bfrom\s*["'](${ABS})`, 'g'),
     new RegExp(String.raw`\bfetch\s*\(\s*["'\`](${ABS})`, 'g'),
     new RegExp(String.raw`\bimportScripts\s*\(\s*["'\`](${ABS})`, 'g'),
+    new RegExp(String.raw`\bsrc\s*:\s*["'\`](${ABS})`, 'g'),
     new RegExp(String.raw`\bnew\s+URL\s*\(\s*["'\`](${ABS})`, 'g'),
   ],
 };
