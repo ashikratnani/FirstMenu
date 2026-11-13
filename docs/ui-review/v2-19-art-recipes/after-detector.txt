@@ -1,0 +1,28 @@
+360x800 [
+  {
+    "antipattern": "cream-palette",
+    "name": "Cream / beige palette",
+    "description": "A warm cream or beige page background has become the default \"tasteful\" AI surface, reached for by reflex. Choose a background that comes from a deliberate palette, not the safe warm off-white.",
+    "severity": "warning",
+    "category": "slop",
+    "file": "http://localhost:4393/FirstMenu/#/recipes",
+    "line": 0,
+    "snippet": "cream/beige page background rgb(255, 248, 240)",
+    "selector": "body"
+  }
+]
+
+1280x800 [
+  {
+    "antipattern": "cream-palette",
+    "name": "Cream / beige palette",
+    "description": "A warm cream or beige page background has become the default \"tasteful\" AI surface, reached for by reflex. Choose a background that comes from a deliberate palette, not the safe warm off-white.",
+    "severity": "warning",
+    "category": "slop",
+    "file": "http://localhost:4393/FirstMenu/#/recipes",
+    "line": 0,
+    "snippet": "cream/beige page background rgb(255, 248, 240)",
+    "selector": "body"
+  }
+]
+

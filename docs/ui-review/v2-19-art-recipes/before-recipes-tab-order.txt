@@ -1,0 +1,85 @@
+Keyboard tab order on My recipes (before)
+
+## My recipes, 360px (40 stops, first 40)
+1. a: Skip to content
+2. a: FirstMenu
+3. a: Add recipe
+4. button: Open navigation
+5. input: 
+6. button: All
+7. button: 6–8 months
+8. button: 9–11 months
+9. button: 12–23 months
+10. button: 2–3 years
+11. button: All
+12. button: Breakfast
+13. button: Lunch
+14. button: Dinner
+15. button: Snack
+16. a: Carrots and Apples. New food: apple. Freezes for 1 month. ab
+17. a: Sweet Potato Chicken. New food: sweet potato, chicken, brown
+18. a: Beef, Peas and Potatoes. New food: beef, potato, pea. Freeze
+19. a: Chicken, Broccoli and Rice. New food: chicken, rice, broccol
+20. a: Beef, Squash and Macaroni. New food: beef, wheat, squash. Fr
+21. a: Apple Rice Pudding. Not yet: dairy. Reaction recorded.. New 
+22. a: Mashed banana. Simple idea. Time not given · Easy · Fruit
+23. a: Sweet potato puree. New food: sweet potato. Simple idea. Tim
+24. a: Mashed cooked oats. New food: oat. Simple idea. Time not giv
+25. a: Chicken puree. New food: chicken. Simple idea. Time not give
+26. a: Sweet Potato Hummus. New food: sweet potato, chickpea, sesam
+27. a: Hummus (No Tahini). Not yet: dairy. Reaction recorded.. New 
+28. a: Microwave Applesauce. New food: apple, cinnamon. about 140 m
+29. a: Mashed Carrots. Not yet: dairy. Reaction recorded.. New food
+30. a: Mashed Turnips and Potatoes. Not yet: dairy. Reaction record
+31. a: Refried Beans. New food: bean, vegetable oil, onion, garlic,
+32. a: Green Pea Soup. Not yet: dairy. Reaction recorded.. New food
+33. a: Chunky Black Bean Dip. New food: black bean, onion, bell pep
+34. a: Frozen Strawberry Yogurt. Not yet: dairy. Reaction recorded.
+35. a: Pinto Bean Dip. New food: pinto bean, jalapeno, vegetable oi
+36. a: Lemony Garbanzo Bean Dip. Not yet: dairy. Reaction recorded.
+37. a: Any Berry Sauce. New food: cornstarch, berry. Time not given
+38. a: Cranberry Applesauce. New food: apple, cranberry, cinnamon, 
+39. a: Beet Dip. New food: beet, lemon juice, garlic, cumin, black 
+40. a: Strawberry Swirl. New food: strawberry. about 245 min · Easy
+
+## My recipes, 1280px (40 stops, first 40)
+1. a: Skip to content
+2. a: FirstMenu
+3. a: Make
+4. a: My recipes
+5. a: Add recipe
+6. a: Foods
+7. a: Plan
+8. a: Sources
+9. a: Settings
+10. a: Add recipe
+11. input: 
+12. button: All
+13. button: 6–8 months
+14. button: 9–11 months
+15. button: 12–23 months
+16. button: 2–3 years
+17. button: All
+18. button: Breakfast
+19. button: Lunch
+20. button: Dinner
+21. button: Snack
+22. a: Carrots and Apples. New food: apple. Freezes for 1 month. ab
+23. a: Sweet Potato Chicken. New food: sweet potato, chicken, brown
+24. a: Beef, Peas and Potatoes. New food: beef, potato, pea. Freeze
+25. a: Chicken, Broccoli and Rice. New food: chicken, rice, broccol
+26. a: Beef, Squash and Macaroni. New food: beef, wheat, squash. Fr
+27. a: Apple Rice Pudding. Not yet: dairy. Reaction recorded.. New 
+28. a: Mashed banana. Simple idea. Time not given · Easy · Fruit
+29. a: Sweet potato puree. New food: sweet potato. Simple idea. Tim
+30. a: Mashed cooked oats. New food: oat. Simple idea. Time not giv
+31. a: Chicken puree. New food: chicken. Simple idea. Time not give
+32. a: Sweet Potato Hummus. New food: sweet potato, chickpea, sesam
+33. a: Hummus (No Tahini). Not yet: dairy. Reaction recorded.. New 
+34. a: Microwave Applesauce. New food: apple, cinnamon. about 140 m
+35. a: Mashed Carrots. Not yet: dairy. Reaction recorded.. New food
+36. a: Mashed Turnips and Potatoes. Not yet: dairy. Reaction record
+37. a: Refried Beans. New food: bean, vegetable oil, onion, garlic,
+38. a: Green Pea Soup. Not yet: dairy. Reaction recorded.. New food
+39. a: Chunky Black Bean Dip. New food: black bean, onion, bell pep
+40. a: Frozen Strawberry Yogurt. Not yet: dairy. Reaction recorded.
