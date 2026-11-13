@@ -180,6 +180,31 @@ describe('quick solve: What can I make', () => {
   });
 });
 
+describe('quick solve pictures (task 19.4)', () => {
+  it('puts a plate on each What can I make result and none on Foods to leave out', async () => {
+    const user = userEvent.setup();
+    renderApp('/onboarding/tour', onboardedState());
+    await chooseAndShow(user, /what can i make/i);
+    await user.type(await screen.findByLabelText('What do you have?'), 'banana, oats and egg');
+    const top = await screen.findByLabelText('Top recipes');
+    const cards = within(top).getAllByRole('listitem');
+    expect(cards.length).toBeGreaterThan(0);
+    for (const card of cards) {
+      expect(card.querySelector('[data-band]')).not.toBeNull();
+      expect(card.querySelector('img')).not.toBeNull();
+    }
+  });
+
+  it('gives the Foods to leave out list no pictures', async () => {
+    const user = userEvent.setup();
+    renderApp('/onboarding/tour', onboardedState(8));
+    await chooseAndShow(user, /what's safe for my child/i);
+    await screen.findByRole('heading', { name: 'Foods to leave out' });
+    const list = screen.getByRole('list', { name: /leave out/i });
+    expect(list.querySelector('img, [data-band]')).toBeNull();
+  });
+});
+
 describe('quick solve: Save recipes', () => {
   it('shows both boxes and an example with its safety result and disclaimers, without saving', async () => {
     const user = userEvent.setup();

@@ -4,12 +4,16 @@
 // (Req 3.4). The whole card links to the recipe page. The button sits beside
 // the link, never inside it, so no interactive element is nested.
 
-import { Badge } from '@astryxdesign/core/Badge';
+import { useMemo } from 'react';
 import TagBadge from './TagBadge';
 import { Button } from '@astryxdesign/core/Button';
 import { ClickableCard } from '@astryxdesign/core/ClickableCard';
 import type { MakeResult } from '../../domain/make';
 import { foodLabel } from '../../domain/foods';
+import { useApp } from '../../state/AppProvider';
+import { plateNotYetCheck, recipeView } from '../pages/recipeView';
+import Plate from './Plate';
+import StatePicture from './StatePicture';
 import { effortLabel, foodList, tagLabel, timeLabel } from '../pages/makeView';
 import styles from './ResultCard.module.css';
 
@@ -24,6 +28,8 @@ export interface ResultCardProps {
 
 export default function ResultCard({ result, doorText, showMissing, onHave }: ResultCardProps) {
   const { recipe, tags, missing } = result;
+  const { state } = useApp();
+  const isNotYet = useMemo(() => plateNotYetCheck(recipeView(recipe, state), state), [recipe, state]);
   const time = timeLabel(result);
   const effort = effortLabel(result.effort);
   const missingText = showMissing && missing.length > 0 ? `Missing: ${foodList(missing)}` : null;
@@ -43,20 +49,28 @@ export default function ResultCard({ result, doorText, showMissing, onHave }: Re
   return (
     <li className={styles.item}>
       <ClickableCard label={name} href={`/recipes/${recipe.id}`} padding={3} width="100%">
-        <span className={styles.body}>
-          <span className={styles.title}>{recipe.title}</span>
-          <span className={styles.meta}>
-            {time} · {effort}
-          </span>
-          {(tags.length > 0 || doorText) && (
-            <span className={styles.badges}>
-              {tags.map((tag) => (
-                <TagBadge key={tag} tag={tag} />
-              ))}
-              {doorText && <Badge variant="orange" label={doorText} />}
+        <span className={styles.row}>
+          <Plate recipe={recipe} isNotYet={isNotYet} size={48} compact />
+          <span className={styles.body}>
+            <span className={styles.title}>{recipe.title}</span>
+            <span className={styles.meta}>
+              {time} · {effort}
             </span>
-          )}
-          {missingText && <span className={styles.missing}>{missingText}</span>}
+            {tags.length > 0 && (
+              <span className={styles.badges}>
+                {tags.map((tag) => (
+                  <TagBadge key={tag} tag={tag} />
+                ))}
+              </span>
+            )}
+            {doorText && (
+              <span className={styles.stateLine}>
+                <StatePicture state="new" size={24} />
+                {doorText}
+              </span>
+            )}
+            {missingText && <span className={styles.missing}>{missingText}</span>}
+          </span>
         </span>
       </ClickableCard>
       {showMissing && missing.length > 0 && onHave && (

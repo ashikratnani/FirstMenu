@@ -13,13 +13,15 @@ export interface GhostCardProps {
   /** Visible + accessible state label, e.g. "Not yet: honey...". */
   label: string;
   children?: ReactNode;
+  /** Replaces the ghost drawing (the Make screen passes a greyed plate). */
+  art?: ReactNode;
 }
 
-export default function GhostCard({ label, children }: GhostCardProps) {
+export default function GhostCard({ label, children, art }: GhostCardProps) {
   return (
     <li className={`${styles.card} ${styles.ghost}`} aria-label={label}>
       <div className={styles.head}>
-        <GhostArt />
+        {art ?? <GhostArt />}
         <span className={styles.label}>{label}</span>
       </div>
       {children}
