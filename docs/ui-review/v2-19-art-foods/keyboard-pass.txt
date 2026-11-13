@@ -1,0 +1,33 @@
+before first 14 tab stops:
+1 Skip to content | 2px rgb(180, 84, 26) fv=true
+2 FirstMenu | 1px rgb(16, 16, 16) fv=true
+3 Add recipe | 2px rgb(180, 84, 26) fv=true
+4 Open navigation | 2px rgb(180, 84, 26) fv=true
+5 search | NONE fv=true
+6 Log a try: apple | 2px rgb(143, 63, 16) fv=true
+7 Log a try: sweet potato | 2px rgb(143, 63, 16) fv=true
+8 Log a try: chicken | 2px rgb(143, 63, 16) fv=true
+9 Log a try: brown rice | 2px rgb(143, 63, 16) fv=true
+10 Log a try: beef | 2px rgb(143, 63, 16) fv=true
+11 Log a try: potato | 2px rgb(143, 63, 16) fv=true
+12 Log a try: pea | 2px rgb(143, 63, 16) fv=true
+13 Log a try: rice | 2px rgb(143, 63, 16) fv=true
+14 Log a try: broccoli | 2px rgb(143, 63, 16) fv=true
+focused: Log a try: applesauce 2px rgb(143, 63, 16)
+after first 14 tab stops:
+1 Skip to content | 2px rgb(180, 84, 26) fv=true
+2 FirstMenu | 1px rgb(16, 16, 16) fv=true
+3 Add recipe | 2px rgb(180, 84, 26) fv=true
+4 Open navigation | 2px rgb(180, 84, 26) fv=true
+5 search | NONE fv=true
+6 Log a try: apple | 2px rgb(143, 63, 16) fv=true
+7 Log a try: sweet potato | 2px rgb(143, 63, 16) fv=true
+8 Log a try: chicken | 2px rgb(143, 63, 16) fv=true
+9 Log a try: brown rice | 2px rgb(143, 63, 16) fv=true
+10 Log a try: beef | 2px rgb(143, 63, 16) fv=true
+11 Log a try: potato | 2px rgb(143, 63, 16) fv=true
+12 Log a try: pea | 2px rgb(143, 63, 16) fv=true
+13 Log a try: rice | 2px rgb(143, 63, 16) fv=true
+14 Log a try: broccoli | 2px rgb(143, 63, 16) fv=true
+focused: Log a try: applesauce 2px rgb(143, 63, 16)
+after Enter expanded= true next Tab -> Tried, no reaction 2px rgb(180, 84, 26)
