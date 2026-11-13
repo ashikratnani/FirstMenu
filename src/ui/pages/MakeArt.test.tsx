@@ -13,6 +13,7 @@ import { AppProvider } from '../../state/AppProvider';
 import { STORAGE_KEY, defaultState } from '../../domain/storage';
 import type { AppState, Recipe } from '../../domain/types';
 import { spyOnNetwork } from '../../test/networkSpy';
+import { SIMPLE_IDEAS } from '../../data/simpleIdeas';
 
 type AxeMatcherFn = (results: unknown) => { pass: boolean; message: () => string };
 expect.extend({
@@ -208,6 +209,25 @@ describe('Left-out cards (Not yet)', () => {
     expect(sources.some((s) => s.includes('bowl_with_spoon'))).toBe(false);
     expect(hasHourglass(ghost)).toBe(true);
     expect(ghost.querySelector('[data-band]')).toHaveAttribute('data-band', 'not-yet');
+  });
+
+  it('the built-in Mashed banana with a banana reaction shows the greyed banana, not the generic bowl', async () => {
+    const user = userEvent.setup();
+    const builtin = SIMPLE_IDEAS.find((r) => r.title === 'Mashed banana');
+    expect(builtin).toBeDefined();
+    renderMake(
+      seedState({
+        customRecipes: [builtin!],
+        foods: { banana: { status: 'reaction', date: '2026-03-01' } },
+      }),
+    );
+    await user.click(screen.getByRole('button', { name: 'Show left-out recipes' }));
+    const ghost = screen.getByLabelText(/^Mashed banana\. Not yet/);
+    const banana = [...ghost.querySelectorAll('img')].find((i) => i.getAttribute('src')?.includes('/banana.webp'));
+    expect(banana).toBeDefined();
+    expect(banana!.className).toMatch(/greyed/);
+    expect(imgs(ghost).some((s) => s.includes('bowl_with_spoon'))).toBe(false);
+    expect(hasHourglass(ghost)).toBe(true);
   });
 
   it('use a plate in Recipes named, and no GhostCard drawing', async () => {
