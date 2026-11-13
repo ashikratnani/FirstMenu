@@ -572,6 +572,15 @@ describe('built-in recipes derive clean food keys (Item 3)', () => {
       'sunflower seed butter',
       'spaghetti',
       'chili sauce',
+      // Batch 10 (task 14.3) recipes add these.
+      'molasses',
+      'cereal',
+      'broccoli slaw',
+      'sriracha',
+      'pickled vegetable',
+      'root vegetable',
+      'tortilla chip',
+      'tater tot',
     ]);
   });
 
