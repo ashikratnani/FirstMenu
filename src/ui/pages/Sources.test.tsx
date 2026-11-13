@@ -163,8 +163,10 @@ describe('Sources page', () => {
     renderSources();
 
     const heading = screen.getByRole('heading', { name: /recipe sources/i });
-    const list = heading.nextElementSibling;
-    expect(list?.tagName).toBe('UL');
+    // The section groups its entries by publisher: one list per publisher
+    // under an h3, all inside the section that holds the heading.
+    const section = heading.closest('section') as HTMLElement;
+    expect(section).not.toBeNull();
 
     // Expected distinct recipe-source URLs, derived from the data so the test
     // cannot drift from BUILTIN_RECIPES.
@@ -177,7 +179,7 @@ describe('Sources page', () => {
     ];
     expect(expectedUrls.length).toBeGreaterThan(0);
 
-    const items = [...(list?.querySelectorAll(':scope > li') ?? [])];
+    const items = [...section.querySelectorAll('h3 + ul > li')];
     // One <li> per distinct recipe-source URL (de-duplicated).
     expect(items.length).toBe(expectedUrls.length);
 

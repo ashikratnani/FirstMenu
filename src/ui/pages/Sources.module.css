@@ -1,53 +1,142 @@
 /*
- * Sources page (Task 6.2). Plain, readable lists; links use the accent token
- * and remain keyboard-focusable with a visible focus ring.
+ * Sources page (Task 6.2, design pass 19.2). A reference page: a jump list at
+ * the top, then one soft lavender band per section holding white cards
+ * (Pattern 3 in docs/design-inspiration.md). Every source link is a full
+ * 44 px row, so none of them is a small target.
  */
+
+.pageTitle:focus,
+.sectionTitle:focus,
+.publisherTitle:focus {
+  outline: none;
+}
+
+.pageTitle:focus-visible,
+.sectionTitle:focus-visible,
+.publisherTitle:focus-visible {
+  outline: 3px solid var(--fm-color-focus);
+  outline-offset: 2px;
+}
+
+/* Keep a jump target clear of the sticky app header. */
+.pageTitle,
+.sectionTitle,
+.publisherTitle {
+  scroll-margin-top: 72px;
+}
+
+.jump {
+  margin: calc(var(--space) * 2) 0 calc(var(--space) * 3);
+}
+
+.jumpTitle {
+  margin: 0 0 calc(var(--space) * 0.5);
+  font-weight: 600;
+  color: var(--fm-color-heading);
+}
+
+.jumpList,
+.publisherList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 calc(var(--space) * 2.5);
+}
+
+.jumpLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+
+.band {
+  background: color-mix(in srgb, var(--fm-color-lavender) 60%, var(--fm-color-bg));
+  border-radius: var(--radius);
+  padding: calc(var(--space) * 2);
+  margin: 0 0 calc(var(--space) * 3);
+}
+
+.sectionTitle {
+  margin-top: 0;
+}
 
 .ruleList,
 .referenceList {
   list-style: none;
   padding: 0;
-  margin: var(--space) 0 calc(var(--space) * 2);
+  margin: calc(var(--space) * 2) 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr));
+  gap: calc(var(--space) * 1);
 }
 
 .rule {
+  padding: calc(var(--space) * 2);
+}
+
+.rule,
+.reference {
   background: var(--fm-color-surface);
   border: 1px solid var(--fm-color-border);
   border-radius: var(--radius);
-  padding: var(--space);
-  margin-bottom: var(--space);
+}
+
+.reference {
+  padding: 0 calc(var(--space) * 2) calc(var(--space) * 1);
 }
 
 .ruleLabel {
-  margin: 0 0 calc(var(--space) * 0.25);
+  margin: 0 0 calc(var(--space) * 0.5);
   font-size: 1rem;
   color: var(--fm-color-heading);
 }
 
 .ruleMessage {
-  margin: 0 0 calc(var(--space) * 0.5);
+  margin: 0 0 calc(var(--space) * 1);
 }
 
-.ruleSources {
+.sourcesLabel {
   margin: 0;
   font-size: 0.85rem;
   color: var(--fm-color-muted);
 }
 
-.reference {
-  margin-bottom: calc(var(--space) * 0.5);
+.sourceLinks {
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
-.reference a {
-  color: var(--fm-color-accent);
+.entryLink {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  font-size: 0.95rem;
 }
 
-.reference a:focus-visible {
+.entryLink:focus-visible {
   outline: 3px solid var(--fm-color-focus);
   outline-offset: 2px;
 }
 
+.publisher {
+  margin-top: calc(var(--space) * 3);
+}
+
+.publisherTitle {
+  margin: 0;
+  font-size: 1.05rem;
+  color: var(--fm-color-heading);
+}
+
 .retrieved {
+  display: block;
   color: var(--fm-color-muted);
   font-size: 0.85rem;
+}
+
+.backToTop {
+  margin: 0;
 }

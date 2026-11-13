@@ -182,14 +182,17 @@ export default function Settings() {
     <>
       <h1>Settings</h1>
 
-      <p className={styles.hint}>
-        New here? <Link to="/onboarding/tour">Quick tour</Link>
+      <p className={styles.tour}>
+        New here?{' '}
+        <Link className={`fm-link ${styles.tourLink}`} to="/onboarding/tour">
+          Quick tour
+        </Link>
       </p>
 
       {/* Pantry (Req 2.3): foods usually at home. Edits save as you go, so it
           sits outside the profile form below. */}
       <section className={styles.pantry} aria-labelledby="settings-pantry">
-        <h2 id="settings-pantry" className={styles.pantryHeading}>
+        <h2 id="settings-pantry" className={styles.sectionHeading}>
           Pantry
         </h2>
         <p className={styles.hint}>
@@ -199,56 +202,61 @@ export default function Settings() {
       </section>
 
       <form className={styles.form} onSubmit={handleSubmit}>
-        <TextInput
-          label="First name"
-          isOptional
-          value={name}
-          onChange={(value) => {
-            setSaved(false);
-            setName(value);
-          }}
-          autoComplete="off"
-        />
-
-        <div className={styles.field}>
-          <label className={styles.label} htmlFor="settings-birthdate">
-            Birth date
-          </label>
-          <input
-            ref={birthDateRef}
-            id="settings-birthdate"
-            className={styles.input}
-            type="date"
-            required
-            max={todayYmd()}
-            value={birthDate}
-            aria-invalid={isFutureDate || undefined}
-            aria-describedby={isFutureDate ? 'settings-birthdate-error' : undefined}
-            onChange={(e) => {
+        <section className={styles.profile} aria-labelledby="settings-profile">
+          <h2 id="settings-profile" className={styles.sectionHeading}>
+            Child profile
+          </h2>
+          <TextInput
+            label="First name"
+            isOptional
+            value={name}
+            onChange={(value) => {
               setSaved(false);
-              setBirthDate(e.target.value);
+              setName(value);
             }}
+            autoComplete="off"
           />
-          {isFutureDate && (
-            <p id="settings-birthdate-error" className={styles.fieldError}>
-              {FUTURE_DATE_ERROR}
+
+          <div className={styles.field}>
+            <label className={styles.label} htmlFor="settings-birthdate">
+              Birth date
+            </label>
+            <input
+              ref={birthDateRef}
+              id="settings-birthdate"
+              className={styles.input}
+              type="date"
+              required
+              max={todayYmd()}
+              value={birthDate}
+              aria-invalid={isFutureDate || undefined}
+              aria-describedby={isFutureDate ? 'settings-birthdate-error' : undefined}
+              onChange={(e) => {
+                setSaved(false);
+                setBirthDate(e.target.value);
+              }}
+            />
+            {isFutureDate && (
+              <p id="settings-birthdate-error" className={styles.fieldError}>
+                {FUTURE_DATE_ERROR}
+              </p>
+            )}
+          </div>
+
+          {persistedMonths !== null && (
+            <p className={styles.derived}>
+              Current age: {persistedMonths}{' '}
+              {persistedMonths === 1 ? 'month' : 'months'}
+              {persistedStage ? ` (stage ${stageLabel(persistedStage)})` : ''}
             </p>
           )}
-        </div>
 
-        {persistedMonths !== null && (
-          <p className={styles.derived}>
-            Current age: {persistedMonths}{' '}
-            {persistedMonths === 1 ? 'month' : 'months'}
-            {persistedStage ? ` (stage ${stageLabel(persistedStage)})` : ''}
-          </p>
-        )}
-
-        {notice && (
-          <p className={styles.notice} role="status">
-            {notice}
-          </p>
-        )}
+          {notice && (
+            <p className={styles.notice} role="status">
+              {notice}
+            </p>
+          )}
+        </section>
 
         <fieldset className={styles.fieldset}>
           <legend className={styles.legend}>Foods already tried</legend>
