@@ -84,7 +84,7 @@
 }
 
 .reference {
-  padding: 0 calc(var(--space) * 2) calc(var(--space) * 1);
+  padding: calc(var(--space) * 0.5) calc(var(--space) * 2) calc(var(--space) * 1);
 }
 
 .ruleLabel {
@@ -127,6 +127,7 @@
 
 .publisherTitle {
   margin: 0;
+  text-wrap: balance;
   font-size: 1.05rem;
   color: var(--fm-color-heading);
 }

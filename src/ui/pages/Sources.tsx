@@ -239,13 +239,15 @@ export default function Sources() {
         <h2 id="sources-spacing" tabIndex={-1} className={styles.sectionTitle}>
           New food spacing
         </h2>
-        <section aria-label="New food spacing sources" className={styles.rule}>
+        <ul aria-label="New food spacing sources" className={styles.ruleList}>
+          <li className={styles.rule}>
           <p className={styles.ruleMessage}>
             FirstMenu uses a gap of at least {NEW_FOOD_SPACING_DAYS} days between new foods when
             it checks the week plan and suggests a new food.
           </p>
           <SourceLinks ids={NEW_FOOD_SPACING_SOURCES} />
-        </section>
+        </li>
+        </ul>
         {backToTop}
       </section>
 
