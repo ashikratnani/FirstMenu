@@ -1,0 +1,10 @@
+/* Pictures are decorative and fixed-size; greyed is the Not yet look (Requirement 21.8). */
+.picture {
+  display: block;
+  flex: none;
+}
+
+.greyed {
+  filter: grayscale(1);
+  opacity: 0.55;
+}

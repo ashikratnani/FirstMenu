@@ -1,0 +1,20 @@
+/* The band carries the food group color; the plate is a white round dish (Requirement 21.12). */
+.band {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space);
+  padding: var(--space);
+  border-radius: var(--radius);
+}
+
+.plate {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: center;
+  justify-content: center;
+  border-radius: 50%;
+  background-color: var(--fm-color-surface);
+  box-shadow: 0 1px 3px rgba(43, 35, 48, 0.18);
+  overflow: hidden;
+}

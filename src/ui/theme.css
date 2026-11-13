@@ -54,6 +54,34 @@
   --fm-color-monster-surface: #d9efd6; /* friendly monster (soft green) */
   --fm-color-pumpkin-surface: #f7c9a0; /* pumpkin badge (warm orange) */
 
+  /* Food group colors for plate bands and tile circles (Requirement 21.12).
+   * They carry no text. Not yet is the existing lavender. */
+  --fm-color-group-vegetable: #e3f3dd;
+  --fm-color-group-fruit: #fbe0e7;
+  --fm-color-group-grain: #fdf3c4;
+  --fm-color-group-protein: #fde6d3;
+  --fm-color-group-dairy: #e3eefb;
+  --fm-color-group-pantry: #f1ece4;
+  --fm-color-group-other: #f8eee3;
+  --fm-color-group-not-yet: #efe7f7;
+
+  /* Nutrition tag chips: background and text, each at least 4.5:1
+   * (checked by scripts/contrast-check.mjs). Five reuse a group color. */
+  --fm-color-tag-vegetable-bg: #e3f3dd;
+  --fm-color-tag-vegetable-text: #1f4d1a; /* 8.49:1 */
+  --fm-color-tag-fruit-bg: #fbe0e7;
+  --fm-color-tag-fruit-text: #6e1f36; /* 8.85:1 */
+  --fm-color-tag-whole-grain-bg: #fdf3c4;
+  --fm-color-tag-whole-grain-text: #4b3900; /* 9.97:1 */
+  --fm-color-tag-protein-bg: #fde6d3;
+  --fm-color-tag-protein-text: #6b2a10; /* 8.88:1 */
+  --fm-color-tag-dairy-bg: #e3eefb;
+  --fm-color-tag-dairy-text: #1d3f6e; /* 9.00:1 */
+  --fm-color-tag-iron-rich-bg: #f6dccf;
+  --fm-color-tag-iron-rich-text: #6b2a10; /* 8.18:1 */
+  --fm-color-tag-healthy-fat-bg: #edf3d4;
+  --fm-color-tag-healthy-fat-text: #3d4a0f; /* 8.41:1 */
+
   --radius: 12px;
   --space: 8px;
 

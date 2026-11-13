@@ -35,13 +35,29 @@ describe('monsterStyleFor (pure allergen-group -> monster mapping)', () => {
     expect(monsterStyleFor(undefined).variant).toBe('generic');
   });
 
-  it('every variant uses a plain colour and a friendly eye count (1-3)', () => {
+  it('every variant is colors only: a 3-stop body, an arm and a horn gradient', () => {
     for (const group of [...GROUPS, undefined]) {
       const style = monsterStyleFor(group);
-      expect(style.body).toMatch(/^#[0-9a-f]{3,6}$/i);
-      expect(style.belly).toMatch(/^#[0-9a-f]{3,6}$/i);
-      expect([1, 2, 3]).toContain(style.eyes);
-      expect(typeof style.antenna).toBe('boolean');
+      expect(style.body).toHaveLength(3);
+      expect(style.arm).toHaveLength(2);
+      expect(style.horn).toHaveLength(2);
+      for (const color of [...style.body, ...style.arm, ...style.horn]) {
+        expect(color).toMatch(/^#[0-9a-f]{6}$/i);
+      }
+      // The shape is the same for every monster, so no shape fields exist.
+      expect(Object.keys(style).sort()).toEqual(['arm', 'body', 'horn', 'variant']);
     }
+  });
+
+  it('uses the reference colors: generic is green with cream horns, egg is yellow with lavender horns', () => {
+    expect(monsterStyleFor().body).toEqual(['#dcf7d4', '#a3df96', '#58a865']);
+    expect(monsterStyleFor().horn).toEqual(['#fff4d6', '#f0b45e']);
+    expect(monsterStyleFor('egg').body).toEqual(['#fff8dc', '#ffdc78', '#e0a338']);
+    expect(monsterStyleFor('egg').horn).toEqual(['#f4eeff', '#b9a4ee']);
+  });
+
+  it('gives each group its own main body color', () => {
+    const mains = new Set([...GROUPS, undefined].map((g) => monsterStyleFor(g).body[1]));
+    expect(mains.size).toBe(GROUPS.length + 1);
   });
 });

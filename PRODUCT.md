@@ -10,7 +10,7 @@ web
 
 ## Stack
 
-React 19 and TypeScript with Vite, Astryx components (`@astryxdesign/core`) with the FirstMenu theme in `src/ui/theme/`, CSS modules for app-specific pieces, Vitest. Fonts are self-hosted Figtree through `@fontsource/figtree`. `HashRouter`, Vite `base` `'/FirstMenu/'`, hosted on GitHub Pages. No other CSS framework or CSS-in-JS.
+React 19 and TypeScript with Vite, Astryx components (`@astryxdesign/core`) with the FirstMenu theme in `src/ui/theme/`, CSS modules for app-specific pieces, Vitest. Fonts are self-hosted Figtree (body) and Fredoka 600 (headings) through `@fontsource`. `HashRouter`, Vite `base` `'/FirstMenu/'`, hosted on GitHub Pages. No other CSS framework or CSS-in-JS.
 
 ## Users
 
@@ -35,20 +35,20 @@ Undecided (not stated in the sources).
 ## Capabilities and Constraints
 
 - Make: pantry plus on-hand foods give Ready now and Missing one, sorted by time and effort, with Iron-rich and other food-group tags. Tags show food groups, not nutrient amounts.
-- Safety: ingredient names are matched against a fixed rule list (block rules show a ghost, prep reminders, allergen rules show a mystery door). Pasted recipes also get block rules checked against title, steps and notes until the user taps "Not used in this recipe". The rule list is not user-editable and every rule has a cited source (AAP, WHO, CDC, FDA/EPA or NIAID).
-- First tastes: untried foods are mystery doors, introduced foods are friendly monsters, a recorded reaction ghosts recipes until cleared.
-- No network requests other than the app's own files. No analytics, ads, trackers, web fonts, photos or third-party hosts. Illustrations are inline SVG, `aria-hidden`, and every state is also in text.
+- Safety: ingredient names are matched against a fixed rule list (block rules show Not yet, prep reminders, allergen rules show a new food). Pasted recipes also get block rules checked against title, steps and notes until the user taps "Not used in this recipe". The rule list is not user-editable and every rule has a cited source (AAP, WHO, CDC, FDA/EPA or NIAID).
+- First tastes: untried foods show the peekaboo monster, introduced foods are friendly monsters, a recorded reaction marks recipes Not yet (hourglass) until cleared.
+- No network requests other than the app's own files. No analytics, ads, trackers, web fonts, photos or third-party hosts. Food pictures are committed Fluent Emoji files (MIT, credited on the Sources page) and the monsters are inline SVG; all are decorative (`aria-hidden` or `alt=""`), and every state is also in text.
 - Animations are CSS-only and off under `prefers-reduced-motion`.
 - WCAG 2.1 AA contrast. Build checks: `check:contrast`, `check:external`, `check:size`.
 - One filled primary button per screen (Requirement 17.10).
 - Disclaimer wording is fixed and pinned by tests (`src/ui/components/Disclaimer.tsx`). It stays on first run, in every page footer, on every recipe page, in the paste preview and in the prompt helper.
 - Out of scope: accounts, cloud sync, any backend or in-app AI, reading Instagram links or videos, nutrient amounts or calorie tracking, more than one child per device, allergy diagnosis, offline install (PWA), translations.
-- Undecided (not stated in the sources): the voice guide beyond "welcoming" and "light cute-spooky", target performance numbers, any brand assets beyond the name and the ghost, door, monster and pumpkin art.
+- Undecided (not stated in the sources): the voice guide beyond "welcoming" and "light cute-spooky", target performance numbers, any brand assets beyond the name and the art described in `DESIGN.md`.
 
 ## Brand Commitments
 
 - Name: FirstMenu.
-- Welcoming, with a light cute-spooky touch: friendly ghosts, pumpkins, mystery doors, friendly monsters. Light palette (creams, soft oranges, lavender), rounded shapes, smiling characters.
+- Welcoming, with a light cute-spooky touch: the peekaboo monster (a new food), friendly monsters (tried foods), the hourglass (Not yet), the snowflake (freezes well), with Fluent Emoji 3D food pictures and Fredoka headings (active spec Requirement 21, November 13, 2026). Light palette (creams, soft oranges, lavender, pastel food-group colors), rounded shapes, smiling characters. The peekaboo monster's dark round hiding hole is allowed. No photos and no pictures made by an image-generation model.
 - Never haunted houses, night scenes, frightening imagery, gore, skulls, blood, sharp teeth or jump scares.
 - Theme decisions (palette, visual world) belong to the maintainer. The Astryx components stay.
 

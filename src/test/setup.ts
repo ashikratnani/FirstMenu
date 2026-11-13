@@ -1,4 +1,10 @@
 import '@testing-library/jest-dom/vitest';
+import { vi } from 'vitest';
+
+// Vitest leaves import.meta.env.BASE_URL at "/" even though vite.config.ts
+// serves the app from /FirstMenu/. Picture and license URLs are built from it
+// (src/ui/components/artUrl.ts), so tests run with the real Pages base path.
+vi.stubEnv('BASE_URL', '/FirstMenu/');
 
 // jsdom does not implement the <dialog> methods that Astryx Dialog calls.
 // Minimal stand-ins keep `open` in sync so dialog content is queryable.

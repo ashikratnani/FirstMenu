@@ -5,6 +5,7 @@
 // the link, never inside it, so no interactive element is nested.
 
 import { Badge } from '@astryxdesign/core/Badge';
+import TagBadge from './TagBadge';
 import { Button } from '@astryxdesign/core/Button';
 import { ClickableCard } from '@astryxdesign/core/ClickableCard';
 import type { MakeResult } from '../../domain/make';
@@ -50,7 +51,7 @@ export default function ResultCard({ result, doorText, showMissing, onHave }: Re
           {(tags.length > 0 || doorText) && (
             <span className={styles.badges}>
               {tags.map((tag) => (
-                <Badge key={tag} variant="green" label={tagLabel(tag)} />
+                <TagBadge key={tag} tag={tag} />
               ))}
               {doorText && <Badge variant="orange" label={doorText} />}
             </span>
