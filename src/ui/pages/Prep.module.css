@@ -2,7 +2,7 @@
  * Prep screen (Task 11.2). Mirrors Plan.module.css tokens and structure: a
  * controls panel for the editable prep day, then the derived cook sessions and
  * thaw reminders. Per design "Theme mapping" the store state is carried by card
- * TEXT + accessible name (no color-only signalling); the pumpkin badge is a
+ * TEXT + accessible name (no color-only signalling); the snowflake badge is a
  * freezer-friendly marker. Any motion inherits the reduced-motion rule from
  * theme.css. Stays usable at 360px width (Req 14.6): single-column lists.
  */
@@ -134,11 +134,6 @@
   font-size: 0.8rem;
   font-weight: 600;
   color: var(--fm-color-heading);
-}
-
-.badgeIcon {
-  width: 1em;
-  height: 1em;
 }
 
 .makeAheadNote {

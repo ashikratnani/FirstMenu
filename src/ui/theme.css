@@ -49,8 +49,6 @@
 
   /* Theme surfaces for later illustration states (task 15). Defined here so
    * components share tokens; text placed on them must still meet AA. */
-  --fm-color-ghost-surface: #e7e0f3; /* friendly ghost card (lavender) */
-  --fm-color-door-surface: #f6d9c4; /* mystery door (soft orange) */
   --fm-color-monster-surface: #d9efd6; /* friendly monster (soft green) */
   --fm-color-pumpkin-surface: #f7c9a0; /* pumpkin badge (warm orange) */
 
@@ -141,33 +139,8 @@ body {
   }
 }
 
-/*
- * Door-open animation (Task 15, design "Theme mapping": a mystery door that
- * opens toward the friendly-monster reveal). CSS only. The door panel of the
- * mystery-door art (DoorArt's `.doorPanel` group) swings gently open and back
- * on a slow loop, hinged on its left edge. Decorative only — the state is in
- * the visible label (Req 14.3) — and disabled under reduced motion below.
- */
-.foodArt .doorPanel {
-  transform-box: fill-box;
-  transform-origin: left center;
-  animation: door-open 4.5s ease-in-out infinite;
-}
-
-@keyframes door-open {
-  0%,
-  55%,
-  100% {
-    transform: perspective(60px) rotateY(0deg);
-  }
-  80% {
-    transform: perspective(60px) rotateY(-55deg);
-  }
-}
-
-/* Animations (door opening, ghost floating, added in task 15) are CSS only and
- * disabled under reduced motion (Req 14.5). The rule lives here so every later
- * component inherits the behavior. */
+/* Any animation is CSS only and disabled under reduced motion (Req 14.5). The
+ * rule lives here so every component inherits the behavior. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -175,10 +148,5 @@ body {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
-  }
-
-  /* Explicit guard for the new component-scoped animations (Task 15). */
-  .foodArt .doorPanel {
-    animation: none;
   }
 }

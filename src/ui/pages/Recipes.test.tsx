@@ -292,7 +292,7 @@ describe('Recipes library page', () => {
     expect(name).toContain('Not yet: salt.');
   });
 
-  it('shows a pumpkin badge "Freezes for N months" for a freezer-friendly recipe', () => {
+  it('shows a freezer badge "Freezes for N months" for a freezer-friendly recipe', () => {
     renderRecipes(seedState(8));
     // b-carrots-and-apples sets storage.freezerMonths: 1.
     expect(
