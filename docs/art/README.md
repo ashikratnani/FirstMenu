@@ -34,6 +34,7 @@ The state labels in the app stay the same; only the pictures change. Two help li
 - The Blueberries tile on `final-picks.png` says "Flatten or cut small". The app shows the rule's message as written in `src/domain/safety/rules.ts` ("Flatten or cut into small pieces.").
 - Band colors on the boards were picked by hand. In the app, a card's band follows the food group of the first food on its plate, and a Not yet card uses the lavender band (design "Colors").
 - Sizes on the boards are a guide only.
+- The legend captions ("hiding in the dark", "came out to say hi", "waits until later", "make ahead"), the status lines on the board's Foods tiles (for example "Tried Nov 12") and the cards' "New foods: carrot, apple" are mockup text. The app keeps its current labels, such as "egg — tried on Nov 12" and "New food: carrot, apple" (Requirement 21.10).
 
 ## Credits
 
