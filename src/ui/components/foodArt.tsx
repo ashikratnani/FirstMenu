@@ -6,57 +6,11 @@
 // TEXT label and the card's accessible name — never by the SVG (Req 14.3).
 //
 // Nothing scary: no haunted houses, night scenes, skulls, blood, sharp teeth
-// or jump scares. Ghosts are translucent and smiling; monsters smile; the door
-// is a friendly rounded mystery door; the pumpkin is a cheerful bright pumpkin;
-// the lantern is a warm welcoming glow.
+// or jump scares. Monsters smile; the lantern is a warm welcoming glow.
 
 import { useId } from 'react';
 import type { AllergenGroup } from '../../domain/types';
 import { monsterStyleFor } from './monsterArt';
-
-/**
- * A friendly rounded mystery door — an untried food. Soft-orange door on a warm
- * frame with a little round knob and a welcoming arched top. The `.doorPanel`
- * class lets the door-open animation swing it on hover-free, CSS-only motion.
- */
-export function DoorArt() {
-  return (
-    <svg
-      className="foodArt"
-      width="40"
-      height="40"
-      viewBox="0 0 40 40"
-      aria-hidden="true"
-      focusable="false"
-    >
-      {/* Warm frame */}
-      <rect
-        x="7"
-        y="4"
-        width="26"
-        height="33"
-        rx="8"
-        fill="var(--fm-color-accent-soft, #f6d9c4)"
-        stroke="var(--fm-color-accent, #b4541a)"
-        strokeWidth="1.5"
-      />
-      {/* Door panel (animated open) */}
-      <g className="doorPanel">
-        <rect
-          x="11"
-          y="8"
-          width="18"
-          height="25"
-          rx="6"
-          fill="var(--fm-color-door-surface, #f6d9c4)"
-          stroke="var(--fm-color-accent, #b4541a)"
-          strokeWidth="1.2"
-        />
-        <circle cx="25" cy="21" r="1.8" fill="var(--fm-color-accent, #b4541a)" />
-      </g>
-    </svg>
-  );
-}
 
 /** React's useId() without the colons, so the id is safe inside `url(#...)`. */
 function useArtId(): string {
@@ -206,74 +160,6 @@ export function PeekabooArt({ size = 40 }: { size?: number } = {}) {
       <ellipse cx="44" cy="20" rx="14" ry="6" transform="rotate(-20 44 20)" fill="#ffffff" opacity="0.45" />
       <path d="M106 16 l2.6 7.4 7.4 2.6 -7.4 2.6 -2.6 7.4 -2.6 -7.4 -7.4 -2.6 7.4 -2.6 z" fill="#ffd36b" />
       <path d="M18 98 l1.8 5 5 1.8 -5 1.8 -1.8 5 -1.8 -5 -5 -1.8 5 -1.8 z" fill="#ffd36b" />
-    </svg>
-  );
-}
-
-/**
- * A cheerful bright pumpkin — the freezer-friendly ("Freezes for N months")
- * badge on a recipe card. Decorative only (aria-hidden); the text carries the
- * meaning (Req 14.3). Warm orange, rounded, with a friendly green stem and a
- * little leaf. No spooky carving.
- */
-export function PumpkinArt() {
-  return (
-    <svg
-      className="foodArt"
-      width="24"
-      height="24"
-      viewBox="0 0 40 40"
-      aria-hidden="true"
-      focusable="false"
-    >
-      {/* Stem + leaf */}
-      <rect x="18" y="5" width="4" height="8" rx="2" fill="#6b8e4e" />
-      <path d="M22 9 q6 -3 7 2 q-5 2 -7 -2 z" fill="#8ab566" />
-      {/* Rounded pumpkin body */}
-      <ellipse cx="20" cy="25" rx="15" ry="12" fill="var(--fm-color-pumpkin-surface, #f7c9a0)" />
-      <ellipse cx="20" cy="25" rx="15" ry="12" fill="none" stroke="var(--fm-color-accent, #b4541a)" strokeWidth="1.1" opacity="0.5" />
-      {/* Soft ribs */}
-      <path d="M20 14 v22" stroke="var(--fm-color-accent, #b4541a)" strokeWidth="1.1" opacity="0.5" />
-      <path d="M12 17 q-3 8 0 16" fill="none" stroke="var(--fm-color-accent, #b4541a)" strokeWidth="1.1" opacity="0.5" />
-      <path d="M28 17 q3 8 0 16" fill="none" stroke="var(--fm-color-accent, #b4541a)" strokeWidth="1.1" opacity="0.5" />
-    </svg>
-  );
-}
-
-/**
- * A friendly, translucent, smiling ghost — a blocked or reaction-flagged food.
- * Lavender-tinted, rounded, with a gentle wavy hem, round eyes and a soft
- * smile. Decorative (aria-hidden); state lives in the visible "Not yet…" label
- * and accessible name (Req 14.3).
- */
-export function GhostArt() {
-  return (
-    <svg
-      className="foodArt"
-      width="40"
-      height="40"
-      viewBox="0 0 40 40"
-      aria-hidden="true"
-      focusable="false"
-    >
-      <path
-        d="M9 21 a11 11 0 0 1 22 0 v12 q-2.75 3 -5.5 0 q-2.75 3 -5.5 0 q-2.75 3 -5.5 0 q-2.75 3 -5.5 0 z"
-        fill="var(--fm-color-ghost-surface, #e7e0f3)"
-        stroke="var(--fm-color-lavender, #e7e0f3)"
-        strokeWidth="1"
-        opacity="0.85"
-      />
-      {/* Round friendly eyes */}
-      <circle cx="16" cy="19" r="1.7" fill="var(--fm-color-heading, #4a2f5e)" />
-      <circle cx="24" cy="19" r="1.7" fill="var(--fm-color-heading, #4a2f5e)" />
-      {/* Soft smile */}
-      <path
-        d="M16 24 q4 3 8 0"
-        fill="none"
-        stroke="var(--fm-color-heading, #4a2f5e)"
-        strokeWidth="1.4"
-        strokeLinecap="round"
-      />
     </svg>
   );
 }

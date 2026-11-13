@@ -135,7 +135,7 @@ export interface RecipeView {
  *   - an ingredient whose foodKeyFor key has a RECORDED reaction
  *     (foodStatus === 'ghost' while no block applies means a reaction).
  * A door badge means an ingredient food is still a mystery door (untried).
- * A pumpkin badge means recipe.storage.freezerMonths is a positive number.
+ * A freezer badge (the snowflake) means recipe.storage.freezerMonths is a positive number.
  */
 export function recipeView(
   recipe: Recipe,

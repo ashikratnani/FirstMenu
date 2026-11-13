@@ -154,7 +154,7 @@ describe('Prep page', () => {
     expect(within(session).getByText('Keep in the fridge')).toBeInTheDocument();
     // The prep-day date label ("Sun Mar 1") is shown for the session.
     expect(screen.getByText('Sun Mar 1')).toBeInTheDocument();
-    // The freezer-friendly recipe shows a pumpkin badge and make-ahead note.
+    // The freezer-friendly recipe shows a freezer badge and make-ahead note.
     expect(within(session).getByText(/Freezes for 1 month/)).toBeInTheDocument();
     expect(
       within(session).getByText('Cool fully before freezing.'),

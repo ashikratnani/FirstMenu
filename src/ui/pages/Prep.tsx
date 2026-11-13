@@ -8,7 +8,7 @@
 // GHOSTED slots are already excluded inside computePrepList (the shared
 // isRecipeGhosted rule), so this page never has to re-check safety; it only
 // turns the derived sessions and thaw reminders into plain prep LOGISTICS text.
-// Per design "Theme mapping": a Pumpkin badge marks a freezer-friendly recipe;
+// Per design "Theme mapping": a snowflake badge marks a freezer-friendly recipe;
 // every store state is carried by visible TEXT + accessible name (no color-only
 // signalling) and any illustration stays aria-hidden with the state in text.
 
@@ -19,6 +19,7 @@ import { selectAgeMonths, selectAllRecipes } from '../../state/selectors';
 import { computePrepList, type CookSession } from '../../domain/prep';
 import type { Recipe } from '../../domain/types';
 import { freezerBadgeText } from './recipeView';
+import StatePicture from '../components/StatePicture';
 import { dayDateLabel } from './weekView';
 import { LanternArt } from '../components/foodArt';
 import styles from './Prep.module.css';
@@ -147,15 +148,7 @@ export default function Prep() {
                         {typeof freezerMonths === 'number' &&
                           freezerMonths > 0 && (
                             <span className={styles.freezerBadge}>
-                              <svg
-                                className={styles.badgeIcon}
-                                viewBox="0 0 16 16"
-                                aria-hidden="true"
-                                focusable="false"
-                              >
-                                <circle cx="8" cy="9" r="5" fill="#e07b2f" />
-                                <rect x="7" y="2" width="2" height="3" fill="#5a7d3a" />
-                              </svg>
+                              <StatePicture state="freezes" size={20} />
                               {freezerBadgeText(freezerMonths)}
                             </span>
                           )}
