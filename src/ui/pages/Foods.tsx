@@ -27,10 +27,10 @@ import { Link } from '@astryxdesign/core/Link';
 import { TextInput } from '@astryxdesign/core/TextInput';
 import { useApp } from '../../state/AppProvider';
 import { selectAgeMonths, selectFoodViews } from '../../state/selectors';
-import { allergenGuidance } from '../../domain/foods';
+import { allergenGuidance, foodKeyFor } from '../../domain/foods';
 import { screenIngredient } from '../../domain/safety/screen';
 import { SOURCES } from '../../domain/safety/rules';
-import type { FoodRecord } from '../../domain/types';
+import type { FoodRecord, Ingredient } from '../../domain/types';
 import { todayYmd } from './childProfile';
 import MysteryDoor from '../components/MysteryDoor';
 import FriendlyMonster from '../components/FriendlyMonster';
@@ -93,9 +93,15 @@ export default function Foods() {
   // The food whose card should take focus once the record change renders.
   const focusKey = useRef<string | null>(null);
   const needle = search.trim().toLowerCase();
+  // A food also matches when the typed word maps to its key (shrimp finds the
+  // shellfish card, milk the dairy card), using the same allergen matching as
+  // the plans.
+  const needleKeys = needle ? foodKeyFor({ name: needle } as Ingredient) : [];
   const views = needle
-    ? allViews.filter((v) =>
-        foodLabel(v.key, v.allergenGroup).toLowerCase().includes(needle),
+    ? allViews.filter(
+        (v) =>
+          foodLabel(v.key, v.allergenGroup).toLowerCase().includes(needle) ||
+          needleKeys.includes(v.key),
       )
     : allViews;
 
@@ -144,7 +150,7 @@ export default function Foods() {
         aria-label={`${hint}: ${label}`}
         onClick={() => setOpenKey(isOpen ? null : key)}
       >
-        {isOpen ? 'Close' : hint}
+        {hint}
       </button>
     );
   };
@@ -191,164 +197,167 @@ export default function Foods() {
               : `${allViews.length} foods.`}
         </p>
         {views.length === 0 && (
-          <Button label="Clear search" onClick={() => {
+            <Button
+            label="Clear search"
+            onClick={() => {
               setSearch('');
               setOpenKey(null);
-            }} />
+            }}
+          />
         )}
       </div>
 
       {(!needle || doors.length > 0) && (
-      <section className={styles.section} aria-labelledby="foods-doors">
-        <h2 id="foods-doors" className={styles.sectionHeading}>
-          New foods to try
-        </h2>
-        <p className={styles.sectionHint}>
-          Each untried food is a mystery door. Allergen doors include guidance
-          from published sources.
-        </p>
-        {doors.length === 0 ? (
-          <p className={styles.empty}>No new foods right now.</p>
-        ) : (
-          <ul className={styles.grid}>
-            {doors.map((view) => {
-              const label = foodLabel(view.key, view.allergenGroup);
-              const guidance = view.isAllergen
-                ? allergenGuidance(view.allergenGroup!)
-                : null;
-              return (
-                <MysteryDoor
-                  key={view.key}
-                  label={`New food: ${label}`}
-                  action={tryToggle(view.key, label, 'Log a try')}
-                >
-                  {guidance && (
-                    <>
-                      <p className={styles.guidance}>{guidance.generic}</p>
-                      {guidance.peanutNote && (
-                        <p className={styles.peanutNote}>
-                          {guidance.peanutNote}
+        <section className={styles.section} aria-labelledby="foods-doors">
+          <h2 id="foods-doors" className={styles.sectionHeading}>
+            New foods to try
+          </h2>
+          <p className={styles.sectionHint}>
+            Each untried food is a mystery door. Allergen doors include guidance
+            from published sources.
+          </p>
+          {doors.length === 0 ? (
+            <p className={styles.empty}>No new foods right now.</p>
+          ) : (
+            <ul className={styles.grid}>
+              {doors.map((view) => {
+                const label = foodLabel(view.key, view.allergenGroup);
+                const guidance = view.isAllergen
+                  ? allergenGuidance(view.allergenGroup!)
+                  : null;
+                return (
+                  <MysteryDoor
+                    key={view.key}
+                    label={`New food: ${label}`}
+                    action={tryToggle(view.key, label, 'Log a try')}
+                  >
+                    {guidance && (
+                      <>
+                        <p className={styles.guidance}>{guidance.generic}</p>
+                        {guidance.peanutNote && (
+                          <p className={styles.peanutNote}>
+                            {guidance.peanutNote}
+                          </p>
+                        )}
+                        <p className={styles.sources}>
+                          Source
+                          {guidance.sources.length > 1 ? 's' : ''}:{' '}
+                          {guidance.sources.map((id, i) => (
+                            <span key={id}>
+                              {i > 0 ? ', ' : ''}
+                              <Link
+                                href={SOURCES[id].url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                {SOURCES[id].title}
+                              </Link>
+                            </span>
+                          ))}
                         </p>
-                      )}
-                      <p className={styles.sources}>
-                        Source
-                        {guidance.sources.length > 1 ? 's' : ''}:{' '}
-                        {guidance.sources.map((id, i) => (
-                          <span key={id}>
-                            {i > 0 ? ', ' : ''}
-                            <Link
-                              href={SOURCES[id].url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                            >
-                              {SOURCES[id].title}
-                            </Link>
-                          </span>
-                        ))}
-                      </p>
-                    </>
-                  )}
-                  {tryControls(view.key)}
-                </MysteryDoor>
-              );
-            })}
-          </ul>
-        )}
-      </section>
+                      </>
+                    )}
+                    {tryControls(view.key)}
+                  </MysteryDoor>
+                );
+              })}
+            </ul>
+          )}
+        </section>
       )}
 
       {(!needle || monsters.length > 0) && (
-      <section className={styles.section} aria-labelledby="foods-monsters">
-        <h2 id="foods-monsters" className={styles.sectionHeading}>
-          Tried foods
-        </h2>
-        {monsters.length === 0 ? (
-          <p className={styles.empty}>Nothing tried yet.</p>
-        ) : (
-          <ul className={styles.grid}>
-            {monsters.map((view) => {
-              const label = foodLabel(view.key, view.allergenGroup);
-              const when = view.record
-                ? formatTriedDate(view.record.date)
-                : '';
-              const name = when
-                ? `${label} — tried on ${when}`
-                : `${label} — tried, no reaction`;
-              return (
-                <FriendlyMonster
-                  key={view.key}
-                  label={name}
-                  action={tryToggle(view.key, label, 'Change record')}
-                  group={
-                    view.isAllergen ? view.allergenGroup ?? undefined : undefined
-                  }
-                >
-                  {tryControls(view.key)}
-                </FriendlyMonster>
-              );
-            })}
-          </ul>
-        )}
-      </section>
+        <section className={styles.section} aria-labelledby="foods-monsters">
+          <h2 id="foods-monsters" className={styles.sectionHeading}>
+            Tried foods
+          </h2>
+          {monsters.length === 0 ? (
+            <p className={styles.empty}>Nothing tried yet.</p>
+          ) : (
+            <ul className={styles.grid}>
+              {monsters.map((view) => {
+                const label = foodLabel(view.key, view.allergenGroup);
+                const when = view.record
+                  ? formatTriedDate(view.record.date)
+                  : '';
+                const name = when
+                  ? `${label} — tried on ${when}`
+                  : `${label} — tried, no reaction`;
+                return (
+                  <FriendlyMonster
+                    key={view.key}
+                    label={name}
+                    action={tryToggle(view.key, label, 'Change record')}
+                    group={
+                      view.isAllergen ? view.allergenGroup ?? undefined : undefined
+                    }
+                  >
+                    {tryControls(view.key)}
+                  </FriendlyMonster>
+                );
+              })}
+            </ul>
+          )}
+        </section>
       )}
 
       {(!needle || ghosts.length > 0) && (
-      <section className={styles.section} aria-labelledby="foods-ghosts">
-        <h2 id="foods-ghosts" className={styles.sectionHeading}>
-          Not yet
-        </h2>
-        {ghosts.length === 0 ? (
-          <p className={styles.empty}>No foods on hold.</p>
-        ) : (
-          <ul className={styles.grid}>
-            {ghosts.map((view) => {
-              const label = foodLabel(view.key, view.allergenGroup);
-              const isReaction = view.record?.status === 'reaction';
-              const block = blockFindingFor(view.key, ageMonths);
+        <section className={styles.section} aria-labelledby="foods-ghosts">
+          <h2 id="foods-ghosts" className={styles.sectionHeading}>
+            Not yet
+          </h2>
+          {ghosts.length === 0 ? (
+            <p className={styles.empty}>No foods on hold.</p>
+          ) : (
+            <ul className={styles.grid}>
+              {ghosts.map((view) => {
+                const label = foodLabel(view.key, view.allergenGroup);
+                const isReaction = view.record?.status === 'reaction';
+                const block = blockFindingFor(view.key, ageMonths);
 
-              if (isReaction) {
-                return (
-                  <GhostCard
-                    key={view.key}
-                    label={`Not yet: ${label}. Reaction recorded.`}
-                  >
-                    <p
-                      className={styles.reactionAdvice}
-                      role="note"
-                      tabIndex={-1}
-                      data-food-focus={view.key}
+                if (isReaction) {
+                  return (
+                    <GhostCard
+                      key={view.key}
+                      label={`Not yet: ${label}. Reaction recorded.`}
                     >
-                      {REACTION_ADVICE}
-                    </p>
-                    <div className={styles.controls}>
-                      <Button
-                        label="Clear reaction"
-                        size="sm"
-                        onClick={() => clearReaction(view.key)}
-                      />
-                    </div>
+                      <p
+                        className={styles.reactionAdvice}
+                        role="note"
+                        tabIndex={-1}
+                        data-food-focus={view.key}
+                      >
+                        {REACTION_ADVICE}
+                      </p>
+                      <div className={styles.controls}>
+                        <Button
+                          label="Clear reaction"
+                          size="sm"
+                          onClick={() => clearReaction(view.key)}
+                        />
+                      </div>
+                    </GhostCard>
+                  );
+                }
+
+                // Block-covered ghost: show the reason and the age it becomes
+                // available (from the real block rule); NOT user-clearable.
+                const available = block?.availableAtMonths;
+                const name =
+                  available !== undefined
+                    ? `Not yet: ${label}. Available at ${available} months.`
+                    : `Not yet: ${label}.`;
+                return (
+                  <GhostCard key={view.key} label={name}>
+                    {block && (
+                      <p className={styles.detail}>{block.message}</p>
+                    )}
                   </GhostCard>
                 );
-              }
-
-              // Block-covered ghost: show the reason and the age it becomes
-              // available (from the real block rule); NOT user-clearable.
-              const available = block?.availableAtMonths;
-              const name =
-                available !== undefined
-                  ? `Not yet: ${label}. Available at ${available} months.`
-                  : `Not yet: ${label}.`;
-              return (
-                <GhostCard key={view.key} label={name}>
-                  {block && (
-                    <p className={styles.detail}>{block.message}</p>
-                  )}
-                </GhostCard>
-              );
-            })}
-          </ul>
-        )}
-      </section>
+              })}
+            </ul>
+          )}
+        </section>
       )}
     </>
   );

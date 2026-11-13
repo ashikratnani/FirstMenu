@@ -115,6 +115,39 @@ describe('Foods disclosure', () => {
   });
 });
 
+describe('Foods disclosure names', () => {
+  it('keeps the accessible name containing the visible text, closed and open', async () => {
+    const user = userEvent.setup();
+    renderFoods();
+    for (const [visible, name] of [
+      ['Log a try', 'Log a try: egg'],
+      ['Change record', 'Change record: carrot'],
+    ]) {
+      const toggle = screen.getByRole('button', { name });
+      for (const expanded of ['false', 'true']) {
+        expect(toggle).toHaveAttribute('aria-expanded', expanded);
+        expect(toggle.textContent).toBe(visible);
+        expect(toggle.getAttribute('aria-label')).toContain(toggle.textContent);
+        if (expanded === 'false') await user.click(toggle);
+      }
+      await user.click(toggle);
+    }
+  });
+
+  it('still shows "Change record" on a tried allergen card, so a reaction can be noted', async () => {
+    const user = userEvent.setup();
+    renderFoods({
+      ...seed(),
+      foods: { 'allergen:egg': { status: 'tried', date: '2026-11-12' } },
+    });
+    const card = screen.getByRole('listitem', { name: /egg — tried on Nov 12/ });
+    const toggle = within(card).getByRole('button', { name: 'Change record: egg' });
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    await user.click(toggle);
+    expect(within(card).getByRole('button', { name: 'Noticed a reaction' })).toBeInTheDocument();
+  });
+});
+
 describe('Foods after logging and filtering', () => {
   it('collapses the card and moves focus to the new card toggle after "Tried, no reaction"', async () => {
     const user = userEvent.setup();
@@ -199,5 +232,24 @@ describe('Foods search', () => {
     await user.click(screen.getByRole('button', { name: 'Clear search' }));
     expect(screen.getByText(/^\d+ foods\.$/)).toHaveAttribute('role', 'status');
     expect(screen.getByRole('listitem', { name: 'New food: egg' })).toBeInTheDocument();
+  });
+
+  it.each([
+    ['shrimp', /Shellfish|shellfish/],
+    ['cheese', /dairy/],
+    ['bread', /wheat/],
+    ['milk', /dairy/],
+  ])('finds the allergen card when searching "%s"', async (word, card) => {
+    const user = userEvent.setup();
+    renderFoods();
+    await user.type(screen.getByRole('searchbox', { name: 'Search foods' }), word);
+    expect(screen.queryAllByRole('listitem').some((li) => card.test(li.getAttribute('aria-label') ?? ''))).toBe(true);
+  });
+
+  it('does not match the dairy card for breast milk', async () => {
+    const user = userEvent.setup();
+    renderFoods();
+    await user.type(screen.getByRole('searchbox', { name: 'Search foods' }), 'breast milk');
+    expect(screen.queryByRole('listitem', { name: /dairy/ })).not.toBeInTheDocument();
   });
 });
