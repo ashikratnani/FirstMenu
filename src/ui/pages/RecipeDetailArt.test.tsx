@@ -126,6 +126,11 @@ describe('Recipe page plate (Requirement 21.5)', () => {
     for (const img of document.querySelectorAll('img')) expect(img).toHaveAttribute('alt', '');
   });
 
+  it('gives the plate its own spaced wrapper so the next block does not touch it', () => {
+    renderDetail(seedState(), 'c-chicken');
+    expect(band()!.parentElement!.className).toMatch(/plate/);
+  });
+
   it.each([10, 30])('never draws a choking-shape food on the plate at %i months', (months) => {
     renderDetail(seedState({}, months, [GRAPE]), 'c-grape');
     expect(imgs(document.body).length).toBeGreaterThan(0);

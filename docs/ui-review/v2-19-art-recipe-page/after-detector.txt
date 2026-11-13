@@ -1,0 +1,95 @@
+recipe 360x800 [
+  {
+    "antipattern": "cream-palette",
+    "name": "Cream / beige palette",
+    "description": "A warm cream or beige page background has become the default \"tasteful\" AI surface, reached for by reflex. Choose a background that comes from a deliberate palette, not the safe warm off-white.",
+    "severity": "warning",
+    "category": "slop",
+    "file": "http://localhost:4503/FirstMenu/#/recipes/c-frozen",
+    "line": 0,
+    "snippet": "cream/beige page background rgb(255, 248, 240)",
+    "selector": "body"
+  }
+]
+
+recipe 1280x800 [
+  {
+    "antipattern": "cream-palette",
+    "name": "Cream / beige palette",
+    "description": "A warm cream or beige page background has become the default \"tasteful\" AI surface, reached for by reflex. Choose a background that comes from a deliberate palette, not the safe warm off-white.",
+    "severity": "warning",
+    "category": "slop",
+    "file": "http://localhost:4503/FirstMenu/#/recipes/c-frozen",
+    "line": 0,
+    "snippet": "cream/beige page background rgb(255, 248, 240)",
+    "selector": "body"
+  }
+]
+
+not-yet 360x800 [
+  {
+    "antipattern": "cream-palette",
+    "name": "Cream / beige palette",
+    "description": "A warm cream or beige page background has become the default \"tasteful\" AI surface, reached for by reflex. Choose a background that comes from a deliberate palette, not the safe warm off-white.",
+    "severity": "warning",
+    "category": "slop",
+    "file": "http://localhost:4503/FirstMenu/#/recipes/c-honey",
+    "line": 0,
+    "snippet": "cream/beige page background rgb(255, 248, 240)",
+    "selector": "body"
+  }
+]
+
+not-yet 1280x800 [
+  {
+    "antipattern": "cream-palette",
+    "name": "Cream / beige palette",
+    "description": "A warm cream or beige page background has become the default \"tasteful\" AI surface, reached for by reflex. Choose a background that comes from a deliberate palette, not the safe warm off-white.",
+    "severity": "warning",
+    "category": "slop",
+    "file": "http://localhost:4503/FirstMenu/#/recipes/c-honey",
+    "line": 0,
+    "snippet": "cream/beige page background rgb(255, 248, 240)",
+    "selector": "body"
+  }
+]
+
+shared 360x800 [
+  {
+    "antipattern": "straggler",
+    "name": "Straggler",
+        "severity": "advisory",
+    "category": "quality",
+    "file": "http://localhost:4503/FirstMenu/#/r/N4IgbiBcCMA0ICcCmBjAlgByVUAXNuANtpCABID2AdkgJ4AEAQgIZWvNMFIDOI83uZgHMeUANogAbAFoAHHxABOadABMIALrwAtkmaEAKrSy9IEgCZoqNBJvhWhyS0iq5TY0G11QQAC2p0CijMuEhCFAi0PhS4vki2AL6wnszepABG7GxBIWERUaQxcYlaIAJIGO4gALJoAB4AdHYgoXW4AK7IPtwUAGa4CtzxYA6mqvyCoea1VO2hptAADAkJQA",
+    "line": 0,
+    "snippet": "\"months.\" alone on the last of 3 lines (19% of the measure)",
+    "advisory": true,
+    "selector": "section:nth-of-type(1) > ul > li"
+  },
+  {
+    "antipattern": "cream-palette",
+    "name": "Cream / beige palette",
+    "description": "A warm cream or beige page background has become the default \"tasteful\" AI surface, reached for by reflex. Choose a background that comes from a deliberate palette, not the safe warm off-white.",
+    "severity": "warning",
+    "category": "slop",
+    "file": "http://localhost:4503/FirstMenu/#/r/N4IgbiBcCMA0ICcCmBjAlgByVUAXNuANtpCABID2AdkgJ4AEAQgIZWvNMFIDOI83uZgHMeUANogAbAFoAHHxABOadABMIALrwAtkmaEAKrSy9IEgCZoqNBJvhWhyS0iq5TY0G11QQAC2p0CijMuEhCFAi0PhS4vki2AL6wnszepABG7GxBIWERUaQxcYlaIAJIGO4gALJoAB4AdHYgoXW4AK7IPtwUAGa4CtzxYA6mqvyCoea1VO2hptAADAkJQA",
+    "line": 0,
+    "snippet": "cream/beige page background rgb(255, 248, 240)",
+    "selector": "body"
+  }
+]
+
+shared 1280x800 [
+  {
+    "antipattern": "cream-palette",
+    "name": "Cream / beige palette",
+    "description": "A warm cream or beige page background has become the default \"tasteful\" AI surface, reached for by reflex. Choose a background that comes from a deliberate palette, not the safe warm off-white.",
+    "severity": "warning",
+    "category": "slop",
+    "file": "http://localhost:4503/FirstMenu/#/r/N4IgbiBcCMA0ICcCmBjAlgByVUAXNuANtpCABID2AdkgJ4AEAQgIZWvNMFIDOI83uZgHMeUANogAbAFoAHHxABOadABMIALrwAtkmaEAKrSy9IEgCZoqNBJvhWhyS0iq5TY0G11QQAC2p0CijMuEhCFAi0PhS4vki2AL6wnszepABG7GxBIWERUaQxcYlaIAJIGO4gALJoAB4AdHYgoXW4AK7IPtwUAGa4CtzxYA6mqvyCoea1VO2hptAADAkJQA",
+    "line": 0,
+    "snippet": "cream/beige page background rgb(255, 248, 240)",
+    "selector": "body"
+  }
+]
+

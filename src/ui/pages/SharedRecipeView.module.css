@@ -54,6 +54,10 @@
   margin: var(--space) 0 calc(var(--space) * 1.5);
 }
 
+.plate {
+  margin-bottom: calc(var(--space) * 1.5);
+}
+
 .ghostTitle {
   display: flex;
   align-items: center;

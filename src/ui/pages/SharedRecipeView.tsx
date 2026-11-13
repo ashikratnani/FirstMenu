@@ -85,7 +85,9 @@ export default function SharedRecipeView() {
   return (
     <Shell>
       <h1>{shared.title}</h1>
-      <Plate recipe={recipe} isNotYet={NEVER_NOT_YET} notYet={notYet} size={160} />
+      <div className={styles.plate}>
+        <Plate recipe={recipe} isNotYet={NEVER_NOT_YET} notYet={notYet} size={160} />
+      </div>
       <p className={styles.intro}>
         Someone shared this recipe with you. Adding it checks it for your child.
       </p>

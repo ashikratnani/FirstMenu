@@ -110,6 +110,11 @@ describe('Shared recipe view plate', () => {
     expect(screen.queryByRole('heading', { name: 'Not yet' })).toBeNull();
   });
 
+  it('gives the plate its own spaced wrapper so the intro does not touch it', () => {
+    renderShared(seedState(), HONEY_BANANA);
+    expect(band()!.parentElement!.className).toMatch(/plate/);
+  });
+
   it('with a block finding greys the plate, keeps the foods and shows the hourglass in the Not yet section', () => {
     renderShared(seedState(), HONEY_BANANA);
     expect(band()).toHaveAttribute('data-band', 'not-yet');

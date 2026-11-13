@@ -1,0 +1,193 @@
+Focus ring per stop (real Chromium, Tab key)
+360 recipe Skip to content outline=solid 2px focus-visible=true
+360 recipe FirstMenu outline=auto 1px focus-visible=true
+360 recipe Add recipe outline=solid 2px focus-visible=true
+360 recipe Open navigation outline=solid 2px focus-visible=true
+360 recipe ← Back to recipes outline=auto 1px focus-visible=true
+360 recipe Add to plan outline=solid 2px focus-visible=true
+360 recipe I made this outline=solid 2px focus-visible=true
+360 recipe Share recipe outline=solid 2px focus-visible=true
+360 recipe Edit serve as outline=solid 2px focus-visible=true
+360 recipe Edit outline=auto 1px focus-visible=true
+360 recipe Delete outline=solid 2px focus-visible=true
+360 not-yet Skip to content outline=solid 2px focus-visible=true
+360 not-yet FirstMenu outline=auto 1px focus-visible=true
+360 not-yet Add recipe outline=solid 2px focus-visible=true
+360 not-yet Open navigation outline=solid 2px focus-visible=true
+360 not-yet ← Back to recipes outline=auto 1px focus-visible=true
+360 not-yet I made this outline=solid 2px focus-visible=true
+360 not-yet Share recipe outline=solid 2px focus-visible=true
+360 not-yet Edit serve as outline=solid 2px focus-visible=true
+360 not-yet Edit outline=auto 1px focus-visible=true
+360 not-yet Delete outline=solid 2px focus-visible=true
+360 shared Add to my recipes outline=solid 2px focus-visible=true
+1280 recipe Skip to content outline=solid 2px focus-visible=true
+1280 recipe FirstMenu outline=auto 1px focus-visible=true
+1280 recipe Make outline=solid 2px focus-visible=true
+1280 recipe My recipes outline=solid 2px focus-visible=true
+1280 recipe Add recipe outline=solid 2px focus-visible=true
+1280 recipe Foods outline=solid 2px focus-visible=true
+1280 recipe Plan outline=solid 2px focus-visible=true
+1280 recipe Sources outline=solid 2px focus-visible=true
+1280 recipe Settings outline=solid 2px focus-visible=true
+1280 not-yet Skip to content outline=solid 2px focus-visible=true
+1280 not-yet FirstMenu outline=auto 1px focus-visible=true
+1280 not-yet Make outline=solid 2px focus-visible=true
+1280 not-yet My recipes outline=solid 2px focus-visible=true
+1280 not-yet Add recipe outline=solid 2px focus-visible=true
+1280 not-yet Foods outline=solid 2px focus-visible=true
+1280 not-yet Plan outline=solid 2px focus-visible=true
+1280 not-yet Sources outline=solid 2px focus-visible=true
+1280 not-yet Settings outline=solid 2px focus-visible=true
+1280 shared Add to my recipes outline=solid 2px focus-visible=true
+
+Network requests (recipe page, Not yet recipe, shared view, both widths): 148
+Non-localhost requests: 0
+360 recipe http://localhost:4503/FirstMenu/
+360 recipe http://localhost:4503/FirstMenu/assets/index-DJ2MtUwp.js
+360 recipe http://localhost:4503/FirstMenu/assets/recipe-data-BuRUkITF.js
+360 recipe http://localhost:4503/FirstMenu/assets/index-BnE5VrOD.css
+360 recipe http://localhost:4503/FirstMenu/assets/RecipeDetail-CPG0JFRu.js
+360 recipe http://localhost:4503/FirstMenu/assets/TagBadge-kspJkNHw.js
+360 recipe http://localhost:4503/FirstMenu/assets/makeView-PJeIdBNa.js
+360 recipe http://localhost:4503/FirstMenu/assets/Badge-CvNcY7Vk.js
+360 recipe http://localhost:4503/FirstMenu/assets/Plate-COnggt9z.js
+360 recipe http://localhost:4503/FirstMenu/assets/foodArt-Cw8VSimj.js
+360 recipe http://localhost:4503/FirstMenu/assets/Plate-D-RpVR-J.css
+360 recipe http://localhost:4503/FirstMenu/assets/age-p-nzRQW7.js
+360 recipe http://localhost:4503/FirstMenu/assets/make-Bi77xh5D.js
+360 recipe http://localhost:4503/FirstMenu/assets/nutrition-DcudlrxX.js
+360 recipe http://localhost:4503/FirstMenu/assets/selectors-Bc4eZHAe.js
+360 recipe http://localhost:4503/FirstMenu/assets/recipeView-7wp4oOmg.js
+360 recipe http://localhost:4503/FirstMenu/assets/recipeShare-Bb8pBLrP.js
+360 recipe http://localhost:4503/FirstMenu/assets/lz-string-UNqkxtPb.js
+360 recipe http://localhost:4503/FirstMenu/assets/CheckboxInput-DVkHRFTd.js
+360 recipe http://localhost:4503/FirstMenu/assets/useBusyAnnouncement-BMq32RBe.js
+360 recipe http://localhost:4503/FirstMenu/assets/RecipeDetail-Dq8NxaqR.css
+360 recipe http://localhost:4503/FirstMenu/assets/figtree-latin-600-normal-Cv_xCTDl.woff2
+360 recipe http://localhost:4503/FirstMenu/assets/figtree-latin-500-normal-BWnGEVsr.woff2
+360 recipe http://localhost:4503/FirstMenu/assets/figtree-latin-400-normal-g7Dtegnw.woff2
+360 recipe http://localhost:4503/FirstMenu/assets/fredoka-latin-600-normal-C4zohCW5.woff2
+360 recipe http://localhost:4503/FirstMenu/art/foods/poultry_leg.webp
+360 recipe http://localhost:4503/FirstMenu/art/foods/cooked_rice.webp
+360 recipe http://localhost:4503/FirstMenu/art/state/snowflake.webp
+360 not-yet http://localhost:4503/FirstMenu/
+360 not-yet http://localhost:4503/FirstMenu/assets/index-DJ2MtUwp.js
+360 not-yet http://localhost:4503/FirstMenu/assets/recipe-data-BuRUkITF.js
+360 not-yet http://localhost:4503/FirstMenu/assets/index-BnE5VrOD.css
+360 not-yet http://localhost:4503/FirstMenu/assets/RecipeDetail-CPG0JFRu.js
+360 not-yet http://localhost:4503/FirstMenu/assets/TagBadge-kspJkNHw.js
+360 not-yet http://localhost:4503/FirstMenu/assets/makeView-PJeIdBNa.js
+360 not-yet http://localhost:4503/FirstMenu/assets/Badge-CvNcY7Vk.js
+360 not-yet http://localhost:4503/FirstMenu/assets/Plate-COnggt9z.js
+360 not-yet http://localhost:4503/FirstMenu/assets/foodArt-Cw8VSimj.js
+360 not-yet http://localhost:4503/FirstMenu/assets/Plate-D-RpVR-J.css
+360 not-yet http://localhost:4503/FirstMenu/assets/age-p-nzRQW7.js
+360 not-yet http://localhost:4503/FirstMenu/assets/make-Bi77xh5D.js
+360 not-yet http://localhost:4503/FirstMenu/assets/nutrition-DcudlrxX.js
+360 not-yet http://localhost:4503/FirstMenu/assets/selectors-Bc4eZHAe.js
+360 not-yet http://localhost:4503/FirstMenu/assets/recipeView-7wp4oOmg.js
+360 not-yet http://localhost:4503/FirstMenu/assets/recipeShare-Bb8pBLrP.js
+360 not-yet http://localhost:4503/FirstMenu/assets/lz-string-UNqkxtPb.js
+360 not-yet http://localhost:4503/FirstMenu/assets/CheckboxInput-DVkHRFTd.js
+360 not-yet http://localhost:4503/FirstMenu/assets/useBusyAnnouncement-BMq32RBe.js
+360 not-yet http://localhost:4503/FirstMenu/assets/RecipeDetail-Dq8NxaqR.css
+360 not-yet http://localhost:4503/FirstMenu/assets/figtree-latin-600-normal-Cv_xCTDl.woff2
+360 not-yet http://localhost:4503/FirstMenu/assets/figtree-latin-500-normal-BWnGEVsr.woff2
+360 not-yet http://localhost:4503/FirstMenu/assets/figtree-latin-400-normal-g7Dtegnw.woff2
+360 not-yet http://localhost:4503/FirstMenu/assets/fredoka-latin-600-normal-C4zohCW5.woff2
+360 not-yet http://localhost:4503/FirstMenu/art/foods/banana.webp
+360 not-yet http://localhost:4503/FirstMenu/art/state/hourglass_not_done.webp
+360 shared http://localhost:4503/FirstMenu/
+360 shared http://localhost:4503/FirstMenu/assets/index-DJ2MtUwp.js
+360 shared http://localhost:4503/FirstMenu/assets/recipe-data-BuRUkITF.js
+360 shared http://localhost:4503/FirstMenu/assets/index-BnE5VrOD.css
+360 shared http://localhost:4503/FirstMenu/assets/SharedRecipeView-C2nyNCRS.js
+360 shared http://localhost:4503/FirstMenu/assets/age-p-nzRQW7.js
+360 shared http://localhost:4503/FirstMenu/assets/recipeShare-Bb8pBLrP.js
+360 shared http://localhost:4503/FirstMenu/assets/lz-string-UNqkxtPb.js
+360 shared http://localhost:4503/FirstMenu/assets/selectors-Bc4eZHAe.js
+360 shared http://localhost:4503/FirstMenu/assets/Plate-COnggt9z.js
+360 shared http://localhost:4503/FirstMenu/assets/foodArt-Cw8VSimj.js
+360 shared http://localhost:4503/FirstMenu/assets/Plate-D-RpVR-J.css
+360 shared http://localhost:4503/FirstMenu/assets/SharedRecipeView-CrtNPK6Y.css
+360 shared http://localhost:4503/FirstMenu/assets/figtree-latin-400-normal-g7Dtegnw.woff2
+360 shared http://localhost:4503/FirstMenu/assets/fredoka-latin-600-normal-C4zohCW5.woff2
+360 shared http://localhost:4503/FirstMenu/assets/figtree-latin-600-normal-Cv_xCTDl.woff2
+360 shared http://localhost:4503/FirstMenu/assets/figtree-latin-500-normal-BWnGEVsr.woff2
+360 shared http://localhost:4503/FirstMenu/art/foods/banana.webp
+360 shared http://localhost:4503/FirstMenu/art/state/hourglass_not_done.webp
+1280 recipe http://localhost:4503/FirstMenu/
+1280 recipe http://localhost:4503/FirstMenu/assets/index-DJ2MtUwp.js
+1280 recipe http://localhost:4503/FirstMenu/assets/recipe-data-BuRUkITF.js
+1280 recipe http://localhost:4503/FirstMenu/assets/index-BnE5VrOD.css
+1280 recipe http://localhost:4503/FirstMenu/assets/RecipeDetail-CPG0JFRu.js
+1280 recipe http://localhost:4503/FirstMenu/assets/TagBadge-kspJkNHw.js
+1280 recipe http://localhost:4503/FirstMenu/assets/makeView-PJeIdBNa.js
+1280 recipe http://localhost:4503/FirstMenu/assets/Badge-CvNcY7Vk.js
+1280 recipe http://localhost:4503/FirstMenu/assets/Plate-COnggt9z.js
+1280 recipe http://localhost:4503/FirstMenu/assets/foodArt-Cw8VSimj.js
+1280 recipe http://localhost:4503/FirstMenu/assets/Plate-D-RpVR-J.css
+1280 recipe http://localhost:4503/FirstMenu/assets/age-p-nzRQW7.js
+1280 recipe http://localhost:4503/FirstMenu/assets/make-Bi77xh5D.js
+1280 recipe http://localhost:4503/FirstMenu/assets/nutrition-DcudlrxX.js
+1280 recipe http://localhost:4503/FirstMenu/assets/selectors-Bc4eZHAe.js
+1280 recipe http://localhost:4503/FirstMenu/assets/recipeView-7wp4oOmg.js
+1280 recipe http://localhost:4503/FirstMenu/assets/recipeShare-Bb8pBLrP.js
+1280 recipe http://localhost:4503/FirstMenu/assets/lz-string-UNqkxtPb.js
+1280 recipe http://localhost:4503/FirstMenu/assets/CheckboxInput-DVkHRFTd.js
+1280 recipe http://localhost:4503/FirstMenu/assets/useBusyAnnouncement-BMq32RBe.js
+1280 recipe http://localhost:4503/FirstMenu/assets/RecipeDetail-Dq8NxaqR.css
+1280 recipe http://localhost:4503/FirstMenu/assets/figtree-latin-600-normal-Cv_xCTDl.woff2
+1280 recipe http://localhost:4503/FirstMenu/assets/figtree-latin-500-normal-BWnGEVsr.woff2
+1280 recipe http://localhost:4503/FirstMenu/assets/figtree-latin-400-normal-g7Dtegnw.woff2
+1280 recipe http://localhost:4503/FirstMenu/assets/fredoka-latin-600-normal-C4zohCW5.woff2
+1280 recipe http://localhost:4503/FirstMenu/art/foods/poultry_leg.webp
+1280 recipe http://localhost:4503/FirstMenu/art/foods/cooked_rice.webp
+1280 recipe http://localhost:4503/FirstMenu/art/state/snowflake.webp
+1280 not-yet http://localhost:4503/FirstMenu/
+1280 not-yet http://localhost:4503/FirstMenu/assets/index-DJ2MtUwp.js
+1280 not-yet http://localhost:4503/FirstMenu/assets/recipe-data-BuRUkITF.js
+1280 not-yet http://localhost:4503/FirstMenu/assets/index-BnE5VrOD.css
+1280 not-yet http://localhost:4503/FirstMenu/assets/RecipeDetail-CPG0JFRu.js
+1280 not-yet http://localhost:4503/FirstMenu/assets/TagBadge-kspJkNHw.js
+1280 not-yet http://localhost:4503/FirstMenu/assets/makeView-PJeIdBNa.js
+1280 not-yet http://localhost:4503/FirstMenu/assets/Badge-CvNcY7Vk.js
+1280 not-yet http://localhost:4503/FirstMenu/assets/Plate-COnggt9z.js
+1280 not-yet http://localhost:4503/FirstMenu/assets/foodArt-Cw8VSimj.js
+1280 not-yet http://localhost:4503/FirstMenu/assets/Plate-D-RpVR-J.css
+1280 not-yet http://localhost:4503/FirstMenu/assets/age-p-nzRQW7.js
+1280 not-yet http://localhost:4503/FirstMenu/assets/make-Bi77xh5D.js
+1280 not-yet http://localhost:4503/FirstMenu/assets/nutrition-DcudlrxX.js
+1280 not-yet http://localhost:4503/FirstMenu/assets/selectors-Bc4eZHAe.js
+1280 not-yet http://localhost:4503/FirstMenu/assets/recipeView-7wp4oOmg.js
+1280 not-yet http://localhost:4503/FirstMenu/assets/recipeShare-Bb8pBLrP.js
+1280 not-yet http://localhost:4503/FirstMenu/assets/lz-string-UNqkxtPb.js
+1280 not-yet http://localhost:4503/FirstMenu/assets/CheckboxInput-DVkHRFTd.js
+1280 not-yet http://localhost:4503/FirstMenu/assets/useBusyAnnouncement-BMq32RBe.js
+1280 not-yet http://localhost:4503/FirstMenu/assets/RecipeDetail-Dq8NxaqR.css
+1280 not-yet http://localhost:4503/FirstMenu/assets/figtree-latin-600-normal-Cv_xCTDl.woff2
+1280 not-yet http://localhost:4503/FirstMenu/assets/figtree-latin-500-normal-BWnGEVsr.woff2
+1280 not-yet http://localhost:4503/FirstMenu/assets/figtree-latin-400-normal-g7Dtegnw.woff2
+1280 not-yet http://localhost:4503/FirstMenu/assets/fredoka-latin-600-normal-C4zohCW5.woff2
+1280 not-yet http://localhost:4503/FirstMenu/art/foods/banana.webp
+1280 not-yet http://localhost:4503/FirstMenu/art/state/hourglass_not_done.webp
+1280 shared http://localhost:4503/FirstMenu/
+1280 shared http://localhost:4503/FirstMenu/assets/index-DJ2MtUwp.js
+1280 shared http://localhost:4503/FirstMenu/assets/recipe-data-BuRUkITF.js
+1280 shared http://localhost:4503/FirstMenu/assets/index-BnE5VrOD.css
+1280 shared http://localhost:4503/FirstMenu/assets/SharedRecipeView-C2nyNCRS.js
+1280 shared http://localhost:4503/FirstMenu/assets/age-p-nzRQW7.js
+1280 shared http://localhost:4503/FirstMenu/assets/recipeShare-Bb8pBLrP.js
+1280 shared http://localhost:4503/FirstMenu/assets/lz-string-UNqkxtPb.js
+1280 shared http://localhost:4503/FirstMenu/assets/selectors-Bc4eZHAe.js
+1280 shared http://localhost:4503/FirstMenu/assets/Plate-COnggt9z.js
+1280 shared http://localhost:4503/FirstMenu/assets/foodArt-Cw8VSimj.js
+1280 shared http://localhost:4503/FirstMenu/assets/Plate-D-RpVR-J.css
+1280 shared http://localhost:4503/FirstMenu/assets/SharedRecipeView-CrtNPK6Y.css
+1280 shared http://localhost:4503/FirstMenu/assets/figtree-latin-400-normal-g7Dtegnw.woff2
+1280 shared http://localhost:4503/FirstMenu/assets/fredoka-latin-600-normal-C4zohCW5.woff2
+1280 shared http://localhost:4503/FirstMenu/assets/figtree-latin-600-normal-Cv_xCTDl.woff2
+1280 shared http://localhost:4503/FirstMenu/assets/figtree-latin-500-normal-BWnGEVsr.woff2
+1280 shared http://localhost:4503/FirstMenu/art/foods/banana.webp
+1280 shared http://localhost:4503/FirstMenu/art/state/hourglass_not_done.webp

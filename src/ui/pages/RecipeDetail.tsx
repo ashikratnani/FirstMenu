@@ -250,7 +250,11 @@ function MadeThis({ recipe }: { recipe: Recipe }) {
 function RecipePlate({ view }: { view: RecipeView }) {
   const { state } = useApp();
   const isNotYet = useMemo(() => plateNotYetCheck(view, state), [view, state]);
-  return <Plate recipe={view.recipe} isNotYet={isNotYet} notYet={view.isGhosted} size={160} />;
+  return (
+    <div className={styles.plate}>
+      <Plate recipe={view.recipe} isNotYet={isNotYet} notYet={view.isGhosted} size={160} />
+    </div>
+  );
 }
 
 export default function RecipeDetail() {
