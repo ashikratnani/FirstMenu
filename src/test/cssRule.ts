@@ -2,7 +2,8 @@
 // (imported with `?raw`) whose selector list contains `selector`. jsdom does
 // not apply CSS modules, so this lets a test pin facts such as
 // "min-height: 44px" on a control's class.
-export function ruleBody(css: string, selector: string): string {
+export function ruleBody(source: string, selector: string): string {
+  const css = source.replace(/\/\*[\s\S]*?\*\//g, '');
   const escaped = selector.replace(/[.[\]()]/g, '\\$&');
   const match = new RegExp(`(?:^|[\\s,}])${escaped}(?:,[^{]*)?\\s*\\{([^}]*)\\}`).exec(css);
   if (match === null) throw new Error(`No rule for ${selector}`);

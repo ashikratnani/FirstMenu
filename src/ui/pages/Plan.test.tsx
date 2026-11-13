@@ -1,8 +1,9 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { MemoryRouter } from 'react-router-dom';
+import { HashRouter, MemoryRouter, Route, Routes } from 'react-router-dom';
 import { describe, expect, it, beforeEach } from 'vitest';
 import Plan from './Plan';
+import Layout from '../components/Layout';
 import planCss from './Plan.module.css?raw';
 import { ruleBody } from '../../test/cssRule';
 import { AppProvider, useApp } from '../../state/AppProvider';
@@ -368,11 +369,34 @@ describe('Plan week view', () => {
     // The same region element now carries the message and a link to the settings.
     expect(screen.getByRole('status')).toBe(region);
     expect(region).toHaveTextContent('No meals selected.');
-    const link = within(region).getByRole('link', { name: 'Plan settings' });
+    const link = within(region).getByRole('link', { name: 'Go to Plan settings' });
     expect(link).toHaveAttribute('href', '#week-controls');
     expect(link).toHaveClass('fm-link');
     expect(document.getElementById('week-controls')).not.toBeNull();
     expect(screen.queryByRole('heading', { name: /Day 1/ })).toBeNull();
+  });
+
+  it('the settings link keeps the page and moves focus to Plan settings under HashRouter', async () => {
+    const user = userEvent.setup();
+    window.location.hash = '#/plan';
+    render(
+      <AppProvider storage={makeStorage(seedState(8, [OATS_RECIPE], []))}>
+        <HashRouter>
+          <Routes>
+            <Route element={<Layout />}>
+              <Route path="/plan" element={<Plan />} />
+            </Route>
+          </Routes>
+        </HashRouter>
+      </AppProvider>,
+    );
+    await user.click(screen.getByRole('link', { name: 'Go to Plan settings' }));
+    // The fragment click is not read as a route change: the page is still there.
+    expect(screen.getByRole('heading', { name: 'This week' })).toBeInTheDocument();
+    expect(screen.getByText(/No meals selected/)).toBeInTheDocument();
+    expect(window.location.hash).toBe('#/plan');
+    expect(document.activeElement).toBe(document.getElementById('week-controls'));
+    window.location.hash = '';
   });
 
   it('slot buttons and settings controls are 44 px targets (CSS)', () => {

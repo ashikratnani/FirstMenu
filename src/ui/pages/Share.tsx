@@ -28,8 +28,10 @@ export default function Share() {
   const { state } = useApp();
   const { url } = encodeSharePayload(state);
   const tooLong = isShareLinkLong(url);
+  // Only the active slots count, as in the shared view: a meal left in a
+  // deselected slot is not part of the shared week.
   const planIsEmpty = state.plan.days.every((day) =>
-    Object.values(day).every((id) => id === undefined),
+    state.plan.activeSlots.every((meal) => day[meal] === undefined),
   );
 
   const [copied, setCopied] = useState(false);
@@ -66,11 +68,13 @@ export default function Share() {
 
       {planIsEmpty && (
         <p className={styles.emptyNote}>
-          Nothing is planned yet, so the link would show an empty week.{' '}
-          <Link to="/plan" className={`fm-link ${styles.nextStep}`}>
-            Plan your week
-          </Link>
+          Nothing is planned yet, so the link would show an empty week.
         </p>
+      )}
+      {planIsEmpty && (
+        <Link to="/plan" className={`fm-link ${styles.nextStep}`}>
+          Plan your week
+        </Link>
       )}
 
       <section className={styles.linkBlock} aria-labelledby="share-link-heading">

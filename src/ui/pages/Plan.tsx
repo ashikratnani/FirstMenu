@@ -17,12 +17,13 @@
 // recording a reaction on a planned recipe's food ghosts that slot and shows
 // the Replace prompt on the next render (Req 7.6).
 //
-// Below the grid (the week comes first): active-slot toggles (Req 8.2, dispatch setActiveSlots), a
-// new-week keep|empty control (Req 8.5, dispatch newWeek{mode}), a prep-date
-// input (Req 8.4, dispatch setPrepDate), and — when newFoodSpacingWarning is
-// non-null — ONE new-food spacing warning citing its source (Req 7.8). No new
-// health wording is written: the warning is derived from the spacing value +
-// its published source, like the existing Foods/Sources citations.
+// The week comes first. Above the grid, when newFoodSpacingWarning is non-null,
+// sits ONE new-food spacing warning citing its source (Req 7.8). No new health
+// wording is written: the warning is derived from the spacing value + its
+// published source, like the existing Foods/Sources citations. Below the grid
+// is the Plan settings section: active-slot toggles (Req 8.2, dispatch
+// setActiveSlots), a new-week keep|empty control (Req 8.5, dispatch
+// newWeek{mode}) and a prep-date input (Req 8.4, dispatch setPrepDate).
 
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -115,13 +116,15 @@ export default function Plan() {
         )}
 
         {activeSlots.length === 0 && (
-          <p className={styles.noSlots}>
-            No meals selected. Choose at least one meal in{' '}
+          <>
+            <p className={styles.noSlots}>
+              No meals selected. Choose at least one meal in Plan settings to
+              start planning.
+            </p>
             <a href="#week-controls" className={`fm-link ${styles.nextStep}`}>
-              Plan settings
-            </a>{' '}
-            to start planning.
-          </p>
+              Go to Plan settings
+            </a>
+          </>
         )}
       </div>
 

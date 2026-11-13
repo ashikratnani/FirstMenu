@@ -8,7 +8,7 @@ import { ruleBody } from '../../test/cssRule';
 import { AppProvider } from '../../state/AppProvider';
 import { STORAGE_KEY, defaultState } from '../../domain/storage';
 import { SHARE_BASE_URL } from '../../domain/share';
-import type { AppState, Recipe } from '../../domain/types';
+import type { AppState, MealType, Recipe } from '../../domain/types';
 
 // The Share page copies a read-only share link (navigator.clipboard with a
 // graceful fallback field), warns when the link is long (Req 11.6) and surfaces
@@ -157,6 +157,23 @@ describe('Share page', () => {
     unmount();
 
     renderShare(longState());
+    expect(screen.queryByRole('link', { name: 'Plan your week' })).toBeNull();
+  });
+
+  it('counts only active slots when deciding the plan is empty', () => {
+    const withMeal = (activeSlots: MealType[]): AppState => {
+      const base = shortState();
+      const days: AppState['plan']['days'] = Array.from({ length: 7 }, () => ({}));
+      days[0] = { dinner: 'b-carrots-and-apples' };
+      return { ...base, plan: { ...base.plan, activeSlots, days } };
+    };
+    // A meal in a deselected slot is not shared, so the empty note shows.
+    const { unmount } = renderShare(withMeal(['breakfast']));
+    expect(screen.getByRole('link', { name: 'Plan your week' })).toBeInTheDocument();
+    unmount();
+
+    // The same meal in an active slot: no note.
+    renderShare(withMeal(['breakfast', 'dinner']));
     expect(screen.queryByRole('link', { name: 'Plan your week' })).toBeNull();
   });
 

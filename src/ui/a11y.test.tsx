@@ -461,7 +461,7 @@ describe('Accessibility: axe on every main page (color-contrast disabled)', () =
     } as AppState;
     const { container } = renderApp(path, emptyPlan);
     expect(screen.getByRole('heading', { level: 1, name: heading })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /^(Plan your week|Plan settings)$/ })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /^(Plan your week|Go to Plan settings)$/ })).toBeInTheDocument();
     const results = await axe(container, AXE_OPTIONS);
     expect(results).toHaveNoViolations();
   });
