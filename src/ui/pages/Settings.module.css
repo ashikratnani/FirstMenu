@@ -21,6 +21,7 @@
 .label {
   font-weight: 500;
   font-size: 0.875rem;
+  color: var(--color-text-secondary);
 }
 
 /* Native date input styled to match the Astryx text input. */
@@ -111,6 +112,8 @@
   align-items: center;
   gap: 12px;
   padding: 12px 0;
+  /* Pill on the right, Saved. to its left; tab order stays Save last. */
+  flex-direction: row-reverse;
   pointer-events: none;
 }
 

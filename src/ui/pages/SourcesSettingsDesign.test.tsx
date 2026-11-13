@@ -160,6 +160,13 @@ describe('Sources: jump list and grouping', () => {
       .getByRole('heading', { name: 'Safety rules', level: 2 })
       .closest('section') as HTMLElement;
     expect(band.className).toMatch(/band/);
+    // Every level-2 section is a band with its own way back to the top.
+    const sections = screen
+      .getAllByRole('heading', { level: 2 })
+      .map((h) => h.closest('section') as HTMLElement)
+      .filter((sec) => sec !== null && within(sec).queryByRole('link', { name: 'Back to top' }));
+    expect(sections.length).toBeGreaterThanOrEqual(5);
+    for (const sec of sections) expect(sec.className).toMatch(/band/);
     expect(within(band).getByRole('link', { name: 'Back to top' })).toBeInTheDocument();
   });
 
@@ -175,8 +182,13 @@ describe('Sources and Settings network use', () => {
     const network = spyOnNetwork();
     renderAt('/sources');
     fireEvent.click(screen.getByRole('link', { name: /^Recipe sources/ }));
+    await user.click(screen.getAllByRole('link', { name: 'Back to top' })[0]);
     cleanup();
     renderAt('/settings');
+    const first = screen.getByRole('textbox', { name: /First name/ });
+    await user.clear(first);
+    await user.type(first, 'Pip');
+    await user.click(screen.getByRole('checkbox', { name: 'rice' }));
     await user.click(screen.getByRole('button', { name: 'Save' }));
     network.expectNoNetwork();
   });

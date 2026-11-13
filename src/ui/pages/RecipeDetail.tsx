@@ -456,10 +456,10 @@ export default function RecipeDetail() {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  {source.publisher}
+                  see the storage page
                 </ExternalLink>
               ) : (
-                source.publisher
+                'from the source above'
               )}
             </p>
           )}
