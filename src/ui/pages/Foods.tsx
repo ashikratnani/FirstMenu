@@ -197,7 +197,7 @@ export default function Foods() {
               : `${allViews.length} foods.`}
         </p>
         {views.length === 0 && (
-            <Button
+          <Button
             label="Clear search"
             onClick={() => {
               setSearch('');
