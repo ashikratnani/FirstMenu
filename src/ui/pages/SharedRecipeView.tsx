@@ -20,6 +20,7 @@ import type { Ingredient } from '../../domain/types';
 import { useApp } from '../../state/AppProvider';
 import { selectAgeMonths } from '../../state/selectors';
 import Disclaimer from '../components/Disclaimer';
+import Plate from '../components/Plate';
 import styles from './SharedRecipeView.module.css';
 
 function quantityLabel(ingredient: Ingredient): string {
@@ -27,6 +28,9 @@ function quantityLabel(ingredient: Ingredient): string {
   if (quantity === undefined) return '';
   return unit ? `${quantity} ${unit} ` : `${quantity} `;
 }
+
+/** A shared recipe keeps every main food on its plate (greyed when it is Not yet). */
+const NEVER_NOT_YET = () => false;
 
 function Shell({ children }: { children: React.ReactNode }) {
   return (
@@ -69,6 +73,9 @@ export default function SharedRecipeView() {
     ageMonths === null ? { blocks: [], reminders: [] } : screenRecipe(recipe, ageMonths);
   const textMentions = ageMonths === null ? [] : screenTextMentions(recipe, ageMonths);
 
+  // Greyed only when this view's own Not yet section shows, so never without a child.
+  const notYet = blocks.length > 0 || textMentions.length > 0;
+
   const add = () => {
     dispatch({ type: 'saveCustomRecipe', recipe });
     navigate(`/recipes/${recipe.id}`);
@@ -77,6 +84,9 @@ export default function SharedRecipeView() {
   return (
     <Shell>
       <h1>{shared.title}</h1>
+      <div className={styles.plate}>
+        <Plate recipe={recipe} isNotYet={NEVER_NOT_YET} notYet={notYet} size={160} />
+      </div>
       <p className={styles.intro}>
         Someone shared this recipe with you. Adding it checks it for your child.
       </p>

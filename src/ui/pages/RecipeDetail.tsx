@@ -11,9 +11,11 @@
 // Foods page and recipeView.ts helpers. The page offers NO control that would
 // let a user bypass a block (blocks are presented honestly).
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import TagBadge from '../components/TagBadge';
+import Plate from '../components/Plate';
+import StatePicture from '../components/StatePicture';
 import { Button } from '@astryxdesign/core/Button';
 import { CheckboxInput } from '@astryxdesign/core/CheckboxInput';
 import { Link as ExternalLink } from '@astryxdesign/core/Link';
@@ -26,7 +28,15 @@ import { useApp } from '../../state/AppProvider';
 import { selectAgeMonths, selectAllRecipes } from '../../state/selectors';
 import { screenRecipe } from '../../domain/safety/screen';
 import type { Ingredient, MealType, Recipe, ServeAs } from '../../domain/types';
-import { MEAL_TYPES, dayLabel, ghostReason, mealTypeLabel, recipeView } from './recipeView';
+import {
+  MEAL_TYPES,
+  dayLabel,
+  ghostReason,
+  mealTypeLabel,
+  plateNotYetCheck,
+  recipeView,
+  type RecipeView,
+} from './recipeView';
 import { FIXED_LIST_NOTE, TAG_EXPLAINER, effortLabel, timeLabel } from './makeView';
 import Disclaimer from '../components/Disclaimer';
 import ShareRecipe from '../components/ShareRecipe';
@@ -236,6 +246,17 @@ function MadeThis({ recipe }: { recipe: Recipe }) {
   );
 }
 
+/** The recipe's plate; a Not yet food stays off a ready recipe's plate. */
+function RecipePlate({ view }: { view: RecipeView }) {
+  const { state } = useApp();
+  const isNotYet = useMemo(() => plateNotYetCheck(view, state), [view, state]);
+  return (
+    <div className={styles.plate}>
+      <Plate recipe={view.recipe} isNotYet={isNotYet} notYet={view.isGhosted} size={160} />
+    </div>
+  );
+}
+
 export default function RecipeDetail() {
   const { id } = useParams<{ id: string }>();
   const { state, dispatch, deleteCustomRecipe } = useApp();
@@ -287,6 +308,8 @@ export default function RecipeDetail() {
       <h1>{recipe.title}</h1>
 
       {recipe.kind === 'simple-idea' && <p className={styles.simpleIdea}>Simple idea</p>}
+
+      <RecipePlate view={view} />
 
       {/* Ghost / block reasons, prominent near the top (Req 5.3). No control
           here lets the user bypass a block. */}
@@ -401,7 +424,7 @@ export default function RecipeDetail() {
       </section>
 
       {(storage?.fridgeDays !== undefined ||
-        storage?.freezerMonths !== undefined ||
+        (storage?.freezerMonths ?? 0) > 0 ||
         recipe.makeAheadNote) && (
         <section aria-labelledby="recipe-storage">
           <h2 id="recipe-storage">Storage</h2>
@@ -409,8 +432,11 @@ export default function RecipeDetail() {
             {storage?.fridgeDays !== undefined && (
               <li>{fridgeText(storage.fridgeDays)}</li>
             )}
-            {storage?.freezerMonths !== undefined && (
-              <li>{freezerText(storage.freezerMonths)}</li>
+            {storage?.freezerMonths !== undefined && storage.freezerMonths > 0 && (
+              <li className={styles.freezer}>
+                <StatePicture state="freezes" />
+                <span>{freezerText(storage.freezerMonths)}</span>
+              </li>
             )}
           </ul>
           {recipe.makeAheadNote && (

@@ -1,0 +1,111 @@
+Keyboard tab order on the recipe page and shared view (after)
+
+## recipe, 360px (10 stops)
+1. a: Skip to content
+2. a: FirstMenu
+3. a: Add recipe
+4. button: Open navigation
+5. a: ← Back to recipes
+6. button: Add to plan
+7. button: I made this
+8. button: Share recipe
+9. a: Carrots and Apples
+10. a: see the storage page
+
+## recipe-not-yet, 360px (10 stops)
+1. a: Skip to content
+2. a: FirstMenu
+3. a: Add recipe
+4. button: Open navigation
+5. a: ← Back to recipes
+6. button: I made this
+7. button: Share recipe
+8. button: Edit serve as
+9. a: Edit
+10. button: Delete
+
+## recipe-freezable, 360px (11 stops)
+1. a: Skip to content
+2. a: FirstMenu
+3. a: Add recipe
+4. button: Open navigation
+5. a: ← Back to recipes
+6. button: Add to plan
+7. button: I made this
+8. button: Share recipe
+9. button: Edit serve as
+10. a: Edit
+11. button: Delete
+
+## shared-no-child, 360px (1 stops)
+1. button: Add to my recipes
+
+## shared-block, 360px (1 stops)
+1. button: Add to my recipes
+
+## shared-reaction-only, 360px (1 stops)
+1. button: Add to my recipes
+
+## recipe, 1280px (16 stops)
+1. a: Skip to content
+2. a: FirstMenu
+3. a: Make
+4. a: My recipes
+5. a: Add recipe
+6. a: Foods
+7. a: Plan
+8. a: Sources
+9. a: Settings
+10. a: Add recipe
+11. a: ← Back to recipes
+12. button: Add to plan
+13. button: I made this
+14. button: Share recipe
+15. a: Carrots and Apples
+16. a: see the storage page
+
+## recipe-not-yet, 1280px (16 stops)
+1. a: Skip to content
+2. a: FirstMenu
+3. a: Make
+4. a: My recipes
+5. a: Add recipe
+6. a: Foods
+7. a: Plan
+8. a: Sources
+9. a: Settings
+10. a: Add recipe
+11. a: ← Back to recipes
+12. button: I made this
+13. button: Share recipe
+14. button: Edit serve as
+15. a: Edit
+16. button: Delete
+
+## recipe-freezable, 1280px (17 stops)
+1. a: Skip to content
+2. a: FirstMenu
+3. a: Make
+4. a: My recipes
+5. a: Add recipe
+6. a: Foods
+7. a: Plan
+8. a: Sources
+9. a: Settings
+10. a: Add recipe
+11. a: ← Back to recipes
+12. button: Add to plan
+13. button: I made this
+14. button: Share recipe
+15. button: Edit serve as
+16. a: Edit
+17. button: Delete
+
+## shared-no-child, 1280px (1 stops)
+1. button: Add to my recipes
+
+## shared-block, 1280px (1 stops)
+1. button: Add to my recipes
+
+## shared-reaction-only, 1280px (1 stops)
+1. button: Add to my recipes
