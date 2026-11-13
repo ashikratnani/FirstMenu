@@ -83,8 +83,9 @@ Requirement 21, design "Food art"):
   `small-round-fruit`, `sausages`, `whole-nuts`) match, at any age. A Foods
   tile may show such a food's picture only with the rule's message, unchanged,
   as the first line under it.
-- Where pictures are shown, a Not yet food or recipe is greyed with the
-  hourglass, and a plate never shows a Not yet food in full color.
+- The cards and recipe page of a Not yet recipe, and the Foods tile of a Not
+  yet food, show the hourglass. Every picture of a Not yet food is greyed, so
+  a plate never shows a Not yet food in full color.
 - No photos, no pictures made by an image-generation model, and no pictures
   from other hosts.
 - Renaming or removing one of these rule ids needs the same change in

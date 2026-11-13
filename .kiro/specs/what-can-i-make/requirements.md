@@ -50,7 +50,7 @@ Terms from the v1 glossary keep their meaning. New terms:
 - **Group picture**: the picture shown for a food that has no food picture of its own. It shows no food: an empty jar for the pantry group, and an empty bowl, the **generic bowl**, for every other group.
 - **Main foods**: a recipe's foods in ingredient order, leaving out optional ingredients, ignored foods and staples such as oil, salt and spices (rules in the design).
 - **Plate**: the round picture on a recipe card and at the top of a recipe page that shows up to 3 of the recipe's main foods.
-- **Not yet**: the visible name of a ghosted food or recipe (v1 glossary "Ghost / ghosted"), shown with the hourglass.
+- **Not yet**: the visible name of a ghosted food or recipe (v1 glossary "Ghost / ghosted"), shown with the hourglass where pictures are shown.
 - **Peekaboo monster**: the picture for a food the child has not tried yet. It replaces the mystery door picture; the state keeps the name `door` in code.
 
 ## Requirements
@@ -373,14 +373,14 @@ This requirement replaces the theme elements of v1 Requirement 14.1 and the mapp
 
 #### Acceptance Criteria
 
-1. ON recipe cards, recipe pages and the Foods page (the design lists the screens), THE app SHALL show a picture for each food: its own picture from Microsoft Fluent Emoji in the 3D style (MIT license), or, IF Fluent Emoji has no picture of that food, THEN the group picture of the food's food group. A food SHALL NEVER show a picture of a different food. Other screens, such as the week plan, the slot picker and print, get no pictures.
+1. EVERY Foods page tile SHALL show its food's picture, and every plate (criterion 5) SHALL show its foods' pictures. A food's picture SHALL be its own picture from Microsoft Fluent Emoji in the 3D style (MIT license), or, IF Fluent Emoji has no picture of that food, THEN the group picture of the food's food group. A food SHALL NEVER show a picture of a different food. Other screens, such as the week plan, the slot picker and print, get no food pictures and keep their current art (the design lists the screens).
 2. THE app SHALL NOT show photos or pictures made by an image-generation model. EVERY picture SHALL be a file that ships with the app or an SVG drawn in the app's code, and SHALL NEVER be loaded from another host.
 3. EVERY food picture SHALL have its width and height set, SHALL load lazily, and SHALL be decorative (empty `alt` text).
 4. A fixed map in source code SHALL give each food key (as `src/domain/foods.ts` makes it) its own picture or its food group. EVERY food that a built-in recipe uses SHALL have an entry, and a test SHALL check this. That covers every main food of the built-in recipes: 206 foods on November 13, 2026 by the design's rules, more than the 168 that the session counted with a rougher rule.
 5. EVERY recipe card (the design lists them), for built-in and pasted recipes, and the top of every recipe page SHALL show a plate with up to 3 of the recipe's main foods, chosen by the rules in the design.
 6. A plate SHALL NEVER show a food that is matched, at any age, by the `choking-no-safe-form` block rule or by a prep reminder for round or tube-shaped foods (`grapes`, `cherry-tomato`, `cherries`, `small-round-fruit`, `sausages`, `whole-nuts`). It SHALL show the recipe's other main foods instead, or the generic bowl IF none are left.
 7. A Foods page tile MAY show the picture of a food that criterion 6 keeps off plates, but only with that rule's message, unchanged, as the first line under the picture and the food's name.
-8. ON recipe cards, recipe pages and the Foods page, a food or recipe that is Not yet for the child (blocked for the child's age, or paused after a recorded reaction) SHALL be shown greyed with the hourglass. A plate SHALL NEVER show a Not yet food in full color. Only pictures are greyed; text keeps its contrast. Other screens keep showing Not yet as text.
+8. A food or recipe is Not yet for the child when it is blocked for the child's age or paused after a recorded reaction. THE cards and recipe page of a Not yet recipe, and the Foods tile of a Not yet food, SHALL show the hourglass, and the plate of a Not yet recipe SHALL be greyed. EVERY picture of a Not yet food SHALL be greyed, so a plate SHALL NEVER show a Not yet food in full color. Only pictures are greyed; text keeps its contrast. Other screens keep showing Not yet as text.
 9. THE state pictures SHALL be:
 
    | State | Shown for | Picture |
