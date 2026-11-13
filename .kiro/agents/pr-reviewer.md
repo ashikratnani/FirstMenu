@@ -64,10 +64,19 @@ You review pull requests for FirstMenu (`ashikratnani/FirstMenu`), a baby meal p
 - CI workflow files don't print environment variables or secrets.
 
 **UI and accessibility**
-- Ghost, door, monster and pumpkin states have visible text and an accessible name (v1 Requirement 14.3).
-- Nothing scary: no haunted houses, night scenes, skulls or sharp teeth (v1 Requirement 14.1).
+- Theme states (new food, tried, Not yet, freezes well) have visible text and an accessible name (v1 Requirement 14.3), and their pictures are decorative (`alt=""` or `aria-hidden`). Active spec Requirement 21 sets the pictures (peekaboo monster, friendly monster, hourglass, snowflake); until task 19.4 is done, some screens still show the old door, ghost and pumpkin.
+- Nothing scary: no haunted houses, night scenes, skulls or sharp teeth (v1 Requirement 14.1). The peekaboo monster's dark hiding hole is allowed.
 - Disclaimers appear where v1 Requirement 13.1 and active spec Requirement 11 say.
 - Astryx (active spec Requirement 15): versions are pinned; fonts and styles are bundled, never from Google Fonts or a CDN; `scripts/check-external.mjs` passes; the size budget is reported when the build changes.
+
+**Art** (active spec Requirement 21, design "Food art"; for PRs that add or change pictures, plates, fonts or colors)
+- Plates never show a food that `choking-no-safe-form` or the round or tube-shaped prep reminders (`grapes`, `cherry-tomato`, `cherries`, `small-round-fruit`, `sausages`, `whole-nuts`) match at any age, and never a picture in `ROUND_OR_TUBE_PICTURES`. The tests that prove it run over every built-in recipe. A Foods tile that shows such a food's picture has the rule's message, unchanged, as the first line under the picture and name.
+- Not yet foods and recipes are greyed with the hourglass and never in full color on a plate. Only pictures are greyed, never text.
+- No photos and no pictures made by an image-generation model. Every picture is a file under `public/art/` or an SVG in the app's code, nothing loads from another host, and `check:external` passes.
+- Spot-check `src/data/foodPictures.ts`: no food shows a picture of a different food, foods without a Fluent picture use their group picture, and the coverage test (every food a built-in recipe uses has an entry) ran.
+- `public/art/LICENSE-fluentui-emoji.txt` holds the MIT text and names the pinned commit, and the Sources page credits Fluent Emoji (MIT) and Fredoka (SIL Open Font License).
+- The art size check passes: every file under `dist/art/` is at most 8 KB, and the PR reports a warning if they pass 900 KB together.
+- Fredoka is bundled at weight 600, latin only, for headings; body text stays Figtree.
 
 **Design skills** (`.kiro/steering/design-skills.md`)
 - UI PRs include the impeccable critique findings, and before and after screenshots at 360 px and 1280 px committed to `docs/ui-review/<branch name>/` and linked from the PR body.

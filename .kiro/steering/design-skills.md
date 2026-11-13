@@ -14,7 +14,7 @@ Both skills are written mostly for marketing and company websites. FirstMenu is 
 ## How to apply them
 
 - **Mode: Operate** (impeccable). Every FirstMenu screen is a task screen: find something to cook, add a recipe, check a food. Ambition shows as clarity, speed and precision, not spectacle. The share view is also Operate.
-- **Refinement, not redesign.** Keep the Astryx components, the FirstMenu theme (creams, soft orange, lavender), the friendly ghost, door, monster and pumpkin art, and every safety state and its text. Improve hierarchy, spacing, copy, flows and feedback within that.
+- **Refinement, not redesign.** Keep the Astryx components, the FirstMenu theme (creams, soft orange, lavender, pastel food-group colors), the theme art of active spec Requirement 21 (food pictures and plates, the peekaboo monster, friendly monsters, the hourglass and the snowflake; decided by the maintainer on November 13, 2026), and every safety state and its text. Improve hierarchy, spacing, copy, flows and feedback within that.
 - **Context files.** impeccable looks for `PRODUCT.md` and `DESIGN.md`. If they don't exist, create them at the repo root from `.kiro/steering/product.md`, `tech.md`, the active spec and `src/ui/theme/firstmenu.css`. Don't invent facts.
 - **Inspiration:** `docs/design-inspiration.md`. Use it for patterns, never to copy another site's look, text or images.
 - **Every UI PR** (task 19 and any later UI change): start with an impeccable critique of the screen at 360 px and 1280 px, fix what it finds, then run its craft-floor checks before the PR. Put the critique's main findings and what you changed in the PR body, and commit before and after screenshots of the changed screens at 360 px and 1280 px to `docs/ui-review/<branch name>/`, linked from the PR body.
@@ -23,8 +23,8 @@ Both skills are written mostly for marketing and company websites. FirstMenu is 
 
 | Skill guidance | FirstMenu rule that wins |
 | --- | --- |
-| Hosted fonts, Google Fonts, font matching from the Google catalog | Only bundled fonts (Figtree via `@fontsource`). `check:external` must pass. |
-| Stock or licensed photographs, picsum, Wikimedia, generated plates | No photos or remote images. Inline SVG art only, `aria-hidden`, with state in text. |
+| Hosted fonts, Google Fonts, font matching from the Google catalog | Only bundled fonts (Figtree and Fredoka via `@fontsource`). `check:external` must pass. |
+| Stock or licensed photographs, picsum, Wikimedia, generated plates | No photos, AI-generated images or remote images. Bundled open-licensed art (Fluent Emoji, MIT) and the app's own SVGs, decorative (`alt=""` or `aria-hidden`), with state in text. Plates follow the art safety rules (active spec Requirement 21). |
 | Hero sections, "one section per screen", entrance moments, shader effects, scenes | App screens, not landing pages. No hero, no scroll-jacking, no shaders. |
 | Bolder or louder motion | CSS-only, subtle, and off under `prefers-reduced-motion`. |
 | Replacing the palette or visual world | Theme decisions belong to the maintainer. Contrast must stay WCAG 2.1 AA (`check:contrast`). |

@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <defs>
+    <radialGradient id="rim" cx="0.38" cy="0.28" r="0.85">
+      <stop offset="0" stop-color="#efe8ff"/>
+      <stop offset="0.6" stop-color="#bba9ee"/>
+      <stop offset="1" stop-color="#8a72cf"/>
+    </radialGradient>
+    <radialGradient id="hole" cx="0.5" cy="0.62" r="0.62">
+      <stop offset="0" stop-color="#3a2b63"/>
+      <stop offset="1" stop-color="#171028"/>
+    </radialGradient>
+    <radialGradient id="head" cx="0.45" cy="0.3" r="0.8">
+      <stop offset="0" stop-color="#4c3b80"/>
+      <stop offset="1" stop-color="#2a1f4a"/>
+    </radialGradient>
+    <radialGradient id="eye" cx="0.4" cy="0.32" r="0.75">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.7" stop-color="#f3f0fa"/>
+      <stop offset="1" stop-color="#cfc6e6"/>
+    </radialGradient>
+    <radialGradient id="pupil" cx="0.4" cy="0.3" r="0.8">
+      <stop offset="0" stop-color="#55457a"/>
+      <stop offset="1" stop-color="#1d1630"/>
+    </radialGradient>
+    <radialGradient id="shadow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#6b4a2a" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#6b4a2a" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <clipPath id="clip"><circle cx="64" cy="64" r="44"/></clipPath>
+  </defs>
+  <ellipse cx="64" cy="119" rx="40" ry="6" fill="url(#shadow)"/>
+  <circle cx="64" cy="62" r="55" fill="url(#rim)"/>
+  <circle cx="64" cy="64" r="44" fill="url(#hole)"/>
+  <g clip-path="url(#clip)">
+    <path d="M44 56 C 41 46, 43 38, 49 33 C 53 40, 56 47, 56 54 Z" fill="#4a3a7c"/>
+    <path d="M84 56 C 87 46, 85 38, 79 33 C 75 40, 72 47, 72 54 Z" fill="#4a3a7c"/>
+    <path d="M26 120 C 24 84, 42 54, 64 54 C 86 54, 104 84, 102 120 Z" fill="url(#head)"/>
+    <ellipse cx="51" cy="74" rx="14" ry="16" fill="#cbb8ff" opacity="0.4" filter="url(#glow)"/>
+    <ellipse cx="77" cy="74" rx="14" ry="16" fill="#cbb8ff" opacity="0.4" filter="url(#glow)"/>
+    <ellipse cx="51" cy="74" rx="11" ry="13" fill="url(#eye)"/>
+    <ellipse cx="77" cy="74" rx="11" ry="13" fill="url(#eye)"/>
+    <ellipse cx="54" cy="72" rx="5.5" ry="7" fill="url(#pupil)"/>
+    <ellipse cx="80" cy="72" rx="5.5" ry="7" fill="url(#pupil)"/>
+    <circle cx="56" cy="69" r="2" fill="#ffffff"/>
+    <circle cx="82" cy="69" r="2" fill="#ffffff"/>
+  </g>
+  <ellipse cx="44" cy="20" rx="14" ry="6" transform="rotate(-20 44 20)" fill="#ffffff" opacity="0.45"/>
+  <path d="M106 16 l2.6 7.4 7.4 2.6 -7.4 2.6 -2.6 7.4 -2.6 -7.4 -7.4 -2.6 7.4 -2.6 z" fill="#ffd36b"/>
+  <path d="M18 98 l1.8 5 5 1.8 -5 1.8 -1.8 5 -1.8 -5 -5 -1.8 5 -1.8 z" fill="#ffd36b"/>
+</svg>

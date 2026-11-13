@@ -23,6 +23,7 @@ This change adds pure domain modules and three screens to the built v1 app, move
 | Make screen | New, home route | `ui/pages/Make.tsx` |
 | Add recipe (paste + preview) | New | `ui/pages/AddRecipe.tsx` |
 | Week plan | Moved to `/plan` | `ui/pages/Home.tsx` renamed `Plan.tsx` |
+| Food pictures, plates and theme art | New (Requirement 21) | `public/art/`, `data/foodPictures.ts`, `domain/plate.ts`, `ui/components/` (`FoodPicture`, `Plate`, `StatePicture`, `foodArt.tsx`, `monsterArt.ts`), `ui/theme/` |
 
 Facts about the current code this design relies on (from the v1 build):
 
@@ -676,6 +677,7 @@ The first trial build was +320 KB over v1 against the +150 KB budget (issue #37)
 | `navigator.share` rejected or cancelled | No error shown; copy fallback offered. |
 | Bad recipe share link | "This link can't be read." Nothing rendered. |
 | v1 data on load | Migrated to v2. |
+| A picture file fails to load | The `<img>` shows nothing (its `alt` is empty) and the card keeps all its text. No retry and no other source (Requirement 21.2). |
 
 ## Testing strategy
 
@@ -699,6 +701,7 @@ The first trial build was +320 KB over v1 against the +150 KB budget (issue #37)
 - `rules`: `juice-limit` fires at 12 and 35 months, not at 11 or 36; `fromMonths` respected; existing rules unchanged.
 - Built-in recipes: the v1 invariant tests extended to four stages, the counts in Requirement 14.1, `kind` set for simple ideas, scaling adaptations recorded when quantities differ from the source.
 - Build: `scripts/check-external.mjs` passes in CI.
+- Food art (Requirement 21): the tests listed in "Food art" below, under "Tests".
 
 ## Smart suggestions (`suggest.ts`, Requirement 17)
 
@@ -800,6 +803,170 @@ All suggestion banner buttons (Yes, keep · Clear · Add · No thanks · Show an
 
 On Add recipe: before a preview, "Paste" is primary and "Read recipe" is secondary. During a preview, "Save recipe" is primary and "Paste" is hidden.
 
+## Food art (Requirement 21)
+
+Approved by the maintainer on November 13, 2026 (decision 10 below). The boards and the reference drawings are in `docs/art/`; start with `docs/art/final-picks.png`. The boards are mockups: where a board and this design differ, this design wins. Where other sections of this design or of v1 name a door, a ghost or a pumpkin, they mean the state, which is now shown with the pictures below.
+
+| Piece | Where |
+| --- | --- |
+| Picture files and their license | `public/art/foods/*.webp`, `public/art/state/*.webp`, `public/art/LICENSE-fluentui-emoji.txt` |
+| Food picture map | `src/data/foodPictures.ts` |
+| Main foods, plates and art safety | `src/domain/plate.ts` |
+| Picture components | `src/ui/components/FoodPicture.tsx`, `Plate.tsx`, `StatePicture.tsx`; drawings in `foodArt.tsx` and `monsterArt.ts` |
+| Fonts and colors | `src/ui/theme/ThemeRoot.tsx`, `src/ui/theme/firstmenu.css`, `src/ui/theme.css` |
+| Checks | `scripts/size-budget.mjs`, `size-report.mjs`, `check-external.mjs`, `contrast-check.mjs` |
+
+### Picture files
+
+- Food pictures, group pictures, the hourglass and the snowflake come from Microsoft Fluent Emoji (`https://github.com/microsoft/fluentui-emoji`, MIT), 3D style: the 256 px PNG in `assets/<Name>/3D/` at one pinned commit of that repository.
+- Each picture is converted once to a 128 × 128 px WebP (about 3.5 KB each, measured in the session) and committed. The conversion is done by hand outside the build, like the PDF note in "Built-in recipe expansion": no new dependency, and no network access during the build.
+- File names are the Fluent name in lowercase with underscores, as in that repository's file names without `_3d`: `roasted_sweet_potato.webp`, `hourglass_not_done.webp`. Food and group pictures go in `public/art/foods/`, and the hourglass and the snowflake in `public/art/state/`.
+- The files live in `public/`, not `src/`. Vite copies `public/` as it is, so a picture is never inlined into JavaScript as a data URL (Vite inlines imported files under 4 KB) and stays out of the JavaScript budget. URLs are built from `import.meta.env.BASE_URL` (`/FirstMenu/art/foods/carrot.webp`), so they work under the Pages base path.
+- Each picture is an `<img>` with `width` and `height` set to its displayed size, `alt=""`, `loading="lazy"` and `decoding="async"`.
+- `public/art/LICENSE-fluentui-emoji.txt` starts with one line naming the repository and the pinned commit, followed by the repository's MIT license text unchanged. It ships as `dist/art/LICENSE-fluentui-emoji.txt`.
+- The peekaboo monster and the friendly monsters are not files. They are SVG components drawn in code (see "State pictures").
+
+### Food picture map (`data/foodPictures.ts`)
+
+```ts
+type FoodGroup = 'vegetable' | 'fruit' | 'grain' | 'protein' | 'dairy' | 'pantry' | 'other';
+interface FoodPictureEntry {
+  group: FoodGroup;
+  picture?: string;             // file name in public/art/foods/ without ".webp", e.g. 'carrot'
+}
+export const FOOD_PICTURES: Record<string, FoodPictureEntry>;  // key: a food key from foods.ts
+export const GROUP_PICTURES: Record<FoodGroup, string>;        // 'jar' for pantry, 'bowl_with_spoon' for the rest
+export const ROUND_OR_TUBE_PICTURES: ReadonlySet<string>;      // pictures that never go on a plate
+```
+
+- **Keys** are food keys exactly as `foods.ts` makes them: plain keys from `groceryFoodKey` (plates) and Foods page keys from `foodKeyFor`, which include the nine `allergen:<group>` keys. A test checks that every key equals `foodKeyFromName(key)` or is an allergen key, like the other-names test.
+- **Lookup is by exact key only.** Word or partial matching would show an egg for "egg noodle" and a chicken leg for "chicken broth". A food that is not in the map (possible only in typed and pasted recipes) gets the `other` group and the generic bowl.
+- **Own picture** only when the Fluent picture shows that same food, in any form: a whole carrot for mashed carrot, "Roasted sweet potato" for sweet potato. Several keys may share a picture when they are the same food (`beef` and `ground beef`, `rice` and `brown rice`). A related but different food gets its group picture: peanut butter is not "Peanuts", and yogurt is not "Glass of milk".
+- **Allergen keys** may use a common food of their group: `allergen:egg` → Egg, `allergen:dairy` → Glass of milk, `allergen:wheat` → Bread, `allergen:peanut` → Peanuts, `allergen:fish` → Fish, `allergen:shellfish` → Shrimp. Tree nuts, soy and sesame have no such picture and use their group picture.
+- **Group pictures** show no food, so they can never be a picture of a different food: Fluent "Jar" (an empty jar) for the pantry group (oils, spices, sauces and sweeteners), and Fluent "Bowl with spoon" (an empty bowl, the generic bowl) for every other group. The group color behind the picture tells the groups apart.
+- **Round or tube pictures.** Grapes, Cherries, Blueberries, Olive, Hot dog, Peanuts, Chestnut, Popcorn, Candy and Lollipop show a whole food with a choking shape. They are listed in `ROUND_OR_TUBE_PICTURES` and never go on a plate, whatever food uses them (see "Main foods and plates", step 3).
+
+| Food key (examples) | Picture | Food group |
+| --- | --- | --- |
+| `carrot` | Carrot | vegetable |
+| `sweet potato` | Roasted sweet potato | vegetable |
+| `chicken` | Poultry leg | protein |
+| `beef`, `ground beef` | Cut of meat | protein |
+| `rice`, `brown rice` | Cooked rice | grain |
+| `cheese`, `cheddar cheese` | Cheese wedge | dairy |
+| `egg`, `allergen:egg` | Egg | protein |
+| `blueberry` | Blueberries (round or tube) | fruit |
+| `tofu`, `yogurt`, `cauliflower`, `celery`, `quinoa` | none, so the group picture | protein, dairy, vegetable, vegetable, grain |
+| `black pepper`, `vegetable oil` | none, so the group picture (Jar) | pantry |
+
+- **Coverage** (Requirement 21.4). The November 13 session counted 168 foods that are some built-in recipe's main food: the 100 most common cover every main food of 341 of the 421 built-in recipes, and the 150 most common cover 399. The map goes further and has an entry for every food a built-in recipe uses: 316 food keys on November 13 (307 plain keys and 233 Foods page keys, which overlap). Most rare foods and all staples use a group picture. With the main-food rules below, the plates of the 421 recipes use 184 different foods, and 1 recipe gets the generic bowl. A test fails when a built-in recipe uses a food with no entry, so from task 19.3 on, each recipe batch adds entries for its new foods.
+- **Size.** About 316 short entries, about 3 KB gzipped (estimate). The map loads with the pages that show pictures. It is not in the `recipe-data` chunk: the `manualChunks` pattern in `vite.config.ts` matches only the recipe files.
+
+### Main foods and plates (`domain/plate.ts`)
+
+```ts
+export const PLATE_HIDDEN_RULE_IDS = [
+  'choking-no-safe-form', 'grapes', 'cherry-tomato', 'cherries', 'small-round-fruit', 'sausages', 'whole-nuts',
+] as const;
+mainFoods(recipe: Recipe): string[]        // plain food keys, in ingredient order
+plateFoods(recipe: Recipe): PlateFood[]    // at most 3; [] means the generic bowl alone
+// PlateFood = { key: string; picture: string; group: FoodGroup }
+plateGroup(recipe: Recipe): FoodGroup      // the band color: the first plate food's group, or 'other'
+```
+
+1. **Main foods.** Walk `recipe.ingredients` in order and keep each ingredient's plain key (`groceryFoodKey`) once. Skip an ingredient when it is optional, when its key is an ignored food (`isIgnoredFood`: water, breast milk, formula, ice), or when its key is a staple.
+2. **Staples.** A key is a staple when its last words are a term in `PLATE_STAPLES`, compared word by word with the safety matcher's plural-aware `tokenMatches`. So "olive oil" and "chicken broth" are staples, but "vanilla yogurt" and "cinnamon applesauce" are not. The terms: cooking fats (`oil`, `cooking spray`, `margarine`, and `butter` unless a nut, seed or fruit word comes before it, so `peanut butter`, `almond butter`, `sunflower seed butter` and `apple butter` are main foods); `salt`; sweeteners (`sugar`, `honey`, `syrup`, `molasses`); herbs and spices (`spice`, `seasoning`, `herb`, `herbs de provence`, `black pepper`, `white pepper`, `pepper flake`, `cayenne`, `cinnamon`, `nutmeg`, `cumin`, `paprika`, `oregano`, `garlic powder`, `onion powder`, `ginger`, `ginger root`, `basil`, `thyme`, `dill`, `parsley`, `cilantro`, `mint`, `rosemary`, `sage`, `bay leaf`, `turmeric`, `chili powder`, `curry powder`, `coriander`, `clove`, `allspice`, `mustard seed`); aromatics (`onion`, `garlic`); baking items (`flour`, `baking powder`, `baking soda`, `vanilla`, `extract`, `cornstarch`); cooking liquids (`broth`, `stock`, `soup`, `soup mix`, `bouillon`, `vinegar`, `lemon juice`, `lime juice`); and condiments (`sauce`, `salsa`, `ketchup`, `mustard`, `mayonnaise`, `dressing`, `relish`, `paste`). Staples stay on the Foods page; they are only left off plates.
+3. **Art safety** (Requirement 21.6). `plateFoods` goes through the main foods in order and skips a food when a plate-hidden rule matches it or when its picture is in `ROUND_OR_TUBE_PICTURES`. A rule matches when `screenIngredient(text, 0)` returns a finding whose `ruleId` is in `PLATE_HIDDEN_RULE_IDS`, tried on both the ingredient name as written and the food key. Age 0 is the youngest age, where every one of these rules applies (none has `fromMonths`, and a test checks this), so a plate never changes as the child grows. The safety code is reused unchanged.
+4. **Each picture once.** A plate food shows its own picture, or else its group picture. A picture that is already on the plate is not repeated: that food is skipped and the next main food is tried, until the plate has 3 foods or the main foods run out.
+5. **Nothing left.** When no main food is left, `plateFoods` returns `[]` and the plate shows the generic bowl alone.
+6. **Band color** (Requirement 21.12): the food group of the first plate food, or `other` for an empty plate. A Not yet recipe uses the lavender Not yet band instead.
+7. **Not yet** (Requirement 21.8). When the recipe is Not yet (`recipeView(...).isGhosted`), every picture on the plate is greyed (a CSS grayscale filter and lower opacity on the pictures only, never on text) and the hourglass sits beside the plate. A plate food that is itself Not yet (`foodStatus` is `ghost` for one of its `foodKeyFor` keys) is greyed too, so a Not yet food is never in full color on a plate, even in the rare case where its recipe is not ghosted.
+
+### Art safety on Foods tiles (Requirement 21.7)
+
+- A Foods tile shows the food's own picture, or else its group picture.
+- When a plate-hidden rule matches the food (checked as in step 3, on the food's key and its label), the tile shows the food's own picture only together with that rule's `message` from `rules.ts`, unchanged (for example "Quarter lengthwise before serving."), as the first line under the picture and the food's name. The final board shortens one message to "Flatten or cut small"; the app shows the rule's message as written.
+- A round or tube picture whose food no plate-hidden rule matches (for example Chestnut) is never shown on a tile; the tile shows the group picture.
+- A Not yet tile greys the picture and shows the hourglass. Its label and block message stay as they are.
+- Allergen guidance, block messages and controls stay as they are, below these lines.
+
+### State pictures
+
+| State (code status) | Picture | Made from | Used on |
+| --- | --- | --- | --- |
+| New food (`door`) | Peekaboo monster | `PeekabooArt` in `foodArt.tsx`, drawn from `docs/art/reference/peekaboo.svg` | Foods tiles, "New food: …" lines on cards and recipe pages |
+| Tried (`monster`) | Friendly monster, one color per allergen group or the generic color | `MonsterArt` (redrawn) with colors from `monsterArt.ts`, drawn from `monster.svg` and `monster-egg.svg` | Foods tiles, empty states, the first-taste moment |
+| Not yet (`ghost`) | Fluent 3D "Hourglass not done" | `public/art/state/hourglass_not_done.webp` | Not yet tiles, cards, labels and recipe pages |
+| Freezes well | Fluent 3D "Snowflake" | `public/art/state/snowflake.webp` | "Freezes for N months" lines |
+| Prep reminder | Lantern (unchanged) | `LanternArt` in `foodArt.tsx` | Prep page |
+
+This table replaces the v1 design's "Theme mapping" table. The text equivalents stay as v1 lists them.
+
+- **Drawing rules.** Both drawings follow the reference SVGs: soft radial gradients, no outlines, round eyes with highlights, a smile with no teeth, rounded horns and a soft shadow. The peekaboo monster's dark round hole is allowed (`product.md` "Theme boundaries"): it is a small round hole, not a scene. One peekaboo monster is used for every new food.
+- **Monster colors.** `monsterArt.ts` keeps one style per allergen group plus `generic`, chosen by `monsterStyleFor(group)`, but a style is now colors only: the body gradient (3 stops), the arm gradient and the horn gradient. Every monster has the same shape. Today's body colors become the middle stops; `generic` and `egg` use the colors of `monster.svg` and `monster-egg.svg`. The `data-monster` test hook stays.
+- **Unique ids.** Each drawing prefixes its gradient, filter and clip-path ids with React's `useId()`. Without this, two monsters of different colors on one page would share `url(#body)`, and both would show the first one's colors.
+- **Sizes.** About 24 px in text lines, 32 px as a tile badge and 96 px in empty states, drawn in a 128-unit viewBox like the references.
+- **Decorative.** SVGs have `aria-hidden="true"` and `focusable="false"`; files have `alt=""`.
+- **Removed.** `DoorArt`, `GhostArt`, `PumpkinArt`, the door-open animation in `theme.css` and the ghost float in `foodCard.module.css` are deleted by the task 19.4 PR that stops using the last of them. Internal names stay: `GhostCard`, `MysteryDoor`, `FriendlyMonster`, the `ghost` and `door` statuses and the spec's word "ghosted". Renaming is not required.
+- **Wording** (Requirement 21.10). The state labels stay. Two lines on the Foods page name the mystery door today, and task 19.4 rewords them without naming a picture. The intro's last sentence, "Open a mystery door when your child tries something new.", becomes "Tap "Log a try" when your child tries something new." The "New foods to try" hint, "Each untried food is a mystery door. Allergen doors include guidance from published sources.", becomes "Allergens include guidance from published sources." A test checks the Foods page headings and help lines, the empty states and the label helpers in `recipeView.ts` (`doorBadgeText`, `ghostReason`, `freezerBadgeText`) for the words ghost, door and pumpkin.
+
+### Screens (task 19.4)
+
+- **Recipe cards** are the Make result cards (Ready now, Missing one, More ideas, Recipes named …), the Try this card, the Make again cards, the left-out cards on Make and the My recipes cards. Each card gets a band in its main food group's color with the plate on it, then the title, facts and tags as today. The "New food: …" and "Freezes for N months" badges become lines with a small state picture before their unchanged text, and a Not yet card shows the hourglass before its reason. Sizes from the board at 1280 px: band about 140 px tall, plate about 112 px, pictures about 62 px. Where a list must stay short (Make results and left-out cards at 360 px), a card may use a compact row with a plate of about 64 px at the left. The screen's 19.4 critique decides, and both layouts follow the plate rules.
+- **Recipe page:** a larger plate (about 160 px) on the band at the top of `RecipeDetail.tsx`, with the hourglass for a Not yet recipe. The shared recipe view (`/r/…`) shows the same.
+- **Foods tiles** (`Foods.tsx`): the food's picture on a circle in its food group's color, the state picture as a small badge at the circle's edge, the food's name, then the status line. The controls ("Log a try", "Change record", "Clear reaction") stay.
+- **Empty states:** "Nothing fits yet" on Make, "No recipes match your search or filters." on My recipes, and "No new foods right now." and "No foods on hold." on Foods show the generic friendly monster (about 96 px) next to the text. "Nothing tried yet." on Foods shows the peekaboo monster instead, since no monster has come out yet. The Plan area (week, prep, grocery, share, print) gets no pictures: it has no new work, and print stays black and white.
+- **First-taste moment** (Requirement 21.13): after "Tried, no reaction" on a Foods tile, the food's tile appears under "Tried foods" and its monster rises out of a dark hole once, in a CSS animation of 600 ms or less. The page sets a class on that one tile (component state, never stored) and removes it when the animation ends. Nothing animates on page load. Under `prefers-reduced-motion: reduce` the class adds no animation. Focus behaves as it does today.
+
+### Headings: Fredoka (Requirement 21.11)
+
+- `ThemeRoot.tsx` imports only `@fontsource/fredoka/latin-600.css`: one weight, latin only, one woff2 file of about 16 KB (16,468 bytes in version 5.3.0, checked in the session). Vite bundles it into `dist/assets/` like Figtree. The package is pinned to an exact version, as Figtree is.
+- `firstmenu.css` sets Astryx's `--font-family-heading` to Fredoka, followed by the body font stack as the fallback. App CSS uses the same token for `h1` to `h3`, recipe card titles and Foods tile names. Body text, buttons, chips and labels stay Figtree.
+- `size-report.mjs` already lists the latin woff2 fonts outside the budget, so the 19.3 PR shows the new file there.
+
+### Colors (Requirement 21.12)
+
+Starting values come from the approved board. Task 19.3 may adjust them while contrast stays AA and the palette stays light (`autonomy.md` "Decide yourself"). The tokens go in `theme.css` with the `--fm-color-` prefix, so `contrast-check.mjs` can read them.
+
+| Food group | Band and tile circle |
+| --- | --- |
+| vegetable | `#e3f3dd` |
+| fruit | `#fbe0e7` |
+| grain | `#fdf3c4` |
+| protein | `#fde6d3` |
+| dairy | `#e3eefb` |
+| pantry | `#f1ece4` |
+| other | `#f8eee3` (the muted cream) |
+| Not yet, any group | `#efe7f7` (the existing lavender) |
+
+Bands and circles carry no text. Each nutrition tag has a background and a text color, and five tags use their food group's color as the background:
+
+| Tag | Background | Text | Contrast |
+| --- | --- | --- | --- |
+| Vegetable | `#e3f3dd` | `#1f4d1a` | 8.49:1 |
+| Fruit | `#fbe0e7` | `#6e1f36` | 8.85:1 |
+| Whole grain | `#fdf3c4` | `#4b3900` | 9.97:1 |
+| Protein | `#fde6d3` | `#6b2a10` | 8.88:1 |
+| Dairy | `#e3eefb` | `#1d3f6e` | 9.00:1 |
+| Iron-rich | `#f6dccf` | `#6b2a10` | 8.18:1 |
+| Healthy fat | `#edf3d4` | `#3d4a0f` | 8.41:1 |
+
+`contrast-check.mjs` adds each tag pair at 4.5:1, plus the Not yet label text (`#4a2f5e`) on the Not yet band (9.38:1). Tags keep showing their names, so color is never the only signal.
+
+### Credits, license and checks (Requirements 21.15, 21.16)
+
+- **Sources page.** A "Credits" section at the end: "Food pictures, the hourglass and the snowflake: Fluent Emoji by Microsoft, MIT License", linking to the repository and to the shipped `art/LICENSE-fluentui-emoji.txt`, and "Headings: Fredoka. Body text: Figtree. Both under the SIL Open Font License 1.1." These are plain links, not fetches.
+- **Art size check.** `size-budget.mjs` gains `ART_FILE_LIMIT_BYTES = 8 * 1024`, `ART_WARN_BYTES = 900 * 1024` and `artStatus(files)`. `size-report.mjs` walks `dist/art/` and prints the file count, the total and the largest file. It fails when any file is over 8 KB, and prints a `::warning::` when the total passes 900 KB. These files are not JavaScript or CSS, so the page budget and the recipe data budget do not change. `size-budget.test.mjs` covers 8,192 bytes (ok) against 8,193 (fail), and 900 KB (ok) against one byte more (warning).
+- **External check.** `check-external.mjs` keeps passing because every picture is local. It also gains one pattern, an absolute URL in a JavaScript `src` property (`src:"https://…"`), so a remote `<img>` rendered by React cannot pass unnoticed. The 19.3 PR runs it on a build first, and any safe match it finds is added to `ALLOWED` with a comment.
+- **Bundle.** The map, the plate code and the two drawings add an estimated 6 KB gzipped to the pages that show pictures. My recipes is the heaviest page, at +236.3 KB of the +250 KB budget in PR #102 (Requirement 15.6), so each PR reports the size. If a page would pass the budget, fix the code; raising the budget needs the maintainer (`autonomy.md`).
+
+### Tests
+
+- Map: every food key a built-in recipe uses (plain keys from `groceryFoodKey` and Foods page keys from `collectFoods`) has an entry; every key has the food key form; every picture named in the map, in `GROUP_PICTURES` and among the state pictures exists in `public/art/` and is at most 8 KB; the ten round or tube pictures are in `ROUND_OR_TUBE_PICTURES`.
+- Plates: main foods skip optional ingredients, ignored foods and staples, keep ingredient order and appear once; `butter` and `olive oil` are staples, but `peanut butter` and `vanilla yogurt` are not; every id in `PLATE_HIDDEN_RULE_IDS` exists in `RULES` and has no `fromMonths`; over every built-in recipe, no plate food is matched by a plate-hidden rule (by name or by key) and none uses a round or tube picture; fixtures for "red grapes, halved", "cherry tomatoes" with the `food` override `tomato`, "hot dog", "whole almonds", "popcorn" and "blueberries" are left off and the next main food is shown; "almond milk" stays on; a test map that gives `peanut butter` the Peanuts picture keeps it off; a recipe whose only main food is hidden gets the generic bowl; a picture shows once per plate; the band color follows the first plate food.
+- Components: `FoodPicture` renders an `<img>` with `alt=""`, `width`, `height`, `loading="lazy"` and a path under `/FirstMenu/art/`; two monsters of different colors on one page have different gradient ids; pictures add no text to the accessible name; a Not yet plate is greyed with the hourglass; a Foods tile with a hidden food's picture shows the rule's message first under the picture and name; after "Tried, no reaction" the tile gets the pop class, and with reduced motion (mocked `matchMedia`) no animation runs; the wording check in "State pictures"; `vitest-axe` on every changed page.
+- Checks: the art budget cases in `size-budget.test.mjs`, the new pattern in `check-external.mjs` and the new pairs in `contrast-check.mjs`.
+
 ## Decisions confirmed by the maintainer (November 8, 2026)
 
 1. **Text mentions** (Requirement 7): block rules are checked in the steps, title and notes of pasted recipes only, with a one-tap "Not used in this recipe" for false alarms. Typed recipes stay ingredient-only.
@@ -811,3 +978,4 @@ On Add recipe: before a preview, "Paste" is primary and "Read recipe" is seconda
 7. **Astryx** (Requirement 15): trial first, then convert. Build order: trial, new screens and domain, toddler stages, recipes, sharing. The schema and stage plumbing for toddlers (task 1) goes first because every later task builds on the new `StageId`; toddler recipe content comes with the recipe expansion (task 14).
 8. **Smart suggestions** (Requirement 17, maintainer UI feedback in issue #36, approved November 9, 2026): Try this card, time-of-day meal hint, stale on-hand prompt, new-food nudge using the existing cited spacing, Make again, pantry learning and a Paste button. All rule-based on the device, no AI service, never a ghosted recipe, never a stored change without a tap. Try this and untried foods: option b. Never two or more. One only when a new food is due and it's the food the new-food banner names, or, when no new food is due, when it's the only non-ghosted Ready now recipe.
 9. **JSON prompt flow, Instagram flow and onboarding** (maintainer request, November 10, 2026, in session; issue #59 records only item (a); items (b)-(d) are quoted verbatim in the tasks.md change note and approved by the maintainer in a comment on PR #64: "approved, Requirements 18–20 and the quoted replies"): (a) puree-only recipes for toddlers are not allowed, the batch 1 invariant stays; (b) task 16.1 no longer asks for real pastes: the user types a question, the app wraps it with age and safety context plus a Recipe JSON template, and the user pastes the reply back, where it is parsed strictly with a fallback to the free-text parser when the reply has no JSON; (c) for Instagram the user pastes a reel URL and the app writes a prompt for Meta AI or any AI chat app connected to Instagram, never fetching the URL; (d) a short problem-first onboarding quickly solves one of the user's problems. The fallback does not conflict with the request: it only runs when there is no JSON, and it feeds the same safety screen.
+10. **Food pictures and theme art** (Requirement 21, maintainer request in session, November 13, 2026): "I think the app needs images for foods, recipes. Also, the UI lacks art and general baby app feel. It feels very dull." After seeing the options: "yes, I like this direction" (Fluent 3D food pictures, theme art redrawn in the same style, Fredoka headings, no photos and no AI-generated images). He said the mystery door and "the pumpkin for freezes well" didn't make sense, asked to replace the ghost too, and picked "New food: Peekaboo monster", "Freezes well: Snowflakes" and "I like hourglass for not yet". The boards are in `docs/art/`. The not-yet board marks the sleeping monster as "My pick", but the maintainer chose the hourglass.

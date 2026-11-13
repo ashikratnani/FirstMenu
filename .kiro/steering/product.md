@@ -33,10 +33,13 @@ Active spec: `.kiro/specs/what-can-i-make/`. v1 baseline (built):
   no typing. A prompt helper writes the ChatGPT question with the foods to
   leave out.
 - Screens every ingredient name against a fixed safety rule list. For pasted
-  recipes, block rules are also checked in the steps. Unsafe-for-age foods
-  appear as ghosts.
-- Tracks first tastes: untried foods are mystery doors; introduced foods become
-  friendly monsters; a recorded reaction ghosts recipes until cleared.
+  recipes, block rules are also checked in the steps. Unsafe-for-age foods and
+  recipes are shown as "Not yet", greyed with an hourglass.
+- Tracks first tastes: an untried food shows the peekaboo monster hiding in its
+  hole; once tried, the friendly monster comes out; a recorded reaction makes
+  recipes with that food "Not yet" until cleared.
+- Shows a picture of each food (Fluent Emoji, 3D style) and a plate of each
+  recipe's main foods (active spec Requirement 21).
 - Secondary (under Plan): 7-day plan, prep list, grocery list, print view and
   plan share link. No new work on these.
 
@@ -45,17 +48,24 @@ Active spec: `.kiro/specs/what-can-i-make/`. v1 baseline (built):
 - No backend and no account. All data lives in the browser's `localStorage`.
 - The app makes no network requests other than loading its own files. It never
   calls an AI service and never opens Instagram links itself. No analytics,
-  ads, trackers, web fonts or files from third-party hosts.
+  ads or trackers, and no fonts or other files from third-party hosts. Font
+  files that ship with the app (Figtree, Fredoka) are allowed.
 - The user can export all data to JSON and import it back.
 - One child per device.
 
 ## Theme boundaries
 
-- Welcoming, with a light cute-spooky touch: friendly ghosts, pumpkins, mystery
-  doors, friendly monsters. Light palette (creams, soft oranges, lavender),
-  rounded shapes, smiling characters.
+- Welcoming, with a light cute-spooky touch: the peekaboo monster (a new food,
+  hiding in its hole), friendly monsters (tried foods), the hourglass (Not yet)
+  and the snowflake (freezes well), with Fluent Emoji 3D food pictures. Light
+  palette (creams, soft oranges, lavender, plus pastel food-group colors),
+  rounded shapes, smiling characters, Fredoka headings. Decided by the
+  maintainer on November 13, 2026 (active spec Requirement 21).
 - Never haunted houses, night scenes, frightening imagery, gore, skulls, blood,
-  sharp teeth or jump scares.
+  sharp teeth or jump scares. The peekaboo monster's dark hiding hole is
+  allowed: it is a small round hole, not a scene.
+- No photos and no pictures made by an image-generation model. Pictures are
+  bundled open-licensed art (Fluent Emoji, MIT) or the app's own SVGs.
 - Every state shown by a theme element is also shown in text that screen readers
   announce.
 

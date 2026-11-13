@@ -47,8 +47,9 @@ built, in `src/domain/safety/rules.ts`.
 
 - The rule list is fixed in the app's source code and is NOT editable by users
   (Req 4.6).
-- A rule is one of three kinds: a block rule (ghost), a prep reminder, or an
-  allergen rule (mystery door). Allergen and reminder rules never block.
+- A rule is one of three kinds: a block rule (Not yet, "ghosted"), a prep
+  reminder, or an allergen rule (new food). Allergen and reminder rules never
+  block.
 
 ## Changing a safety rule
 
@@ -71,3 +72,21 @@ Per `.kiro/steering/autonomy.md`:
   never remove a rule's source without a replacement that has a URL. These
   always go to the maintainer.
 - Every rule change bumps `RULESET_VERSION`.
+
+## Art
+
+Pictures never change the safety screen; they only add limits (active spec
+Requirement 21, design "Food art"):
+
+- A plate never shows a food that `choking-no-safe-form` or the prep reminders
+  for round or tube-shaped foods (`grapes`, `cherry-tomato`, `cherries`,
+  `small-round-fruit`, `sausages`, `whole-nuts`) match, at any age. A Foods
+  tile may show such a food's picture only with the rule's message, unchanged,
+  as the first line under it.
+- A Not yet food or recipe is greyed with the hourglass, never in full color
+  on a plate.
+- No photos, no pictures made by an image-generation model, and no pictures
+  from other hosts.
+- Renaming or removing one of these rule ids needs the same change in
+  `PLATE_HIDDEN_RULE_IDS` (`src/domain/plate.ts`, from task 19.3); a test
+  fails otherwise.

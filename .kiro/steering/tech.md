@@ -18,8 +18,10 @@ calls an AI service.
 
 - React 19 + TypeScript, built with Vite. Strict TypeScript everywhere.
 - UI components: Astryx (`@astryxdesign/core`, pinned versions) once the trial
-  passes, with the FirstMenu theme in `ui/theme/`. Fonts are self-hosted
-  (`@fontsource/figtree`); never use the Astryx CDN or Google Fonts setup.
+  passes, with the FirstMenu theme in `ui/theme/`. Fonts are self-hosted:
+  Figtree for body text (`@fontsource/figtree`) and Fredoka 600, latin only,
+  for headings (`@fontsource/fredoka`, active spec Requirement 21); never use
+  the Astryx CDN or Google Fonts setup.
   Trial setup (task 2): `ui/theme/ThemeRoot.tsx` wraps the app in `<Theme>`
   with `@astryxdesign/theme-neutral` plus FirstMenu color overrides in
   `ui/theme/firstmenu.css`; `ui/theme/RouterLinkProvider.tsx` makes Astryx
@@ -37,6 +39,8 @@ calls an AI service.
   `<input type="date">` (issue #37). Pages are lazy-loaded through
   `ui/pages/routes.ts`; add new pages there and to `routes.eager.ts`.
 - Build checks in CI: `npm run check:contrast`, `check:external`, `check:size`.
+  `check:size` also checks the picture files in `dist/art/`: each at most 8 KB,
+  and a warning when they pass 900 KB together.
 - Look up Astryx component docs with `npm run astryx -- component <Name>`.
 - Static hosting on GitHub Pages at `https://ashikratnani.github.io/FirstMenu/`.
 - `HashRouter` for routing. GitHub Pages has no server-side rewrites, so hash
@@ -75,11 +79,16 @@ src/
 
 ## Hard rules
 
-- No analytics, ads, third-party trackers, web fonts, or any files loaded from
-  third-party hosts (Req 12.2, 12.3). The only network requests the app makes
-  are for its own files.
-- All illustrations are inline SVG with `aria-hidden="true"`; state is carried
-  by visible text and the accessible name.
+- No analytics, ads or third-party trackers, and no fonts or other files loaded
+  from third-party hosts (Req 12.2, 12.3). Font files and pictures that ship
+  with the app are allowed. The only network requests the app makes are for its
+  own files.
+- Illustrations are the app's own inline SVGs (`aria-hidden="true"`) or bundled
+  Fluent Emoji pictures from `public/art/` (`<img alt="">` with width and
+  height, `loading="lazy"`), mapped to food keys in `src/data/foodPictures.ts`.
+  No photos and no pictures made by an image-generation model. State is
+  carried by visible text and the accessible name. Plates follow the art
+  safety rules (active spec Requirement 21, `src/domain/plate.ts`).
 - Animations are CSS-only and disabled under `prefers-reduced-motion: reduce`.
 - Meet WCAG 2.1 AA color contrast; the app must be fully keyboard-usable and
   work on screens 360 px wide and up.

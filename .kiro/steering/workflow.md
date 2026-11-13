@@ -8,7 +8,7 @@ inclusion: always
 
 - One branch and one PR per top-level task in the active spec's `tasks.md` (`.kiro/specs/what-can-i-make/tasks.md`). Branch name: `v2/<number>-<short-name>`, such as `v2/6-paste-parser`. (v1 used `task/<number>-...`; don't reuse those names.)
 - Exception: active spec task 14 (built-in recipes) is split into one PR per batch of about 50 recipes, branch `v2/14-recipes-batch-<n>`, and runs alongside the other tasks.
-- Exception: active spec task 19 (design pass) is one PR for 19.1 (`v2/19-design-critique`) and then one PR per screen or flow for 19.2 (`v2/19-design-<screen>`). The PR that fixes the last finding ticks 19.2 and 19.
+- Exception: active spec task 19 (design pass) is one PR for 19.1 (`v2/19-design-critique`) and then one PR per screen or flow for 19.2 (`v2/19-design-<screen>`). The PR that fixes the last finding ticks 19.2 and 19. The food art added on November 13, 2026 is one PR for 19.3 (`v2/19-art-pipeline`) and then one PR per screen for 19.4 (`v2/19-art-<screen>`); the PR for the last screen ticks 19.4 and 19.
 - Small follow-up fixes can be a separate PR named `fix/<short-name>`.
 - The PR body lists the task ids completed, the requirement ids covered, what was tested, and anything the maintainer should know.
 - Tick the completed task checkboxes in `tasks.md` in the same PR.
