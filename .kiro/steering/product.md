@@ -34,7 +34,8 @@ Active spec: `.kiro/specs/what-can-i-make/`. v1 baseline (built):
   leave out.
 - Screens every ingredient name against a fixed safety rule list. For pasted
   recipes, block rules are also checked in the steps. Unsafe-for-age foods and
-  recipes are shown as "Not yet", greyed with an hourglass.
+  recipes are shown as "Not yet", greyed with an hourglass where pictures are
+  shown.
 - Tracks first tastes: an untried food shows the peekaboo monster hiding in its
   hole; once tried, the friendly monster comes out; a recorded reaction makes
   recipes with that food "Not yet" until cleared.
@@ -59,8 +60,9 @@ Active spec: `.kiro/specs/what-can-i-make/`. v1 baseline (built):
   hiding in its hole), friendly monsters (tried foods), the hourglass (Not yet)
   and the snowflake (freezes well), with Fluent Emoji 3D food pictures. Light
   palette (creams, soft oranges, lavender, plus pastel food-group colors),
-  rounded shapes, smiling characters, Fredoka headings. Decided by the
-  maintainer on November 13, 2026 (active spec Requirement 21).
+  rounded shapes, smiling characters (the peekaboo monster shows only its eyes
+  and horn tips), Fredoka headings. Decided by the maintainer on November 13,
+  2026 (active spec Requirement 21).
 - Never haunted houses, night scenes, frightening imagery, gore, skulls, blood,
   sharp teeth or jump scares. The peekaboo monster's dark hiding hole is
   allowed: it is a small round hole, not a scene.

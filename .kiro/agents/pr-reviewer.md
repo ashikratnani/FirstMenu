@@ -71,7 +71,7 @@ You review pull requests for FirstMenu (`ashikratnani/FirstMenu`), a baby meal p
 
 **Art** (active spec Requirement 21, design "Food art"; for PRs that add or change pictures, plates, fonts or colors)
 - Plates never show a food that `choking-no-safe-form` or the round or tube-shaped prep reminders (`grapes`, `cherry-tomato`, `cherries`, `small-round-fruit`, `sausages`, `whole-nuts`) match at any age, and never a picture in `ROUND_OR_TUBE_PICTURES`. The tests that prove it run over every built-in recipe. A Foods tile that shows such a food's picture has the rule's message, unchanged, as the first line under the picture and name.
-- Not yet foods and recipes are greyed with the hourglass and never in full color on a plate. Only pictures are greyed, never text.
+- On recipe cards, recipe pages and the Foods page, Not yet foods and recipes are greyed with the hourglass, and a plate never shows a Not yet food in full color. Only pictures are greyed, never text. Other screens (week plan, slot picker, prep, grocery, share, print, the shared plan view) show Not yet as text and get no pictures.
 - No photos and no pictures made by an image-generation model. Every picture is a file under `public/art/` or an SVG in the app's code, nothing loads from another host, and `check:external` passes.
 - Spot-check `src/data/foodPictures.ts`: no food shows a picture of a different food, foods without a Fluent picture use their group picture, and the coverage test (every food a built-in recipe uses has an entry) ran.
 - `public/art/LICENSE-fluentui-emoji.txt` holds the MIT text and names the pinned commit, and the Sources page credits Fluent Emoji (MIT) and Fredoka (SIL Open Font License).

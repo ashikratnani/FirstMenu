@@ -15,7 +15,7 @@ Maintainer changes of November 10, 2026 (approved in session): recipes now arriv
 
 Maintainer changes of November 13, 2026 (approved in session): food pictures, a plate of main foods on every recipe card, new theme art and Fredoka headings (Requirement 21).
 
-This spec changes FirstMenu's focus to answer those. The safety screen, ghosted foods, first tastes, built-in recipes, theme, local storage and disclaimers from v1 stay. The week plan, prep list, grocery list, print view and plan share link stay as secondary features with no new work beyond what's listed here.
+This spec changes FirstMenu's focus to answer those. The safety screen, ghosted foods, first tastes, built-in recipes, local storage and disclaimers from v1 stay. The v1 theme stays except for its pictures, which Requirement 21 replaces. The week plan, prep list, grocery list, print view and plan share link stay as secondary features with no new work beyond what's listed here.
 
 Constraints carried over from v1: no backend, no account, no network requests other than the app's own files, React + TypeScript + Vite on GitHub Pages, MIT license. Deadline: Friday, December 4, 2026, 2:00 PM PT (submission planned Thursday, December 3).
 
@@ -373,14 +373,14 @@ This requirement replaces the theme elements of v1 Requirement 14.1 and the mapp
 
 #### Acceptance Criteria
 
-1. THE app SHALL show a picture for each food: its own picture from Microsoft Fluent Emoji in the 3D style (MIT license), or, IF Fluent Emoji has no picture of that food, THEN the group picture of the food's food group. A food SHALL NEVER show a picture of a different food.
+1. ON recipe cards, recipe pages and the Foods page (the design lists the screens), THE app SHALL show a picture for each food: its own picture from Microsoft Fluent Emoji in the 3D style (MIT license), or, IF Fluent Emoji has no picture of that food, THEN the group picture of the food's food group. A food SHALL NEVER show a picture of a different food. Other screens, such as the week plan, the slot picker and print, get no pictures.
 2. THE app SHALL NOT show photos or pictures made by an image-generation model. EVERY picture SHALL be a file that ships with the app or an SVG drawn in the app's code, and SHALL NEVER be loaded from another host.
 3. EVERY food picture SHALL have its width and height set, SHALL load lazily, and SHALL be decorative (empty `alt` text).
-4. A fixed map in source code SHALL give each food key (as `src/domain/foods.ts` makes it) its own picture or its food group. EVERY food that a built-in recipe uses SHALL have an entry, and a test SHALL check this. This covers at least the 168 foods that are some built-in recipe's main food.
-5. EVERY recipe card, for built-in and pasted recipes, and the top of every recipe page SHALL show a plate with up to 3 of the recipe's main foods, chosen by the rules in the design.
+4. A fixed map in source code SHALL give each food key (as `src/domain/foods.ts` makes it) its own picture or its food group. EVERY food that a built-in recipe uses SHALL have an entry, and a test SHALL check this. That covers every main food of the built-in recipes: 206 foods on November 13, 2026 by the design's rules, more than the 168 that the session counted with a rougher rule.
+5. EVERY recipe card (the design lists them), for built-in and pasted recipes, and the top of every recipe page SHALL show a plate with up to 3 of the recipe's main foods, chosen by the rules in the design.
 6. A plate SHALL NEVER show a food that is matched, at any age, by the `choking-no-safe-form` block rule or by a prep reminder for round or tube-shaped foods (`grapes`, `cherry-tomato`, `cherries`, `small-round-fruit`, `sausages`, `whole-nuts`). It SHALL show the recipe's other main foods instead, or the generic bowl IF none are left.
 7. A Foods page tile MAY show the picture of a food that criterion 6 keeps off plates, but only with that rule's message, unchanged, as the first line under the picture and the food's name.
-8. A food or recipe that is Not yet for the child (blocked for the child's age, or paused after a recorded reaction) SHALL be shown greyed with the hourglass. It SHALL NEVER be shown in full color on a plate. Only pictures are greyed; text keeps its contrast.
+8. ON recipe cards, recipe pages and the Foods page, a food or recipe that is Not yet for the child (blocked for the child's age, or paused after a recorded reaction) SHALL be shown greyed with the hourglass. A plate SHALL NEVER show a Not yet food in full color. Only pictures are greyed; text keeps its contrast. Other screens keep showing Not yet as text.
 9. THE state pictures SHALL be:
 
    | State | Shown for | Picture |
