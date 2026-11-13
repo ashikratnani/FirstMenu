@@ -13,7 +13,9 @@ In a second review the maintainer also asked for more built-in recipes, support 
 
 Maintainer changes of November 10, 2026 (approved in session): recipes now arrive through a JSON prompt flow instead of unstructured pastes (Requirements 18 and 19), and a short problem-first onboarding helps new users (Requirement 20). Free-text pasting stays as a fallback.
 
-This spec changes FirstMenu's focus to answer those. The safety screen, ghosted foods, first tastes, built-in recipes, theme, local storage and disclaimers from v1 stay. The week plan, prep list, grocery list, print view and plan share link stay as secondary features with no new work beyond what's listed here.
+Maintainer changes of November 13, 2026 (approved in session): food pictures, a plate of main foods on every recipe card, new theme art and Fredoka headings (Requirement 21).
+
+This spec changes FirstMenu's focus to answer those. The safety screen, ghosted foods, first tastes, built-in recipes, local storage and disclaimers from v1 stay. The v1 theme stays except for its pictures, which Requirement 21 replaces. The week plan, prep list, grocery list, print view and plan share link stay as secondary features with no new work beyond what's listed here.
 
 Constraints carried over from v1: no backend, no account, no network requests other than the app's own files, React + TypeScript + Vite on GitHub Pages, MIT license. Deadline: Friday, December 4, 2026, 2:00 PM PT (submission planned Thursday, December 3).
 
@@ -43,6 +45,13 @@ Terms from the v1 glossary keep their meaning. New terms:
 - **Stages**: `6–8 months`, `9–11 months` (id `9-12`, kept from v1), `12–23 months` and `24–36 months`. The last two are the **toddler stages**.
 - **Simple idea**: a built-in single-food or two-food preparation taken from a public health feeding guide, with no exact amounts ("ripe banana, mashed").
 - **Astryx**: Meta's open source React design system (`@astryxdesign/core`, MIT license).
+- **Food picture**: the picture of one food, from Microsoft Fluent Emoji in the 3D style (MIT license), shipped with the app (Requirement 21).
+- **Food group**: the one group a food belongs to for pictures and colors: vegetable, fruit, grain, protein, dairy, pantry or other. A food can have several nutrition tags but has exactly one food group.
+- **Group picture**: the picture shown for a food that has no food picture of its own, and on a Foods tile in place of a choking-shape picture (a whole round or tube-shaped food, or a food with no safe form) whose food no Requirement 21.6 rule matches. It shows no food: an empty jar for the pantry group, and an empty bowl, the **generic bowl**, for every other group. A food the picture map does not list shows the generic bowl.
+- **Main foods**: a recipe's foods in ingredient order, leaving out optional ingredients, ignored foods and staples such as oil, salt and spices (rules in the design).
+- **Plate**: the round picture on a recipe card and at the top of a recipe page that shows up to 3 of the recipe's main foods.
+- **Not yet**: the visible name of a ghosted food or recipe (v1 glossary "Ghost / ghosted"), shown with the hourglass where pictures are shown.
+- **Peekaboo monster**: the picture for a food the child has not tried yet. It replaces the mystery door picture; the state keeps the name `door` in code.
 
 ## Requirements
 
@@ -252,7 +261,7 @@ Terms from the v1 glossary keep their meaning. New terms:
 
 1. THE app SHALL use Astryx components for layout, navigation, forms, buttons, cards, chips, dialogs and lists, after a trial that meets every criterion in this requirement. Date fields SHALL use the browser's native date picker instead of Astryx DateInput, to keep the app small (issue #37).
 2. THE app SHALL upgrade to React 19, which Astryx requires.
-3. THE app SHALL use a custom Astryx theme with the v1 palette (creams, soft oranges, lavender), meeting WCAG 2.1 AA contrast. The friendly ghosts, doors, monsters and pumpkins SHALL stay as the app's own inline SVGs.
+3. THE app SHALL use a custom Astryx theme with the v1 palette (creams, soft oranges, lavender) plus the pastel food-group colors of Requirement 21, meeting WCAG 2.1 AA contrast. Theme art SHALL follow Requirement 21. (Changed by the maintainer on November 13, 2026. Until then this criterion kept the friendly ghosts, doors, monsters and pumpkins as the app's own inline SVGs.)
 4. ALL fonts and styles SHALL ship with the app. THE app SHALL NOT load fonts, CSS or scripts from Google Fonts, a CDN or any other host (v1 Requirement 12.2 still applies).
 5. THE app's `vitest-axe` tests SHALL pass on every page, and every page SHALL work with a keyboard and on screens 360 px wide.
 6. Pages SHALL load their code the first time they are opened. THE first load of the heaviest page (gzipped JavaScript and CSS the browser downloads to open it, excluding the built-in recipe data) SHALL be no more than 250 KB larger than the v1 build, which loaded everything at once. THE size check SHALL report every page's first load and the gzipped size of the built-in recipe data. (Raised from 150 KB by the maintainer on November 8, 2026, issue #37.)
@@ -354,6 +363,42 @@ These suggestions come from the maintainer's UI feedback (issue #36): the app sh
 9. EVERY quick-solve screen that shows safety results (What's safe, and the Save recipes example preview) SHALL show the disclaimers of Requirement 11 (`NOT_MEDICAL_ADVICE` and `SCREEN_LIMITS`) next to the results, not only in the page footer.
 10. THE onboarding SHALL be re-openable from Settings as "Quick tour".
 
+### Requirement 21: Food pictures and theme art
+
+**User Story:** As a parent, I want to see pictures of the foods in each recipe and a warmer look made for babies, so that I can spot a recipe at a glance and the app feels friendly to open.
+
+The maintainer asked for this on November 13, 2026, in session: "I think the app needs images for foods, recipes. Also, the UI lacks art and general baby app feel. It feels very dull." After seeing the options he approved the direction ("yes, I like this direction": Fluent 3D food pictures, theme art redrawn in the same style, Fredoka headings, no photos and no AI-generated images). He said the mystery door and "the pumpkin for freezes well" didn't make sense, asked to replace the ghost too, and picked "New food: Peekaboo monster", "Freezes well: Snowflakes" and "I like hourglass for not yet". The boards are in `docs/art/`.
+
+This requirement replaces the theme elements of v1 Requirement 14.1 and the mapping of v1 Requirement 14.2. It changes the pictures, not the behavior, of v1 Requirements 5, 7.3, 7.5 and 9.1. v1 Requirements 14.3 to 14.6 still apply. Where other requirements say ghost, mystery door or pumpkin, they mean the state, which is now shown with the pictures below.
+
+#### Acceptance Criteria
+
+1. EVERY Foods page tile SHALL show its food's picture, and every plate (criterion 5) SHALL show its foods' pictures. A food's picture SHALL be the one the map (criterion 4) gives it: its own picture from Microsoft Fluent Emoji in the 3D style (MIT license), or, IF Fluent Emoji has no picture of that food, THEN the group picture of its food group. A food the map does not list SHALL show the generic bowl, and a Foods tile SHALL show the group picture instead of a choking-shape picture (a picture of a whole round or tube-shaped food, or of a food with no safe form, listed in the design) whose food no criterion 6 rule matches. A food SHALL NEVER show a picture of a different food. Other screens, such as the week plan, the slot picker and print, get no food pictures and keep their current art, except that a freezes-well picture anywhere becomes the snowflake (criterion 9; the design lists the screens).
+2. THE app SHALL NOT show photos or pictures made by an image-generation model. EVERY picture SHALL be a file that ships with the app or an SVG drawn in the app's code, and SHALL NEVER be loaded from another host.
+3. EVERY food picture SHALL have its width and height set, SHALL load lazily, and SHALL be decorative (empty `alt` text).
+4. A fixed map in source code SHALL give each food key (as `src/domain/foods.ts` makes it) its own picture or its food group. EVERY food that a built-in recipe uses, and the food of each block rule, which the Foods page shows as a Not yet tile while the rule applies (`blockRuleFoods()`, v1 Requirement 5.7), SHALL have an entry, and a test SHALL check this. That covers every main food of the built-in recipes: 206 foods on November 13, 2026 by the design's rules, more than the 168 that the session counted with a rougher rule.
+5. EVERY recipe card (the design lists them), for built-in and pasted recipes, and the top of every recipe page SHALL show a plate with up to 3 of the recipe's main foods, chosen by the rules in the design.
+6. A plate SHALL NEVER show a food that is matched, at any age, by the `choking-no-safe-form` block rule or by a prep reminder for round or tube-shaped foods (`grapes`, `cherry-tomato`, `cherries`, `small-round-fruit`, `sausages`, `whole-nuts`). It SHALL show the recipe's other main foods instead, or the generic bowl IF none are left.
+7. A Foods page tile MAY show the picture of a food that criterion 6 keeps off plates, but only with that rule's message, unchanged, as the first line under the picture and the food's name.
+8. A food or recipe is Not yet for the child when it is blocked for the child's age or paused after a recorded reaction. THE cards and recipe page of a Not yet recipe, and the Foods tile of a Not yet food, SHALL show the hourglass, and the plate of a Not yet recipe SHALL be greyed. EVERY picture of a Not yet food SHALL be greyed, so a plate SHALL NEVER show a Not yet food in full color. Only pictures are greyed; text keeps its contrast. ON the shared recipe view, Not yet is what that view's "Not yet" section shows for the viewer's child, so with no child set up nothing is greyed. Other screens keep showing Not yet as text.
+9. THE state pictures SHALL be:
+
+   | State | Shown for | Picture |
+   | --- | --- | --- |
+   | New food | a food the child has not tried, including allergens | The peekaboo monster: a friendly monster hiding in a dark round hole, with only its eyes and horn tips showing |
+   | Tried | a food marked "tried, no reaction" | The same friendly monster out of its hole, in one color for each allergen group or a generic color |
+   | Not yet | a food or recipe blocked for the child's age, or paused after a recorded reaction | Fluent 3D "Hourglass not done" |
+   | Freezes well | a recipe with freezer storage info | Fluent 3D "Snowflake" |
+
+   THE peekaboo monster and the friendly monster SHALL be SVGs drawn in the app's code in the Fluent 3D look (soft gradients, no outlines), following the reference drawings in `docs/art/reference/`.
+10. EVERY picture SHALL be decorative, and each state SHALL stay in visible text and in the accessible name (v1 Requirement 14.3). THE state labels SHALL NOT change ("New food: egg", "egg — tried on Nov 12", "Not yet: honey. Available at 12 months.", "Freezes for 3 months" and the others). THE app's own wording SHALL NOT call a state a ghost, a door or a pumpkin. Recipe and food names, such as a pumpkin recipe, are not the app's own wording.
+11. Headings SHALL use Fredoka at weight 600 (SIL Open Font License) from the `@fontsource/fredoka` package, latin subset only, bundled with the build. Body text SHALL stay as it is.
+12. EACH recipe card SHALL have a pastel band in the color of its main food group (the Not yet color for a Not yet recipe), and EACH nutrition tag SHALL have its own color, as listed in the design. ALL text SHALL meet WCAG 2.1 AA, and `npm run check:contrast` SHALL check every new pair of text and background colors.
+13. WHEN the user taps "Tried, no reaction" on a Foods tile THEN its friendly monster SHALL pop out of its hole, in an animation of 600 ms or less. WHEN the user's system requests reduced motion THEN the app SHALL show the tried picture with no animation.
+14. THE empty states on the Make, My recipes and Foods pages (the design lists them) SHALL show a friendly monster picture next to their text. Their text SHALL NOT change.
+15. THE Fluent Emoji MIT license text SHALL ship next to the pictures. THE Sources page SHALL credit Fluent Emoji (MIT) and Fredoka (SIL Open Font License).
+16. THE size check (`npm run check:size`) SHALL keep the picture files out of the JavaScript budget, SHALL fail when any picture file is larger than 8 KB, and SHALL warn when the picture files together pass 900 KB. `npm run check:external` SHALL still pass.
+
 ## Out of scope
 
 - Calling any AI service from the app, or any backend.
@@ -363,6 +408,7 @@ These suggestions come from the maintainer's UI feedback (issue #36): the app sh
 - Opening or fetching Instagram links, transcribing reel audio or video, or reading text from images inside the app (the AI chat app the user chooses does this, Requirement 19).
 - Nutrient amounts, calorie or portion tracking.
 - Image cards for Instagram stories (possible later, depending on Requirement 9 review).
-- New work on the week plan, prep list, grocery list, print view or plan share link.
+- Photos, pictures made by an image-generation model, and pictures from other hosts (Requirement 21).
+- New work on the week plan, prep list, grocery list, print view or plan share link, apart from the snowflake on the Prep page's freezer badge (Requirement 21.1).
 - Children older than 3 years.
 - Built-in recipes from publishers that fail the recipe source criteria (Requirement 14.2).

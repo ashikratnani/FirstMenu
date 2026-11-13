@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <defs>
+    <radialGradient id="body" cx="0.36" cy="0.28" r="0.85">
+      <stop offset="0" stop-color="#dcf7d4"/>
+      <stop offset="0.5" stop-color="#a3df96"/>
+      <stop offset="1" stop-color="#58a865"/>
+    </radialGradient>
+    <radialGradient id="arm" cx="0.4" cy="0.3" r="0.9">
+      <stop offset="0" stop-color="#b8e8aa"/>
+      <stop offset="1" stop-color="#5fae6a"/>
+    </radialGradient>
+    <linearGradient id="horn" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff4d6"/>
+      <stop offset="1" stop-color="#f0b45e"/>
+    </linearGradient>
+    <radialGradient id="eye" cx="0.4" cy="0.32" r="0.75">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.7" stop-color="#f3f0fa"/>
+      <stop offset="1" stop-color="#cfc6e6"/>
+    </radialGradient>
+    <radialGradient id="pupil" cx="0.4" cy="0.3" r="0.8">
+      <stop offset="0" stop-color="#55457a"/>
+      <stop offset="1" stop-color="#1d1630"/>
+    </radialGradient>
+    <radialGradient id="shadow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#6b4a2a" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#6b4a2a" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <ellipse cx="64" cy="117" rx="42" ry="7" fill="url(#shadow)"/>
+  <path d="M41 42 C 37 30, 39 19, 46 12 C 51 21, 55 31, 55 40 Z" fill="url(#horn)"/>
+  <path d="M87 42 C 91 30, 89 19, 82 12 C 77 21, 73 31, 73 40 Z" fill="url(#horn)"/>
+  <ellipse cx="21" cy="90" rx="8" ry="11" transform="rotate(28 21 90)" fill="url(#arm)"/>
+  <ellipse cx="107" cy="90" rx="8" ry="11" transform="rotate(-28 107 90)" fill="url(#arm)"/>
+  <path d="M22 98 C 18 62, 36 30, 64 30 C 92 30, 110 62, 106 98 C 105 109, 98 114, 90 114 L 38 114 C 30 114, 23 109, 22 98 Z" fill="url(#body)"/>
+  <ellipse cx="45" cy="47" rx="13" ry="7" transform="rotate(-28 45 47)" fill="#ffffff" opacity="0.4"/>
+  <ellipse cx="64" cy="103" rx="24" ry="9" fill="#ffffff" opacity="0.22"/>
+  <ellipse cx="50" cy="64" rx="12" ry="14" fill="url(#eye)"/>
+  <ellipse cx="78" cy="64" rx="12" ry="14" fill="url(#eye)"/>
+  <ellipse cx="52.5" cy="67" rx="6" ry="7.5" fill="url(#pupil)"/>
+  <ellipse cx="80.5" cy="67" rx="6" ry="7.5" fill="url(#pupil)"/>
+  <circle cx="55" cy="63.5" r="2.3" fill="#ffffff"/>
+  <circle cx="83" cy="63.5" r="2.3" fill="#ffffff"/>
+  <ellipse cx="37" cy="84" rx="7" ry="4" fill="#ff8fa6" opacity="0.5"/>
+  <ellipse cx="91" cy="84" rx="7" ry="4" fill="#ff8fa6" opacity="0.5"/>
+  <path d="M53 85 Q 64 99 75 85 Q 64 89 53 85 Z" fill="#3b2747"/>
+  <path d="M58.5 90 Q 64 96 69.5 90 Q 64 91.5 58.5 90 Z" fill="#ff7d96"/>
+</svg>

@@ -47,8 +47,9 @@ built, in `src/domain/safety/rules.ts`.
 
 - The rule list is fixed in the app's source code and is NOT editable by users
   (Req 4.6).
-- A rule is one of three kinds: a block rule (ghost), a prep reminder, or an
-  allergen rule (mystery door). Allergen and reminder rules never block.
+- A rule is one of three kinds: a block rule (Not yet, "ghosted"), a prep
+  reminder, or an allergen rule (new food). Allergen and reminder rules never
+  block.
 
 ## Changing a safety rule
 
@@ -71,3 +72,30 @@ Per `.kiro/steering/autonomy.md`:
   never remove a rule's source without a replacement that has a URL. These
   always go to the maintainer.
 - Every rule change bumps `RULESET_VERSION`.
+
+## Art
+
+Pictures never change the safety screen; they only add limits (active spec
+Requirement 21, design "Food art"):
+
+- A plate never shows a food that `choking-no-safe-form` or the prep reminders
+  for round or tube-shaped foods (`grapes`, `cherry-tomato`, `cherries`,
+  `small-round-fruit`, `sausages`, `whole-nuts`) match, at any age, and never
+  a choking-shape picture (`CHOKING_SHAPE_PICTURES`), whatever food uses it.
+- A Foods tile may show such a food's picture only with the rule's message,
+  unchanged, as the first line under the picture and the food's name. A tile
+  shows the group picture instead of a choking-shape picture whose food none
+  of those rules matches (for example Chestnut).
+- The cards and recipe page of a Not yet recipe, and the Foods tile of a Not
+  yet food, show the hourglass, and the plate of a Not yet recipe is greyed.
+  Every picture of a Not yet food is greyed, so a plate never shows a Not yet
+  food in full color. A Not yet recipe's plate keeps all its main foods and is
+  greyed as a whole; on a recipe that is not Not yet, a Not yet food is left
+  off the plate. The shared recipe view greys and shows the hourglass only
+  when it shows its own "Not yet" section, greys nothing when no child is set
+  up, and leaves no food off its plate for being Not yet.
+- No photos, no pictures made by an image-generation model, and no pictures
+  from other hosts.
+- Renaming or removing one of these rule ids needs the same change in
+  `PLATE_HIDDEN_RULE_IDS` (`src/domain/plate.ts`, from task 19.3); a test
+  fails otherwise.
