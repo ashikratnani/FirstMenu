@@ -85,11 +85,26 @@
   color: var(--color-text-primary);
 }
 
-.ghostReason {
+.stateLines {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.stateLine {
   display: flex;
   align-items: center;
   gap: 6px;
   font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.stateLine > :first-child {
+  flex: none;
+}
+
+.ghostReason {
   color: var(--color-text-purple);
 }
 

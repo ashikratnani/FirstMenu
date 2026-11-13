@@ -8,10 +8,10 @@
 //
 // Each card carries its state in VISIBLE text and in the card link's
 // accessible name (Req 14.3); the illustrations are decorative/aria-hidden:
-//   - a GHOST state ("Not yet: ...") when the recipe is ghosted;
-//   - a DOOR badge ("New food: <food>") naming each untried food (Req 7.3);
-//   - a PUMPKIN badge ("Freezes for N months") when freezer-friendly.
-// Ghosting/door/pumpkin logic lives in recipeView.ts.
+//   - a Not yet state (hourglass, plate greyed) ("Not yet: ...") when the recipe is ghosted;
+//   - a New food line (peekaboo monster) ("New food: <food>") naming each untried food (Req 7.3);
+//   - a Freezes line (snowflake) ("Freezes for N months") when freezer-friendly.
+// The Not yet, new-food and freezer logic lives in recipeView.ts.
 //
 // The list is shown RECIPES_PAGE_SIZE (50) cards at a time with a "Show more"
 // button, so 500+ recipes never render at once (Requirement 14.9). The
@@ -30,7 +30,8 @@ import { recipeDerived } from '../../domain/make';
 import { useApp } from '../../state/AppProvider';
 import { selectAllRecipes, selectStage } from '../../state/selectors';
 import type { Recipe } from '../../domain/types';
-import { GhostArt, PumpkinArt } from '../components/foodArt';
+import Plate from '../components/Plate';
+import StatePicture from '../components/StatePicture';
 import {
   MEAL_TYPES,
   RECIPES_PAGE_SIZE,
@@ -43,6 +44,7 @@ import {
   matchesSearch,
   mealTypeLabel,
   pageStatusText,
+  plateNotYetCheck,
   recipeView,
   stageLabel,
   type MealFilter,
@@ -54,8 +56,10 @@ import styles from './Recipes.module.css';
 
 /** One recipe card: a clickable card opening the recipe page, with badges. */
 function RecipeCard({ view }: { view: RecipeView }) {
+  const { state } = useApp();
   const { recipe, isGhosted, usesUntriedFood, untriedFoodLabels, freezerMonths } =
     view;
+  const isNotYet = useMemo(() => plateNotYetCheck(view, state), [view, state]);
   const reason = isGhosted ? ghostReason(view) : null;
   const doorText = usesUntriedFood ? doorBadgeText(untriedFoodLabels) : null;
   const freezerText =
@@ -85,6 +89,7 @@ function RecipeCard({ view }: { view: RecipeView }) {
         width="100%"
       >
         <span className={styles.cardBody}>
+          <Plate recipe={recipe} isNotYet={isNotYet} notYet={isGhosted} />
           <span className={styles.title}>{recipe.title}</span>
           <span className={styles.facts}>
             {[timeText, effortText, ...shownTags.map(tagLabel)].map((fact) => (
@@ -94,20 +99,32 @@ function RecipeCard({ view }: { view: RecipeView }) {
             ))}
             {hiddenTags > 0 && <span className={styles.fact}>+{hiddenTags} more</span>}
           </span>
-          {reason && (
-            <span className={styles.ghostReason}>
-              <GhostArt />
-              <span>{reason}</span>
+          {(reason || doorText || freezerText) && (
+            <span className={styles.stateLines}>
+              {reason && (
+                <span className={`${styles.stateLine} ${styles.ghostReason}`}>
+                  <StatePicture state="not-yet" />
+                  <span>{reason}</span>
+                </span>
+              )}
+              {doorText && (
+                <span className={styles.stateLine}>
+                  <StatePicture state="new" />
+                  <span>{doorText}</span>
+                </span>
+              )}
+              {freezerText && (
+                <span className={styles.stateLine}>
+                  <StatePicture state="freezes" />
+                  <span>{freezerText}</span>
+                </span>
+              )}
             </span>
           )}
-          {(doorText || freezerText || pasted || simpleIdea) && (
+          {(pasted || simpleIdea) && (
             <span className={styles.badges}>
               {simpleIdea && <Badge variant="green" label={simpleIdea} />}
               {pasted && <Badge variant="blue" label={pasted} />}
-              {doorText && <Badge variant="orange" label={doorText} />}
-              {freezerText && (
-                <Badge variant="yellow" icon={<PumpkinArt />} label={freezerText} />
-              )}
             </span>
           )}
         </span>
@@ -251,6 +268,7 @@ export default function Recipes() {
       )}
       {/* One live region stays mounted for both outcomes, so a search with no match is announced too. */}
       <div className={matching.length === 0 ? styles.empty : styles.more}>
+        {matching.length === 0 && <StatePicture state="tried" size={96} />}
         <p className={matching.length === 0 ? undefined : styles.moreStatus} role="status">
           {matching.length === 0
             ? 'No recipes match your search or filters.'
